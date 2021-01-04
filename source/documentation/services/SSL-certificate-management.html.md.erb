@@ -1,1 +1,46 @@
+---
+title: Gandi.net SSL Certificates
+last_reviewed_on: 2021-01-04
+review_in: 3 months
+---
 
+# Gandi.net SSL Certificates
+
+This processes is for any Ministry of Justice users (or suppliers) requiring a Gandi.net SSL Certificate.
+
+There are 2 categories of certificate we use at Ministry of Justice:
+
+* AWS Certificate Manager (ACM)/Let’s Encrypt - automated certificate management for modern cloud native software and infrastructure
+* Gandi.net - where automated certificate management is not possible
+
+Where at all practicable we should utilise [automated certificate management](https://ministryofjustice.github.io/security-guidance/automated-certificate-renewal/#automated-certificate-renewal). The MoJ Hosting Service is looking at strategy to move consumers to modern certificate management solutions.
+
+This process specifically relates to [Standard](https://docs.gandi.net/en/ssl/description/standard.html#standard-certificates) certificates issued through [Gandi.net]
+
+## Requesting a new certificate via Gandi.net
+
+Complete the [MoJ Hosting Service SSL Certificate Request Form](https://docs.google.com/document/d/14XbWoudZd-t4-J3mDBcrAeafAbqxwvdkV-u3Zf8eLOs/edit?usp=sharing) and return it with the Certificate Signing Request (CSR) (and an authority email approval if not an MoJ employee e.g. 3rd party supplier) to [certificates@digital.justice.gov.uk](mailto:certificates@digital.justice.gov.uk).
+
+The Operations Engineering Team will create the new certificate and issue it, along with details of the expiry date (which will be in 12 months from date created), to the named contact provided in the request form.
+
+When the certficate is created there is a validation step required. In most cases the Team manages the DNS so will complete this step. In instances where we do not manage a domain we will contact the requestor to assist in completing validation before the certificate can be issued.
+
+Should you require intermediate or root certificates please contact [certificates@digital.justice.gov.uk](mailto:certificates@digital.justice.gov.uk).
+
+## Renewal Process for Gandi.net SSL Certificates
+
+The Operations Engineering Team will review the list of Gandi.net certificates and identify any that require renewal 4 weeks prior to expiry, and contact the owner of the service to confirm if renewal is required.
+
+If a renewal is required the Team will request a new CSR from the service owner and process the renewal.
+
+## Revoking Gandi.net certificates
+
+If an SSL certificate is no longer required e.g. a service has been decommissioned please contact [certificates@digital.justice.gov.uk](mailto:certificates@digital.justice.gov.uk), so that the team can revoke the certificate.
+
+**Note that once a certificate has expired or been revoked it cannot be reinstated. If a certificate is required the process to request a new certificate should be followed.**
+
+## Costs/Funding information
+
+The costs for Gandi.net certificates are met centrally by Platforms & Architecture. There is no cross charge for using this service.
+
+[gandi.net]: https://gandi.net
