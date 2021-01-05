@@ -1,0 +1,79 @@
+---
+title: Add GitHub collaborators from a fork PR
+last_reviewed_on: 2020-12-01
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+Usually, when they need to add [GitHub collaborators], someone in the [MoJ GitHub Organisation] will raise a PR via a [branch] of the repository.
+
+If there is no such MoJ Organisation member who can do this, someone in the collaborator organisation (who won't have access permissions to create a branch PR) will raise a PR via a [fork] instead.
+
+In this case, the [GitHub Actions] which run on a branch PR will fail with unhelpful messages like this:
+
+```text
+Error: error configuring S3 Backend: no valid credential sources for S3 Backend
+found.
+```
+
+or:
+
+```text
+Running: git status --porcelain=1 --untracked-files=no
+/usr/local/bundle/gems/octokit-4.20.0/lib/octokit/response/raise_error.rb:14:in
+`on_complete': GET
+https://api.github.com/repos/ministryofjustice/github-collaborators/git/refs/heads/made-tech-ima-team:
+404 - Not Found // See:
+https://docs.github.com/enterprise/2.18/user/rest/reference/git#get-a-reference
+(Octokit::NotFound)
+from /usr/local/bundle/gems/faraday-0.9.0/lib/faraday/response.rb:9:in `block in call'
+```
+
+To fix this, you need to raise an equivalent PR via a branch.
+
+* Start in an up to date working copy of the [GitHub collaborators] repository
+
+* Get the fork details from the PR. Near the top of the page, you should see something like this:
+
+```
+thip wants to merge 1 commit into ministryofjustice:main from madetech:made-tech-ima-team
+```
+
+Here, the GitHub login which owns the fork is `madetech`, and their branch of the repository is called `made-tech-ima-team`
+
+* Add a remote for the fork
+
+```bash
+git remote add madetech git@github.com:madetech/github-collaborators
+```
+
+* Create a new branch
+
+```bash
+git checkout -b madetech-changes
+```
+
+* Get the changes from the fork
+
+```bash
+git pull madetech made-tech-ima-team
+```
+
+At this point, your local branch `madetech-changes` has the same changes as the
+fork branch, so you can raise a PR as usual, and all the checks should run
+successfully.
+
+It's good practice to reference the fork PR in the branch PR, to make it easier
+for people to figure out what happened, later.
+
+Once you are happy, merge your PR.
+
+The fork PR should be closed without merging, with a comment pointing to the
+equivalent branch PR.
+
+[GitHub collaborators]: https://github.com/ministryofjustice/github-collaborators
+[MoJ GitHub Organisation]: https://github.com/ministryofjustice
+[branch]: https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging
+[fork]: https://guides.github.com/activities/forking/
+[GitHub Actions]: https://docs.github.com/en/free-pro-team@latest/actions
