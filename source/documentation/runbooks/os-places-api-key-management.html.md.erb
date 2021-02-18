@@ -1,45 +1,53 @@
 ---
 title: OS Places API Key Management
-last_reviewed_on: 2020-12-04
+last_reviewed_on: 2021-02-18
 review_in: 3 months
 ---
 
 # OS Places API Key Management
 
-The [OS Places API](https://developer.ordnancesurvey.co.uk/os-places-api) is the MoJ's product of choice for addess lookup and verification.
+The [OS Places API](https://osdatahub.os.uk/docs/places/overview) is the MoJ's product of choice for addess lookup and verification.
 
 Service Teams require a key to access the API.
 
 ## Pre-requisites
 
-You must have access to the OS Places API portal. If not, please contact your [administrator](mailto:os-places-admin@digital.justice.gov.uk).
+You must have access to the [OS Data Hub](https://osdatahub.os.uk/). If not, please contact your [administrator](mailto:os-places-admin@digital.justice.gov.uk).
 
 ## Creating a new API key
 
-1. Login the the [OS Places API Portal](https://developer.ordnancesurvey.co.uk/os-places-api).
+1. Login the the [OS Data Hub](https://osdatahub.os.uk/).
 
-2. Go to "My Keys".
+2. Go to "API Dashboard".
 
-3. Click "Add a new Key".
+3. Click on "My Projects"
 
-4. Input "Key Name" in the format `<Organisation> <Application> <Type of Environment>`.
+4. Click "Create a New Project".
+
+5. Enter "Project Name" in the format `<Organisation> <Application> <Type of Environment>`.
 
 > e.g. HMCTS Apply For Probate Online Production
+  
+6. Click "Create Project" to save the project.
+  
+7. Click "Add API"
+  
+8. Find the "OS Places API" and click "Add"
 
-5. Check the "OS Names API" and "OS Places API - Capture and Verification" boxes.
-
-6. Click "Create Key".
-
-This will return you to the "My Keys" tab. Select the key you created from the list. You should copy the value for `Consumer Key`. This is the key that you will need to send to the requester.
+This will take you to the page where you can see the key has been created. You should copy the `Project API Key`. This is the key that you will send to the requester.
 
 > Note - This key is a secret and should only be transfered via a secure method e.g. email of an encrypted archive with password in a separate message. 
 
 ## Revoking an API key
 
-1. Login the the [OS Places API Portal](https://developer.ordnancesurvey.co.uk/os-places-api).
+1. Login the the [OS Data Hub](https://osdatahub.os.uk/).
 
-2. Go to "Support" and click on "Contact Us".
+2. Go to "API Dashboard".
 
-3. Complete the form ensuring you include details of the key you want to revoke.
+3. Click on the link to the project for the key you wish to revoke.
+  
+4. Click on "Actions"
+  
+5. Select "Delete Project". This will automatically revoke the key.
 
-This process can take a couple of days for OS Places to revoke the key. You can check if it has been revoked by going back to the Portal. If the `Consumer Key` value is <del>struck through</del> then the key has been successfully revoked.
+Revoked keys cannot be recovered.
