@@ -1,6 +1,6 @@
 ---
 title: OS Places API Key Management
-last_reviewed_on: 2021-02-18
+last_reviewed_on: 2021-03-03
 review_in: 3 months
 ---
 
@@ -38,7 +38,7 @@ This will take you to the page where you can see the key has been created. You s
 
 > Note - This key is a secret and should only be transfered via a secure method e.g. email of an encrypted archive with password in a separate message. 
 
-## Revoking an API key
+## Rotating an API key
 
 1. Login the the [OS Data Hub](https://osdatahub.os.uk/).
 
@@ -48,6 +48,22 @@ This will take you to the page where you can see the key has been created. You s
   
 4. Click on "Actions"
   
-5. Select "Delete Project". This will automatically revoke the key.
+5. Select "Regenerate API Key". 
+  
+6. A prompt will appear. Enter code provided.
+  
+7. Click "Regenerate API Key" to confirm action and rotate key.
+  
+Note that as soon as a key is rotated the old API key will immediatly stop working.
+
+## Revoking an API key
+
+1. Login the the [OS Data Hub](https://osdatahub.os.uk/).
+
+2. Go to "API Dashboard".
+
+3. Click on the link to the project for the key you wish to revoke.
+  
+4.  Select "Delete Project". This will automatically revoke the key.
 
 Revoked keys cannot be recovered.
