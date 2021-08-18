@@ -1,6 +1,6 @@
 ---
 title: Sentry.io
-last_reviewed_on: 2021-08-12
+last_reviewed_on: 2021-08-18
 review_in: 3 months
 ---
 
@@ -13,6 +13,21 @@ sentry.io account using this [self signup link].
 
 ![Sentry.io Self Signup Form](../../images/sentry-self-signup.png)
 
+
+In addition to error and custom even tracking, our Sentry plan now includes [performance monitoring].
+
+Our plan includes 20mil transactions per month for all projects. In order for everyone to be able to make use of it, we recommend a sample rate of 5%. 
+
+There might be limited value in sending transaction information for health and status endpoints and we suggest that those are filtered out. 
+
+If you are only interested in a sub-section of your application routes, you can specifically opt in only those routes and increase your sample rate, for example if you're trying to debug a known performance issue and need a larger dataset.
+
+Below are some examples of performance monitoring config from MoJ projects: [Express], [Rails], [Django].
+
 [Sentry.io]: https://sentry.io
 [MoJ GitHub Organization]: https://github.com/ministryofjustice
 [self signup link]: https://sentry.io/auth/login/ministryofjustice/
+[performance monitoring]: https://docs.sentry.io/product/performance/
+[Express]: https://github.com/ministryofjustice/hmpps-book-secure-move-frontend/blob/501bc4aadfd8626532a61cf1239465c68760427c/server.js#L68-L106
+[Rails]: https://github.com/ministryofjustice/fb-runner/blob/240dd0d39fd9006e63a84804690e223e60bda314/config/initializers/sentry.rb
+[Django]: https://github.com/ministryofjustice/money-to-prisoners-cashbook/blob/d15c7a39a2636f88f71df7c66a7ee1528686b29a/mtp_cashbook/settings/base.py#L201-L213
