@@ -4,7 +4,7 @@ host: https://ministryofjustice.github.io/operations-engineering
 # Header-related options
 show_govuk_logo: true
 service_name: MoJ Operations Engineering
-service_link: /operations-engineering
+service_link: /
 
 # Links to show on right-hand-side of header
 header_links:
