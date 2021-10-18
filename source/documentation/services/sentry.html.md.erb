@@ -24,7 +24,7 @@ If you are only interested in a sub-section of your application routes, you can 
 
 If you would like to ensure spikes in errors do not affect Sentry usage, you can set up a [rate limit] per DSN key. This can be useful if you would like to control the amount of events staging or test environments can send, or if you don't want to be spammed with 100s of errors when something goes down for a bit longer. The value depends entirely on your project needs.
 
-Below are some examples of performance monitoring config from MoJ projects: [Express], [Rails], [Django].
+Below are some examples of performance monitoring config from MoJ projects: [Express], [Rails], [Django], [Django with path filtering].
 
 [Sentry.io]: https://sentry.io
 [MoJ GitHub Organization]: https://github.com/ministryofjustice
@@ -34,3 +34,4 @@ Below are some examples of performance monitoring config from MoJ projects: [Exp
 [Express]: https://github.com/ministryofjustice/hmpps-book-secure-move-frontend/blob/501bc4aadfd8626532a61cf1239465c68760427c/server.js#L68-L106
 [Rails]: https://github.com/ministryofjustice/fb-runner/blob/240dd0d39fd9006e63a84804690e223e60bda314/config/initializers/sentry.rb
 [Django]: https://github.com/ministryofjustice/money-to-prisoners-cashbook/blob/d15c7a39a2636f88f71df7c66a7ee1528686b29a/mtp_cashbook/settings/base.py#L201-L213
+[Django with path filtering]: https://github.com/ministryofjustice/cla_frontend/blob/51a6c5a05597384c780041dd810c9108c9b575bb/cla_frontend/settings/base.py#L57-L65
