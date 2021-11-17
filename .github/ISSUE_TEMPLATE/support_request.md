@@ -20,3 +20,4 @@ valid service label options are:
 - `SSL Certificate Management`
 - `Domains Management`
 - `MoJ GitHub Organisation`
+- `Other Support Request`
