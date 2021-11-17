@@ -1,15 +1,15 @@
 ---
 name: Operations Engineering Support Request
 about: Create support request issue
-title: ''
-labels: ''
+title: 'Support Request'
+labels: 'Support'
 assignees: ''
 
 ---
 
 ## Support Request
 
-Add label for service associated to support request and then close issue.
+A default label of `Support` will be added to the issue. Also add a second label for service associated to support request.  Then close issue.
 
 Label options are:
 - 
