@@ -11,5 +11,12 @@ assignees: ''
 
 A default label of `Support` will be added to the issue. Also add a second label for service associated to support request.  Then close issue.
 
-Label options are:
-- 
+valid service label options are:
+- `Pingdom`
+- `PagerDuty`
+- `LastPass`
+- `Sentry`
+- `OS Date Hub APIs`
+- `SSL Certificate Management`
+- `Domains Management`
+- `MoJ GitHub Organisation`
