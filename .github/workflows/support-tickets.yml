@@ -16,6 +16,8 @@ jobs:
             cache: 'pip'
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/assign-support-tickets.py
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
   close-support-ticket:
     runs-on: ubuntu-latest
     steps:
@@ -27,4 +29,6 @@ jobs:
             cache: 'pip'
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/close-support-tickets.py
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
 
