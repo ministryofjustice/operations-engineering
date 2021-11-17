@@ -1,0 +1,30 @@
+name: Assign Creator if no assignee and is support ticket
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  assign-support-tickets-to-creator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+          with:
+            python-version: '3.x'
+            architecture: 'x64'
+            cache: 'pip'
+      - run: pip install -r scripts/python/requirements.txt
+      - run: python scripts/python/assign-support-tickets.py
+  close-support-ticket:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+          with:
+            python-version: '3.x'
+            architecture: 'x64'
+            cache: 'pip'
+      - run: pip install -r scripts/python/requirements.txt
+      - run: python scripts/python/close-support-tickets.py
+

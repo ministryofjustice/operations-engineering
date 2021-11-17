@@ -1,15 +1,18 @@
-name: Add new issues to the Icebox
+# Disabling this as it wasn't working properly with Zenhub integration and currently new issues sitting in New Issues ready for
+# Planning seems like a reasonable way to work
 
-on:
-  issues:
-    types: [opened]
+# name: Add new issues to the Icebox
 
-jobs:
-  automate-project-columns:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: alex-page/github-project-automation-plus@v0.3.0
-        with:
-          project: operations-engineering
-          column: Icebox
-          repo-token: ${{ secrets.CLOUD_PLATFORM_MOJ_GITHUB_TOKEN }}
+# on:
+#   issues:
+#     types: [opened]
+
+# jobs:
+#   automate-project-columns:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: alex-page/github-project-automation-plus@v0.3.0
+#         with:
+#           project: operations-engineering
+#           column: Icebox
+#           repo-token: ${{ secrets.CLOUD_PLATFORM_MOJ_GITHUB_TOKEN }}
