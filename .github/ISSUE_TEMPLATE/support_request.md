@@ -16,7 +16,7 @@ valid service label options are:
 - `PagerDuty`
 - `LastPass`
 - `Sentry`
-- `OS Date Hub APIs`
+- `OS Data Hub APIs`
 - `SSL Certificate Management`
 - `Domains Management`
 - `MoJ GitHub Organisation`
