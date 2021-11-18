@@ -2,7 +2,9 @@ name: Assign Creator if no assignee and is support ticket
 
 on:
   issues:
-    types: [edited]
+    types:
+      - opened
+      - edited
 
 jobs:
   assign-support-tickets-to-creator:
