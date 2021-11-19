@@ -20,4 +20,5 @@ valid service label options are:
 - `SSL Certificate Management`
 - `Domains Management`
 - `MoJ GitHub Organisation`
+- `Docker`
 - `Other Support Request`
