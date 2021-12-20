@@ -21,4 +21,5 @@ valid service label options are:
 - `Domains Management`
 - `MoJ GitHub Organisation`
 - `Docker`
+- `MoJ Acronyms`
 - `Other Support Request`
