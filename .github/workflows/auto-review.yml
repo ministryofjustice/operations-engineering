@@ -6,6 +6,7 @@ on:
 env:
   PR_OWNER: ${{ github.event.pull_request.user.login }}
   GITHUB_OAUTH_TOKEN: ${{ secrets.CLOUD_PLATFORM_MOJ_GITHUB_TOKEN }}
+  TEAM_NAME: "operations-engineering"
 
 jobs:
   check-diff:
@@ -31,7 +32,7 @@ jobs:
 
       - name: Auto-approval check
         id: approve_pr_check
-        uses: ministryofjustice/github-actions/approve-doc-review@main
+        uses: ministryofjustice/cloud-platform-doc-checker@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
