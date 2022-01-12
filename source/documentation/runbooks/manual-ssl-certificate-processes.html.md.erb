@@ -37,17 +37,33 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 
 3. When the form is received check to see if the domain associated to the request is managed in Route53 in the MoJDSD AWS account. If not, the validation step in the process will need to be carried out by the team that manages the domain. You will need to check with the requestor how the 3rd party wants to carry out validation. [There are 3 types of validation](https://docs.gandi.net/en/ssl/common_operations/dcv.html).
 
-4. Assuming that we manage the domain, create a new certificate in Gandi.net. Full detailed instructions can be found [here](https://docs.gandi.net/en/ssl/create/index.html)
+4. Login to Gandi.net. Go to the SSL Certificates page. To start the process click on the "Buy" button.
 
-5. If creation has been successful two emails will be sent to the Certificate Alerts Google group. An invoice (which can be ignored), and a Validation email. Click on the link in the validation email to obtain CNAME details that will need to be added in the Hosted Zone in Route53.
+5. For the question `Where will you install your certificate?` select `Somewhere else` and then click "Next".
 
-6. Create the CNAME record in Route53. Gandi.net will automatically try to pick up this CNAME to confirm that we have ownership of the domain. 
+6. For the question `What type of certificate do you want?` select `Standard`.
+
+**Note - We only offer "Standard" type certificates as part of our service.**
+
+7. For the question `What do you want to protect?` select the appropriate option for the request, then click "Next". 
+
+**Note - If the request is for 9 or more addresses it may be better to request a wildcard certificate. Discuss with the requestor on best approach. If a wildcard is the best option the requester will need to supply a fresh wildcard CSR.**
+
+8. Paste the CSR text into the `CSR` box. Then click "Next". 
+
+**Remember to copy the entire contents of the .csr file, including the lines containing `-----BEGIN CERTIFICATE REQUEST-----` and `-----END CERTIFICATE REQUEST-----`. If there are any issues with the validaity of the CSR file you will be notified at this stage. These will need to be rectified before you can proceed. Abandon the process and start again with a new CSR.**
+
+9. Complete the checkout process. Ensure that when you get to the payment options section that you select `Pre-paid account` for the payment method. 
+
+10. If creation has been successful two emails will be sent to the Certificate Alerts Google group. An invoice (which can be ignored), and a Validation email. Click on the link in the validation email to obtain CNAME details that will need to be added in the Hosted Zone in Route53.
+
+11. Create the CNAME record in Route53. Gandi.net will automatically try to pick up this CNAME to confirm that we have ownership of the domain. 
 
 **Note - Any preceeding "_" or trailing "." characters in the CNAME values are extermely important for validation. Missing characters will mean that validation will not be successful.**
 
-7. When validation is complete an email will be sent to the Certificate Alerts Google group. Click on the link in the email to visit Gandi.net and download the new certificate.
+12. When validation is complete an email will be sent to the Certificate Alerts Google group. Click on the link in the email to visit Gandi.net and download the new certificate.
 
-8. Email the certificate to the requestor along with details of the expiry date. All certificates are valid for 12 months.
+13. Email the certificate to the requestor along with details of the expiry date. All certificates are valid for 12 months.
 
 ## Renewing a new certificate via Gandi.net
 
