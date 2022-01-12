@@ -33,17 +33,21 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 
 1. Users need to complete the [MoJ Hosting Service SSL Certificate Request Form](https://docs.google.com/document/d/14XbWoudZd-t4-J3mDBcrAeafAbqxwvdkV-u3Zf8eLOs/edit?usp=sharing) and return it with the Certificate Signing Request (CSR) (and an authority email approval if not an MoJ employee e.g. 3rd party supplier) to [certificates@digital.justice.gov.uk](mailto:certificates@digital.justice.gov.uk).
 
-2. When the form is received check to see if the domain is managed in Route53. If not, the validation step in the process will need to be carried out by the team that manages the domain. You will need to check with the requestor how the 3rd party wants to carry out validation. [There are 3 types of validation](https://docs.gandi.net/en/ssl/common_operations/dcv.html).
+2. When the form is received check to see if the certificate already exists in the Gandi.net portal. Sometimes requestors mix up new certs and renewals. If this is a renewal see the renewal steps in this runbook.
 
-3. Assuming that we manage the domain, create a new certificate in Gandi.net. Full detailed instructions can be found [here](https://docs.gandi.net/en/ssl/create/index.html)
+3. When the form is received check to see if the domain associated to the request is managed in Route53 in the MoJDSD AWS account. If not, the validation step in the process will need to be carried out by the team that manages the domain. You will need to check with the requestor how the 3rd party wants to carry out validation. [There are 3 types of validation](https://docs.gandi.net/en/ssl/common_operations/dcv.html).
 
-4. If creation has been successful two emails will be sent to the Certificate Alerts Google group. An invoice (which can be ignored), and a Validation email. Click on the link in the validation email to obtain CNAME details that will need to be added in the Hosted Zone in Route53.
+4. Assuming that we manage the domain, create a new certificate in Gandi.net. Full detailed instructions can be found [here](https://docs.gandi.net/en/ssl/create/index.html)
 
-5. Create the CNAME record in Route53. Gandi.net will automatically try to pick up this CNAME to confirm that we have ownership of the domain.
+5. If creation has been successful two emails will be sent to the Certificate Alerts Google group. An invoice (which can be ignored), and a Validation email. Click on the link in the validation email to obtain CNAME details that will need to be added in the Hosted Zone in Route53.
 
-6. When validation is complete an email will be sent to the Certificate Alerts Google group. Click on the link in the email to visit Gandi.net and download the new certificate.
+6. Create the CNAME record in Route53. Gandi.net will automatically try to pick up this CNAME to confirm that we have ownership of the domain. 
 
-7. Email the certificate to the requestor along with details of the expiry date. All certificates are valid for 12 months.
+**Note - Any preceeding "_" or trailing "." characters in the CNAME values are extermely important for validation. Missing characters will mean that validation will not be successful.**
+
+7. When validation is complete an email will be sent to the Certificate Alerts Google group. Click on the link in the email to visit Gandi.net and download the new certificate.
+
+8. Email the certificate to the requestor along with details of the expiry date. All certificates are valid for 12 months.
 
 ## Renewing a new certificate via Gandi.net
 
