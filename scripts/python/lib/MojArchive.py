@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from lib.MojGithub import MojGithub
 from github import Repository
 import logging
