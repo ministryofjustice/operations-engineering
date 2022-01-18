@@ -1,3 +1,5 @@
+# THIS FILE IS LEGACY
+# Please see scripts/python/archive-repositories.py
 
 require 'github_api'
 require 'date'
@@ -38,5 +40,6 @@ sorted_repos.each do |repo|
   end
 end
 out_file.close
+
 system 'cat out.txt | xargs -P8 -L1 hub api -X PATCH -F archived=true'
 File.delete(out_file)

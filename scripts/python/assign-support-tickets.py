@@ -4,6 +4,8 @@ import os
 # This file assigns unassigned support tickets to the user that opened the ticket
 # Its goal is to streamline the capture of support tickets as far as possible
 
+# TODO: This file should be rewritten to use the MojGitHub Library
+
 # Config
 organization    = "ministryofjustice"
 repository      = "operations-engineering"
