@@ -16,10 +16,9 @@ class MojGithub:
       
     @property 
     def repos(self) -> list:
-        """Returns all repos for given organization
-        This does include archived repos.
-        This does not include forks repos.
-        
+        """Returns all repos for given organization.\n
+        This does include archived repos.\n
+        This does not include forks repos.\n
         Please see the function get_unarchived_repos to ommit archived repos
         """
         if self.__repos == None:
@@ -28,10 +27,9 @@ class MojGithub:
        
     @property
     def public_repos(self) -> list:
-        """Returns all public repos for given organization
-        This does include archived repos.
-        This does not include forks repos.
-        
+        """Returns all public repos for given organization\n
+        This does include archived repos.\n
+        This does not include forks repos.\n
         Please see the function get_unarchived_repos to ommit archived repos
         """
         if self.__public_repos == None:
@@ -41,9 +39,8 @@ class MojGithub:
     @property
     def private_repos(self) -> list:
         """Returns all private repos for given organization.\n
-        This does include archived repos.
-        This does not include forks repos.
-        
+        This does include archived repos.\n
+        This does not include forks repos.\n
         Please see the function get_unarchived_repos to ommit archived repos
         """
         if self.__private_repos == None:
@@ -83,9 +80,14 @@ class MojGithub:
         """NOTE: Internal function used by libary, please use with care\n
         Returns all orgs for a given repository type\n
         This function does not return fork repos\n
-        Please refer to following properties for proper usage:\n
+        Please refer to following properties for proper usage:
         * repos
         * public_repos
         * private_repos
+        
+        type:
+        * all
+        * public
+        * private
         """
         return self._exclude_fork_repos(list(self.org.get_repos(type=type)))
