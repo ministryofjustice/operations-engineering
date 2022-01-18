@@ -4,6 +4,8 @@ import os
 # This file closes any open support tickets as we are testing limited capture of support activities 
 # Its goal is to streamline the capture of support tickets as far as possible
 
+# TODO: This file should be rewritten to use the MojGitHub Library
+
 # Config
 organization    = "ministryofjustice"
 repository      = "operations-engineering"
