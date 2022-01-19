@@ -23,7 +23,7 @@ org_token           = os.getenv('ADMIN_GITHUB_TOKEN')
 # How long ago in which the repositories should be archived
 archive_date_days = 0
 archive_date_months = 0
-archive_date_years = 5
+archive_date_years = 3
 
 archive_date = datetime.now() - relativedelta(
     days=archive_date_days,
