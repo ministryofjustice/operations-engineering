@@ -1,12 +1,17 @@
-from functools import reduce
 from github import Github
-from github import PaginatedList
-from github import Repository
+import logging
 
 # This class is an interface for interacting with a GitHub org and its repos at an admin level, it can be pointed at any org
 # But please be aware it has been written with the ministryofjustice org in mind
 
 class MojGithub:
+    
+    # Logging Config
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)-8s %(message)s',
+        level=logging.INFO,
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
     def __init__(self, org: str, org_token: str) -> None:
         self.git = Github(org_token)
         self.org = self.git.get_organization(org)
@@ -62,7 +67,7 @@ class MojGithub:
            case "private":
                return self._exclude_archived_repos(self.private_repos)
            case "_":
-               print(f"MojGithub.get_unarchived_repos called with incorrect parameter: {type}")
+               logging.error(f"MojGithub.get_unarchived_repos called with incorrect parameter: {type}")
         
     def _exclude_archived_repos(self, repos: list) -> list:
         """NOTE: Internal function used by libary, please use with care\n
