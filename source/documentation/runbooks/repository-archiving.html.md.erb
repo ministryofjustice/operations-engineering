@@ -1,0 +1,40 @@
+---
+title: Configuring automatic GitHub repository archiving
+last_reviewed_on: 2022-01-27
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+
+### Overview
+
+This document will serve as a guide on how to configure the automatic GitHub repository archiving run from this repository via GitHub Actions.
+
+This [GitHub Action workflow file](https://github.com/ministryofjustice/operations-engineering/blob/main/.github/workflows/archive-repos.yml) runs a Python script on a schedule that archives inactive GitHub repositories.
+There are two main ways to configure this task:
+
+* Add/remove a repository to an allow list that filters it out from this process
+* Alter the period of time a repository has been inactive before it gets archived
+
+### Changing the archive inactivity time
+
+Inside the Python file that controls this process there are 3 variables that dictate how long a repository has been inactive before it gets archived.
+
+In order to change these values, please open a PR editing these 3 variables: [Python archive file](https://github.com/ministryofjustice/operations-engineering/blob/main/scripts/python/archive-repositories.py#L23-L26)
+
+> These three values combine to make a time period e.g. if days was 0, months 0 and years 2, it would archive repositories over 2 years old
+
+`archive_date_days = 0 # 0-28 (the day must be within the target`
+`archive_date_months = 6 # 0-12`
+`archive_date_years = 2 # 0-2022`
+
+Once the PR has been merged, the changes will automatically be impacted.
+
+### Adding a repository to the allow list
+
+Inside this repository [there is a file](https://github.com/ministryofjustice/operations-engineering/blob/main/scripts/python/archive-allow-list.txt) that contains a list of repositories that should be ignored by this process.
+
+In order to add a repository, please open a PR on this file adding the repositories you want.
+
+> Each repository must be on its own line in the file.
