@@ -1,4 +1,26 @@
+import boto3
 import json
+import sys
+import traceback
+
+
+def print_stack_trace(message):
+    """This will attempt to print a stack trace when an exception occurs
+    Args:
+        message (string): A message to print when exception occurs
+    """
+    print(message)
+    try:
+        exc_info = sys.exc_info()
+    finally:
+        traceback.print_exception(*exc_info)
+        del exc_info
+
+
+try:
+    route53_client = boto3.client("route53")
+except Exception:
+    print_stack_trace("Exception: Problem with the route53 client.")
 
 
 def create_delete_cname_record(cname):
@@ -21,49 +43,60 @@ def create_delete_cname_record(cname):
     return cname_record
 
 
-def create_delete_cname_file(cnames, filename):
-    """Create a file of cname records that shall be deleted from AWS
+def delete_cname_records(host_zone_id):
+    """Delete selected cname records from the AWS Route53 host zone
 
     Args:
-        cnames (list): The cnames records downloaded from AWS Route 53
-        filename (string): The name of the file to create
+        host_zone_id (string): The AWS ID of the host zone that contains the records to delete
     """
-    changes = []
+    delete_records = []
+    next_record_name = "a"
+    next_record_type = "CNAME"
 
-    for cname in cnames:
-        if "comodoca" in cname["ResourceRecords"][0]["Value"]:
-            record = create_delete_cname_record(cname)
-            changes.append(record)
-        elif "sectigo" in cname["ResourceRecords"][0]["Value"]:
-            record = create_delete_cname_record(cname)
-            changes.append(record)
-        else:
-            pass
+    while next_record_name is not None and next_record_type is not None:
+        try:
+            response = route53_client.list_resource_record_sets(
+                HostedZoneId=host_zone_id,
+                StartRecordName=next_record_name,
+                StartRecordType=next_record_type,
+                MaxItems="400",
+            )
 
-    if len(changes) != 0:
-        json_output = {"Changes": changes}
-        output_file = open(filename, "w")
-        output_file.write(json.dumps(json_output, indent=2))
-        output_file.close()
+            for record_set in response["ResourceRecordSets"]:
+                if record_set["Type"] == "CNAME":
+                    if "comodoca" in record_set["ResourceRecords"][0]["Value"]:
+                        delete_record = create_delete_cname_record(record_set)
+                        delete_records.append(delete_record)
+                    elif "sectigo" in record_set["ResourceRecords"][0]["Value"]:
+                        delete_record = create_delete_cname_record(record_set)
+                        delete_records.append(delete_record)
+                    else:
+                        pass
+
+            next_record_name = response["NextRecordName"]
+            next_record_type = response["NextRecordType"]
+
+        except:
+            next_record_name = None
+            next_record_type = None
+
+    try:
+        if len(delete_records) != 0:
+            response = route53_client.change_resource_record_sets(
+                ChangeBatch={"Changes": delete_records},
+                HostedZoneId=host_zone_id,
+            )
+            print(response)
+
+            print("Deleted records:")
+            print(json.dumps(delete_records, indent=2))
+    except:
+        print_stack_trace("Exception: AWS call to delete cname records")
 
 
 def run():
-    """A function for the main functionality of the script"""
-
-    # Get service justice hostzone cname data
-    service_justice_cnames_file = open("service_justice_cnames.json")
-    service_justice_cnames_data = json.load(service_justice_cnames_file)
-    service_justice_cnames_file.close()
-
-    # Get justice hostzone cname data
-    justice_cnames_file = open("justice_cnames.json")
-    justice_cnames_data = json.load(justice_cnames_file)
-    justice_cnames_file.close()
-
-    create_delete_cname_file(
-        service_justice_cnames_data, "delete_service_justice_cnames.json"
-    )
-    create_delete_cname_file(justice_cnames_data, "delete_justice_cnames.json")
+    delete_cname_records("Z2BAIDDV5DBDJR")
+    delete_cname_records("Z1QLRMQEXOI5G4")
 
 
 print("Start")
