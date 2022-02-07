@@ -5,6 +5,11 @@ on:
   schedule:
     - cron: "0 0 1 1-12 *"
 
+# These permissions are required to use AWS OIDC federate roles
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   archive-repos:
     runs-on: ubuntu-latest
