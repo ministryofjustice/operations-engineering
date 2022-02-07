@@ -17,7 +17,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
-          role-to-assume: arn:aws:iam::${{secrets.AWS_ID}}:role/OpsEng_delete_cname_records_federated
+          role-to-assume: ${{secrets.AWS_ID}}
           aws-region: eu-west-2
       - uses: actions/setup-python@v2
         with:
