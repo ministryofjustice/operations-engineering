@@ -1,0 +1,24 @@
+name: Delete AWS Route53 CNAME records
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 1-12 *"
+
+jobs:
+  archive-repos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          role-to-assume: arn:aws:iam::880656497252:role/OpsEng_delete_cname_records
+          aws-region: eu-west-2
+      - uses: actions/setup-python@v2
+        with:
+            python-version: '3.10'
+            architecture: 'x64'
+            cache: 'pip'
+      - run: pip install -r scripts/python/requirements.txt
+      - run: python scripts/python/delete-cnames.py
