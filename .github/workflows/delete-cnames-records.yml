@@ -25,4 +25,4 @@ jobs:
             architecture: 'x64'
             cache: 'pip'
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/delete-cnames.py
+      - run: python scripts/python/delete-cnames.py {{ secrets.ROUTE53_HOSTEDZONE_ID_1 }} {{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
