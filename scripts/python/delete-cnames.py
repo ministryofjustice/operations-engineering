@@ -26,9 +26,9 @@ except Exception:
 def create_delete_cname_record(cname):
     """Create a delete cname record
     Args:
-        cname (string): The cname record from AWS. Defaults to None.
+        cname (string): The cname record from AWS.
     Returns:
-        cname_record: a delete cname record
+        cname_record: a completed delete cname record
     """
     cname_record = {
         "Action": "DELETE",
