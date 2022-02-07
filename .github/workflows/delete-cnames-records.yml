@@ -17,7 +17,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@master
         with:
-          role-to-assume: arn:aws:iam::880656497252:role/OpsEng_delete_cname_records
+          role-to-assume: arn:aws:iam::${{secrets.AWS_ID}}:role/OpsEng_delete_cname_records
           aws-region: eu-west-2
       - uses: actions/setup-python@v2
         with:
@@ -25,4 +25,4 @@ jobs:
             architecture: 'x64'
             cache: 'pip'
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/delete-cnames.py {{ secrets.ROUTE53_HOSTEDZONE_ID_1 }} {{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
+      - run: python scripts/python/delete-cnames.py ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }} ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
