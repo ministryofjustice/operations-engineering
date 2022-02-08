@@ -12,7 +12,7 @@ review_in: 3 months
 
 -  The cloud provider needs to support OIDC on their end, and you must configure a trust relationship that controls which workflows are able to request the access tokens.
 
--  This means no cloud secrets, can use your cloud provider's authentication and authorisation tools to control access to cloud resources and can rotating credentials: With OIDC, your cloud provider issues a short-lived access token that is only valid for a single job, and then automatically expires.
+-  This means no cloud secrets, can use your cloud provider's authentication and authorisation tools to control access to cloud resources and can rotate credentials: With OIDC, your cloud provider issues a short-lived access token that is only valid for a single job, and then automatically expires.
 
 -  Every time your job runs, GitHub's OIDC Provider auto-generates an OIDC token. This token contains multiple claims to establish a security-hardened and verifiable identity about the specific workflow that is trying to authenticate.
 
@@ -20,6 +20,7 @@ review_in: 3 months
 # Links
 
 [GH OIDC](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+
 [Nice summary of the steps below](https://benoitboure.com/securely-access-your-aws-resources-from-github-actions)
 
 # AWS IAM
@@ -74,11 +75,12 @@ Select an AWS service, pick which API calls can be used and select which AWS res
 	                    }
 	                }
 	            }
-	        ] }
+	        ] 
+	    }
 
 10. Add an extra condition check with the organisation name and repository name as its arguments as shown below, this extra setting restricts the OIDC token to this specific repository only, the star represents branches, thus it can be restricted further to a specific branch:
 
-	    ,
+            ,
             "StringLike": {
                 "token.actions.githubusercontent.com:sub": "repo:organisation-name/repository-name:*"
             }
