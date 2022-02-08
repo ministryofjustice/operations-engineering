@@ -95,9 +95,8 @@ def delete_cname_records(host_zone_id):
 
 
 def run():
-    delete_cname_records("Z2BAIDDV5DBDJR")
-    delete_cname_records("Z1QLRMQEXOI5G4")
-
+    for i in range(1, len(sys.argv)):
+        delete_cname_records(sys.argv[i])
 
 print("Start")
 run()
