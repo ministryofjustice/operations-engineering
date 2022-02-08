@@ -1,0 +1,88 @@
+---
+title: Add OIDC between AWS and GH Runbook
+last_reviewed_on: 2022-02-08
+review_in: 3 months
+---
+
+### Intro
+-  OpenID Connect (OIDC) allows YAML workflows to use OIDC access tokens instead of secrets.  
+-  OpenID Connect allows your workflows to exchange short-lived tokens directly from your cloud provider.  
+-  The cloud provider needs to support OIDC on their end, and you must configure a trust relationship that controls which workflows are able to request the access tokens.  
+-  This means no cloud secrets, can use your cloud provider's authentication and authorisation tools to control access to cloud resources and can rotating credentials: With OIDC, your cloud provider issues a short-lived access token that is only valid for a single job, and then automatically expires.  
+-  Every time your job runs, GitHub's OIDC Provider auto-generates an OIDC token. This token contains multiple claims to establish a security-hardened and verifiable identity about the specific workflow that is trying to authenticate.
+
+### Links
+
+[GH OIDC](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
+[Nice summary of the steps below](https://benoitboure.com/securely-access-your-aws-resources-from-github-actions)
+
+### AWS IAM
+#### Identify Provider
+ 1. Open the AWS account and IAM.
+ 2. Go to the Identity providers section.
+ 3. Press the Add Provider button.
+ 4. Select the OpenID Connect option.
+ 5. Set the Provider URL as `token.actions.githubusercontent.com`
+ 6. Set the Audience as `sts.amazonaws.com`
+
+#### Create a Policy
+Select an AWS service, pick which API calls can be used and select which AWS resources can be accessed.
+
+#### Create a Role
+ 1. Select the new role button.
+ 2. Select the Web Identity option.
+ 3. From the drop down menu select the `token.actions.githubusercontent.com` option for identity provider.
+ 4. From the drop down menu select the `sts.amazonaws.com` option for audience.
+ 5. Select the policy created above or use an existing policy.
+ 6. Enter a role name and a role description.
+ 7. Click the create role button.
+ 8. Open the new role and copy the ARN string value ie *arn:aws:iam::account-id-number:role/the-role-name*
+ 9. The Trust relationships tab should look like this:
+
+	    {
+	        "Version": "2012-10-17",
+	        "Statement": [
+	            {
+	                "Effect": "Allow",
+	                "Principal": {
+	                    "Federated": "arn:aws:iam::account-id-number:oidc-provider/token.actions.githubusercontent.com"
+	                },
+	                "Action": "sts:AssumeRoleWithWebIdentity",
+	                "Condition": {
+	                    "StringEquals": {
+	                        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+	                    }
+	                }
+	            }
+	        ] }
+
+ 10. Add an extra condition check with the organisation name and repository name as its arguments as shown below, this extra setting restricts the OIDC token to this specific repository only, the star represents branches, thus it can be restricted further to a specific branch:
+
+			,
+            "StringLike": {
+                "token.actions.githubusercontent.com:sub": "repo:organisation-name/repository-name:*"
+            }
+
+#### GH Repository Settings
+Add a new repository secret that contains the role ARN string ie *arn:aws:iam::account-id-number:role/the-role-name*
+
+#### GH Repository Action
+In the .yml file add this code:
+
+	    jobs:
+	      workflow-name:
+	        runs-on: ubuntu-latest
+	        # These permissions are required to use AWS OIDC federate roles
+	        permissions:
+	          id-token: write
+	          contents: read
+	        steps:
+	          - uses: actions/checkout@v2
+	          - name: Configure AWS credentials
+	            uses: aws-actions/configure-aws-credentials@master
+	            with:
+	              role-to-assume: ${{secrets.AWS_ID}}
+	              aws-region: eu-west-2
+
+-  The aws-region should match the region used by the AWS account.  
+-  The permission *id-token: write* is needed by GH for the token to be requested from GitHub's OIDC provider.
