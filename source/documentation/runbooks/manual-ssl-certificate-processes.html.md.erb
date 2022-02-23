@@ -1,6 +1,6 @@
 ---
 title: Create Manual SSL Certificate Processes
-last_reviewed_on: 2022-01-12
+last_reviewed_on: 2022-02-23
 review_in: 3 months
 ---
 
@@ -36,6 +36,8 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 2. When the form is received check to see if the certificate already exists in the Gandi.net portal. Sometimes requesters mix up new certs and renewals. If this is a renewal see the renewal steps in this runbook.
 
 3. When the form is received check to see if the domain associated to the request is managed in Route53 in the MoJDSD AWS account. If not, the validation step in the process will need to be carried out by the team that manages the domain. You will need to check with the requester how the 3rd party wants to carry out validation. [There are 3 types of validation](https://docs.gandi.net/en/ssl/common_operations/dcv.html).
+
+**Note - When confirming if we manage the domain, check whether the subdomain record that exists is a delegation i.e. it is Nameserver(NS) type record. If it is there is a high likelihood that the management of the domain is managed by another team. Detail of who manages the domain can be found in the history in the [Certificates Goolge Group](https://groups.google.com/u/1/a/digital.justice.gov.uk/g/certificates?hl=en-GB)
 
 4. Login to Gandi.net. Go to the SSL Certificates page. To start the process click on the "Buy" button.
 
