@@ -24,6 +24,10 @@ This should include an supporting runbooks or other documentation.
 
 If there is a bridge call related to the work, please add invite details to the shared Operations Engineering calender for visibility.
 
+## Check that Operations Engineering actually manages the domains being changed
+
+Operations Engineering manages a vast majority of the MoJ DNS estate. However, things to look our for:
+
 ## A few days in advance reduce TTL on DNS records
 
 A few days in advance of changes you should consider reducing the TTL for DNS records that have long durations. Recommended that TTL be reduced to 300 seconds. This will help with DNS propagation and caching issues.
@@ -32,11 +36,23 @@ A few days in advance of changes you should consider reducing the TTL for DNS re
 
 In case changes need to be backed out you must back-up the current DNS records that are being changed. There is no specific tool for doing this, but ensure that wherever you back-up to you can access the back-up easily. Also consider saving the back-up in a shared location if someone else in the team might need to assist.
 
+## What are the escalation/reporting routes during the migration?
+
+Get confirmation of who you report completion of changes to, and what the escalation route is in case of emergency. If access to 3rd party tooling is required for this process check you can access those tools in advance of the change window and report any issues back to the project.
+
 # During implementation
+
+## How to change changes have propagated?
+
+You can check that DNS changes have taken effect by running a [Dig command](https://linuxize.com/post/how-to-use-dig-command-to-query-dns-in-linux/) in a Terminal session.
 
 ## Browser caching issues
 
 Sometimes DNS changes to do appear to have worked. This may be due to browser caching. It is always worth asking implementation team or testers to clear their browser cache or try the URL in an incognito browser.
+
+## Who is responsible for testing that migration is successful?
+
+That's the responsability of the migration team, not Operations Engineering. The migration team is resonsible for signing off that migration is successful.
 
 ## Don't be a hero
 
@@ -47,4 +63,5 @@ DNS changes can cause all sorts of problems. Our DNS estate is large and complex
 **No**. JISC manage the domain lock service that prohibits changes on certain domains. 
 
 Any work requiring support from JISC should only be arrange in working hours, Monday to Friday.
+
 
