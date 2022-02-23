@@ -8,7 +8,9 @@ review_in: 3 months
 
 The purpose of this runbook is to provide guidance and tips when supporting migration projects that involve DNS changes.
 
-## Can we support weekend and out of hours work?
+# Before implementation
+
+## Can we support weekend or out of hours work?
 
 Operations Engineering does not offer any out of hour or weekend support for services. If asked, we should challenge any requests and try to schedule work within normal working hours. 
 
@@ -22,6 +24,27 @@ This should include an supporting runbooks or other documentation.
 
 If there is a bridge call related to the work, please add invite details to the shared Operations Engineering calender for visibility.
 
+## A few days in advance reduce TTL on DNS records
+
+A few days in advance of changes you should consider reducing the TTL for DNS records that have long durations. Recommended that TTL be reduced to 300 seconds. This will help with DNS propagation and caching issues.
+
+## Backup DNS records
+
+In case changes need to be backed out you must back-up the current DNS records that are being changed. There is no specific tool for doing this, but ensure that wherever you back-up to you can access the back-up easily. Also consider saving the back-up in a shared location if someone else in the team might need to assist.
+
+# During implementation
+
+## Browser caching issues
+
+Sometimes DNS changes to do appear to have worked. This may be due to browser caching. It is always worth asking implementation team or testers to clear their browser cache or try the URL in an incognito browser.
+
 ## Don't be a hero
 
-DNS changes can cause all sorts of problems. Our DNS estate is large and complex. If something goes wrong, don't be a hero. Ask for help if in hours. If out of hours and there is no one to help it's ok to back changes out. No one will thank you for a critical system being down on a Monday morning.
+DNS changes can cause all sorts of problems. Our DNS estate is large and complex. **If something goes wrong don't be a hero**. Ask for help if in hours. If out of hours and there is no one to help it's ok to back out changes. No one will thank you for a critical system being down on a Monday morning.
+
+## Do JISC support out of hours changes?
+
+**No**. JISC manage the domain lock service that prohibits changes on certain domains. 
+
+Any work requiring support from JISC should only be arrange in working hours, Monday to Friday.
+
