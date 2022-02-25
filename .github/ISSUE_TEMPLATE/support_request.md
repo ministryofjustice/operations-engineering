@@ -22,4 +22,5 @@ valid service label options are:
 - `MoJ GitHub Organisation`
 - `Docker`
 - `MoJ Acronyms`
+- `CircleCI`
 - `Other Support Request`
