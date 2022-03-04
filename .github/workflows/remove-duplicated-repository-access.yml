@@ -18,7 +18,7 @@ jobs:
             architecture: 'x64'
             cache: 'pip'
       - run: |
-          python3 -m pip install -r scripts/requirements.txt
+          python3 -m pip install -r scripts/python/requirements.txt
           python3 scripts/python/remove-duplicated-repository-access.py ${{ secrets.OPERATIONS_ENGINEERING }} > output.txt
       - uses: actions/upload-artifact@v2
         with:
