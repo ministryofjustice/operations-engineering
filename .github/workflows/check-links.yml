@@ -3,7 +3,7 @@ name: Check for broken links
 on:
   workflow_dispatch:
   pull_request:
-    paths: 
+    paths:
       - "source/**"
 
 jobs:
@@ -12,6 +12,6 @@ jobs:
     container:
       image: ministryofjustice/tech-docs-github-pages-publisher:1.4
     steps:
-    - uses: actions/checkout@v2
-    - name: htmlproofer
-      run: /publishing-scripts/publish.sh no-repository-changes
+      - uses: actions/checkout@v2
+      - name: htmlproofer
+        run: /publishing-scripts/publish.sh no-repository-changes
