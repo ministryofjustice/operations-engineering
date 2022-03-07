@@ -21,8 +21,8 @@ jobs:
           aws-region: eu-west-2
       - uses: actions/setup-python@v2
         with:
-            python-version: '3.10'
-            architecture: 'x64'
-            cache: 'pip'
+          python-version: '3.10'
+          architecture: 'x64'
+          cache: 'pip'
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/delete-cnames.py ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }} ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}

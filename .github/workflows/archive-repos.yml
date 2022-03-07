@@ -12,9 +12,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-            python-version: '3.10'
-            architecture: 'x64'
-            cache: 'pip'
+          python-version: '3.10'
+          architecture: 'x64'
+          cache: 'pip'
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/archive-repositories.py
         env:
@@ -28,4 +28,3 @@ jobs:
           notification_title: 'Failed GitHub Action Run'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
