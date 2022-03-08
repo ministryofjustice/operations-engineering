@@ -1,0 +1,83 @@
+---
+title: Add a Slack alert to our alert channel
+last_reviewed_on: 2022-03-08
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+
+### Overview
+
+This document will serve as a guide on how to add an alert to our Slack alerts channel below:
+
+> #operations-engineering-alerts
+
+There are three types of alerts at time of writing:
+
+* RSS Feed - third party tools usually offer an RSS feed we can subscribe to which will alert us if they are having issues
+* Pingdom - end point checking, Pingdom will simply ping an end point every X seconds and report if it responds with bad return code
+* GitHub Actions - a snippet of code we add at the end of certain GitHub Action files to report to us when they fail.
+
+### RSS Feeds
+
+## Requirements:
+* The RSS feed - this can be retrieved from the third party tools website, an example is the [Get Updates button on this page](https://status.pingdom.com/)
+* Access to the Slack RSS application from MoJ (https://mojdt.slack.com/services/B642DDZG9)
+
+## Adding a feed:
+1. Navigate to the bottom of the Slack RSS application
+2. Copy the feed address (Atom/RSS both work) into the "Feed URL" field
+3. Select #operations-engineering-alerts in the "Post to Channel" field
+4. Select "Subscribe to feed"
+
+Once this has been done, every time the selected feed reports an issue, it will let us know on Slack.
+
+### Pingdom
+
+## Requirements:
+* Access to the Operations Engineering tools account (it's in LastPass)
+* The end point you wish monitor
+
+## Adding a Pingdom alert:
+1. Navigate to the [Uptime section on Pingdom](https://my.pingdom.com/app/newchecks/checks)
+2. Select "Add new" at the top left of the page
+3. Enter a relevant name for the "Name of check" field - (We usually go with the application name)
+4. Enter the end point you wish to monitor to the "URL/IP" field
+5. Ensure "http/https" is selected correctly
+6. Select "Europe" for the "Test from" field
+7. Add "operationsengineering" to the "Tags" field
+8. Add any other relevant tags to the "Tags" field - example "decomission" would be relevant for Operations Engineering Decomission Pages end points
+9. Select the option you want for "Check importance" - we usually go with Low
+10. Untick "MoJ Digital" on "Who to alert?"
+11. Tick "Operations Engineering Alerts" in the "Connect Integrations" section
+12. Ensure the test is working with the "Test check" button
+13. Select "Create check"
+
+Once this has been done, every time the selected end point is down, it will let us know on Slack.
+
+### GitHub Actions
+
+## Requirements:
+* SLACK_WEBHOOK_URL secret configured on target repository (secure notes in LastPass)
+* Access to push to target repository
+
+## Adding GitHub Actions alert:
+1. Clone the repository containing the GitHub action file you want to add the alert to
+2. Open the GitHub action/workflow file
+3. As the last step of the action, add the following code:
+
+              - name: Report failure to Slack
+                if: always()
+                uses: ravsamhq/notify-slack-action@v1
+                with:
+                    status: ${{ job.status }}
+                    notify_when: 'failure'
+                    notification_title: 'Failed GitHub Action Run'
+                env:
+                    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+4. An example of a complete workflow with this step is [here](https://github.com/ministryofjustice/operations-engineering/blob/main/.github/workflows/archive-repos.yml)
+5. Pull request this change into `main`
+
+Once this has been done, every time the selected GitHub Action fails, it will let us know on Slack.
