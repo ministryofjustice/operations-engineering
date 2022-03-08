@@ -11,7 +11,7 @@ review_in: 3 months
 
 This document will serve as a guide on how to add an alert to our Slack alerts channel below:
 
-> #operations-engineering-alerts
+* #operations-engineering-alerts
 
 There are three types of alerts at time of writing:
 
@@ -19,13 +19,13 @@ There are three types of alerts at time of writing:
 * Pingdom - end point checking, Pingdom will simply ping an end point every X seconds and report if it responds with bad return code
 * GitHub Actions - a snippet of code we add at the end of certain GitHub Action files to report to us when they fail.
 
-### RSS Feeds
+## RSS Feeds
 
-## Requirements:
+### Requirements:
 * The RSS feed - this can be retrieved from the third party tools website, an example is the [Get Updates button on this page](https://status.pingdom.com/)
 * Access to the Slack RSS application from MoJ (https://mojdt.slack.com/services/B642DDZG9)
 
-## Adding a feed:
+### Adding a feed:
 1. Navigate to the bottom of the Slack RSS application
 2. Copy the feed address (Atom/RSS both work) into the "Feed URL" field
 3. Select #operations-engineering-alerts in the "Post to Channel" field
@@ -33,13 +33,13 @@ There are three types of alerts at time of writing:
 
 Once this has been done, every time the selected feed reports an issue, it will let us know on Slack.
 
-### Pingdom
+## Pingdom
 
-## Requirements:
+### Requirements:
 * Access to the Operations Engineering tools account (it's in LastPass)
 * The end point you wish monitor
 
-## Adding a Pingdom alert:
+### Adding a Pingdom alert:
 1. Navigate to the [Uptime section on Pingdom](https://my.pingdom.com/app/newchecks/checks)
 2. Select "Add new" at the top left of the page
 3. Enter a relevant name for the "Name of check" field - (We usually go with the application name)
@@ -56,13 +56,13 @@ Once this has been done, every time the selected feed reports an issue, it will 
 
 Once this has been done, every time the selected end point is down, it will let us know on Slack.
 
-### GitHub Actions
+## GitHub Actions
 
-## Requirements:
+### Requirements:
 * SLACK_WEBHOOK_URL secret configured on target repository (secure notes in LastPass)
 * Access to push to target repository
 
-## Adding GitHub Actions alert:
+### Adding GitHub Actions alert:
 1. Clone the repository containing the GitHub action file you want to add the alert to
 2. Open the GitHub action/workflow file
 3. As the last step of the action, add the following code:
