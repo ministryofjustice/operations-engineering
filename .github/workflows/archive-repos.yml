@@ -18,7 +18,7 @@ jobs:
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/archive-repositories.py
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v1
