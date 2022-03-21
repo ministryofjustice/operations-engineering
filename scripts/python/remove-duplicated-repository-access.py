@@ -527,10 +527,10 @@ def run():
                         pass
                     else:
                         # raise an issue to say the user has been removed and has access via the team
-                        # create_an_issue(direct_member, repository.name)
+                        create_an_issue(direct_member, repository.name)
 
                         # remove the direct member from the repository
-                        # remove_user_from_repository(direct_member, repository.name)
+                        remove_user_from_repository(direct_member, repository.name)
 
                         print(
                             "Removing the user "
