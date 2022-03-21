@@ -1,0 +1,47 @@
+---
+title: Add a badge to a repository
+last_reviewed_on: 2022-03-21
+review_in: 3 months
+---
+
+# Intro
+
+* The Operations-Engineering team have created a repository badge you can add to your repository landing page (ie README.md) that will display if a repository meets the MoJ [github repository standards](https://github.com/ministryofjustice/github-repository-standards).
+
+* This is possible via https://img.shields.io
+
+* A badge can either be static, dynamic, or a service.
+
+* A static badge is fixed and does not change.
+
+* A dynamic badge can do a API query and change the text value on the right side of the badge.
+
+* A service badge connects to code on the shields.io repository to do a certain action, the result of the action change the value and color on the right hand side of the badge.
+
+* For this example we are using a dynamic badge to query the operations-engineering report to obtain the JSON data regarding wether a repository is complaint or not.
+
+* See the [discussion](https://github.com/orgs/ministryofjustice/teams/operations-engineering/discussions/1) on the operations-engineering team for an example of how the badge looks.
+
+## Badge Code
+
+	[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&logo=github&label=MoJ%20Compliant&query=%24.data%5B%3F%28%40.name%20%3D%3D%20%22REPO-NAME%22%29%5D.status&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fgithub_repositories)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/github_repositories#REPO-NAME "Link to report")
+
+## Example to operations-engineering
+
+	[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&logo=github&label=MoJ%20Compliant&query=%24.data%5B%3F%28%40.name%20%3D%3D%20%22operations-engineering%22%29%5D.status&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fgithub_repositories)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/github_repositories#operations-engineering "Link to report")
+
+[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&logo=github&label=MoJ%20Compliant&query=%24.data%5B%3F%28%40.name%20%3D%3D%20%22operations-engineering%22%29%5D.status&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fgithub_repositories)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/github_repositories#operations-engineering "Link to report")
+
+## Understanding the Badges
+
+* The badge code at a high level looks like this: 
+` 
+	[![hover-text](badge-code)](OPERATIONS-ENGINEERING-REPORT-URL#REPO-NAME "Link to report")
+`
+
+* The badge code can be broken into these sections: 
+`
+	https://img.shields.io/badge/dynamic/ json ?color=blue &style=for-the-badge &logo=github &label=MoJ-Compliant &query=OPERATIONS-ENGINEERING-REPORT-JSON-DATA-PATH &url=OPERATIONS-ENGINEERING-REPORT-URL
+`
+
+* See the [shields.io](https://shields.io/) page to understand each section above or to make modifications.
