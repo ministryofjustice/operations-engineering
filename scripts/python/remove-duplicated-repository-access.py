@@ -8,6 +8,8 @@ from gql.transport.aiohttp import AIOHTTPTransport
 # Get the GH Action token
 oauth_token = sys.argv[1]
 
+repo_issues_enabled = {}
+
 
 def print_stack_trace(message):
     """Print a stack trace when an exception occurs
@@ -96,6 +98,10 @@ def organisation_repo_name_query(after_cursor=None) -> gql:
                 edges {
                     node {
                         name
+                        isDisabled
+                        isArchived
+                        isLocked
+                        hasIssuesEnabled
                     }
                 }
             }
@@ -240,7 +246,18 @@ def fetch_repo_names() -> list:
 
         # Retrieve the name of the repos
         for repo in data["organization"]["repositories"]["edges"]:
-            repo_name_list.append(repo["node"]["name"])
+            # Skip locked repositories
+            if (
+                repo["node"]["isDisabled"]
+                or repo["node"]["isArchived"]
+                or repo["node"]["isLocked"]
+            ):
+                pass
+            else:
+                repo_name_list.append(repo["node"]["name"])
+                repo_issues_enabled[repo["node"]["name"]] = repo["node"][
+                    "hasIssuesEnabled"
+                ]
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
@@ -477,26 +494,27 @@ def create_an_issue(user_name, repository_name):
         repository_name (string): The name of the repository
     """
 
-    try:
-        gh = Github(oauth_token)
-        repo = gh.get_repo("ministryofjustice/" + repository_name)
-        repo.create_issue(
-            title="User access removed, access is now via a team",
-            body="Hi there \n\n This user had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
-            assignee=user_name,
-        )
+    if repo_issues_enabled.get(repository_name):
+        try:
+            gh = Github(oauth_token)
+            repo = gh.get_repo("ministryofjustice/" + repository_name)
+            repo.create_issue(
+                title="User access removed, access is now via a team",
+                body="Hi there \n\n This user had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
+                assignee=user_name,
+            )
 
-        # Delay for GH API
-        time.sleep(5)
+            # Delay for GH API
+            time.sleep(5)
 
-    except Exception:
-        message = (
-            "Warning: Exception in creating an issue for user "
-            + user_name
-            + " in the repository: "
-            + repository_name
-        )
-        print_stack_trace(message)
+        except Exception:
+            message = (
+                "Warning: Exception in creating an issue for user "
+                + user_name
+                + " in the repository: "
+                + repository_name
+            )
+            print_stack_trace(message)
 
 
 def run():
@@ -520,7 +538,7 @@ def run():
                 if (repository.name in team.team_repositories) and (
                     direct_member in team.team_users
                 ):
-                    # This check skips duplicated results
+                    # This check helps skip duplicated results
                     if (direct_member == previous_direct_member) and (
                         repository.name == previous_repository_name
                     ):
