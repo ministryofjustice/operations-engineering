@@ -467,15 +467,13 @@ def remove_user_from_repository(user_name, repository_name):
         user_name (string): User name of the user to remove
         repository_name (string): Name of repository
     """
+    # Delay for GH API
+    time.sleep(10)
 
     try:
         gh = Github(oauth_token)
         repo = gh.get_repo("ministryofjustice/" + repository_name)
         repo.remove_from_collaborators(user_name)
-
-        # Delay for GH API
-        time.sleep(10)
-
     except Exception:
         message = (
             "Warning: Exception in removing a user "
@@ -495,6 +493,9 @@ def create_an_issue(user_name, repository_name):
     """
 
     if repo_issues_enabled.get(repository_name):
+        # Delay for GH API
+        time.sleep(10)
+
         try:
             gh = Github(oauth_token)
             repo = gh.get_repo("ministryofjustice/" + repository_name)
@@ -503,10 +504,6 @@ def create_an_issue(user_name, repository_name):
                 body="Hi there \n\n This user had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
                 assignee=user_name,
             )
-
-            # Delay for GH API
-            time.sleep(10)
-
         except Exception:
             message = (
                 "Warning: Exception in creating an issue for user "
