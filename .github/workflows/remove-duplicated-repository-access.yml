@@ -4,7 +4,7 @@ name: Remove users who have duplicated access to a repository
 on:
   schedule:
     # At the end of every day
-    - cron: "0 0 * * *"
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 jobs:
