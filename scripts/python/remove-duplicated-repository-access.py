@@ -474,7 +474,7 @@ def remove_user_from_repository(user_name, repository_name):
         repo.remove_from_collaborators(user_name)
 
         # Delay for GH API
-        time.sleep(5)
+        time.sleep(10)
 
     except Exception:
         message = (
@@ -505,7 +505,7 @@ def create_an_issue(user_name, repository_name):
             )
 
             # Delay for GH API
-            time.sleep(5)
+            time.sleep(10)
 
         except Exception:
             message = (
