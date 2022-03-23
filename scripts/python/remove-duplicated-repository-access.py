@@ -501,7 +501,7 @@ def create_an_issue(user_name, repository_name):
             repo = gh.get_repo("ministryofjustice/" + repository_name)
             repo.create_issue(
                 title="User access removed, access is now via a team",
-                body="Hi there \n\n This user had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
+                body="Hi there \n\n The user " + user_name + " had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
                 assignee=user_name,
             )
         except Exception:
