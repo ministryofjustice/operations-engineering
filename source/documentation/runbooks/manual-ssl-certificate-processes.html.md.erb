@@ -22,7 +22,7 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 **We are not responsible for any HMCTS owned certificates. These are typically domains in the format `<application>.<environment>.hmcts.net` or `<application>.<environment>.cjscp.org.uk`. For these no action is required. The contact for these certificates is [opsconfman@hmcts.net](mailto:opsconfman@hmcts.net). That Team has access to all the shared mailboxes and gets all the same notifications for renewals.**
 
-**Other teams have their own AWS Route53 accounts. These are HMCTS (hmcts.net + cjscp.org.uk) at [opsconfman@hmcts.net](mailto:opsconfman@hmcts.net), LAA (legalservices.gov.uk), OPG, more to be confirmed. Either the other team or our team will renew the Gandi certificate. If we do, send the CNAME validation details to the relevant team. If the other team does it they have their own Gandi process or use AWS ACM auto renewal process. **
+**Other teams have their own AWS Route53 accounts. These are HMCTS (hmcts.net + cjscp.org.uk) at [opsconfman@hmcts.net](mailto:opsconfman@hmcts.net), LAA (legalservices.gov.uk), OPG, more to be confirmed. Either the other team or our team will renew the Gandi certificate. If we do, send the CNAME validation details to the relevant team. If the other team does it they have their own Gandi process or use AWS ACM auto renewal process.**
 
 **To confirm if we manage a domain, check whether the subdomain record exists in AWS as a delegation i.e. a Nameserver(NS) type record. If one exists there is a high likelihood that the management of the domain is managed by another team. For example if it states Azure that is definitely another team. Details of who manages the domain can be found in the history in the [Certificates Google Group](https://groups.google.com/u/1/a/digital.justice.gov.uk/g/certificates?hl=en-GB).**
 
@@ -30,13 +30,13 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 **In the email 'Re: SSL Cert query' within the Certificates Google Group is a list of the domains that the HMCTS are responsible for.** 
 
-**BT will sporadically send us emails, as BT domain management looks after a group of gov.uk domains. BT should auto renew those domains. BT will batch renew their certificates at the start of the month! So there will be a delay in processing. **
+**BT will sporadically send us emails, as BT domain management looks after a group of gov.uk domains. BT should auto renew those domains. BT will batch renew their certificates at the start of the month! So there will be a delay in processing.**
 
 **JISC Emails: JISC is a group that checks for any DNS changes that attempt to modify gov.uk DNS settings without approval from MoJ security.**
 
-**In Gandi the SSL certs that are "No longer valid - To reissue" require a Gandi support request to remove them. **
+**In Gandi the SSL certs that are "No longer valid - To reissue" require a Gandi support request to remove them.**
 
-**A team throughout the year that a SSL certificate is valid may move to their own AWS ACM account, in which case the SSL Certificate in Gandi can be allowed to lapse.**  
+**A team may at somepoint throughout the year that a SSL certificate is valid may move to their own AWS ACM account, in which case the SSL Certificate in Gandi can be allowed to lapse.**
 
 **There is an operations-engineering script that runs on the first day of the month that will delete the Gandi related CNAME records from the AWS account. Be wary of this if doing a CNAME validation around that time of the month.**
 
