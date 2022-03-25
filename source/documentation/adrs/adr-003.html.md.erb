@@ -1,0 +1,36 @@
+---
+title: ADR-002 DNS Failover
+last_reviewed_on: 2022-03-25
+review_in: 3 months
+---
+
+# <%= current_page.data.title %>
+
+### Date: 2022-03-25
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Operations Engineering manages the Route53 DNS estate for MoJ, we are responsible for the following:
+
+1. Entry of new DNS records
+2. Decommission of old records
+3. Management of defensive domains
+4. Renewal of records
+
+## Decision
+
+The decision to not offer DNS failover was made for the following reasons:
+
+1. Route53 is already highly available and runs on a 100% uptime SLA
+2. The technical effort of implementing failover is not worth the reduction in risk
+
+## Consequences
+
+A full Route53 lasting longer than the various caching outage would result in downtime for the various domains in Route53.
+
+
+[Ticket discussing decision]: https://github.com/ministryofjustice/operations-engineering/issues/30
