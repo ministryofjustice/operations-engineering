@@ -1,5 +1,5 @@
 ---
-title: ADR-002 DNS Failover
+title: ADR-003 DNS Failover
 last_reviewed_on: 2022-03-25
 review_in: 3 months
 ---
@@ -25,7 +25,7 @@ Operations Engineering manages the Route53 DNS estate for MoJ, we are responsibl
 
 The decision to not offer DNS failover was made for the following reasons:
 
-1. Route53 is already highly available and runs on a 100% uptime SLA
+1. Route53 is already highly available and runs on a 100% uptime SLA (Service-level Agreement)
 2. The technical effort of implementing failover is not worth the reduction in risk
 
 ## Consequences
