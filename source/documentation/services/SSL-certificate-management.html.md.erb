@@ -24,9 +24,7 @@ This process specifically relates to [Standard](https://docs.gandi.net/en/ssl/de
 
 1. Gandi send an email notification to the Operations-Engineering team one month prior to the SSL certificate expiry date.
 
-2. The Operations-Engineering team will attempt to contact the SSL certificate responsible person/team. 
-
-The first point of call is to check the emails from the previous year when the SSL certificate was generated. 
+2. The Operations-Engineering team will attempt to contact the SSL certificate responsible person/team. The first point of call is to check the emails from the previous year when the SSL certificate was generated. 
 
 3. The Operations-Engineering team will ask for a Certificate Signing Request (CSR).
 
@@ -34,13 +32,9 @@ The first point of call is to check the emails from the previous year when the S
 
 5. The Operations-Engineering team will create or renew a SSL certificate in the Gandi portal.
 
-6. Gandi will send an email to the Operations-Engineering team containing a CNAME entry. 
+6. Gandi will send an email to the Operations-Engineering team containing a CNAME entry. A CNAME is an alias to a record in a DNS registry.
 
-A CNAME is an alias to a record in a DNS registry.
-
-7a. The Operations-Engineering team will add the CNAME entry in AWS Route53 for the hosted zones / domains they are responsible for.
-
-7b. The Operations-Engineering team will email the CNAME entry to the responsible person/team and they will manually add it to their DNS. 
+7. The Operations-Engineering team will add the CNAME entry in AWS Route53 for the hosted zones / domains they are responsible for, or the Operations-Engineering team will email the CNAME entry to the responsible person/team and they will manually add it to their DNS. 
 
 8. Gandi will attempt to verify the CNAME against the CSR and once completed send the new SSL Certificate via email to the Operations-Engineering team.
 
