@@ -15,6 +15,8 @@ jobs:
       image: ministryofjustice/tech-docs-github-pages-publisher:latest
     steps:
       - name: Trust My Directory
+        run: git config --global --add safe.directory /__w/operations-engineering/operations-engineering
+      - name: Trust My Directory OLD
         run: export GIT_CEILING_DIRECTORIES=/__w # only work before git v2.35.2
       - uses: actions/checkout@v3
       - name: Publish
