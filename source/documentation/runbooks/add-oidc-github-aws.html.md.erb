@@ -4,8 +4,9 @@ last_reviewed_on: 2022-02-08
 review_in: 3 months
 ---
 
+# Add OIDC between AWS and GH Runbook
 
-# Intro
+## Intro
 -  OpenID Connect (OIDC) allows YAML workflows to use OIDC access tokens instead of secrets.
 
 -  OpenID Connect allows your workflows to exchange short-lived tokens directly from your cloud provider.
@@ -17,14 +18,14 @@ review_in: 3 months
 -  Every time your job runs, GitHub's OIDC Provider auto-generates an OIDC token. This token contains multiple claims to establish a security-hardened and verifiable identity about the specific workflow that is trying to authenticate.
 
 
-# Links
+## Links
 
 [GH OIDC](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services)
 
 [Nice summary of the steps below](https://benoitboure.com/securely-access-your-aws-resources-from-github-actions)
 
-# AWS IAM
-# Identify Provider
+## AWS IAM
+### Identify Provider
 1. Open the AWS account and IAM.
 
 2. Go to the Identity providers section.
@@ -37,10 +38,10 @@ review_in: 3 months
 
 6. Set the Audience as `sts.amazonaws.com`
 
-# Create a Policy
+### Create a Policy
 Select an AWS service, pick which API calls can be used and select which AWS resources can be accessed.
 
-# Create a Role
+### Create a Role
 
 1. Select the new role button.
 
@@ -85,11 +86,11 @@ Select an AWS service, pick which API calls can be used and select which AWS res
                 "token.actions.githubusercontent.com:sub": "repo:organisation-name/repository-name:*"
             }
 
-# GH Repository Settings
+## GH Repository Settings
 
 Add a new repository secret that contains the role ARN string ie *arn:aws:iam::account-id-number:role/the-role-name*
 
-# GH Repository Action
+## GH Repository Action
 
 In the .yml file add this code:
 

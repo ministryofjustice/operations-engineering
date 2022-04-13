@@ -4,10 +4,9 @@ last_reviewed_on: 2022-01-27
 review_in: 3 months
 ---
 
-# <%= current_page.data.title %>
+# Configuring automatic GitHub repository archiving
 
-
-### Overview
+## Overview
 
 This document will serve as a guide on how to configure the automatic GitHub repository archiving run from this repository via GitHub Actions.
 
@@ -17,7 +16,7 @@ There are two main ways to configure this task:
 * Add/remove a repository to an allow list that filters it out from this process
 * Alter the period of time a repository has been inactive before it gets archived
 
-### Changing the archive inactivity time
+## Changing the archive inactivity time
 
 Inside the Python file that controls this process there are 3 variables that dictate how long a repository has been inactive before it gets archived.
 
