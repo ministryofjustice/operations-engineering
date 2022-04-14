@@ -14,6 +14,7 @@ jobs:
     container:
       image: ministryofjustice/tech-docs-github-pages-publisher:v1.5
     steps:
+#     TODO: delete this run command when checkout has fixed the git checkout issue
       - name: Trust My Directory
         run: git config --global --add safe.directory /__w/operations-engineering/operations-engineering
       - uses: actions/checkout@v3
