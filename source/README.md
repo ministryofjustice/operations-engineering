@@ -6,6 +6,8 @@ This stands for embedded ruby and markdown turned into html.
 
 The files are not written in HTML instead Markdown is used.
 
+The syntax is Markdown, more details can be found [here](https://daringfireball.net/projects/markdown/). 
+
 A hash represents a header `<h1>, <h2>,` etc.
 
 See this [link](https://tdt-documentation.london.cloudapps.digital/write_docs/content/#write-your-content) on how to write items in the Markdown files.
