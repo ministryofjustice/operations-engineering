@@ -1,3 +1,5 @@
+# See the available options: https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/#configure-your-documentation-site
+
 # Host to use for canonical URL generation (without trailing slash)
 host: https://ministryofjustice.github.io/operations-engineering
 
