@@ -19,3 +19,5 @@ Middleman is used to create the html files for the website.
 It uses the index.html.md.erb file as the entry point.
 
 The other .html.md.erb files are seperate entities from each other and not used as a structure as seen in other [Middleman projects](https://tdt-documentation.london.cloudapps.digital/configure_project/structure_docs/#structure-your-documentation).
+
+The Markdown syntax may use [kramdown](https://kramdown.gettalong.org/syntax.html) format.
