@@ -14,6 +14,8 @@ jobs:
     container:
       image: ministryofjustice/tech-docs-github-pages-publisher:latest
     steps:
+      - name: Trust My Directory
+        run: git config --global --add safe.directory /__w/operations-engineering/operations-engineering
       - uses: actions/checkout@v3
       - name: Publish
         run: /publishing-scripts/publish.sh
