@@ -2,16 +2,20 @@
 
 The source files in this folder are html.md.erb files.
 
-They are not written in HTML.
+This stands for embedded ruby and markdown turned into html.
 
-It is more like Markdown.
+The files are not written in HTML instead Markdown is used.
 
 A hash represents a header `<h1>, <h2>,` etc.
 
-See the [link](https://tdt-documentation.london.cloudapps.digital/configure_project/structure_docs/#structure-your-documentation) for more details.
+See this [link](https://tdt-documentation.london.cloudapps.digital/write_docs/content/#write-your-content) on how to write items in the Markdown files.
 
-Files are relatively linked to each other using this approach `[text](documentation/alliance/alliance)`
+Files are linked to each other using this approach `[text](documentation/folder-name/file-name.html)` or `[text](folder-name/file-name.html)`
 
 Filenames must be `[something].html.md.erb`
 
-Webpages are laid out using index.html.md.erb files and folders. See the [link](https://tdt-documentation.london.cloudapps.digital/configure_project/structure_docs/#structure-your-documentation) for more details.
+Middleman is used to create the html files for the website.
+
+It uses the index.html.md.erb file as the entry point.
+
+The other .html.md.erb files are seperate entities from each other and not used as a structure as seen in other [Middleman projects](https://tdt-documentation.london.cloudapps.digital/configure_project/structure_docs/#structure-your-documentation).
