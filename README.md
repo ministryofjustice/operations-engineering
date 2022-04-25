@@ -6,7 +6,7 @@
 
 This is the MoJ Operations Engineering team's repository for public facing documentation, feature work, enhancements, and issues.
 
-**The docs folder is used by the gh-pages branch to host the website. Do not delete.****
+**The docs folder is used by the gh-pages branch to host the website. Do not delete.**
 
 ## Website
 

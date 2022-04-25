@@ -4,14 +4,13 @@ last_reviewed_on: 2022-04-19
 review_in: 3 months
 ---
 
-# <%= current_page.data.title %>
+# Adding SSO to a Tool
 
-
-### Overview
+## Overview
 
 This document will serve as a guide on how to add Single Sign-On to a third party tool in a way in which Operations Engineering has been doing so at time of writing
 
-### Methods to adding SSO
+## Methods to adding SSO
 
 There are currently three methods of adding SSO at MoJ for Operations Engineering tooling:
 
@@ -21,7 +20,7 @@ There are currently three methods of adding SSO at MoJ for Operations Engineerin
 
 Details and any relevant instructions for the above methods are in the sections below.
 
-### Auth0 inbuilt SSO integration
+## Auth0 inbuilt SSO integration
 
 > The Auth0 onboard process is still a WIP, please ask within the team if you need to access it.
 
@@ -32,7 +31,7 @@ Auth0 comes with various Plug and Play integrations that may setting up SSO very
 Each integration comes with a step by step guide on the Auth0 UI, please follow that to install.
 
 
-### Auth0 SAML middleman 
+## Auth0 SAML middleman 
 
 > The Auth0 onboard process is still a WIP, please ask within the team if you need to access it.
 
@@ -49,7 +48,7 @@ Steps:
     - Key x509 Certificate: "Identity Provider Certificate"
 4. A TXT record may have to be added to the "digital.justice.gov.uk" domain on Route53 to validate it as an SSO target
 
-### Inbuilt third party tool integration
+## Inbuilt third party tool integration
 
 > The Auth0 onboard process is still a WIP, please ask within the team if you need to access it.
 
@@ -57,7 +56,7 @@ Steps:
 
 Although fairly rare, sometimes a tool has it's own inbuilt integration for SSO with GitHub, in cases like this the documentation from said third party tool will have to be followed.
 
-### Gotchas
+## Gotchas
 
 This section includes various gotchas that we have experienced when integrating SSO to the tooling we own, please be wary of them for future SSO work:
 
@@ -65,6 +64,6 @@ This section includes various gotchas that we have experienced when integrating 
 * The default assigned role/permission on third party tools can often be higher than want we want, this may need tweaking for new work.
 * Turning SSO allows users to consume tooling licenses/subscriptions/seats without going through us, for tools with limited available licenses, SSO may be better turned off.
 
-### Links
+## Links
 
 * [Auth0](https://github.com/ministryofjustice/operations-engineering/blob/gh-pages/.github/ISSUE_TEMPLATE/maintenance_request.md)
