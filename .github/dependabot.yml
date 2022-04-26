@@ -13,12 +13,3 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-  # Disable Ruby dependency checking
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    ignore:
-      # For all packages, ignore all patch updates
-      - dependency-name: "*"
-        update-types: ["version-update:semver-patch"]
