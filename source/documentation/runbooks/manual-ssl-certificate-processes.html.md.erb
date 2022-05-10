@@ -42,6 +42,10 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 **There is an operations-engineering script that runs on the first day of the month that will delete the Gandi related CNAME records from the AWS account. Be wary of this if doing a CNAME validation around that time of the month.**
 
+## CNAME's we do not process
+
+This [file](https://docs.google.com/spreadsheets/d/1gAVhX8Ts-BuhZRNBEF-80UUjlnYyyMKKBQ4ZPnHPZmE/edit?usp=sharing) is a list of SSL Certificates where the CNAME should be sent to the author of the CSR to add to their DNS systems. Gandi will generate the SSL Certificate once the CNAME validation is completed. The list will require maintenance to keep it updated with new and removed SSL Certificates where we do not carry out the CNAME validation.
+  
 ## Pre-requisites
 
 Before you begin, there are a few prerequisites:
