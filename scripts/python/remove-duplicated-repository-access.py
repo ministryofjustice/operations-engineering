@@ -1,6 +1,8 @@
 import sys
 import traceback
 import time
+from datetime import datetime
+from datetime import timedelta
 from github import Github
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -501,7 +503,9 @@ def create_an_issue(user_name, repository_name):
             repo = gh.get_repo("ministryofjustice/" + repository_name)
             repo.create_issue(
                 title="User access removed, access is now via a team",
-                body="Hi there \n\n The user " + user_name + " had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n You may have less access it is dependant upon the teams access to the repo. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
+                body="Hi there \n\n The user "
+                + user_name
+                + " had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n You may have less access it is dependant upon the teams access to the repo. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
                 assignee=user_name,
             )
         except Exception:
@@ -512,6 +516,39 @@ def create_an_issue(user_name, repository_name):
                 + repository_name
             )
             print_stack_trace(message)
+
+
+def close_expired_issues(repository_name):
+    """Close issues that have been open longer than 45 days
+
+    Args:
+        repository_name (string): The name of the repository
+    """
+
+    try:
+        gh = Github(oauth_token)
+        repo = gh.get_repo("ministryofjustice/" + repository_name)
+        issues = repo.get_issues()
+        for issue in issues:
+            # Check for open issues that match the issue created by this script
+            if (
+                issue.title == "User access removed, access is now via a team"
+                and issue.state == "open"
+            ):
+                created_date = issue.created_at
+                grace_period = created_date + timedelta(days=45)
+                # Check if the 45 day grace period has expired
+                if grace_period < datetime.now():
+                    # Close issue
+                    issue.edit(state="closed")
+
+                    # Delay for GH API
+                    time.sleep(5)
+    except Exception:
+        message = (
+            "Warning: Exception in closing issue in the repository: " + repository_name
+        )
+        print_stack_trace(message)
 
 
 def run():
@@ -528,6 +565,8 @@ def run():
 
     # loop through each organisation repository that has direct members
     for repository in org_repositories:
+        # close any previously opened issues that have expired
+        close_expired_issues(repository.name)
         for direct_member in repository.direct_members:
             # loop through all the teams
             for team in org_teams:
