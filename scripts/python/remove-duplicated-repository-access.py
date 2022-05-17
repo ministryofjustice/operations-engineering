@@ -568,7 +568,7 @@ def run():
         # close any previously opened issues that have expired
         close_expired_issues(repository.name)
         if repository.direct_members:
-            print(repository.name)
+            print("\n" + repository.name)
         for direct_member in repository.direct_members:
             print(direct_member)
             # loop through all the teams
