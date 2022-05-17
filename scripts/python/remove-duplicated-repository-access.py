@@ -567,7 +567,10 @@ def run():
     for repository in org_repositories:
         # close any previously opened issues that have expired
         close_expired_issues(repository.name)
+        if repository.direct_members:
+            print(repository.name)
         for direct_member in repository.direct_members:
+            print(direct_member)
             # loop through all the teams
             for team in org_teams:
                 # see if that team is attached to the repository and contains the direct member
