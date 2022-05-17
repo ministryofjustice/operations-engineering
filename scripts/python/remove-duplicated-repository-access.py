@@ -551,8 +551,26 @@ def close_expired_issues(repository_name):
         print_stack_trace(message)
 
 
+def get_outside_collaborators():
+    """
+    Create a list of the outside collaborators usernames
+
+    Returns:
+        list: The list of outside collaborators usernames
+    """
+    gh = Github(oauth_token)
+    org = gh.get_organization("ministryofjustice")
+    usernames = []
+    for outside_collaborator in org.get_outside_collaborators():
+        usernames.append(outside_collaborator.login)
+    return usernames
+
+
 def run():
     """A function for the main functionality of the script"""
+
+    # Get the usernames of the outside collaborators
+    outside_collaborators = get_outside_collaborators()
 
     # Get the MoJ organisation teams and users info
     org_teams = fetch_teams()
@@ -563,42 +581,45 @@ def run():
     previous_direct_member = ""
     previous_repository_name = ""
 
-    # loop through each organisation repository that has direct members
+    # loop through each organisation repository
     for repository in org_repositories:
         # close any previously opened issues that have expired
         close_expired_issues(repository.name)
         if repository.direct_members:
             print("\n" + repository.name)
+        # loop through each repository direct members
         for direct_member in repository.direct_members:
-            print(direct_member)
-            # loop through all the teams
-            for team in org_teams:
-                # see if that team is attached to the repository and contains the direct member
-                if (repository.name in team.team_repositories) and (
-                    direct_member in team.team_users
-                ):
-                    # This check helps skip duplicated results
-                    if (direct_member == previous_direct_member) and (
-                        repository.name == previous_repository_name
+            # Skip outside collaborators
+            if direct_member not in outside_collaborators:
+                print(direct_member)
+                # loop through all the organisation teams
+                for team in org_teams:
+                    # see if that team is attached to the repository and contains the direct member
+                    if (repository.name in team.team_repositories) and (
+                        direct_member in team.team_users
                     ):
-                        pass
-                    else:
-                        # raise an issue to say the user has been removed and has access via the team
-                        create_an_issue(direct_member, repository.name)
+                        # This check helps skip duplicated results
+                        if (direct_member == previous_direct_member) and (
+                            repository.name == previous_repository_name
+                        ):
+                            pass
+                        else:
+                            # raise an issue to say the user has been removed and has access via the team
+                            create_an_issue(direct_member, repository.name)
 
-                        # remove the direct member from the repository
-                        remove_user_from_repository(direct_member, repository.name)
+                            # remove the direct member from the repository
+                            remove_user_from_repository(direct_member, repository.name)
 
-                        print(
-                            "Removing the user "
-                            + direct_member
-                            + " from the repository: "
-                            + repository.name
-                        )
+                            print(
+                                "Removing the user "
+                                + direct_member
+                                + " from the repository: "
+                                + repository.name
+                            )
 
-                        # save values for next iteration
-                        previous_direct_member = direct_member
-                        previous_repository_name = repository.name
+                            # save values for next iteration
+                            previous_direct_member = direct_member
+                            previous_repository_name = repository.name
 
 
 print("Start")
