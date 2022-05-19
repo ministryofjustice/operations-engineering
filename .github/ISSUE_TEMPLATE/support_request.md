@@ -23,4 +23,5 @@ valid service label options are:
 - `Docker`
 - `MoJ Acronyms`
 - `CircleCI`
+- `SonarCloud.io`
 - `Other Support Request`
