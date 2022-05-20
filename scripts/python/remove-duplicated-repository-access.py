@@ -883,7 +883,7 @@ def run():
                 repository.name, username, remaining_users, org_teams
             )
 
-        put_users_into_new_team(remaining_users)
+        put_users_into_new_team(repository.name, remaining_users)
 
 
 print("Start")
