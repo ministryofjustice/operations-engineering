@@ -708,7 +708,7 @@ def add_user_to_team(team_id, username):
         gh_team = org.get_team(team_id)
         user = gh.get_user(username)
         gh_team.add_membership(user)
-        print("Add user " + username " to team " + team_id)
+        print("Add user " + username + " to team " + team_id)
     except Exception:
         message = (
             "Warning: Exception in adding user " + username + " to team " + team_id
