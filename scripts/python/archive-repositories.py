@@ -48,6 +48,5 @@ logging.info("-----------------------------")
 
 # Archive repos
 for repo in repos:
-    logging.info(repo.name)
-    #MojArchive(repo).archive()
+    MojArchive(repo).archive()
 
