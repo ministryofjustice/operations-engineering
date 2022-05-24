@@ -13,6 +13,8 @@ oauth_token = sys.argv[1]
 repo_issues_enabled = {}
 outside_collaborators = []
 
+MINISTRYOFJUSTICE = "ministryofjustice/"
+
 
 def print_stack_trace(message):
     """Print a stack trace when an exception occurs
@@ -276,13 +278,11 @@ def fetch_repo_names() -> list:
         # Retrieve the name of the repos
         for repo in data["organization"]["repositories"]["edges"]:
             # Skip locked repositories
-            if (
+            if not (
                 repo["node"]["isDisabled"]
                 or repo["node"]["isArchived"]
                 or repo["node"]["isLocked"]
             ):
-                pass
-            else:
                 repo_name_list.append(repo["node"]["name"])
                 repo_issues_enabled[repo["node"]["name"]] = repo["node"][
                     "hasIssuesEnabled"
@@ -524,7 +524,7 @@ def remove_user_from_repository(user_name, repository_name):
 
     try:
         gh = Github(oauth_token)
-        repo = gh.get_repo("ministryofjustice/" + repository_name)
+        repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
         repo.remove_from_collaborators(user_name)
         print(
             "Removing the user "
@@ -556,7 +556,7 @@ def create_an_issue(user_name, repository_name):
 
         try:
             gh = Github(oauth_token)
-            repo = gh.get_repo("ministryofjustice/" + repository_name)
+            repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
             repo.create_issue(
                 title="User access removed, access is now via a team",
                 body="Hi there \n\n The user "
@@ -583,7 +583,7 @@ def close_expired_issues(repository_name):
 
     try:
         gh = Github(oauth_token)
-        repo = gh.get_repo("ministryofjustice/" + repository_name)
+        repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
         issues = repo.get_issues()
         for issue in issues:
             # Check for open issues that match the issue created by this script
@@ -652,11 +652,9 @@ def remove_users_with_duplicate_access(
                 username in team.team_users
             ):
                 # This check helps skip duplicated results
-                if (username == previous_user) and (
-                    repository_name == previous_repository
+                if (username != previous_user) and (
+                    repository_name != previous_repository
                 ):
-                    pass
-                else:
                     # raise an issue to say the user has been removed and has access via the team
                     create_an_issue(username, repository_name)
 
@@ -685,7 +683,7 @@ def get_user_permission(repository_name, username):
 
     try:
         gh = Github(oauth_token)
-        repo = gh.get_repo("ministryofjustice/" + repository_name)
+        repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
         user = gh.get_user(username)
         users_permission = repo.get_collaborator_permission(user)
     except Exception:
@@ -708,7 +706,7 @@ def add_user_to_team(team_id, username):
         gh_team = org.get_team(team_id)
         user = gh.get_user(username)
         gh_team.add_membership(user)
-        print("Add user " + username " to team " + team_id)
+        print("Add user " + username + " to team " + team_id)
     except Exception:
         message = (
             "Warning: Exception in adding user " + username + " to team " + team_id
@@ -725,7 +723,7 @@ def create_new_team_with_repository(repository_name, team_name):
     """
     try:
         gh = Github(oauth_token)
-        repo = gh.get_repo("ministryofjustice/" + repository_name)
+        repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
         org = gh.get_organization("ministryofjustice")
         org.create_team(
             team_name,
@@ -782,7 +780,7 @@ def change_team_repository_permission(repository_name, team_name, team_id, permi
 
     try:
         gh = Github(oauth_token)
-        repo = gh.get_repo("ministryofjustice/" + repository_name)
+        repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
         org = gh.get_organization("ministryofjustice")
         gh_team = org.get_team(team_id)
         gh_team.update_team_repository(repo, permission)
@@ -863,7 +861,7 @@ def run():
     org_repositories = fetch_repositories()
 
     test_count = 0
-        
+
     # loop through each organisation repository
     for repository in org_repositories:
 
@@ -880,7 +878,7 @@ def run():
         )
 
         remaining_users = users_not_in_a_team
-        
+
         if test_count < 5:
             for username in users_not_in_a_team:
                 put_user_into_existing_team(
