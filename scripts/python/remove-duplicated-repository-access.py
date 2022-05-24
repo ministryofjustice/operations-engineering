@@ -708,6 +708,7 @@ def add_user_to_team(team_id, username):
         gh_team = org.get_team(team_id)
         user = gh.get_user(username)
         gh_team.add_membership(user)
+        print("Add user " + username " to team " + team_id)
     except Exception:
         message = (
             "Warning: Exception in adding user " + username + " to team " + team_id
@@ -861,6 +862,8 @@ def run():
     # Get the MoJ organisation repos and direct users
     org_repositories = fetch_repositories()
 
+    test_count = 0
+        
     # loop through each organisation repository
     for repository in org_repositories:
 
@@ -877,13 +880,16 @@ def run():
         )
 
         remaining_users = users_not_in_a_team
+        
+        if test_count < 5:
+            for username in users_not_in_a_team:
+                put_user_into_existing_team(
+                    repository.name, username, remaining_users, org_teams
+                )
 
-        for username in users_not_in_a_team:
-            put_user_into_existing_team(
-                repository.name, username, remaining_users, org_teams
-            )
+            put_users_into_new_team(repository.name, remaining_users)
 
-        put_users_into_new_team(repository.name, remaining_users)
+            test_count += test_count
 
 
 print("Start")
