@@ -652,8 +652,8 @@ def remove_users_with_duplicate_access(
                 username in team.team_users
             ):
                 # This check helps skip duplicated results
-                if not (username == previous_user) and (
-                    repository_name == previous_repository
+                if (username != previous_user) and (
+                    repository_name != previous_repository
                 ):
                     # raise an issue to say the user has been removed and has access via the team
                     create_an_issue(username, repository_name)
