@@ -856,6 +856,7 @@ def put_users_into_new_team(repository_name, remaining_users):
         remaining_users (list): a list of user names that have direct access to the repository
     """
     team_created = False
+    team_id = 0
 
     for username in remaining_users:
         users_permission = get_user_permission(repository_name, username)
@@ -876,7 +877,7 @@ def put_users_into_new_team(repository_name, remaining_users):
         remove_user_from_repository(username, repository_name)
 
     if team_created:
-        remove_user_from_team(team.team_id, "AntonyBishop")
+        remove_user_from_team(team_id, "AntonyBishop")
 
 
 def run():
