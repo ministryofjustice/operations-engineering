@@ -34,7 +34,7 @@ jobs:
         id: approve_pr_check
         uses: ministryofjustice/cloud-platform-doc-checker@main
         env:
-          GITHUB_TOKEN: ${{ ssecrets.OPERATIONS_ENGINEERING }}
+          GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
 
       - name: Approving PR
         uses: hmarr/auto-approve-action@v2
