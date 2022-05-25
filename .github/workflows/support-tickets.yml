@@ -19,7 +19,7 @@ jobs:
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/assign-support-tickets.py
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   close-support-ticket:
     runs-on: ubuntu-latest
     steps:
@@ -32,4 +32,4 @@ jobs:
       - run: pip install -r scripts/python/requirements.txt
       - run: python scripts/python/close-support-tickets.py
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
