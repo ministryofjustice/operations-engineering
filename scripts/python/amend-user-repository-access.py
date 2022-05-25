@@ -693,6 +693,30 @@ def get_user_permission(repository_name, username):
     return users_permission
 
 
+def remove_user_from_team(team_id, username):
+    """remove a user from a team
+
+    Args:
+        team_id (int): the GH ID of the team
+        username (string): the name of the user
+    """
+    try:
+        gh = Github(oauth_token)
+        org = gh.get_organization("ministryofjustice")
+        gh_team = org.get_team(team_id)
+        user = gh.get_user(username)
+        gh_team.remove_membership(user)
+        print("Remove user " + username + " from team " + team_id.__str__())
+    except Exception:
+        message = (
+            "Warning: Exception in removing user "
+            + username
+            + " from team "
+            + team_id.__str__()
+        )
+        print_stack_trace(message)
+
+
 def add_user_to_team(team_id, username):
     """add a user to a team
 
@@ -831,6 +855,8 @@ def put_users_into_new_team(repository_name, remaining_users):
         repository_name (string): the name of the repository
         remaining_users (list): a list of user names that have direct access to the repository
     """
+    team_created = False
+    team_id = 0
 
     for username in remaining_users:
         users_permission = get_user_permission(repository_name, username)
@@ -839,6 +865,7 @@ def put_users_into_new_team(repository_name, remaining_users):
 
         if not does_team_exist(team_name):
             create_new_team_with_repository(repository_name, team_name)
+            team_created = True
 
         team_id = fetch_team_id(team_name)
 
@@ -848,6 +875,9 @@ def put_users_into_new_team(repository_name, remaining_users):
 
         add_user_to_team(team_id, username)
         remove_user_from_repository(username, repository_name)
+
+    if team_created:
+        remove_user_from_team(team_id, "AntonyBishop")
 
 
 def run():
