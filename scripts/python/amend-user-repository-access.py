@@ -599,7 +599,7 @@ def close_expired_issues(repository_name):
                     issue.edit(state="closed")
 
                     # Delay for GH API
-                    time.sleep(5)
+                    time.sleep(10)
     except Exception:
         message = (
             "Warning: Exception in closing issue in the repository: " + repository_name
@@ -644,7 +644,6 @@ def remove_users_with_duplicate_access(
 
     # loop through each repository direct users
     for username in repository_direct_users:
-        print(username)
         # loop through all the organisation teams
         for team in org_teams:
             # see if that team is attached to the repository and contains the direct user
@@ -832,20 +831,27 @@ def put_user_into_existing_team(
         users_not_in_a_team (list): a list of the repositories users with direct access
         org_teams (list): a list of the organizations teams
     """
-    users_permission = get_user_permission(repository_name, username)
 
-    # create a team name that has the same permissions as the user
-    expected_team_name = repository_name + "-" + users_permission + "-team"
+    if repository_name == "" or username == "" or len(org_teams) == 0:
+        users_not_in_a_team.clear()
+        return
+    elif len(users_not_in_a_team) == 0:
+        return
+    else:
+        users_permission = get_user_permission(repository_name, username)
 
-    # Find an existing team with the same permissions as
-    # the user which has access to the repository
-    for team in org_teams:
-        if (expected_team_name == team.name) and (
-            repository_name in team.team_repositories
-        ):
-            add_user_to_team(team.team_id, username)
-            remove_user_from_repository(username, repository_name)
-            users_not_in_a_team.remove(username)
+        # create a team name that has the same permissions as the user
+        expected_team_name = repository_name + "-" + users_permission + "-team"
+
+        # Find an existing team with the same permissions as
+        # the user which has access to the repository
+        for team in org_teams:
+            if (expected_team_name == team.name) and (
+                repository_name in team.team_repositories
+            ):
+                add_user_to_team(team.team_id, username)
+                remove_user_from_repository(username, repository_name)
+                users_not_in_a_team.remove(username)
 
 
 def put_users_into_new_team(repository_name, remaining_users):
@@ -858,26 +864,29 @@ def put_users_into_new_team(repository_name, remaining_users):
     team_created = False
     team_id = 0
 
-    for username in remaining_users:
-        users_permission = get_user_permission(repository_name, username)
+    if repository_name == "" or len(remaining_users) == 0:
+        return
+    else:
+        for username in remaining_users:
+            users_permission = get_user_permission(repository_name, username)
 
-        team_name = repository_name + "-" + users_permission + "-team"
+            team_name = repository_name + "-" + users_permission + "-team"
 
-        if not does_team_exist(team_name):
-            create_new_team_with_repository(repository_name, team_name)
-            team_created = True
+            if not does_team_exist(team_name):
+                create_new_team_with_repository(repository_name, team_name)
+                team_created = True
 
-        team_id = fetch_team_id(team_name)
+            team_id = fetch_team_id(team_name)
 
-        change_team_repository_permission(
-            repository_name, team_name, team_id, users_permission
-        )
+            change_team_repository_permission(
+                repository_name, team_name, team_id, users_permission
+            )
 
-        add_user_to_team(team_id, username)
-        remove_user_from_repository(username, repository_name)
+            add_user_to_team(team_id, username)
+            remove_user_from_repository(username, repository_name)
 
-    if team_created:
-        remove_user_from_team(team_id, "AntonyBishop")
+        if team_created:
+            remove_user_from_team(team_id, "AntonyBishop")
 
 
 def run():
