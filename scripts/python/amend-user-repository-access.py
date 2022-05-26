@@ -7,8 +7,17 @@ from github import Github
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
-# Get the GH Action token
-oauth_token = sys.argv[1]
+oauth_token = 0
+script_initiator_username = ""
+
+if len(sys.argv) == 3:
+    # Get the GH Action token
+    oauth_token = sys.argv[1]
+    # Get the username of the person that started the script
+    script_initiator_username = sys.argv[2]
+else:
+    print("Missing a script input parameter")
+    sys.exit()
 
 repo_issues_enabled = {}
 outside_collaborators = []
@@ -886,7 +895,7 @@ def put_users_into_new_team(repository_name, remaining_users):
             remove_user_from_repository(username, repository_name)
 
         if team_created:
-            remove_user_from_team(team_id, "AntonyBishop")
+            remove_user_from_team(team_id, script_initiator_username)
 
 
 def run():
