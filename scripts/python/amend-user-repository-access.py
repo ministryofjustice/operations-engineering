@@ -517,6 +517,8 @@ def fetch_teams() -> list:
     teams_names_list = fetch_team_names()
     for team_name in teams_names_list:
         teams_list.append(fetch_team(team_name))
+        # Delay for GH API
+        time.sleep(1)
 
     return teams_list
 
@@ -528,9 +530,6 @@ def remove_user_from_repository(user_name, repository_name):
         user_name (string): User name of the user to remove
         repository_name (string): Name of repository
     """
-    # Delay for GH API
-    time.sleep(10)
-
     try:
         gh = Github(oauth_token)
         repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
@@ -541,6 +540,8 @@ def remove_user_from_repository(user_name, repository_name):
             + " from the repository: "
             + repository_name
         )
+        # Delay for GH API
+        time.sleep(10)
     except Exception:
         message = (
             "Warning: Exception in removing a user "
@@ -560,9 +561,6 @@ def create_an_issue(user_name, repository_name):
     """
 
     if repo_issues_enabled.get(repository_name):
-        # Delay for GH API
-        time.sleep(10)
-
         try:
             gh = Github(oauth_token)
             repo = gh.get_repo(MINISTRYOFJUSTICE + repository_name)
@@ -573,6 +571,8 @@ def create_an_issue(user_name, repository_name):
                 + " had Direct Member access to this repository and access via a team. \n\n Access is now only via a team. \n\n You may have less access it is dependant upon the teams access to the repo. \n\n If you have any questions, please post in #ask-operations-engineering on Slack. \n\n This issue can be closed. ",
                 assignee=user_name,
             )
+            # Delay for GH API
+            time.sleep(10)
         except Exception:
             message = (
                 "Warning: Exception in creating an issue for user "
@@ -606,7 +606,6 @@ def close_expired_issues(repository_name):
                 if grace_period < datetime.now():
                     # Close issue
                     issue.edit(state="closed")
-
                     # Delay for GH API
                     time.sleep(10)
     except Exception:
@@ -715,6 +714,8 @@ def remove_user_from_team(team_id, username):
         user = gh.get_user(username)
         gh_team.remove_membership(user)
         print("Remove user " + username + " from team " + team_id.__str__())
+        # Delay for GH API
+        time.sleep(10)
     except Exception:
         message = (
             "Warning: Exception in removing user "
@@ -739,6 +740,8 @@ def add_user_to_team(team_id, username):
         user = gh.get_user(username)
         gh_team.add_membership(user)
         print("Add user " + username + " to team " + team_id.__str__())
+        # Delay for GH API
+        time.sleep(10)
     except Exception:
         message = (
             "Warning: Exception in adding user "
@@ -767,6 +770,8 @@ def create_new_team_with_repository(repository_name, team_name):
             "closed",
             "Automated generated team to grant users access to this repository",
         )
+        # Delay for GH API
+        time.sleep(10)
     except Exception:
         message = "Warning: Exception in creating a team " + team_name
         print_stack_trace(message)
@@ -819,6 +824,8 @@ def change_team_repository_permission(repository_name, team_name, team_id, permi
         org = gh.get_organization("ministryofjustice")
         gh_team = org.get_team(team_id)
         gh_team.update_team_repository(repo, permission)
+        # Delay for GH API
+        time.sleep(10)
     except Exception:
         message = (
             "Warning: Exception in changing team "
@@ -870,7 +877,6 @@ def put_users_into_new_team(repository_name, remaining_users):
         repository_name (string): the name of the repository
         remaining_users (list): a list of user names that have direct access to the repository
     """
-    team_created = False
     team_id = 0
 
     if repository_name == "" or len(remaining_users) == 0:
@@ -883,7 +889,8 @@ def put_users_into_new_team(repository_name, remaining_users):
 
             if not does_team_exist(team_name):
                 create_new_team_with_repository(repository_name, team_name)
-                team_created = True
+                team_id = fetch_team_id(team_name)
+                remove_user_from_team(team_id, script_initiator_username)
 
             team_id = fetch_team_id(team_name)
 
@@ -893,9 +900,6 @@ def put_users_into_new_team(repository_name, remaining_users):
 
             add_user_to_team(team_id, username)
             remove_user_from_repository(username, repository_name)
-
-        if team_created:
-            remove_user_from_team(team_id, script_initiator_username)
 
 
 def run():
