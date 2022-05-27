@@ -914,23 +914,24 @@ def run():
     # loop through each organisation repository
     for repository in org_repositories:
 
-        # close any previously opened issues that have expired
-        close_expired_issues(repository.name)
+        if repository.name != "MOJ.PTTP.DevicesAndApps.Pipeline.Windows10Apps":
+            # close any previously opened issues that have expired
+            close_expired_issues(repository.name)
 
-        users_not_in_a_team = repository.direct_members
+            users_not_in_a_team = repository.direct_members
 
-        remove_users_with_duplicate_access(
-            repository.name, repository.direct_members, users_not_in_a_team, org_teams
-        )
-
-        remaining_users = users_not_in_a_team
-
-        for username in users_not_in_a_team:
-            put_user_into_existing_team(
-                repository.name, username, remaining_users, org_teams
+            remove_users_with_duplicate_access(
+                repository.name, repository.direct_members, users_not_in_a_team, org_teams
             )
 
-        put_users_into_new_team(repository.name, remaining_users)
+            remaining_users = users_not_in_a_team
+
+            for username in users_not_in_a_team:
+                put_user_into_existing_team(
+                    repository.name, username, remaining_users, org_teams
+                )
+
+            put_users_into_new_team(repository.name, remaining_users)
 
 
 print("Start")
