@@ -10,11 +10,9 @@ from gql.transport.aiohttp import AIOHTTPTransport
 oauth_token = 0
 script_initiator_username = ""
 
-if len(sys.argv) == 3:
+if len(sys.argv) == 2:
     # Get the GH Action token
     oauth_token = sys.argv[1]
-    # Get the username of the person that started the script
-    script_initiator_username = sys.argv[2]
 else:
     print("Missing a script input parameter")
     sys.exit()
@@ -890,7 +888,8 @@ def put_users_into_new_team(repository_name, remaining_users):
             if not does_team_exist(team_name):
                 create_new_team_with_repository(repository_name, team_name)
                 team_id = fetch_team_id(team_name)
-                remove_user_from_team(team_id, script_initiator_username)
+                # Because the oauth_token belongs to AntonyBishop he is added to every team
+                remove_user_from_team(team_id, "AntonyBishop")
 
             team_id = fetch_team_id(team_name)
 
