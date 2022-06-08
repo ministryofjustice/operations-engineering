@@ -14,6 +14,8 @@ sentry.io account using this [self signup link].
 
 ![Sentry.io Self Signup Form](../../images/sentry-self-signup.png)
 
+Anyone in the MoJ organisation in Sentry could potentially view the information you send over. While that is presumed a trusted group, it is still advisable to remove any Personal Identifiable Information from your errors and traces. Sentry have [documentation] on how to do that, and there are examples in the code samples linked at the bottom of this page.
+
 
 In addition to error and custom even tracking, our Sentry plan now includes [performance monitoring].
 
@@ -30,6 +32,7 @@ Below are some examples of performance monitoring config from MoJ projects: [Exp
 [Sentry.io]: https://sentry.io
 [MoJ GitHub Organization]: https://github.com/ministryofjustice
 [self signup link]: https://sentry.io/auth/login/ministryofjustice/
+[documentation]: https://docs.sentry.io/product/data-management-settings/scrubbing/advanced-datascrubbing/
 [performance monitoring]: https://docs.sentry.io/product/performance/
 [rate limit]: https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#6-rate-limiting
 [Express]: https://github.com/ministryofjustice/hmpps-book-secure-move-frontend/blob/501bc4aadfd8626532a61cf1239465c68760427c/server.js#L68-L106
