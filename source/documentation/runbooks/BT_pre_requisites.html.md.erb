@@ -1,0 +1,32 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: BT DNS Change Process Pre-requisites
+last_reviewed_on: 2022-06-08
+review_in: 3 months
+---
+
+# BT DNS Change Process Pre-requisites
+
+This runbook provides a set of steps that should be followed to ensure that DNS changes to domains that are subject to [Registry Lock](https://www.gov.uk/guidance/keeping-your-domain-name-secure#check-name-servers-critical-to-your-domain-are-locked) go as smoothly as possible.
+
+In our case we have a number of `gov.uk` domains that are registered via BT which are subject to Registry Lock. This means that any changes to Nameserver records require verbal authorisation by the MoJ Operational Security (OST), via [JISC](https://www.jisc.ac.uk/domain-registry) who manage the second level domain .gov.uk on behalf of Cabinet Office.
+
+## Set an appropriate date for DNS changes to be implemented
+
+Agree and appropriate change window with the change originator. You should allow up to 5 working days to make the various arrangements.
+
+Changes to Registry Locked domains take place twice a day (at 10:07 and 15:07). 
+
+Do not schedule changes outside of normal working hours as JISC do not offer a service out of hours or at weekends. 
+
+## Contact Operational Security
+
+Prior to changes contact [Operational Security](mailto:OperationalSecurityTeam@justice.gov.uk) to advise them of the changes that are being made. Also, depending in the schedule for changes request confirmation of who will be central point of contact that day and confirm their telephone contact details (mobile and/or landline). This number will be used by JISC on the day to gain approval for changes.
+
+## Contact GDS Domain Management
+
+Prior to changes contact GDS Domain Management(mailto:domainmanagement@digital.cabinet-office.gov.uk) to get confirmation of the number they have registered as the Operational Security named contact. If it differs from the contact provided by OST, provide GDS will new details and advise then to contact JISC to update their records.
+
+## Raise change with BT
+
+Now all the contact details should be up to date and OST are aware of scheduled changes. Raise the change request with BT via their [portal](https://www.dmc.bt.com/). BT will implement changes and notify JISC, who in turn will contact OST for approval. BT will keep us notified of progress via domains@digital.justice.gov.uk
