@@ -1,0 +1,26 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: ADR-004 Docker SSO
+last_reviewed_on: 2022-06-15
+review_in: 6 months
+---
+
+# ADR-004 DNS Failover
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Operations Engineering manages the Docker organisation for the MoJ. Docker have now introduced Single Sign-On (SSO) as an option for people to authenticate. We have set this up with Auth0. 
+
+We use Github as our identity provider. This means that when someone joins or leaves the MoJ Github organisation, this will be reflected in the Docker organisation.
+
+## Decision
+
+Use Docker SSO as the primary login method for the MoJ Docker organisation.
+
+## Consequences
+
+We have already onboarded quite a few people and some might end up with two accounts. This can be prevented by adding a user's digital.justice.gov.uk email to their Docker profile. On a subsequent SSO the accounts will be merged.
