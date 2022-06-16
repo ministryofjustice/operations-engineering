@@ -326,8 +326,7 @@ def fetch_repository_users(repository_name) -> list:
                 # Ignore users that are outside collaborators
                 global outside_collaborators
                 if repository["node"]["login"] not in outside_collaborators:
-                    repository_user_name_list.append(
-                        repository["node"]["login"])
+                    repository_user_name_list.append(repository["node"]["login"])
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
@@ -371,9 +370,13 @@ def fetch_team_id(team_name) -> int:
     Returns:
         int: The team ID of the team
     """
+    print(team_name)
     query = organisation_team_id_query(team_name)
     data = client.execute(query)
-    if data["organization"]["team"]["databaseId"] is not None and data["organization"]["team"]["databaseId"]:
+    if (
+        data["organization"]["team"]["databaseId"] is not None
+        and data["organization"]["team"]["databaseId"]
+    ):
         return data["organization"]["team"]["databaseId"]
     else:
         return 0
@@ -907,6 +910,12 @@ def put_users_into_new_team(repository_name, remaining_users):
             remove_user_from_repository(username, repository_name)
 
 
+badly_named_repositories = [
+    "https---github.com-ministryofjustice-hmpps-incentives-tool",
+    "MOJ.PTTP.DevicesAndApps.Pipeline.Windows10Apps",
+]
+
+
 def run():
     """A function for the main functionality of the script"""
 
@@ -923,14 +932,17 @@ def run():
     # loop through each organisation repository
     for repository in org_repositories:
 
-        if repository.name != "MOJ.PTTP.DevicesAndApps.Pipeline.Windows10Apps":
+        if repository.name not in badly_named_repositories:
             # close any previously opened issues that have expired
             close_expired_issues(repository.name)
 
             users_not_in_a_team = repository.direct_members
 
             remove_users_with_duplicate_access(
-                repository.name, repository.direct_members, users_not_in_a_team, org_teams
+                repository.name,
+                repository.direct_members,
+                users_not_in_a_team,
+                org_teams,
             )
 
             remaining_users = users_not_in_a_team
