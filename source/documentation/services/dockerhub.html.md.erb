@@ -1,11 +1,17 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: MoJ Dockerhub Account
-last_reviewed_on: 2022-04-22
+last_reviewed_on: 2022-06-16
 review_in: 3 months
 ---
 # MoJ Dockerhub Account
 
 Operations Engineering is the owner of the [Ministry of Justice Dockerhub account](https://hub.docker.com/).
 
-If you require access to the MoJ account please contact #ask-operations-engineering slack channel.
+We have enabled SSO for the organisation. When you go to sign in, whether on the web or in the desktop client, enter your digital.justice.gov.uk email and you will be taken through an Auth0 flow where you will be asked to authenticate with Github. Once that is complete you will automatically gain access to the organisation.
+
+If you have a DockerHub account that you would like to continue using, make sure your digital.justice.gov.uk email is listed on that account. When you go through the SSO process, the accounts will be merged.
+
+If you are having trouble completing sign-in with SSO in the desktop client, Docker require version 4.4.2 at minimum for the process to work.
+
+If you have any issues please contact #ask-operations-engineering slack channel.
