@@ -6,7 +6,7 @@ on:
 env:
   PR_OWNER: ${{ github.event.pull_request.user.login }}
   GITHUB_OAUTH_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
-  TEAM_NAME: "operations-engineering"
+  TEAM_NAME: "operations-engineering"   
 
 jobs:
   check-diff:
