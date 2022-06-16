@@ -283,17 +283,18 @@ def fetch_repo_names() -> list:
         data = client.execute(query)
 
         # Retrieve the name of the repos
-        for repo in data["organization"]["repositories"]["edges"]:
-            # Skip locked repositories
-            if not (
-                repo["node"]["isDisabled"]
-                or repo["node"]["isArchived"]
-                or repo["node"]["isLocked"]
-            ):
-                repo_name_list.append(repo["node"]["name"])
-                repo_issues_enabled[repo["node"]["name"]] = repo["node"][
-                    "hasIssuesEnabled"
-                ]
+        if data["organization"]["repositories"]["edges"] is not None:
+            for repo in data["organization"]["repositories"]["edges"]:
+                # Skip locked repositories
+                if not (
+                    repo["node"]["isDisabled"]
+                    or repo["node"]["isArchived"]
+                    or repo["node"]["isLocked"]
+                ):
+                    repo_name_list.append(repo["node"]["name"])
+                    repo_issues_enabled[repo["node"]["name"]] = repo["node"][
+                        "hasIssuesEnabled"
+                    ]
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
@@ -320,11 +321,13 @@ def fetch_repository_users(repository_name) -> list:
         data = client.execute(query)
 
         # Retrieve the usernames of the repository members
-        for repository in data["repository"]["collaborators"]["edges"]:
-            # Ignore users that are outside collaborators
-            global outside_collaborators
-            if repository["node"]["login"] not in outside_collaborators:
-                repository_user_name_list.append(repository["node"]["login"])
+        if data["repository"]["collaborators"]["edges"] is not None:
+            for repository in data["repository"]["collaborators"]["edges"]:
+                # Ignore users that are outside collaborators
+                global outside_collaborators
+                if repository["node"]["login"] not in outside_collaborators:
+                    repository_user_name_list.append(
+                        repository["node"]["login"])
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
@@ -348,8 +351,9 @@ def fetch_team_names() -> list:
         data = client.execute(query)
 
         # Retrieve the name of the teams
-        for team in data["organization"]["teams"]["edges"]:
-            team_name_list.append(team["node"]["slug"])
+        if data["organization"]["teams"]["edges"] is not None:
+            for team in data["organization"]["teams"]["edges"]:
+                team_name_list.append(team["node"]["slug"])
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["organization"]["teams"]["pageInfo"]["hasNextPage"]
@@ -369,7 +373,7 @@ def fetch_team_id(team_name) -> int:
     """
     query = organisation_team_id_query(team_name)
     data = client.execute(query)
-    if data["organization"]["team"]["databaseId"]:
+    if data["organization"]["team"]["databaseId"] is not None and data["organization"]["team"]["databaseId"]:
         return data["organization"]["team"]["databaseId"]
     else:
         return 0
@@ -393,8 +397,9 @@ def fetch_team_users(team_name) -> list:
         data = client.execute(query)
 
         # Retrieve the usernames of the team members
-        for team in data["organization"]["team"]["members"]["edges"]:
-            team_user_name_list.append(team["node"]["login"])
+        if data["organization"]["team"]["members"]["edges"] is not None:
+            for team in data["organization"]["team"]["members"]["edges"]:
+                team_user_name_list.append(team["node"]["login"])
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["organization"]["team"]["members"]["pageInfo"][
@@ -423,8 +428,9 @@ def fetch_team_repos(team_name) -> list:
         data = client.execute(query)
 
         # Retrieve the name of the teams repos
-        for team in data["organization"]["team"]["repositories"]["edges"]:
-            team_repo_list.append(team["node"]["name"])
+        if data["organization"]["team"]["repositories"]["edges"] is not None:
+            for team in data["organization"]["team"]["repositories"]["edges"]:
+                team_repo_list.append(team["node"]["name"])
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["organization"]["team"]["repositories"]["pageInfo"][
