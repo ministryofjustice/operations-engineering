@@ -1,0 +1,25 @@
+name: Add org members to team
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */7 * * *"
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - run: python3 -m pip install -r scripts/python/requirements.txt
+      - run: python3 scripts/python/add-users-all-org-members-github-team.py ${{ secrets.OPERATIONS_ENGINEERING }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
