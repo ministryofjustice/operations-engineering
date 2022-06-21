@@ -3,7 +3,7 @@ import os
 
 # Config
 days = 30  # Number of days to search back
-channel_id = "CPVD6398C"  # Channel ID of the channel to target
+channel_id = "C01BUKJSZD4"  # Channel ID of the channel to target
 
 # Setup auth object
 slack_obj = MojSlack(os.environ["SLACK_BOT_TOKEN"])
