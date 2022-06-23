@@ -1,0 +1,38 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Compiling the Operations Engineering Metrics pack
+last_reviewed_on: 2022-06-24
+review_in: 3 months
+---
+
+# Compiling the Operations Engineering Metrics pack
+
+> Note: that whilst this is still mostly a manual process, effort is being made to automate most of this currently.
+
+## Overview
+
+The Operations Engineering team aim to provide a metrics pack as part of their service.
+
+This metrics pack will allow for the following benefits to the team and MoJ:
+
+* A clear indication of where the teams efforts have been placed
+* The ability to draw trends over time on the usefulness/quality of the teams services
+* Additional data to help cost cutting exercises.
+
+## Metrics
+
+### Slack support channel requests
+
+A large amount of our services/support function is engaged with through the Slack support channel (#ask-operations-engineering).
+
+This metric offers the number of unique requests the channel has had each day for the past 30 days.
+
+#### How to gather the metric
+
+1. Navigate to the GitHub action [Get support channel messages'](https://github.com/ministryofjustice/operations-engineering/actions/workflows/get-support-channel-messages.yml)
+2. Press 'Run Workflow'
+3. Press 'Run Workflow'
+4. Refresh the page and click the top running action
+5. Press 'Run Script'
+6. Press 'Run python3 scripts/python/get-slack-support-messages.py'
+7. The metrics are currently within the printout you can currently see.
