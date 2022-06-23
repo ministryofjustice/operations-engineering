@@ -1,0 +1,37 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: ADR-005 Github Standards Branch Protection
+last_reviewed_on: 2022-06-22
+review_in: 6 months
+---
+
+# ADR-005 Github Standards Branch Protection
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Operations Engineering owns and looks after the [Github Repository standards] for the MoJ organisation. We are in the process of reviewing them in order to make sure they work for the community.
+
+Our current brach protection requirements do not fit the way every team works and so a lot of teams are accepting non-compliance. Our aim is for these standards to be a sensible minimum and currently they are not working for everyone.
+
+## Decision
+
+Change the requirement for branch protection of main from:
+    Require a pull request before merging
+    Require approvals option and a minimum number of user to approve the pull request.
+    Require review from Code Owners option
+    Include administrators option
+
+to:
+  Require a pull request before merging
+    Require approvals option and a minimum number of user who is a member of MoJ to approve the pull request
+    Include administrators option
+
+## Consequences
+
+This decision ensures code still needs to be reviewed by at least one other person who is a member of MoJ organisation, but does not require that to be a code owner. This allows for shared support workflows to continue without being non-compliant without exposing the MoJ to more risk.
+
+[Github Repository standards]: https://github.com/ministryofjustice/github-repository-standards#public-repositories-should
