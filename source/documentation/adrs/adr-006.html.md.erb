@@ -13,11 +13,11 @@ review_in: 6 months
 
 ## Context
 
-Operations Engineering reports are currently completely public. This means they are limited to public repositories. As a result the do not represent the complete code estate of the MoJ organisation.
+Operations Engineering reports are currently completely public. This means they are limited to public repositories. As a result they do not represent the complete code estate of the MoJ organisation.
 
 ## Decision
 
-Require authentication through Auth0 before the reports can be viewed.
+If the user is not authenticated, keep the current view. Authenticated users can view an enhanced version which includes private and public repositories.
 
 ## Consequences
 
