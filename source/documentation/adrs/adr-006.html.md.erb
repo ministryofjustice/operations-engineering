@@ -1,0 +1,24 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: ADR-006 Require authentication for team reports
+last_reviewed_on: 2022-06-29
+review_in: 6 months
+---
+
+# ADR-006 Require authentication for team reports
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Operations Engineering reports are currently completely public. This means they are limited to public repositories. As a result they do not represent the complete code estate of the MoJ organisation.
+
+## Decision
+
+If the user is not authenticated, keep the current view of only public repositories. Authenticated users can view an enhanced version which includes private and public repositories.
+
+## Consequences
+
+Private and internal repositories can be included in the reports, allowing a complete view over the estate.
