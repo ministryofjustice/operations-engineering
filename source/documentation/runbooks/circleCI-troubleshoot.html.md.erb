@@ -1,0 +1,20 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: CircleCI Troubleshooting
+last_reviewed_on: 2022-07-07
+review_in: 3 months
+---
+
+# CircleCI
+
+The Operations Engineering team have Admin permissions in [CircleCI](https://circleci.com/) and may be called upon to answer questions regarding the service, it's availability and behaviour. We do not provide support for issues with Circle setup, so if the issue isn't clear or listed here, we should point users to an appropriate channel.
+
+## Github PR workflows don't fire
+
+This usually means Circle doesn't think the user is authenticated/has access to the repository or team. This is a known issue and has happened multiple times to MoJ users. Usually there are failed Webhooks on Github and the way to restore order is to log out of GH and follow these Circle [instructions](https://support.circleci.com/hc/en-us/articles/360044395953-GitHub-Updates-Results-in-400-Response-for-Webhook)
+
+## Some variation of degraded job performance
+
+This could be due to resource constraints on the container the user is using to run the job. Circle now provides resource information in the "Resources" tab on each job so that can be easily verified.
+
+Sometimes multiple teams are running multiple workflows which strains Circle and things take longer. That is very rare now that we have upgraded our plan, but users might need to rerun workflows they suspect have become victim of account resource constraints.
