@@ -13,9 +13,8 @@ The Operations Engineering team have Admin permissions in [CircleCI](https://cir
 
 This usually means Circle doesn't think the user is authenticated/has access to the repository or team. This is a known issue and has happened multiple times to MoJ users. Usually there are failed Webhooks on Github and the way to restore order is to log out of GH and follow these Circle [instructions](https://support.circleci.com/hc/en-us/articles/360044395953-GitHub-Updates-Results-in-400-Response-for-Webhook)
 
-
 ## Some variation of degraded job performance
 
-This could be due to resource constraints on the container the user is using to run the job. Circle now provides resource information in the "Resources" tab on each job so that can be easily verified. 
+This could be due to resource constraints on the container the user is using to run the job. Circle now provides resource information in the "Resources" tab on each job so that can be easily verified.
 
 Sometimes multiple teams are running multiple workflows which strains Circle and things take longer. That is very rare now that we have upgraded our plan, but users might need to rerun workflows they suspect have become victim of account resource constraints.
