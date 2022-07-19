@@ -17,10 +17,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Publish
         run: |
-          # FIXME: The owner UID of the GITHUB_WORKSPACE directory may not
-          #        match the container user UID because of the way GitHub
-          #        Actions runner is implemented. Remove this workaround when
-          #        GitHub comes up with a fundamental fix for this problem.
           git config --global --add safe.directory ${GITHUB_WORKSPACE}
           /publishing-scripts/publish.sh
       - name: Report failure to Slack
