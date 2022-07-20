@@ -13,7 +13,7 @@ As part of the MoJ Github repository standards it has been decided that certain 
 
 See the [Standards](https://technical-guidance.service.justice.gov.uk/#building-software).
 
-The MoJ Github repositories are scanned on a daily basis to find non-compliant repositories via a Github Action. 
+The MoJ Github repositories are scanned on a daily basis to find non-compliant repositories via a Github Action.
 
 A repository that does not have the minimum Branch Protection settings will be non-compliant and an issue against the repository will be created per non enabled Branch Protection setting.
 
@@ -23,43 +23,35 @@ The non-compliant repositories and created issues are recorded within the [Opera
 
 ## Minimum Branch Protection Settings
 
-The minimum Branch Protection settings for a repository are:
-
-1. Require a pull request before merging.
-
-2. Require approvals.
-
-3. Require review from Code Owners.
-
-4. Include administrators.
+The minimum Branch Protection settings for a repository are listed on [github-repository-standards](https://github.com/ministryofjustice/github-repository-standards) repository.
 
 ## GH GraphQL Query
 
 Below is some of the Branch Protection rules within GH that can be obtained from a GraphQL query. The comment on each line maps the the Branch Protection rule to the Branch Protection setting within the GH repository settings UI.
 
-	{
-	  repository(name: "repo-name", owner: "ministryofjustice") {
-	    branchProtectionRules(first: 100) {
-	      edges {
-	        node {
-	          dismissesStaleReviews             # Dismiss stale pull request approvals when new commits are pushed
-	          isAdminEnforced                   # Include administrators
-	          pattern                           # Should be set to main
-	          requiredApprovingReviewCount      # Require approvals > 0
-	          requiredStatusCheckContexts       # Would apply to a .yml file I believe ie "terraform-plan"
-	          requiresApprovingReviews          # Require a pull request before merging
-	          requiresCodeOwnerReviews          # Require review from Code Owners
-	          requiresCommitSignatures          # Require signed commits
-	          requiresConversationResolution    # Require conversation resolution before merging
-	          requiresLinearHistory             # Require linear history
-	          requiresStrictStatusChecks        # Require branches to be up to date before merging
-	          requiresStatusChecks              # Require status checks to pass before merging
-	        }
-	      }
-	    }
-	  }
-	}
-	
+  {
+    repository(name: "repo-name", owner: "ministryofjustice") {
+      branchProtectionRules(first: 100) {
+        edges {
+          node {
+            dismissesStaleReviews             # Dismiss stale pull request approvals when new commits are pushed
+            isAdminEnforced                   # Include administrators
+            pattern                           # Should be set to main
+            requiredApprovingReviewCount      # Require approvals > 0
+            requiredStatusCheckContexts       # Would apply to a .yml file I believe ie "terraform-plan"
+            requiresApprovingReviews          # Require a pull request before merging
+            requiresCodeOwnerReviews          # Require review from Code Owners
+            requiresCommitSignatures          # Require signed commits
+            requiresConversationResolution    # Require conversation resolution before merging
+            requiresLinearHistory             # Require linear history
+            requiresStrictStatusChecks        # Require branches to be up to date before merging
+            requiresStatusChecks              # Require status checks to pass before merging
+          }
+        }
+      }
+    }
+  }
+
 ## How to implement a Branch Protection setting in Code
 
 Two repositories are required to implement a Branch Protection check, raise an issue and add the details to the report. These are the [github-repository-standards](https://github.com/ministryofjustice/github-repository-standards) repository and the [Operations Engineering Reports](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/github_repositories) repository.
@@ -68,7 +60,7 @@ The github-repository-standards repository contains the check and raises the iss
 
 The Operations Engineering Reports repository parses the output from github-repository-standards repository to generate a new report [here](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/github_repositories).
 
-The github-repository-standards repository Branch Protection check and raise issue againt a repository are implemented using  Ruby.  The files to look at are:<br>
+The github-repository-standards repository Branch Protection check and raise issue againt a repository are implemented using  Ruby. The files to look at are:<br>
 
 -  The [repository-checker](https://github.com/ministryofjustice/github-repository-standards/blob/main/bin/repository-checker) script file that is executed when the CI is run. This is entry point and will require editing for any Branch Protection rules changes. The script will acquire the MoJ repository data via GH GraphQL call, check that the Branch Protection setting is enabled or not and raise an issue where required. The final task of the script is to create a .json file that contains the Branch Protection setting results which is sent to the Operations Engineering Reports repository.
 
@@ -78,7 +70,7 @@ The github-repository-standards repository Branch Protection check and raise iss
 
 -  The [issue_creator.rb](https://github.com/ministryofjustice/github-repository-standards/blob/main/lib/issue_creator.rb) file is called by the repository-checker script when an issue should be raised against a repository. For new Branch Protection settings this file will need to be edited for each new rule. Each issue firstly does a check on the repository to see if an open issue already exists. If no issue exists then the issue is created on the repository with its own unique issue message.
 
-Note: Check the contents of the .json file after the script has completed to ensure the expected Branch Protection results are generated correctly. 
+Note: Check the contents of the .json file after the script has completed to ensure the expected Branch Protection results are generated correctly.
 
 In the Operations Engineering Reports repository the file to look at is:
 
