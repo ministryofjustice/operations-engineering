@@ -74,13 +74,15 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 
 **Note - We only offer "Standard" type certificates as part of our service.**
 
-7. For the question `What do you want to protect?` select the appropriate option for the request, then click "Next". 
+7. For the question `What do you want to protect?` select the appropriate option for the request, then click "Next". Generally we select Single address type unless multiple SAN names are provided within the CSR, if so pick Multi address type. Occassionaly a request will be for a full domain or wildcard, if so pick the Full domain type.
 
 **Note - If the request is for 9 or more addresses it may be better to request a wildcard certificate. Discuss with the requester on the best approach. If a wildcard is the best option the requester will need to supply a fresh wildcard CSR.**
 
 8. Paste the CSR text into the `CSR` box. Then click "Next". 
 
 **Remember to copy the entire contents of the .csr file, including the lines containing `-----BEGIN CERTIFICATE REQUEST-----` and `-----END CERTIFICATE REQUEST-----`. If there are any issues with the validity of the CSR file you will be notified at this stage. These will need to be rectified before you can proceed. Abandon the process and start again with a new CSR.**
+
+**If SSL certificate is a Multi address type, after copying in the CSR contents, you have to manually add the SAN names from the request form into Gandi, it does not automatically extract the information from the CSR.**
 
 9. Complete the checkout process. Ensure that when you get to the payment options section that you select `Pre-paid account` for the payment method. 
 
@@ -90,6 +92,8 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 
 **Note - Any preceding "_" or trailing "." characters in the CNAME values are extremely important for validation. Missing characters will mean that validation will not be successful.**
 
+**If SSL certificate is a Multi address type, then multiple CNAME's will be provided and need to be added to AWS**
+  
 12. When validation is complete an email will be sent to the Certificate Alerts Google group. Click on the link in the email to visit Gandi.net and download the new certificate.
 
 13. Email the certificate to the requester along with details of the expiry date. All certificates are valid for 12 months.
