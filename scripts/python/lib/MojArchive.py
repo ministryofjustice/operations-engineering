@@ -85,8 +85,8 @@ class MojArchive:
         logging.info(
             f"Archiving repository: {self.repo.name}, Status: Successful")
 
-        # Archive the repository
-        self.repo.edit(archived=True)
+#         # Archive the repository
+#         self.repo.edit(archived=True)
 
         return True
 
