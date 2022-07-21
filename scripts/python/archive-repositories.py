@@ -39,7 +39,7 @@ moj_gh = MojGithub(
 
 # Get all repos that need archiving
 repos = [repo for repo in moj_gh.get_unarchived_repos(
-    "public") if repo.pushed_at < archive_date]
+    "public") if moj_gh.ready_for_archiving(repo, archive_date)]
 
 # Print repos
 logging.info(
