@@ -31,7 +31,7 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 **Try the command 'dig -t NS <name>.justice.gov.uk' to find out details about a domain.**
 
-**In the email 'Re: SSL Cert query' within the Certificates Google Group is a list of the domains that the HMCTS are responsible for.** 
+**In the email 'Re: SSL Cert query' within the Certificates Google Group is a list of the domains that the HMCTS are responsible for.**
 
 **BT will sporadically send us emails, as BT domain management looks after a group of gov.uk domains. BT should auto renew those domains. BT will batch renew their certificates at the start of the month! So there will be a delay in processing.**
 
@@ -46,7 +46,7 @@ This process specifically relates to certificates issued through [Gandi.net]
 ## CNAME's we do not process
 
 This [file](https://docs.google.com/spreadsheets/d/1gAVhX8Ts-BuhZRNBEF-80UUjlnYyyMKKBQ4ZPnHPZmE/edit?usp=sharing) is a list of SSL Certificates where the CNAME should be sent to the author of the CSR to add to their DNS systems. Gandi will generate the SSL Certificate once the CNAME validation is completed. The list will require maintenance to keep it updated with new and removed SSL Certificates where we do not carry out the CNAME validation.
-  
+
 ## Pre-requisites
 
 Before you begin, there are a few prerequisites:
@@ -74,21 +74,25 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 
 **Note - We only offer "Standard" type certificates as part of our service.**
 
-7. For the question `What do you want to protect?` select the appropriate option for the request, then click "Next". 
+7. For the question `What do you want to protect?` select the appropriate option for the request, then click "Next". Generally we select Single address type unless multiple SAN names are provided within the CSR, if so pick Multi address type. Occassionaly a request will be for a full domain or wildcard, if so pick the Full domain type.
 
 **Note - If the request is for 9 or more addresses it may be better to request a wildcard certificate. Discuss with the requester on the best approach. If a wildcard is the best option the requester will need to supply a fresh wildcard CSR.**
 
-8. Paste the CSR text into the `CSR` box. Then click "Next". 
+8. Paste the CSR text into the `CSR` box. Then click "Next".
 
 **Remember to copy the entire contents of the .csr file, including the lines containing `-----BEGIN CERTIFICATE REQUEST-----` and `-----END CERTIFICATE REQUEST-----`. If there are any issues with the validity of the CSR file you will be notified at this stage. These will need to be rectified before you can proceed. Abandon the process and start again with a new CSR.**
 
-9. Complete the checkout process. Ensure that when you get to the payment options section that you select `Pre-paid account` for the payment method. 
+**If SSL certificate is a Multi address type, after copying in the CSR contents, you have to manually add the SAN names from the request form into Gandi, it does not automatically extract the information from the CSR.**
+
+9. Complete the checkout process. Ensure that when you get to the payment options section that you select `Pre-paid account` for the payment method.
 
 10. If creation has been successful two emails will be sent to the Certificate Alerts Google group. An invoice (which can be ignored), and a Validation email. Click on the link in the validation email to obtain CNAME details that will need to be added in the Hosted Zone in Route53.
 
-11. Create the CNAME record in Route53. Gandi.net will automatically try to pick up this CNAME to confirm that we have ownership of the domain. 
+11. Create the CNAME record in Route53. Gandi.net will automatically try to pick up this CNAME to confirm that we have ownership of the domain.
 
 **Note - Any preceding "_" or trailing "." characters in the CNAME values are extremely important for validation. Missing characters will mean that validation will not be successful.**
+
+**If SSL certificate is a Multi address type, then multiple CNAME's will be provided and need to be added to AWS**
 
 12. When validation is complete an email will be sent to the Certificate Alerts Google group. Click on the link in the email to visit Gandi.net and download the new certificate.
 
