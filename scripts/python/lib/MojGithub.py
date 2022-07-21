@@ -29,7 +29,7 @@ class MojGithub:
         Please see the function get_unarchived_repos to ommit archived repos
         """
         if self.__repos == None:
-            self.__repos = self._get_repo_type(type="all")
+            self.__repos = self._get_repo_type(repo_type="all")
         return self.__repos
 
     @property
@@ -40,7 +40,7 @@ class MojGithub:
         Please see the function get_unarchived_repos to ommit archived repos
         """
         if self.__public_repos == None:
-            self.__public_repos = self._get_repo_type(type="public")
+            self.__public_repos = self._get_repo_type(repo_type="public")
         return self.__public_repos
 
     @property
@@ -51,7 +51,7 @@ class MojGithub:
         Please see the function get_unarchived_repos to ommit archived repos
         """
         if self.__private_repos == None:
-            self.__private_repos = self._get_repo_type(type="private")
+            self.__private_repos = self._get_repo_type(repo_type="private")
         return self.__private_repos
 
     def ready_for_archiving(self, repository, archive_date) -> bool:
@@ -118,4 +118,4 @@ class MojGithub:
         * public
         * private
         """
-        return self._exclude_fork_repos(list(self.org.get_repos(repo_type=repo_type)))
+        return self._exclude_fork_repos(list(self.org.get_repos(type=repo_type)))
