@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Sentry.io
-last_reviewed_on: 2022-04-22
+last_reviewed_on: 2022-07-22
 review_in: 3 months
 ---
 
@@ -16,12 +16,11 @@ sentry.io account using this [self signup link].
 
 Anyone in the MoJ organisation in Sentry could potentially view the information you send over. While that is presumed a trusted group, it is still advisable to remove any Personal Identifiable Information from your errors and traces. Sentry have [documentation] on how to do that, and there are examples in the code samples linked at the bottom of this page.
 
-
 In addition to error and custom even tracking, our Sentry plan now includes [performance monitoring].
 
-Our plan includes 20mil transactions per month for all projects. In order for everyone to be able to make use of it, we recommend a sample rate of 5%. 
+Our plan includes 20mil transactions per month for all projects. In order for everyone to be able to make use of it, we recommend a sample rate of 5%.
 
-There might be limited value in sending transaction information for health and status endpoints and we suggest that those are filtered out. 
+There might be limited value in sending transaction information for health and status endpoints and we suggest that those are filtered out.
 
 If you are only interested in a sub-section of your application routes, you can specifically opt in only those routes and increase your sample rate, for example if you're trying to debug a known performance issue and need a larger dataset.
 
