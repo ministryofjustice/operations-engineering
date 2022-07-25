@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: CircleCI
-last_reviewed_on: 2022-06-15
+last_reviewed_on: 2022-07-25
 review_in: 3 months
 ---
 
@@ -27,7 +27,7 @@ A CircleCI User is an individual user within an organization, inherited from Git
 
 As Owners we can generate CircleCI API tokens that can be shared with other users for use in Contexts and Orbs.
 
-In your CircleCI settings page look for the section called 'Personal API Tokens' or the link [here](https://app.circleci.com/settings/user/tokens).
+In your personal CircleCI settings page look for the section called 'Personal API Tokens' or the link [here](https://app.circleci.com/settings/user/tokens).
 
 Create an API token and it will display the public key value.
 
@@ -75,8 +75,10 @@ We can store an Owner generated API Token value into a Environment Variable with
 
 ## Example
 
-I created a Context called test_create_orb with a Security Group containing LAA Get Access and an Environment Variable called CIRCLE_TOKEN API with a Token from my account.
+Using the Operations-Engineering GH Bot account we can create API tokens for other teams to publish their own Orbs.
 
-This was enough for the team to then publish the Orb from a GH repo.
+This will require logging into GH then CircleCI as the Operations-Engineering GH Bot most likely in incognito web browser tabs and will require a 2FA authenicator code from someone else in the team that has access to the Bot account.
 
-It may be best to get the API Token generated within Tony's CircleCI account.
+Have created a Context called laa-cla-orbs-token with a Security Group containing LAA Get Access (GH team) and an Environment Variable called CIRCLE_TOKEN which is a token generated from the Bot CircleCI account settings.
+
+This is enough permissions for the team to then publish the Orb from a GH repo.
