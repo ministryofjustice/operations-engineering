@@ -82,9 +82,6 @@ class MojArchive:
                 f"Skipping repository:  {self.repo.name}, Reason: Present in allow list ")
             return True
 
-        logging.info(
-            f"Archiving repository: {self.repo.name}, Status: Successful")
-
         # Archive the repository
         self.repo.edit(archived=True)
 
