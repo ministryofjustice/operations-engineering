@@ -371,7 +371,6 @@ def fetch_team_id(team_name) -> int:
     Returns:
         int: The team ID of the team
     """
-    print(team_name)
     query = organisation_team_id_query(team_name)
     data = client.execute(query)
     if (
