@@ -1,6 +1,7 @@
 import os
+import time
 from datetime import datetime
-from dateutil.relativedelta import *
+from dateutil.relativedelta import relativedelta
 from lib.MojGithub import MojGithub
 from lib.MojArchive import MojArchive
 import logging
@@ -19,6 +20,45 @@ logging.basicConfig(
 # Change this to point at a different GitHub organization
 organization = "ministryofjustice"
 org_token = os.getenv('ADMIN_GITHUB_TOKEN')
+
+
+def get_commit(repository):
+    """get the last commit from a repository
+
+    Args:
+        repository (Repository): the repository object
+
+    Returns:
+        Commit: if commit exists return the last commit
+    """
+    # Try block needed as get_commits() can cause exception when
+    # a repository has no commits as GH returns negative result.
+    try:
+        commits = repository.get_commits()
+        return commits[0]
+    except Exception:
+        return 0
+
+
+def ready_for_archiving(repository, archive_date) -> bool:
+    """See if repository is ready for archiving based on last commit date
+
+    Args:
+        repository (Repository): the repository object
+        archive_date (datetime): the archive date
+
+    Returns:
+        bool: true if the last commit date is longer than the archive date
+    """
+    commit = get_commit(repository)
+    if commit == 0:
+        print("Manually check repository: " + repository.name)
+    else:
+        if commit.commit.author.date < archive_date:
+            time.sleep(1)
+            return True
+    return False
+
 
 # How long ago in which the repositories should be archived
 archive_date_days = 0
@@ -39,7 +79,7 @@ moj_gh = MojGithub(
 
 # Get all repos that need archiving
 repos = [repo for repo in moj_gh.get_unarchived_repos(
-    "public") if moj_gh.ready_for_archiving(repo, archive_date)]
+    "public") if ready_for_archiving(repo, archive_date)]
 
 # Print repos
 logging.info(

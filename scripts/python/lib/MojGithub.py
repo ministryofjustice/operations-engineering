@@ -54,27 +54,6 @@ class MojGithub:
             self.__private_repos = self._get_repo_type(repo_type="private")
         return self.__private_repos
 
-    def ready_for_archiving(self, repository, archive_date) -> bool:
-        """See if repository is ready for archiving based on last commit date
-
-        Args:
-            repository (Repository): the repository object
-            archive_date (datetime): the archive date
-
-        Returns:
-            bool: true if the last commit date is longer than the archive date
-        """
-        if repository.get_stats_code_frequency() is None:
-            # No commits made on this repository
-            return False
-        else:
-            commits = repository.get_commits()
-            last_commit_date = commits[0].commit.author.date
-            if last_commit_date < archive_date:
-                return True
-            else:
-                return False
-
     def get_unarchived_repos(self, repo_type: str) -> list:
         """Returns all repos of a specific repo type omitting the archived ones.\n
         repo_type:
