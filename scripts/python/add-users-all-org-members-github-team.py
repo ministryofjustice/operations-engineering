@@ -25,7 +25,7 @@ if len(sys.argv) == 2:
     oauth_token = sys.argv[1]
 else:
     print("Missing a script input parameter")
-    sys.exit()
+    sys.exit(1)
 
 # Setup a transport and client to interact with the GH GraphQL API
 try:
