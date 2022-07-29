@@ -75,10 +75,8 @@ We can store an Owner generated API Token value into a Environment Variable with
 
 ## Example
 
-Using the Operations-Engineering GH Bot account we can create API tokens for other teams to publish their own Orbs.
+Create a personal API token for other teams to publish their own Orbs.
 
-This will require logging into GH then CircleCI as the Operations-Engineering GH Bot most likely in incognito web browser tabs and will require a 2FA authenicator code from someone else in the team that has access to the Bot account.
-
-Have created a Context called laa-cla-orbs-token with a Security Group containing LAA Get Access (GH team) and an Environment Variable called CIRCLE_TOKEN which is a token generated from the Bot CircleCI account settings.
+Have created a Context called laa-cla-orbs-token with a Security Group containing LAA Get Access (GH team) and an Environment Variable called CIRCLE_TOKEN which takes the personal token generated above.
 
 This is enough permissions for the team to then publish the Orb from a GH repo.
