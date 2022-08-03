@@ -13,7 +13,7 @@ The purpose of this runbook is to provide guidance and tips when supporting migr
 
 ### Can we support weekend or out of hours work?
 
-Operations Engineering does not offer any out of hour or weekend support for services. If asked, we should challenge any requests and try to schedule work within normal working hours. 
+Operations Engineering does not offer any out of hour or weekend support for services. If asked, we should challenge any requests and try to schedule work within normal working hours.
 
 Under exceptional circumstances, it may be appropriate to support changes out of hours, including weekends to mitigate risks, or due to contractual constraints. In this instance seek approval from the Product Manager or Head of Hosting before agreeing to any scheduling and let the rest of the team know.
 
@@ -31,7 +31,7 @@ Operations Engineering manages a vast majority of the MoJ DNS estate. However, t
 
 1. Have a good look round AWS Route53. We manage a lot more domains than just `justice.gov.uk` and `service.justice.gov.uk`. If the hosted zone of domain doesn't appear in there, then we probably don't manage it.
 
-2. If the domain doesn't appear, it may still be worth looking in Route53 `Registered Domains`. If we have registered the domain then it must be somewhere in Route53. Keep digging. 
+2. If the domain doesn't appear, it may still be worth looking in Route53 `Registered Domains`. If we have registered the domain then it must be somewhere in Route53. Keep digging.
 
 3. If a domain is in Route53, but is a subdomain that is an NS Record type then chances are it's a nameserver delegation to another AWS account that we don't manage or to another hosting platform, and therefore we probably don't manage it.
 
@@ -81,6 +81,6 @@ DNS changes can cause all sorts of problems. Our DNS estate is large and complex
 
 ### Do JISC support out of hours changes?
 
-**No**. JISC manage the domain lock service that prohibits changes on certain domains. 
+**No**. JISC manage the domain lock service that prohibits changes on certain domains.
 
 Any work requiring support from JISC should only be arrange in working hours, Monday to Friday.
