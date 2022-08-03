@@ -14,7 +14,7 @@ This difference can cause problems such as:
 * Reverting changes made in Route53
 * Making unwanted changes in Route53
 * Making it impossible to rollback in the case of a failed release
-* Making it impossible to make further changes without significant troubleshooting 
+* Making it impossible to make further changes without significant troubleshooting
 
 This runbook provides a set of steps that should be followed to ensure there is no drift between DNS-IAC and Route53.
 
@@ -33,12 +33,11 @@ If the above message is not given at the end of the Terraform plan output, there
 
 `Plan: 5 to add, 4 to change, 6 to destroy.`
 
-
-## Fixing Drift 
+## Fixing Drift
 
 > Please be careful when doing this - this can be a very contextual area, you do need to up to date knowledge with planned changes in the Route53 estate
 
-In order to fix drift, you must change the DNS-IAC Terraform code to match the current Route53 configuration. 
+In order to fix drift, you must change the DNS-IAC Terraform code to match the current Route53 configuration.
 
 1. Firstly confirm that everything in the `main` repository branch has previously been applied to Route53, if someone has forgot to apply this may look like drift but infact are actually wanted changes - this should not be an issue once we add apply to the CICD pipeline.
 2. Once confirmed that all wanted changed have been pushed, refer to the Terraform plan output.
