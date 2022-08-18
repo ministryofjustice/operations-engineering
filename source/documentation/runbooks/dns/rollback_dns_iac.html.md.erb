@@ -9,9 +9,7 @@ review_in: 3 months
 
 > Please be careful when doing this process, if you do not understand Terraform and the AWS DSD R53 estate, seek guidance from someone that does
 
-There can be cases when you wish to rollback any changes made to AWS Route53 using DNS-IAC
-
-This document includes the process for that.
+There can be cases when you wish to rollback any changes made to AWS Route53 using DNS-IAC, this document includes the process for that.
 
 > Be aware this process is new and this page may not cover unexpected steps, please update the process accordingly.
 
@@ -41,7 +39,7 @@ terraform plan
 
 4. Check the changes in Terraform are the ones you wish to revert
 
-> Please be careful when doing this - this can be a very contextual area, you do need to up to date knowledge with planned changes in the Route53 estate
+> Please be careful when doing this - this can be a very contextual area, you need up to date knowledge of the Route53 estate
 
 5. Run Terraform apply
 
