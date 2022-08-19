@@ -16,7 +16,7 @@ jobs:
       - run: python3 scripts/python/add-users-all-org-members-github-team.py ${{ secrets.OPERATIONS_ENGINEERING }}
       - name: Report failure to Slack
         if: always()
-        uses: ravsamhq/notify-slack-action@v1
+        uses: ravsamhq/notify-slack-action@v2
         with:
           status: ${{ job.status }}
           notify_when: "failure"
