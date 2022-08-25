@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Branch Protection Settings and Issues Runbook
-last_reviewed_on: 2022-05-25
+last_reviewed_on: 2022-08-25
 review_in: 3 months
 ---
 
@@ -29,6 +29,7 @@ The minimum Branch Protection settings for a repository are listed on [github-re
 
 Below is some of the Branch Protection rules within GH that can be obtained from a GraphQL query. The comment on each line maps the the Branch Protection rule to the Branch Protection setting within the GH repository settings UI.
 
+'''
   {
     repository(name: "repo-name", owner: "ministryofjustice") {
       branchProtectionRules(first: 100) {
@@ -51,6 +52,7 @@ Below is some of the Branch Protection rules within GH that can be obtained from
       }
     }
   }
+'''
 
 ## How to implement a Branch Protection setting in Code
 
