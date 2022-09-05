@@ -1,1 +1,2 @@
 django-pagedown
+govuk-pay-ruby-client
