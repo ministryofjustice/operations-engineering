@@ -1,3 +1,4 @@
 django-pagedown
 govuk-pay-ruby-client
 govuk_notify_rails
+analytics-platform-auth0
