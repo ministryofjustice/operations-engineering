@@ -3,3 +3,4 @@ govuk-pay-ruby-client
 govuk_notify_rails
 analytics-platform-auth0
 pflr-express-kit
+hmpps-terraform-modules
