@@ -857,9 +857,8 @@ def put_user_into_existing_team(
 
     if repository_name == "" or username == "" or len(org_teams) == 0:
         users_not_in_a_team.clear()
-        return
     elif len(users_not_in_a_team) == 0:
-        return
+        pass
     else:
         users_permission = get_user_permission(repository_name, username)
 

@@ -19,7 +19,8 @@ def print_stack_trace(message):
 
 try:
     route53_client = boto3.client("route53")
-except Exception:
+except BaseException as err:
+    print(err)
     print_stack_trace("Exception: Problem with the route53 client.")
 
 
@@ -64,19 +65,18 @@ def delete_cname_records(host_zone_id):
 
             for record_set in response["ResourceRecordSets"]:
                 if record_set["Type"] == "CNAME":
-                    if "comodoca" in record_set["ResourceRecords"][0]["Value"]:
+                    if (
+                        "comodoca" in record_set["ResourceRecords"][0]["Value"]
+                        or "sectigo" in record_set["ResourceRecords"][0]["Value"]
+                    ):
                         delete_record = create_delete_cname_record(record_set)
                         delete_records.append(delete_record)
-                    elif "sectigo" in record_set["ResourceRecords"][0]["Value"]:
-                        delete_record = create_delete_cname_record(record_set)
-                        delete_records.append(delete_record)
-                    else:
-                        pass
 
             next_record_name = response["NextRecordName"]
             next_record_type = response["NextRecordType"]
 
-        except:
+        except BaseException as err:
+            print(err)
             next_record_name = None
             next_record_type = None
 
@@ -90,13 +90,15 @@ def delete_cname_records(host_zone_id):
 
             print("Deleted records:")
             print(json.dumps(delete_records, indent=2))
-    except:
+    except BaseException as err:
+        print(err)
         print_stack_trace("Exception: AWS call to delete cname records")
 
 
 def run():
     for i in range(1, len(sys.argv)):
         delete_cname_records(sys.argv[i])
+
 
 print("Start")
 run()

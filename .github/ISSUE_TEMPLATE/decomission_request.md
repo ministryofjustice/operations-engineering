@@ -1,15 +1,14 @@
 ---
 name: Operations Engineering Decomission Pages Request
 about: Create a ticket for the Decomission Pages
-title: ''
-labels: 'Maintenance Pages'
-assignees: ''
-
+title: ""
+labels: "Maintenance Pages"
+assignees: ""
 ---
 
 ## Decomission Pages Request
 
-### __Pretasks__
+### **Pretasks**
 
 Collect the following information in order to action this request, please attach this information to this ticket
 
@@ -20,7 +19,7 @@ Collect the following information in order to action this request, please attach
 - [ ] Current DNS location
 - [ ] \(Optional) Contact point for DNS if not inside DSD
 
-### __Prior to switch__
+### **Prior to switch**
 
 Prior to turning maintenance mode, a number of things must be done
 
@@ -31,22 +30,26 @@ Prior to turning maintenance mode, a number of things must be done
 5. [ ] Maintenance page created (**merged**) - [Example](https://github.com/ministryofjustice/cloud-platform-maintenance-pages/blob/main/views/civil-eligibility-calculator.justice.gov.uk.erb)
 6. [ ] Ingress created (**not merged**) - [Example](https://github.com/ministryofjustice/cloud-platform-maintenance-pages/pull/18)
 
-### __The Switch__
+### **The Switch**
 
 These are the steps that need to be followed at switch time
+
 > Note: step 1 and 2 can be done before hand if the team is comfortable with the Cloud Platform Account handling their DNS for a while
+
 1. [ ] Add NS record to current DNS location pointing at the Name Servers retrieved from the Cloud Platform Team
 2. [ ] Merge Certificate PR and check cert has been issues with below command
+
 ```
 kubectl describe cert domains-cert -n maintenance-pages
 ```
+
 3. [ ] Merge Remove A record PR
 4. [ ] Merge Ingress PR
 5. [ ] Clean up old infrastructure
 
-### __Links and Information__
+### **Links and Information**
+
 - [Maintenance Pages Repository](https://github.com/ministryofjustice/cloud-platform-maintenance-pages)
 - [Cloud Platform Environments Repository](https://github.com/ministryofjustice/cloud-platform-environments)
 - Cloud Platform Slack: **\#ask-cloud-platform**
 - Maintenance Pages Kubernetes Namespace: **maintenance-pages**
-

@@ -69,7 +69,10 @@ def fetch_team_id() -> int:
     """
     query = organisation_team_id_query()
     data = client.execute(query)
-    if data["organization"]["team"]["databaseId"] is not None and data["organization"]["team"]["databaseId"]:
+    if (
+        data["organization"]["team"]["databaseId"] is not None
+        and data["organization"]["team"]["databaseId"]
+    ):
         return data["organization"]["team"]["databaseId"]
     else:
         return 0
@@ -92,9 +95,7 @@ def run():
                 # Delay for GH API
                 time.sleep(3)
     except Exception:
-        message = (
-            "Warning: Exception in Run()"
-        )
+        message = "Warning: Exception in Run()"
         print_stack_trace(message)
 
 

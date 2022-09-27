@@ -12,14 +12,14 @@ import logging
 # Config
 # Logging Config
 logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
+    format="%(asctime)s %(levelname)-8s %(message)s",
     level=logging.INFO,
-    datefmt='%Y-%m-%d %H:%M:%S'
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 # Change this to point at a different GitHub organization
 organization = "ministryofjustice"
-org_token = os.getenv('ADMIN_GITHUB_TOKEN')
+org_token = os.getenv("ADMIN_GITHUB_TOKEN")
 
 
 def get_commit(repository):
@@ -66,24 +66,23 @@ archive_date_months = 6
 archive_date_years = 1
 
 archive_date = datetime.now() - relativedelta(
-    days=archive_date_days,
-    months=archive_date_months,
-    years=archive_date_years
+    days=archive_date_days, months=archive_date_months, years=archive_date_years
 )
 
 # Create MoJGithub object
-moj_gh = MojGithub(
-    org=organization,
-    org_token=org_token
-)
+moj_gh = MojGithub(org=organization, org_token=org_token)
 
 # Get all repos that need archiving
-repos = [repo for repo in moj_gh.get_unarchived_repos(
-    "public") if ready_for_archiving(repo, archive_date)]
+repos = [
+    repo
+    for repo in moj_gh.get_unarchived_repos("public")
+    if ready_for_archiving(repo, archive_date)
+]
 
 # Print repos
 logging.info(
-    f"Beginning archive of inactive repositories for GitHub organization: {organization}")
+    f"Beginning archive of inactive repositories for GitHub organization: {organization}"
+)
 logging.info("-----------------------------")
 logging.info(f"Searching for inactive repositories from date: {archive_date}")
 logging.info("-----------------------------")
