@@ -326,8 +326,7 @@ def fetch_repository_users(repository_name) -> list:
                 # Ignore users that are outside collaborators
                 global outside_collaborators
                 if repository["node"]["login"] not in outside_collaborators:
-                    repository_user_name_list.append(
-                        repository["node"]["login"])
+                    repository_user_name_list.append(repository["node"]["login"])
 
         # Read the GH API page info section to see if there is more data to read
         has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
@@ -857,9 +856,8 @@ def put_user_into_existing_team(
 
     if repository_name == "" or username == "" or len(org_teams) == 0:
         users_not_in_a_team.clear()
-        return
     elif len(users_not_in_a_team) == 0:
-        return
+        pass
     else:
         users_permission = get_user_permission(repository_name, username)
 

@@ -1,10 +1,9 @@
 ---
 name: Operations Engineering Story
 about: Create new Operations Engineering story
-title: ''
-labels: ''
-assignees: ''
-
+title: ""
+labels: ""
+assignees: ""
 ---
 
 ## Background
@@ -18,7 +17,6 @@ assignees: ''
 ## Approach
 
 <!-- Describe proposed approach -->
-
 
 ## Questions / Assumptions
 

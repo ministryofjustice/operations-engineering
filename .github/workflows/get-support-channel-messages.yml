@@ -13,7 +13,7 @@ jobs:
       - run: python3 -m pip install -r scripts/python/requirements.txt
       - run: python3 scripts/python/get-slack-support-messages.py
         env:
-           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

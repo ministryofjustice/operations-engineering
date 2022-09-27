@@ -9,9 +9,9 @@ class MojGithub:
 
     # Logging Config
     logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
+        format="%(asctime)s %(levelname)-8s %(message)s",
         level=logging.INFO,
-        datefmt='%Y-%m-%d %H:%M:%S'
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     def __init__(self, org: str, org_token: str) -> None:
@@ -28,7 +28,7 @@ class MojGithub:
         This does not include forks repos.\n
         Please see the function get_unarchived_repos to ommit archived repos
         """
-        if self.__repos == None:
+        if self.__repos is None:
             self.__repos = self._get_repo_type(repo_type="all")
         return self.__repos
 
@@ -39,7 +39,7 @@ class MojGithub:
         This does not include forks repos.\n
         Please see the function get_unarchived_repos to ommit archived repos
         """
-        if self.__public_repos == None:
+        if self.__public_repos is None:
             self.__public_repos = self._get_repo_type(repo_type="public")
         return self.__public_repos
 
@@ -50,7 +50,7 @@ class MojGithub:
         This does not include forks repos.\n
         Please see the function get_unarchived_repos to ommit archived repos
         """
-        if self.__private_repos == None:
+        if self.__private_repos is None:
             self.__private_repos = self._get_repo_type(repo_type="private")
         return self.__private_repos
 
@@ -70,19 +70,20 @@ class MojGithub:
                 return self._exclude_archived_repos(self.private_repos)
             case "_":
                 logging.error(
-                    f"MojGithub.get_unarchived_repos called with incorrect parameter: {type}")
+                    f"MojGithub.get_unarchived_repos called with incorrect parameter: {type}"
+                )
 
     def _exclude_archived_repos(self, repos: list) -> list:
         """NOTE: Internal function used by libary, please use with care\n
         Filters out archived repos from a list of repos
         """
-        return list(filter(lambda x: x.archived == False, repos))
+        return list(filter(lambda x: x.archived is False, repos))
 
     def _exclude_fork_repos(self, repos: list) -> list:
         """NOTE: Internal function used by libary, please use with care\n
         Filters out forked repos from a list of repos
         """
-        return list(filter(lambda x: x.fork == False, repos))
+        return list(filter(lambda x: x.fork is False, repos))
 
     def _get_repo_type(self, repo_type: str) -> list:
         """NOTE: Internal function used by libary, please use with care\n

@@ -9,9 +9,9 @@ class MojSlack:
 
     # Logging Config
     logging.basicConfig(
-        format='%(asctime)s %(levelname)-8s %(message)s',
+        format="%(asctime)s %(levelname)-8s %(message)s",
         level=logging.INFO,
-        datefmt='%Y-%m-%d %H:%M:%S'
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     def __init__(self, slack_token: str) -> None:
@@ -31,18 +31,18 @@ class MojSlack:
 
             # Setup args for API call
             args = {
-                'channel': channel_id,
-                'oldest': self.generate_datetime(days),
-                'include_all_metadata': False,
-                'limit': 100,
-                'has_more': True
+                "channel": channel_id,
+                "oldest": self.generate_datetime(days),
+                "include_all_metadata": False,
+                "limit": 100,
+                "has_more": True,
             }
 
             # Prepare list for final list of messages
             messages = list()
 
             # Paginate until all results gathered
-            while args['has_more']:
+            while args["has_more"]:
                 # Slow down for rate limit
                 sleep(1)
 
@@ -50,11 +50,15 @@ class MojSlack:
                 response = self.client.conversations_history(**args)
 
                 # Check if any more record pages
-                args["has_more"] = True if response['has_more'] else False
-                args["cursor"] = response['response_metadata']['next_cursor'] if response['has_more'] else None
+                args["has_more"] = True if response["has_more"] else False
+                args["cursor"] = (
+                    response["response_metadata"]["next_cursor"]
+                    if response["has_more"]
+                    else None
+                )
 
                 # Append new messages to list
-                messages += response['messages']
+                messages += response["messages"]
 
             return messages
         except SlackApiError as e:
@@ -74,7 +78,6 @@ class MojSlack:
         logging.error("Got an Error calling Slack API")
         logging.error(f"Function: {function}")
         logging.error(f"Error: {slack_error}")
-        return
 
     # This is quite inefficient/hacky but does seem to run fast enough - room for optimisation at a later day
     # When we decide what we want to do with this data, this is enough to just print for now
@@ -88,7 +91,7 @@ class MojSlack:
             days (int): How many days to search back
         """
         # Loop from today to X days ago
-        for day in range(0, days-1):
+        for day in range(0, days - 1):
 
             # Get the date object for the day
             date = (datetime.now() - timedelta(day)).date()
@@ -132,4 +135,4 @@ class MojSlack:
         Returns:
             list[dict]:  a list of dict objects containing Slack messages with all entries containing the key subtype filtered out
         """
-        return list(filter(lambda x: ('subtype' not in x), list_of_messages))
+        return list(filter(lambda x: ("subtype" not in x), list_of_messages))
