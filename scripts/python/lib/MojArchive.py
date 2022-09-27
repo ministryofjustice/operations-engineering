@@ -80,8 +80,10 @@ class MojArchive:
         # Check it has been archived, report status and set complete flag
         if self.archived:
             self.complete = True
-            logging.info(f"Archiving repository: {self.repo.name}, Status: Successful")
+            logging.info(
+                f"Archiving repository: {self.repo.name}, Status: Successful")
             return True
         else:
-            logging.error(f"Archiving repository: {self.repo.name}, Status: Failure")
+            logging.error(
+                f"Archiving repository: {self.repo.name}, Status: Failure")
             return False

@@ -9,7 +9,8 @@ channel_id = "C01BUKJSZD4"  # Channel ID of the channel to target
 slack_obj = MojSlack(os.environ["SLACK_BOT_TOKEN"])
 
 # Gather all messages from support channel
-all_messages = slack_obj.get_conversation_history(channel_id=channel_id, days=days)
+all_messages = slack_obj.get_conversation_history(
+    channel_id=channel_id, days=days)
 
 # Filter out unwanted messages
 result = slack_obj.filter_out_subtypes(all_messages)
