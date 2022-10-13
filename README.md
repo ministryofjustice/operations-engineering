@@ -14,6 +14,6 @@ The website is designed using the [Technical Documentation Template](https://tdt
 
 This repository is published via Github Pages [here](https://ministryofjustice.github.io/operations-engineering/#moj-operations-engineering)
 
-To update, edit files in [this directory](https://github.com/ministryofjustice/operations-engineering/tree/main/source). To run the site locally while editing, make sure you have docker running and then run `make` in the root folder of the repository. The site will auto-reload on changes.
+To update, edit the files in the `source` directory. To run the site locally whilst editing use `make preview` and open `http://127.0.0.1:4567` within a browser. Use `make check` to compile the site to html and check the URLs are valid.
 
 The config/tech-docs.yml file contains layout configuration options see [link](https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/) for more details.

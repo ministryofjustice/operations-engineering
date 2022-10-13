@@ -8,13 +8,13 @@ The files are not written in HTML instead Markdown is used.
 
 The syntax is Markdown, more details can be found [here](https://daringfireball.net/projects/markdown/).
 
-A hash represents a header `<h1>, <h2>,` etc.
+A `#` hash in markdown represents a html header `<h1>, <h2>,` etc.
 
 See this [link](https://tdt-documentation.london.cloudapps.digital/write_docs/content/#write-your-content) on how to write items in the Markdown files.
 
-Files are linked to each other using this approach `[text](documentation/folder-name/file-name.html)` or `[text](folder-name/file-name.html)`
+Files are linked to each other using this approach `[text](documentation/folder-name/file-name.html)` or `[text](folder-name/file-name.html)`.
 
-Filenames must be `[something].html.md.erb`
+Filenames must be `[something].html.md.erb`.
 
 Middleman is used to create the html files for the website.
 
