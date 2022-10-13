@@ -27,8 +27,7 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 **Other teams have their own AWS Route53 accounts. These are HMCTS (hmcts.net + cjscp.org.uk) at [opsconfman@hmcts.net](mailto:opsconfman@hmcts.net), LAA (legalservices.gov.uk), OPG, more to be confirmed. Either the other team or our team will renew the Gandi certificate. If we do, send the CNAME validation details to the relevant team. If the other team does it they have their own Gandi process or use AWS ACM auto renewal process.**
 
-**To confirm if we manage a domain, check whether the subdomain record exists in AWS as a delegation i.e. a Nameserver(NS) type record. If one exists there is a high likelihood that the management of the domain is managed by another team. For example if it states Azure that is definitely another team. Details of who manages the domain can be found in the history in the [Certificates Google Group](https://groups.google.com/u/1/a/digital.justice.gov.uk/g/certificates?hl=en-GB).**
-
+**To confirm if we manage a domain, check whether the subdomain record exists in AWS as a delegation i.e. a Nameserver(NS) type record. If one exists there is a high likelihood that the management of the domain is managed by another team. For example if it states Azure that is definitely another team. Details of who manages the domain can be found in the history in the Certificates Google Group `https://groups.google.com/u/1/a/digital.justice.gov.uk/g/certificates?hl=en-GB`.**
 **Try the command 'dig -t NS <name>.justice.gov.uk' to find out details about a domain.**
 
 **In the email 'Re: SSL Cert query' within the Certificates Google Group is a list of the domains that the HMCTS are responsible for.**
@@ -52,7 +51,7 @@ This [file](https://docs.google.com/spreadsheets/d/1gAVhX8Ts-BuhZRNBEF-80UUjlnYy
 Before you begin, there are a few prerequisites:
 
 * A user account for [Gandi.net]
-* Access to the [Certificates Google group](https://groups.google.com/a/digital.justice.gov.uk/g/certificates?hl=en-GB)
+* Access to the Certificates Google group `https://groups.google.com/a/digital.justice.gov.uk/g/certificates?hl=en-GB`
 * Access to the [Certificate Alerts Google group](mailto:certificate_alerts@digital.justice.gov.uk)
 * Access to Route53 in the MoJDSD AWS account
 
@@ -102,7 +101,7 @@ Please contact your [administrator](mailto:certificates@digital.justice.gov.uk) 
 
 We will review the list of Gandi.net certificates and identify any that require renewal 4 weeks prior to expiry (we also get a notification to Certificate Alerts 29 and 14 days prior to expiry).
 
-1. Contact the service owner to confirm if renewal is required. If not, allow the certificate to expire. Detail of owners can be found by searching the [certificates@digital.justice.gov.uk Google Group](https://groups.google.com/a/digital.justice.gov.uk/g/certificates?hl=en-GB).
+1. Contact the service owner to confirm if renewal is required. If not, allow the certificate to expire. Detail of owners can be found by searching the certificates@digital.justice.gov.uk Google Group `https://groups.google.com/a/digital.justice.gov.uk/g/certificates?hl=en-GB`.
 
 2. If renewal is required, request a new Certificate Signing Request (CSR) from the service owner.
 
