@@ -280,25 +280,30 @@ def fetch_repo_names() -> list:
 
     while has_next_page:
         query = organisation_repo_name_query(after_cursor)
-        data = client.execute(query)
 
-        # Retrieve the name of the repos
-        if data["organization"]["repositories"]["edges"] is not None:
-            for repo in data["organization"]["repositories"]["edges"]:
-                # Skip locked repositories
-                if not (
-                    repo["node"]["isDisabled"]
-                    or repo["node"]["isArchived"]
-                    or repo["node"]["isLocked"]
-                ):
-                    repo_name_list.append(repo["node"]["name"])
-                    repo_issues_enabled[repo["node"]["name"]] = repo["node"][
-                        "hasIssuesEnabled"
-                    ]
+        try:
+            data = client.execute(query)
+        except Exception as err:
+            print("Exception in fetch_repo_names()")
+            print(err)
+        else:
+            # Retrieve the name of the repos
+            if data["organization"]["repositories"]["edges"] is not None:
+                for repo in data["organization"]["repositories"]["edges"]:
+                    # Skip locked repositories
+                    if not (
+                        repo["node"]["isDisabled"]
+                        or repo["node"]["isArchived"]
+                        or repo["node"]["isLocked"]
+                    ):
+                        repo_name_list.append(repo["node"]["name"])
+                        repo_issues_enabled[repo["node"]["name"]] = repo["node"][
+                            "hasIssuesEnabled"
+                        ]
 
-        # Read the GH API page info section to see if there is more data to read
-        has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
-        after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+            # Read the GH API page info section to see if there is more data to read
+            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
     return repo_name_list
 
@@ -318,20 +323,25 @@ def fetch_repository_users(repository_name) -> list:
 
     while has_next_page:
         query = repository_user_names_query(after_cursor, repository_name)
-        data = client.execute(query)
 
-        # Retrieve the usernames of the repository members
-        if data["repository"]["collaborators"]["edges"] is not None:
-            for repository in data["repository"]["collaborators"]["edges"]:
-                # Ignore users that are outside collaborators
-                global outside_collaborators
-                if repository["node"]["login"] not in outside_collaborators:
-                    repository_user_name_list.append(
-                        repository["node"]["login"])
+        try:
+            data = client.execute(query)
+        except Exception as err:
+            print("Exception in fetch_repository_users()")
+            print(err)
+        else:
+            # Retrieve the usernames of the repository members
+            if data["repository"]["collaborators"]["edges"] is not None:
+                for repository in data["repository"]["collaborators"]["edges"]:
+                    # Ignore users that are outside collaborators
+                    global outside_collaborators
+                    if repository["node"]["login"] not in outside_collaborators:
+                        repository_user_name_list.append(
+                            repository["node"]["login"])
 
-        # Read the GH API page info section to see if there is more data to read
-        has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
-        after_cursor = data["repository"]["collaborators"]["pageInfo"]["endCursor"]
+            # Read the GH API page info section to see if there is more data to read
+            has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["repository"]["collaborators"]["pageInfo"]["endCursor"]
 
     return repository_user_name_list
 
@@ -348,16 +358,20 @@ def fetch_team_names() -> list:
 
     while has_next_page:
         query = organisation_teams_name_query(after_cursor)
-        data = client.execute(query)
+        try:
+            data = client.execute(query)
+        except Exception as err:
+            print("Exception in fetch_team_names()")
+            print(err)
+        else:
+            # Retrieve the name of the teams
+            if data["organization"]["teams"]["edges"] is not None:
+                for team in data["organization"]["teams"]["edges"]:
+                    team_name_list.append(team["node"]["slug"])
 
-        # Retrieve the name of the teams
-        if data["organization"]["teams"]["edges"] is not None:
-            for team in data["organization"]["teams"]["edges"]:
-                team_name_list.append(team["node"]["slug"])
-
-        # Read the GH API page info section to see if there is more data to read
-        has_next_page = data["organization"]["teams"]["pageInfo"]["hasNextPage"]
-        after_cursor = data["organization"]["teams"]["pageInfo"]["endCursor"]
+            # Read the GH API page info section to see if there is more data to read
+            has_next_page = data["organization"]["teams"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["teams"]["pageInfo"]["endCursor"]
 
     return team_name_list
 
@@ -372,14 +386,18 @@ def fetch_team_id(team_name) -> int:
         int: The team ID of the team
     """
     query = organisation_team_id_query(team_name)
-    data = client.execute(query)
-    if (
-        data["organization"]["team"]["databaseId"] is not None
-        and data["organization"]["team"]["databaseId"]
-    ):
-        return data["organization"]["team"]["databaseId"]
+    try:
+        data = client.execute(query)
+    except Exception as err:
+        print("Exception in fetch_team_id()")
+        print(err)
     else:
-        return 0
+        if (
+            data["organization"]["team"]["databaseId"] is not None
+            and data["organization"]["team"]["databaseId"]
+        ):
+            return data["organization"]["team"]["databaseId"]
+    return 0
 
 
 def fetch_team_users(team_name) -> list:
@@ -397,18 +415,22 @@ def fetch_team_users(team_name) -> list:
 
     while has_next_page:
         query = team_user_names_query(after_cursor, team_name)
-        data = client.execute(query)
+        try:
+            data = client.execute(query)
+        except Exception as err:
+            print("Exception in fetch_team_users()")
+            print(err)
+        else:
+            # Retrieve the usernames of the team members
+            if data["organization"]["team"]["members"]["edges"] is not None:
+                for team in data["organization"]["team"]["members"]["edges"]:
+                    team_user_name_list.append(team["node"]["login"])
 
-        # Retrieve the usernames of the team members
-        if data["organization"]["team"]["members"]["edges"] is not None:
-            for team in data["organization"]["team"]["members"]["edges"]:
-                team_user_name_list.append(team["node"]["login"])
-
-        # Read the GH API page info section to see if there is more data to read
-        has_next_page = data["organization"]["team"]["members"]["pageInfo"][
-            "hasNextPage"
-        ]
-        after_cursor = data["organization"]["team"]["members"]["pageInfo"]["endCursor"]
+            # Read the GH API page info section to see if there is more data to read
+            has_next_page = data["organization"]["team"]["members"]["pageInfo"][
+                "hasNextPage"
+            ]
+            after_cursor = data["organization"]["team"]["members"]["pageInfo"]["endCursor"]
 
     return team_user_name_list
 
@@ -428,20 +450,24 @@ def fetch_team_repos(team_name) -> list:
 
     while has_next_page:
         query = team_repos_query(after_cursor, team_name)
-        data = client.execute(query)
+        try:
+            data = client.execute(query)
+        except Exception as err:
+            print("Exception in fetch_team_repos()")
+            print(err)
+        else:
+            # Retrieve the name of the teams repos
+            if data["organization"]["team"]["repositories"]["edges"] is not None:
+                for team in data["organization"]["team"]["repositories"]["edges"]:
+                    team_repo_list.append(team["node"]["name"])
 
-        # Retrieve the name of the teams repos
-        if data["organization"]["team"]["repositories"]["edges"] is not None:
-            for team in data["organization"]["team"]["repositories"]["edges"]:
-                team_repo_list.append(team["node"]["name"])
-
-        # Read the GH API page info section to see if there is more data to read
-        has_next_page = data["organization"]["team"]["repositories"]["pageInfo"][
-            "hasNextPage"
-        ]
-        after_cursor = data["organization"]["team"]["repositories"]["pageInfo"][
-            "endCursor"
-        ]
+            # Read the GH API page info section to see if there is more data to read
+            has_next_page = data["organization"]["team"]["repositories"]["pageInfo"][
+                "hasNextPage"
+            ]
+            after_cursor = data["organization"]["team"]["repositories"]["pageInfo"][
+                "endCursor"
+            ]
 
     return team_repo_list
 
