@@ -1,12 +1,12 @@
 # See the available options: https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/#configure-your-documentation-site
 
 # Host to use for canonical URL generation (without trailing slash)
-host: https://ministryofjustice.github.io/operations-engineering
+host: https://operations-engineering.service.justice.gov.uk/
 
 # Header-related options
 show_govuk_logo: false
 service_name: MoJ Operations Engineering
-service_link: /#moj-operations-engineering
+service_link: https://operations-engineering.service.justice.gov.uk/
 
 # Links to show on right-hand-side of header
 header_links:
