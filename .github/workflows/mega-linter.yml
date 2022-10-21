@@ -33,6 +33,16 @@ jobs:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Upload MegaLinter artifacts
+      - name: Archive production artifacts
+        if: ${{ success() }} || ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: MegaLinter reports
+          path: |
+            megalinter-reports
+            mega-linter.log
+
       # Doesn't work with forks
       - name: Create Pull Request with applied fixes
         id: cpr
