@@ -66,3 +66,19 @@ jobs:
           notification_title: "Failed GitHub Action Run"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  url-check:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download a Build Artifact from build
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact.tar
+      - name: Display structure of downloaded files
+        run: |
+          tar -xvf artifact.tar
+          ls -R
+          npm install linkinator
+          npx linkinator ./docs --recurse --markdown
+          echo "URL Check fails on private and internal GitHub repositories"
