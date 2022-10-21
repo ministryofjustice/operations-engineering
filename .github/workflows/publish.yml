@@ -74,11 +74,11 @@ jobs:
       - name: Download a Build Artifact from build
         uses: actions/download-artifact@v3
         with:
-          name: artifact.tar
-      - name: Display structure of downloaded files
+          name: github-pages
+      - name: Unpack files and check URL links
         run: |
+          unzip github-pages.zip
           tar -xvf artifact.tar
-          ls -R
           npm install linkinator
           npx linkinator ./docs --recurse --markdown
           echo "URL Check fails on private and internal GitHub repositories"
