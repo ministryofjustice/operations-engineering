@@ -14,4 +14,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: htmlproofer
-        run: /scripts/check-url-links.sh.sh
+        run: /scripts/check-url-links.sh
