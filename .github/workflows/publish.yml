@@ -71,7 +71,7 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Download a Build Artifact from publish.yml
+      - name: Download a Build Artifact from build
         uses: actions/download-artifact@v3
         with:
           name: artifact.tar
