@@ -7,15 +7,15 @@ review_in: 12 months
 
 # Adding an SSH Key to Github
 
-1. <code>ssh-keygen -t ed25519 -C "name@digital.justice.gov.uk"</code>
+1. ssh-keygen -t ed25519 -C "name@digital.justice.gov.uk"
 
 2. Press enter until the SSH key is created.
 
-3. <code>eval "$(ssh-agent -s)"</code>
+3. eval "$(ssh-agent -s)"
 
-4. <code>ssh-add ~/.ssh/id_ed25519</code>
+4. ssh-add ~/.ssh/id_ed25519
 
-5. <code><span>pbcopy < ~/.ssh/id_ed25519.pub</span></code>
+5. more ~/.ssh/id_ed25519.pub | pbcopy
 
 6. Paste the text somewhere and it should be in this format: `ssh-ed25519 HEX-VALUE name@digital.justice.gov.uk`
 
