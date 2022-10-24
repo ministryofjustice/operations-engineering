@@ -78,6 +78,7 @@ jobs:
           path: ./github-pages.zip
       - name: Unpack files and check URL links
         run: |
+          ls -R
           unzip github-pages.zip
           tar -xvf artifact.tar
           npm install linkinator
