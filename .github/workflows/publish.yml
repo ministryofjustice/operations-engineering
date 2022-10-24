@@ -75,6 +75,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: github-pages
+          path: ./github-pages.zip
       - name: Unpack files and check URL links
         run: |
           unzip github-pages.zip
