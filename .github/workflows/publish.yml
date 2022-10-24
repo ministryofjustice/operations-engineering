@@ -75,11 +75,22 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: github-pages
-          path: ./github-pages.zip
+          path: github-pages
       - name: Unpack files and check URL links
         run: |
-          unzip github-pages.zip
+          cd github-pages
           tar -xvf artifact.tar
           npm install linkinator
-          npx linkinator ./docs --recurse --markdown
-          echo "URL Check fails on private and internal GitHub repositories"
+          npx linkinator . --recurse --markdown \
+            --skip https://github.com/ministryofjustice/dns \
+            --skip https://github.com/ministryofjustice/moj-ip-addresses \
+            --skip https://github.com/ministryofjustice/mta-sts \
+            --skip https://operations-engineering.service.justice.gov.uk/images/govuk-large.png \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-000+Record+Architecture+Decisions%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-000.html%29&labels=bug&title=Re%3A+%27ADR-000+Record+Architecture+Decisions%27 \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-002+Sentry+Spike+Protection%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-002.html%29&labels=bug&title=Re%3A+%27ADR-002+Sentry+Spike+Protection%27 \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-003+DNS+Failover%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-003.html%29&labels=bug&title=Re%3A+%27ADR-003+DNS+Failover%27 \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-004+Docker+SSO%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-004.html%29&labels=bug&title=Re%3A+%27ADR-004+Docker+SSO%27 \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-006+Require+authentication+for+team+reports%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-006.html%29&labels=bug&title=Re%3A+%27ADR-006+Require+authentication+for+team+reports%27 \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-005+Github+Standards+Branch+Protection%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-005.html%29&labels=bug&title=Re%3A+%27ADR-005+Github+Standards+Branch+Protection%27 \
+            --skip https://github.com/ministryofjustice/operations-engineering/issues/new?body=Problem+with+%27ADR-006+Decomission+developer+portal%27+%28https%3A%2F%2Foperations-engineering.service.justice.gov.uk%2Fdocumentation%2Fadrs%2Fadr-007.html%29&labels=bug&title=Re%3A+%27ADR-006+Decomission+developer+portal%27 \
+          # "URL Check will fail on private and internal GitHub repositories"
