@@ -46,7 +46,7 @@ In order to fix drift, you must change the DNS-IAC Terraform code to match the c
 
 ### An example
 
-Below is a resource from a Terraform plan output, Terraform wants to change `~all` to `-all` (see the - and + on the left hand side)
+Below is a resource from a Terraform plan output, Terraform wants to change `-all` to `~all` (see the - and + on the left hand side)
 
 ```
   # module.publicguardian_gov_uk_records.aws_route53_record.this["publicguardian.gov.uk_TXT"] will be updated in-place
@@ -54,8 +54,8 @@ Below is a resource from a Terraform plan output, Terraform wants to change `~al
         id      = "Z01126121SKXV1BMJWB6J_publicguardian.gov.uk_TXT"
         name    = "publicguardian.gov.uk"
       ~ records = [
-          + "v=spf1 ip4:redacted ip4:redacted  include:redacted -all",
-          - "v=spf1 ip4:redacted ip4:redacted  include:redacted ~all",
+          + "v=spf1 ip4:redacted ip4:redacted  include:redacted ~all",
+          - "v=spf1 ip4:redacted ip4:redacted  include:redacted -all",
             # (1 unchanged element hidden)
         ]
         # (4 unchanged attributes hidden)
@@ -73,12 +73,12 @@ Once the file is open, change the relevant code
       ttl  = 300
       records = [
         "MS=ms49968440",
-        "v=spf1 ip4:redacted  ip4:redacted  include:redacted  -all"
+        "v=spf1 ip4:redacted  ip4:redacted  include:redacted  ~all"
       ]
     },
 ```
 
-Would become (`-all` becomes `~all`)
+Would become (`~all` becomes `-all`)
 
 ```
    {
@@ -87,7 +87,7 @@ Would become (`-all` becomes `~all`)
       ttl  = 300
       records = [
         "MS=ms49968440",
-        "v=spf1 ip4:redacted  ip4:redacted include:redacted  ~all"
+        "v=spf1 ip4:redacted  ip4:redacted include:redacted  -all"
       ]
     },
 ```
