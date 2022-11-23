@@ -3,4 +3,4 @@ PyGithub == 1.57
 python-dateutil == 2.8.2
 gql
 aiohttp
-slack_sdk == 3.19.1
+slack_sdk == 3.19.4
