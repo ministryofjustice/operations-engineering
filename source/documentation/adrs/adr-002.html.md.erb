@@ -17,12 +17,12 @@ We do not have good visibility over our organisational usage of Sentry. Teams ar
 
 Sentry currently does not have billing or usage alerts. There are only two ways to manage quotas - spike protection and per-key rate limiting. Teams are free to set rate limits as they see fit, and we do not change project setups ourselves.
 
-Spike protection would prevent us from using up a certain amount of our quota in a short period of time and we would also get an alert when it has been activated. After it is activated, Sentry will start dropping all subsequent events. This is not acceptable in our case - the organisation has multiple independent teams within it. After getting alerted we would need to identify which project is causing the spike, contact that team and ask them to look into it. This could take a long time during which Sentry is dropping events for all projects. 
+Spike protection would prevent us from using up a certain amount of our quota in a short period of time and we would also get an alert when it has been activated. After it is activated, Sentry will start dropping all subsequent events. This is not acceptable in our case - the organisation has multiple independent teams within it. After getting alerted we would need to identify which project is causing the spike, contact that team and ask them to look into it. This could take a long time during which Sentry is dropping events for all projects.
 
 It is also possible that multiple teams turning on Sentry at the same time causes spike protection to activate, since it is based on average usage. We do not control when and how teams start using Sentry and do not think this risk is acceptable.
 
 [Sentry blog]
-[Sentry docs] 
+[Sentry docs]
 
 ## Decision
 
@@ -31,7 +31,6 @@ Spike protection is not a suitable way to manage our quota.
 ## Consequences
 
 We are looking at other options for monitoring quota usage and seeking help from Sentry.
-
 
 [Sentry blog]: https://blog.sentry.io/2018/05/08/event-spike-protection
 [Sentry docs]: https://docs.sentry.io/product/accounts/quotas/#spike-protection
