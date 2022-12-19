@@ -869,6 +869,26 @@ def change_team_repository_permission(repository_name, team_name, team_id, permi
         print_stack_trace(message)
 
 
+def correct_team_name(team_name):
+    """GH team names use a slug name. This
+    cannot have a full dot or space in them
+    replace with a -
+
+    Args:
+        team_name (string): the name of the team
+    """
+    new_team_name = ""
+    if team_name.startswith("."):
+        temp_name = team_name[len("."):]
+        temp_name = temp_name.replace(".", "-")
+        new_team_name = temp_name.replace(" ", "-")
+        return new_team_name
+    else:
+        temp_name = team_name.replace(".", "-")
+        new_team_name = temp_name.replace(" ", "-")
+    return new_team_name
+
+
 def put_user_into_existing_team(
     repository_name, username, users_not_in_a_team, org_teams
 ):
@@ -889,7 +909,8 @@ def put_user_into_existing_team(
         users_permission = get_user_permission(repository_name, username)
 
         # create a team name that has the same permissions as the user
-        expected_team_name = repository_name + "-" + users_permission + "-team"
+        temp_name = repository_name + "-" + users_permission + "-team"
+        expected_team_name = correct_team_name(temp_name)
 
         # Find an existing team with the same permissions as
         # the user which has access to the repository
@@ -917,7 +938,8 @@ def put_users_into_new_team(repository_name, remaining_users):
         for username in remaining_users:
             users_permission = get_user_permission(repository_name, username)
 
-            team_name = repository_name + "-" + users_permission + "-team"
+            temp_name = repository_name + "-" + users_permission + "-team"
+            team_name = correct_team_name(temp_name)
 
             if not does_team_exist(team_name):
                 create_new_team_with_repository(repository_name, team_name)
@@ -937,7 +959,6 @@ def put_users_into_new_team(repository_name, remaining_users):
 
 badly_named_repositories = [
     "https---github.com-ministryofjustice-hmpps-incentives-tool",
-    "MOJ.PTTP.DevicesAndApps.Pipeline.Windows10Apps",
 ]
 
 
