@@ -1,0 +1,36 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Decommissioning Domains
+last_reviewed_on: 2023-01-25
+review_in: 3 months
+---
+
+# Decommissiomning Domains
+
+## Overview
+
+It's important that decommissioning of a domain is part of decommissioning process for any service.
+
+However, depending on the type of domain or what it's being used for may mean different approaches to decommissioning. The purpose of this runbook is to set out approaches that should be considered depending on the specific situation.
+
+## (service).justice.gov.uk domains
+
+If the service no longer exists in any form the DNS records associated to that service can be deleted. As MoJ controls the sub-domains for service.justice.gov.uk and justice.gov.uk there is low risk that another party could reuse or register the decommissioned domain.
+
+It is optional for the domain to be redirected to the [decommissioned domains](https://github.com/ministryofjustice/cloud-platform-maintenance-pages) page. That can be discussed with the relevant Service Area.
+
+## Services migrated to Gov.uk
+
+If the content of a service is being move to Gov.uk then the [redirection service](https://docs.publishing.service.gov.uk/manual/transition-a-site.html) should be used to redirect traffic from the legacy domain to the Gov.uk content.
+
+## (service).gov.uk domains
+
+If the domain is not managed by Operations Engineering then the Cabinet Office Domains Team (domainmanagement@digital.cabinet-office.gov.uk) should be contacted to decommission the domain.
+
+If the domain is managed by Operations Engineering then the domain should be redirected to an appropriate place. The standards for defensive domains should also be applied to any associated DNS records.
+
+## Non-gov.uk domains
+
+If the domain is not currently owned by MoJ then the domain should be transfered to MoJ e.g. legacy .co.uk or .com domains.
+
+Any non-gov.uk domains should have the defensive domain standards applied.
