@@ -1,0 +1,44 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: LastPass Admin - Troubleshooting Can't See Shared Folder
+last_reviewed_on: 2023-01-26
+review_in: 3 months
+---
+
+# LastPass Admin - Troubleshooting "Can't see shared folders"
+
+Guide to troubleshooting user access issues.
+
+## Pre-requisites
+
+Before you begin, there are a few pre-requisites:
+
+* Access to [LastPass Admin console](https://admin.lastpass.com/dashboard)
+* User's details
+* User's Group details
+* Shared folder details
+
+## Is user account deactivated?
+
+Go to the User section in the Admin console. Check "LastPass status". If showing as "Disabled", select the user and click on the "Activate users" option.
+
+Activating the account will reinstate previous shared access.
+
+If already "Active" is a user attached to a Group? 
+
+**Note - Groups define shared folder access permissions**
+
+## Is user assigned to a Group?
+
+If "Active" but shared folders do not appear check user's Group access. Select the user and "Expand" the "Group" section.
+
+If no Groups assigned then treat request like a [new user request](https://operations-engineering.service.justice.gov.uk/documentation/runbooks/services/add-lastpass-user.html#add-new-lastpass-user) and seek approval from shared folder owner before granting access.
+
+## Is the user added to the correct Group?
+
+It's possible that the user is "Active" and already has the correct Group Access.
+
+In this instance remove the user from the Group and then add them back into the group. Ask the user to log out and log back in again with the Master Password. This will resolve the issue.
+
+**Note - there is sometimes a lag in user accounts picking up permissions. You may have to ask the user to wait 5 mins and try again.**
+
