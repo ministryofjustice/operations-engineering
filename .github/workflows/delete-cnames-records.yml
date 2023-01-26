@@ -6,7 +6,7 @@ on:
     - cron: "0 0 1 1-12 *"
 
 jobs:
-  archive-repos:
+  delete-cnames:
     runs-on: ubuntu-latest
     # These permissions are required to use AWS OIDC federate roles
     permissions:
