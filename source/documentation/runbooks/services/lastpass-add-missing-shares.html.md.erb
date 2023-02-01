@@ -1,0 +1,33 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: LastPass - Add Missing Shared Folder for Migration
+last_reviewed_on: 2023-01-31
+review_in: 3 months
+---
+
+# Add Missing Shared Folder for Migration
+
+In preparation for migration we are encouraging users to identify any missing shared folders that have been set up outside of the admin process. These types of folders can't be migrated. The purpose of this runbook in the steps to ensure folder can be migrated.
+
+## Pre-requisites
+
+Before you begin, there are a few pre-requisites:
+
+* Access to [LastPass Admin console](https://admin.lastpass.com/dashboard)
+* Shared Folder Name
+
+## How to get the folder back within the admin processes.
+
+1. Ask the user to add the `LastPass Admins` Group to the shared folder permissions. They can also tick the `Hide passwords` option.
+
+2. When access is confirmed by the user, check that we can see the shared folder in the `Sharing Centre`. If correct it will appear in the `Administrator` section.
+
+3. It is likely that when you check permissions that users are accessing the share directly rather than via a `Group`. Next create a new `Group` via the admin console and add all the users with direct access to the folder to the new group.
+
+4. Add the new `Group` with admin permissions to the shared folder via the `Sharing Centre`. This will ensure that access to the share is via a Group as per the standard process.
+
+**Note - It is possible that changing a users permissions can somethimes lead to teh user not being able to see the share. This is a bug with LastPass. Follow the [Troubleshooting “Can’t see shared folders”](https://operations-engineering.service.justice.gov.uk/documentation/runbooks/services/lastpass-folder-access.html) runbook to restore access.**
+
+5. Add the share to the [LastPass approvers list](https://docs.google.com/document/d/1O58JjeYRWm1_K4zWCkcrQKy_aE1O7s5b_GtBmQpFPCQ/edit).
+
+6. Add the share to the [list of folders in scope for migration](https://docs.google.com/document/d/1IxvuBw1gqORu9D_XHifQNGz_sIGrGFQ8l3TUYUMufh4/edit?usp=sharing).
