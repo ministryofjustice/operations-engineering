@@ -871,21 +871,33 @@ def change_team_repository_permission(repository_name, team_name, team_id, permi
 
 def correct_team_name(team_name):
     """GH team names use a slug name. This
-    cannot have a full dot or space in them
-    replace with a -
+    swaps ., _, , with a - and lower cases
+    the team name
 
     Args:
         team_name (string): the name of the team
+
+    Returns:
+        string: converted team name
     """
+    temp_name = ""
     new_team_name = ""
-    if team_name.startswith("."):
-        temp_name = team_name[len("."):]
-        temp_name = temp_name.replace(".", "-")
-        new_team_name = temp_name.replace(" ", "-")
-        return new_team_name
-    else:
-        temp_name = team_name.replace(".", "-")
-        new_team_name = temp_name.replace(" ", "-")
+
+    temp_name = team_name
+    temp_name = temp_name.replace(".", "-")
+    temp_name = temp_name.replace("_", "-")
+    temp_name = temp_name.replace(" ", "-")
+    temp_name = temp_name.replace("--", "-")
+    temp_name = temp_name.replace("---", "-")
+
+    if temp_name.startswith(".") or temp_name.startswith("-"):
+        temp_name = temp_name[1:]
+
+    if temp_name.endswith(".") or temp_name.endswith("-"):
+        temp_name = temp_name[:-1]
+
+    new_team_name = temp_name.lower()
+
     return new_team_name
 
 
