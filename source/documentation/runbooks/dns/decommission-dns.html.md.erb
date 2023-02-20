@@ -13,6 +13,12 @@ It's important that decommissioning of a domain is part of decommissioning proce
 
 However, depending on the type of domain or what it's being used for may mean different approaches to decommissioning. The purpose of this runbook is to set out approaches that should be considered depending on the specific situation.
 
+## Checking Domain Usage
+
+Before starting the domain decommissioning process, it's possible to view the DNS queries for a specific domain over a set period of time. It's important to check this to ensure that there is no ongoing activity for the domain, which may indicate it is still in use.
+
+To do this, navigate to the [Checking Domain Activity](check-domain-activity.html) runbook for futher information.
+
 ## (service).justice.gov.uk domains
 
 If the service no longer exists in any form the DNS records associated to that service can be deleted. As MoJ controls the sub-domains for service.justice.gov.uk and justice.gov.uk there is low risk that another party could reuse or register the decommissioned domain.

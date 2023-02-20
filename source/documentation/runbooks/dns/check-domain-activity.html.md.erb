@@ -1,0 +1,61 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Checking Domain Activity
+last_reviewed_on: 2023-02-20
+review_in: 3 months
+---
+
+# Checking Domain Activity
+
+## Overview
+
+Before fully decommisioning a domain, it's important to confirm that the domain hasn't been accessed in a set period of time.
+
+To do this, it is possible to create a graphed view of DNS queries for a particular domain using CloudWatch in AWS.
+
+## Finding the ID of the Domain in Question
+
+Before creating a graphed view, we first need to identify the **Hosted Zone ID** of the domain in question.
+
+We will be using 'prisons-service.com' as an example here.
+
+1. Navigate to [Route53](https://us-east-1.console.aws.amazon.com/route53/v2/home#Dashboard), select the 'Hosted Zones' page in the navigation pane and search for the domain to be decommisioned:
+
+    ![Search Hosted Zone](../../images/check-domain-search-hosted-zone.png)
+
+2. On the right hand side of the results, you will notice the **Hosted Zone ID** - copy this value.
+
+## Creating a Graphed View of the Data
+
+Now we have the Hosted Zone ID, we can check for DNS query activity on that particular domain.
+
+1. Navigate to [CloudWatch](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#home:) on AWS.
+2. In the navigation pane, select **Metrics -> All Metrics** and then select the **Route53** tile: 
+
+    ![Isolate the Domain in CloudWatch](../../images/check-domain-isolate-domain-cloudwatch.png)
+
+3. From here we can continue to the **Hosted Zone Metrics** page and paste the **Hosted Zone ID** we previously copied.
+4. Once the zone has been isolated, we just need to select the checkbox on the left to create our initial view of the data:
+
+![Create Initial Graph](../../images/check-domain-create-initial-graph.png)
+
+## Tweaking the Graph for a Better View
+
+Now we have our initial view of the data, we can navigate to the **Graphed View** tab and tweak the settings for a more informative view. I'd recommend the following settings:
+
+ - Timespan = 3 Months
+ - View = Stacked Area
+ - Statistic = Sum
+ - Period = 6 Hours
+
+You should end up with something like this:
+
+![Create Initial Graph](../../images/check-domain-final-view.png)
+
+These settings are personal preference - the important part is being able to determine that the domain hasn't been hit for an extended period of time.
+
+> The general rule here is that if the domain has been inactive for **1 month**, it should be safe to continue with the decommissioning process.
+
+
+
+
