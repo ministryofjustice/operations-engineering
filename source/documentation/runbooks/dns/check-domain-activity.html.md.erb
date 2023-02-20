@@ -30,7 +30,7 @@ We will be using 'prisons-service.com' as an example here.
 Now we have the Hosted Zone ID, we can check for DNS query activity on that particular domain.
 
 1. Navigate to [CloudWatch](https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#home:) on AWS.
-2. In the navigation pane, select **Metrics -> All Metrics** and then select the **Route53** tile: 
+2. In the navigation pane, select **Metrics -> All Metrics** and then select the **Route53** tile:
 
     ![Isolate the Domain in CloudWatch](../../images/check-domain-isolate-domain-cloudwatch.png)
 
@@ -55,7 +55,3 @@ You should end up with something like this:
 These settings are personal preference - the important part is being able to determine that the domain hasn't been hit for an extended period of time.
 
 > The general rule here is that if the domain has been inactive for **1 month**, it should be safe to continue with the decommissioning process.
-
-
-
-
