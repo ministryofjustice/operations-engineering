@@ -13,6 +13,8 @@ Before fully decommisioning a domain, it's important to confirm that the domain 
 
 To do this, it is possible to create a graphed view of DNS queries for a particular domain using CloudWatch in AWS.
 
+Alternatively, there is a script included within [dns-iac](https://github.com/ministryofjustice/dns-iac) that can quickly check this information for you.
+
 ## Finding the ID of the Domain in Question
 
 Before creating a graphed view, we first need to identify the **Hosted Zone ID** of the domain in question.
@@ -25,7 +27,24 @@ We will be using 'prisons-service.com' as an example here.
 
 2. On the right hand side of the results, you will notice the **Hosted Zone ID** - copy this value.
 
-## Creating a Graphed View of the Data
+## Option 1: Running the Included Script in dns-iac
+
+Script Name: ```fetch-cloudwatch-metrics.py```
+
+1. Before running the script, you must first export your AWS cedentials as environment variables. They can be found [here](https://moj.awsapps.com/start#/).
+
+2. You can now run the script using the Hosted Zone ID you copied earlier as an argument.
+
+Futher information on using the script can be found in the dns-iac [README](https://github.com/ministryofjustice/dns-iac#fetch-cloudwatch-metrics) or by running:
+
+```
+python3 fetch-cloudwatch-metrics.py -h
+```
+
+> The script should indicate the appropriate action for the Hosted Zone in question.
+
+
+## Option 2: Creating a Graphed View of the Data in CloudWatch
 
 Now we have the Hosted Zone ID, we can check for DNS query activity on that particular domain.
 
@@ -39,7 +58,7 @@ Now we have the Hosted Zone ID, we can check for DNS query activity on that part
 
 ![Create Initial Graph](../../../images/check-domain-create-initial-graph.png)
 
-## Tweaking the Graph for a Better View
+### Tweaking the Graph for a Better View
 
 Now we have our initial view of the data, we can navigate to the **Graphed View** tab and tweak the settings for a more informative view. I'd recommend the following settings:
 
