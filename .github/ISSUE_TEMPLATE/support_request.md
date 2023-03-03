@@ -20,6 +20,7 @@ valid service label options are:
 - `SSL Certificate Management`
 - `Domains Management`
 - `MoJ GitHub Organisation`
+- `MoJ Analytical Services GitHub Organisation`
 - `Docker`
 - `MoJ Acronyms`
 - `CircleCI`
