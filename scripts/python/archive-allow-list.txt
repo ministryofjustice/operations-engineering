@@ -6,3 +6,4 @@ pflr-express-kit
 hmpps-terraform-modules
 laa-nolasa
 hmpps-track-a-move
+php-markdown-extra
