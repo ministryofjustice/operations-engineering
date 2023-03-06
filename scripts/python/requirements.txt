@@ -4,3 +4,4 @@ python-dateutil == 2.8.2
 gql
 aiohttp
 slack_sdk == 3.20.0
+freezegun==1.2.2
