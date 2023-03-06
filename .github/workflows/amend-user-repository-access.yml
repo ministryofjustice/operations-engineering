@@ -18,7 +18,7 @@ jobs:
           architecture: "x64"
           cache: "pip"
       - run: python3 -m pip install -r scripts/python/requirements.txt
-      - run: python3 scripts/python/amend-user-repository-access.py ${{ secrets.OPERATIONS_ENGINEERING }} > output.txt
+      - run: python3 scripts/python/amend_user_repository_access.py ${{ secrets.OPERATIONS_ENGINEERING }} > output.txt
       - uses: actions/upload-artifact@v3
         with:
           path: output.txt
