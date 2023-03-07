@@ -17,7 +17,7 @@ jobs:
           architecture: "x64"
           cache: "pip"
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/assign-support-tickets.py
+      - run: python scripts/python/assign_support_tickets.py
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
   close-support-ticket:
@@ -30,6 +30,6 @@ jobs:
           architecture: "x64"
           cache: "pip"
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/close-support-tickets.py
+      - run: python scripts/python/close_support_tickets.py
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}

@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.10"
       - run: python3 -m pip install -r scripts/python/requirements.txt
-      - run: python3 scripts/python/add-users-all-org-members-github-team.py ${{ secrets.OPERATIONS_ENGINEERING }}
+      - run: python3 scripts/python/add_users_all_org_members_github_team.py ${{ secrets.OPERATIONS_ENGINEERING }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

@@ -13,7 +13,7 @@ jobs:
           python-version: "3.10"
           cache: "pip"
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/sentry-projects-rate-limiting.py ${{ secrets.SENTRY_TOKEN }}
+      - run: python scripts/python/sentry_projects_rate_limiting.py ${{ secrets.SENTRY_TOKEN }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
