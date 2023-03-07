@@ -1,26 +1,16 @@
+import logging
 import os
 import time
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
-from lib.MojGithub import MojGithub
+
 from lib.MojArchive import MojArchive
-import logging
+from lib.MojGithub import MojGithub
+
 
 # This file assigns archives all repositories which have had no commits from a certain datetime
 # The goal is clean the ministryofjustice GitHub organization.
-
-# Config
-# Logging Config
-logging.basicConfig(
-    format="%(asctime)s %(levelname)-8s %(message)s",
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
-# Change this to point at a different GitHub organization
-organization = "ministryofjustice"
-org_token = os.getenv("ADMIN_GITHUB_TOKEN")
-
 
 def get_commit(repository):
     """get the last commit from a repository
@@ -60,33 +50,51 @@ def ready_for_archiving(repository, archive_date) -> bool:
     return False
 
 
-# How long ago in which the repositories should be archived
-archive_date_days = 0
-archive_date_months = 6
-archive_date_years = 1
+def main():
+    # Config
+    # Logging Config
+    logging.basicConfig(
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        level=logging.INFO,
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
-archive_date = datetime.now() - relativedelta(
-    days=archive_date_days, months=archive_date_months, years=archive_date_years
-)
+    # Change this to point at a different GitHub organization
+    organization = "ministryofjustice"
+    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
 
-# Create MoJGithub object
-moj_gh = MojGithub(org=organization, org_token=org_token)
+    # How long ago in which the repositories should be archived
+    archive_date_days = 0
+    archive_date_months = 6
+    archive_date_years = 1
 
-# Get all repos that need archiving
-repos = [
-    repo
-    for repo in moj_gh.get_unarchived_repos("public")
-    if ready_for_archiving(repo, archive_date)
-]
+    archive_date = datetime.now() - relativedelta(
+        days=archive_date_days, months=archive_date_months, years=archive_date_years
+    )
 
-# Print repos
-logging.info(
-    f"Beginning archive of inactive repositories for GitHub organization: {organization}"
-)
-logging.info("-----------------------------")
-logging.info(f"Searching for inactive repositories from date: {archive_date}")
-logging.info("-----------------------------")
+    # Create MoJGithub object
+    moj_gh = MojGithub(org=organization, org_token=org_token)
 
-# Archive repos
-for repo in repos:
-    MojArchive(repo).archive()
+    # Get all repos that need archiving
+    repos = [
+        repo
+        for repo in moj_gh.get_unarchived_repos("public")
+        if ready_for_archiving(repo, archive_date)
+    ]
+
+    # Print repos
+    logging.info(
+        f"Beginning archive of inactive repositories for GitHub organization: {organization}"
+    )
+    logging.info("-----------------------------")
+    logging.info(
+        f"Searching for inactive repositories from date: {archive_date}")
+    logging.info("-----------------------------")
+
+    # Archive repos
+    for repo in repos:
+        MojArchive(repo).archive()
+
+
+if __name__ == "__main__":
+    main()
