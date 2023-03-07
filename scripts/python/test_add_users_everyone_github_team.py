@@ -18,7 +18,8 @@ class TestAddUsersEveryoneGithubTeam(unittest.TestCase):
         add_users_all_org_members_github_team.main()
 
     def test_main_returns_error_when_no_token_provided(self, mock1, mock2, mock3):
-        self.assertRaises(ValueError, add_users_all_org_members_github_team.main)
+        self.assertRaises(
+            ValueError, add_users_all_org_members_github_team.main)
 
 
 if __name__ == "__main__":
