@@ -1,9 +1,12 @@
 import sys
 import time
 import traceback
-from github import Github
-from gql import gql, Client
+
+from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
+from graphql import DocumentNode
+
+from services.GithubService import GithubService
 
 
 def print_stack_trace(message):
@@ -20,29 +23,7 @@ def print_stack_trace(message):
         del exc_info
 
 
-if len(sys.argv) == 2:
-    # Get the GH Action token
-    oauth_token = sys.argv[1]
-else:
-    print("Missing a script input parameter")
-    sys.exit(1)
-
-# Setup a transport and client to interact with the GH GraphQL API
-try:
-    transport = AIOHTTPTransport(
-        url="https://api.github.com/graphql",
-        headers={"Authorization": "Bearer {}".format(oauth_token)},
-    )
-except Exception:
-    print_stack_trace("Exception: Problem with the API URL or GH Token")
-
-try:
-    client = Client(transport=transport, fetch_schema_from_transport=False)
-except Exception:
-    print_stack_trace("Exception: Problem with the Client.")
-
-
-def organisation_team_id_query() -> gql:
+def organisation_team_id_query() -> DocumentNode:
     """A GraphQL query to get the id of an organisation team
 
     Returns:
@@ -61,14 +42,14 @@ def organisation_team_id_query() -> gql:
     return gql(query)
 
 
-def fetch_team_id() -> int:
+def fetch_team_id(gql_client: Client) -> int:
     """A wrapper function to run a GraphQL query to get the team ID
 
     Returns:
         int: The team ID of the team
     """
     query = organisation_team_id_query()
-    data = client.execute(query)
+    data = gql_client.execute(query)
     if (
         data["organization"]["team"]["databaseId"] is not None
         and data["organization"]["team"]["databaseId"]
@@ -78,13 +59,13 @@ def fetch_team_id() -> int:
         return 0
 
 
-def run():
+def run(github_service: GithubService, gql_client: Client):
     """A function for the main functionality of the script"""
 
     try:
-        gh = Github(oauth_token)
+        gh = github_service.github_client_core_api
         org = gh.get_organization("ministryofjustice")
-        team_id = fetch_team_id()
+        team_id = fetch_team_id(gql_client)
         gh_team = org.get_team(team_id)
         all_org_members = gh_team.get_members()
         org_members = org.get_members()
@@ -99,7 +80,34 @@ def run():
         print_stack_trace(message)
 
 
-print("Start")
-run()
-print("Finished")
-sys.exit(0)
+def main():
+    if len(sys.argv) == 2:
+        # Get the GH Action token
+        oauth_token = sys.argv[1]
+    else:
+        raise ValueError("Missing a script input parameter")
+
+    # Setup a transport and gql_client to interact with the GH GraphQL API
+    try:
+        transport = AIOHTTPTransport(
+            url="https://api.github.com/graphql",
+            headers={"Authorization": "Bearer {}".format(oauth_token)},
+        )
+    except Exception:
+        print_stack_trace("Exception: Problem with the API URL or GH Token")
+
+    try:
+        gql_client = Client(transport=transport,
+                            fetch_schema_from_transport=False)
+    except Exception:
+        print_stack_trace("Exception: Problem with the Client.")
+
+    github_service = GithubService(oauth_token, "ministryofjustice")
+
+    print("Start")
+    run(github_service, gql_client)
+    print("Finished")
+
+
+if __name__ == "__main__":
+    main()
