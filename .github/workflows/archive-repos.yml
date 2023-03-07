@@ -16,7 +16,7 @@ jobs:
           architecture: "x64"
           cache: "pip"
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/archive-repositories.py
+      - run: python scripts/python/archive_repositories.py
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
       - name: Report failure to Slack
