@@ -11,7 +11,7 @@ class TestGetSlackSupportMessages(unittest.TestCase):
 
     # TODO: requires deeply nested mocking to smoke test due to infinite loop.
     def ignore_test_main_smoke_test(self):
-        get_slack_support_messages
+        get_slack_support_messages.main()
 
 
 if __name__ == "__main__":
