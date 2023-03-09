@@ -3,6 +3,8 @@ import json
 import sys
 import traceback
 
+from botocore.client import BaseClient
+
 
 def print_stack_trace(message):
     """This will attempt to print a stack trace when an exception occurs
@@ -15,13 +17,6 @@ def print_stack_trace(message):
     finally:
         traceback.print_exception(*exc_info)
         del exc_info
-
-
-try:
-    route53_client = boto3.client("route53")
-except BaseException as err:
-    print(err)
-    print_stack_trace("Exception: Problem with the route53 client.")
 
 
 def create_delete_cname_record(cname):
@@ -44,11 +39,12 @@ def create_delete_cname_record(cname):
     return cname_record
 
 
-def delete_cname_records(host_zone_id):
+def delete_cname_records(route53_client: BaseClient, host_zone_id):
     """Delete selected cname records from the AWS Route53 host zone
 
     Args:
         host_zone_id (string): The AWS ID of the host zone that contains the records to delete
+        route53_client (BaseClient)
     """
     delete_records = []
     next_record_name = "a"
@@ -95,11 +91,24 @@ def delete_cname_records(host_zone_id):
         print_stack_trace("Exception: AWS call to delete cname records")
 
 
-def run():
+def run(route53_client: BaseClient):
     for i in range(1, len(sys.argv)):
-        delete_cname_records(sys.argv[i])
+        delete_cname_records(route53_client, sys.argv[i])
 
 
-print("Start")
-run()
-print("Finished")
+
+
+def main():
+    try:
+        route53_client = boto3.client("route53")
+    except BaseException as err:
+        print(err)
+        print_stack_trace("Exception: Problem with the route53 client.")
+
+    print("Start")
+    run(route53_client)
+    print("Finished")
+
+
+if __name__ == "__main__":
+    main()
