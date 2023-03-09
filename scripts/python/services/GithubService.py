@@ -15,7 +15,7 @@ from gql.transport.exceptions import TransportQueryError
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
     def decorator(*args, **kwargs):
         """
-        A decorator to retry the method when rate limiting for GitHub resets if the method fails due to RateLimitExceededException.
+        A decorator to retry the method when rate limiting for GitHub resets if the method fails due to Rate Limit related exception.
 
         WARNING: Since this decorator retries methods, ensure that the method being decorated is idempotent
          or contains only one non-idempotent method at the end of a call chain to GitHub.
