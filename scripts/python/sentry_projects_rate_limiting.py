@@ -1,6 +1,8 @@
 import json
 import sys
 import requests
+
+
 def main():
     if len(sys.argv) == 2:
         # Get the GH Action token
