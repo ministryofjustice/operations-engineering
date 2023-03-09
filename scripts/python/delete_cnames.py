@@ -96,8 +96,6 @@ def run(route53_client: BaseClient):
         delete_cname_records(route53_client, sys.argv[i])
 
 
-
-
 def main():
     try:
         route53_client = boto3.client("route53")
