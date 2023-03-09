@@ -40,7 +40,9 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
             time_until_core_api_rate_limit_resets = (
                 reset_timestamp - now_timestamp) if reset_timestamp > now_timestamp else 0
 
-            sleep(time_until_core_api_rate_limit_resets)
+            wait_time_buffer = 5
+            sleep(time_until_core_api_rate_limit_resets +
+                  wait_time_buffer if time_until_core_api_rate_limit_resets else 0)
             return func(*args, **kwargs)
 
     return decorator
