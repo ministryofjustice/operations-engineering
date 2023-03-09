@@ -241,7 +241,7 @@ class TestGithubServiceCreateAnAccessRemovedIssueForUserInRepository(unittest.Te
         github_service.github_client_core_api.get_repo.assert_has_calls(
             [call('moj-analytical-services/test_repository'),
              call().create_issue(title=USER_ACCESS_REMOVED_ISSUE_TITLE, assignee='test_user',
-                                 body='Hi there\n\nThe user test_user had Direct Member access to this repository and access via a team.\n\nAccess is now only via a team.\n\nYou may have less access it is dependant upon the teams access to the repo.\n\nIf you have any questions, please post in (#ask-operations-engineering)[https://mojdt.slack.com/archives/C01BUKJSZD4] on Slack.\n\nThis issue can be closed.')]
+                                 body='Hi there\n\nThe user test_user had Direct Member access to this repository and access via a team.\n\nAccess is now only via a team.\n\nYou may have less access it is dependant upon the teams access to the repo.\n\nIf you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.\n\nThis issue can be closed.')]
 
         )
 

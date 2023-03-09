@@ -100,7 +100,7 @@ class GithubService:
              
         You may have less access it is dependant upon the teams access to the repo.
                    
-        If you have any questions, please post in (#ask-operations-engineering)[https://mojdt.slack.com/archives/C01BUKJSZD4] on Slack.
+        If you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
             
         This issue can be closed.
         """).strip("\n")
