@@ -1,30 +1,22 @@
-import os
+import logging
 import sys
 
-from github import Github
 from services.GithubService import GithubService
 
-# This file assigns unassigned support tickets to the user that opened the ticket
-# Its goal is to streamline the capture of support tickets as far as possible
 
-# Config
+def identify_support_issues(issues, tag):
+    return [
+        issue
+        for issue in issues
+        for label in issue.labels
+        if label.name == tag and len(issue.assignees) == 0
+    ]
 
-# Create Base Objects
-# Authentication, Repository, Issues
-repo = git.get_repo(project)
-issues = repo.get_issues(state="open")
 
-# Get only unassigned support issues
-support_issues = [
-    issue
-    for issue in issues
-    for label in issue.labels
-    if label.name == support_tag and len(issue.assignees) == 0
-]
-
-# Assign creator to item
-for issue in support_issues:
-    issue.edit(assignees=[issue.user.login])
+def assign_issues_to_creator(support_issues):
+    for issue in support_issues:
+        issue.edit(assignees=[issue.user.login])
+        logging.info(f"Assigned issue {issue.number} to {issue.user.login}")
 
 
 def main():
@@ -38,21 +30,24 @@ def main():
     repo = "operations-engineering"
     tag = "Support"
 
-    github_service = GithubService(oauth_token, org)
-    # Concept
-    # Get a list of repos
-    # repos = github_service.get_repos()
-    #
-    # # Get a list of issues
-    # issues = github_service.get_issues(repo, tag)
-    #
-    # # Get a list of unassigned issues
-    # unassigned_issues = github_service.get_unassigned_issues(repo, tag)
-    #
-    # # Assign issues to the creator
-    # github_service.assign_issues_to_creator(repo, tag)
-    #
-    # # Print the results
-    # print(f"Repos: {repos}")
-    # print(f"Issues: {issues}")
-    # print(f"Unassigned Issues: {unassigned_issues}")
+    gh = GithubService(oauth_token, org)
+
+    issues = gh.get_open_issues_from_repo(repo)
+    if not issues:
+        logging.info("No open issues found")
+        sys.exit(0)
+
+    support_issues = identify_support_issues(issues, tag)
+    if not support_issues:
+        logging.info("No support issues found")
+        sys.exit(0)
+
+    try:
+        assign_issues_to_creator(support_issues)
+    except Exception:
+        message = "Warning: Exception in Run()"
+        logging.error(message, exc_info=True)
+
+
+if __name__ == "__main__":
+    main()
