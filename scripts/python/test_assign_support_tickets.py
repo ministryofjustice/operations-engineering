@@ -25,10 +25,9 @@ class TestAssignSupportTicket(unittest.TestCase):
     def test_valid_args_with_changes(self):
         # Create a mock github call to a repository and return a list of issues
         mock_client = Mock(Github)
-        mock_client.get_repo.return_value = mock_func(mock_client.get_repo("test"))
+        mock_client.get_repo.return_value = mock_func(
+            mock_client.get_repo("test"))
         mock_func.get_issues.return_value = [Mock()]
-
-
 
 
 if __name__ == '__main__':
