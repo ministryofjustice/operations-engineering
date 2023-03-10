@@ -67,6 +67,14 @@ class GithubService:
         return [outside_collaborator.login for outside_collaborator in outside_collaborators]
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
+        logging.info(f"Getting open issues from {repository_name}")
+        required_state = "open"
+        repo = self.github_client_core_api.get_repo(repository_name)
+
+        return repo.get_issues(state=required_state) or []
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def close_expired_issues(self, repository_name: str) -> None:
         logging.info(f"Closing expired issues for {repository_name}")
         issues = self.github_client_core_api.get_repo(
