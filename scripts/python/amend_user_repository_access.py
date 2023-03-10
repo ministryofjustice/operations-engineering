@@ -395,11 +395,12 @@ def put_users_into_new_team(github_service: GithubService, repository_name, rema
 
                 temp_name = repository_name + "-" + users_permission + "-team"
                 team_name = correct_team_name(temp_name)
-                team_id = github_service.get_team_id_from_team_name(team_name)
+
 
                 if not github_service.team_exists(team_name):
                     github_service.create_new_team_with_repository(
                         team_name, repository_name)
+                    team_id = github_service.get_team_id_from_team_name(team_name)
                     # Depends who adds the oauth_token to repo is added to every team
                     github_service.remove_user_from_team(
                         "AntonyBishop", team_id)
@@ -408,6 +409,7 @@ def put_users_into_new_team(github_service: GithubService, repository_name, rema
                     github_service.remove_user_from_team(
                         "moj-operations-engineering-bot", team_id)
 
+                team_id = github_service.get_team_id_from_team_name(team_name)
                 github_service.amend_team_permissions_for_repository(
                     team_id, users_permission, repository_name)
 
