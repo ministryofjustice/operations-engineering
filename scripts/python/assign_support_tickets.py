@@ -20,7 +20,8 @@ def assign_issues_to_creator(support_issues):
     logging.debug(f"Assigning {len(support_issues)} issues to their creator")
 
     for issue in support_issues:
-        logging.debug(f"Issue number {issue.number}, created by {issue.user.login}")
+        logging.debug(
+            f"Issue number {issue.number}, created by {issue.user.login}")
         issue.edit(assignees=[issue.user.login])
         logging.info(f"Assigned issue {issue.number} to {issue.user.login}")
 

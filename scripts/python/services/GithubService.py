@@ -70,7 +70,8 @@ class GithubService:
     def get_open_issues_from_repo(self, repository_name: str):
         logging.info(f"Getting open issues from {repository_name}")
         required_state = "open"
-        logging.debug(f"Getting {required_state} issues from {repository_name}...")
+        logging.debug(
+            f"Getting {required_state} issues from {repository_name}...")
         repo = self.github_client_core_api.get_repo(repository_name)
 
         return repo.get_issues(state=required_state) or []

@@ -8,14 +8,14 @@ import assign_support_tickets
 class TestAssignSupportTicket(unittest.TestCase):
 
     @patch("sys.argv", [
-                    "",
-                    "--oauth_token",
-                    "fake",
-                    "--org",
-                    "fake",
-                    "--repo",
-                    "fake",
-               ])
+        "",
+        "--oauth_token",
+        "fake",
+        "--org",
+        "fake",
+        "--repo",
+        "fake",
+    ])
     def test_valid_args_but_no_changes(self):
         with self.assertRaises(SystemExit) as cm:
             assign_support_tickets.main()
