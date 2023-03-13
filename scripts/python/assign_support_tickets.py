@@ -5,12 +5,14 @@ import sys
 from services.GithubService import GithubService
 
 
-def identify_support_issues(issues, tag):
+def identify_support_issues(gh: GithubService, args):
+    issues = gh.get_open_issues_from_repo(f"{args.org}/{args.repo}")
+
     return [
         issue
         for issue in issues
         for label in issue.labels
-        if label.name == tag and len(issue.assignees) == 0
+        if label.name == args.tag and len(issue.assignees) == 0
     ]
 
 
@@ -58,20 +60,18 @@ def main():
 
     gh = GithubService(args.oauth_token, args.org)
 
-    issues = gh.get_open_issues_from_repo(args.repo)
-    if not issues:
-        logging.info("No open issues found")
-        sys.exit(0)
-
-    support_issues = identify_support_issues(issues, tag)
+    support_issues = identify_support_issues(gh, args)
     if not support_issues:
         logging.info("No support issues found")
         sys.exit(0)
 
+    for issue in support_issues:
+        print("Issue: ", issue.number, issue.title)
+
     try:
         assign_issues_to_creator(support_issues)
     except Exception:
-        message = "Warning: Exception in Run()"
+        message = "Error: An exception occurred while assigning issues"
         logging.error(message, exc_info=True)
 
 
