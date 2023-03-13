@@ -1,3 +1,4 @@
+import argparse
 import logging
 import sys
 
@@ -19,20 +20,45 @@ def assign_issues_to_creator(support_issues):
         logging.info(f"Assigned issue {issue.number} to {issue.user.login}")
 
 
+def add_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--oauth_token",
+        type=str,
+        required=True,
+        help="The GitHub OAuth token to use",
+    )
+
+    parser.add_argument(
+        "--org",
+        type=str,
+        default="ministryofjustice",
+        help="The GitHub organisation to use",
+    )
+
+    parser.add_argument(
+        "--repo",
+        type=str,
+        default="operations-engineering",
+        help="The GitHub repository to use",
+    )
+
+    parser.add_argument(
+        "--tag",
+        type=str,
+        default="Support",
+        help="The GitHub tag to use",
+    )
+
+    return parser.parse_args()
+
+
 def main():
-    if len(sys.argv) == 2:
-        # Get the GH Action token
-        oauth_token = sys.argv[1]
-    else:
-        raise ValueError("Missing a script input parameter")
+    args = add_arguments()
 
-    org = "ministryofjustice"
-    repo = "operations-engineering"
-    tag = "Support"
+    gh = GithubService(args.oauth_token, args.org)
 
-    gh = GithubService(oauth_token, org)
-
-    issues = gh.get_open_issues_from_repo(repo)
+    issues = gh.get_open_issues_from_repo(args.repo)
     if not issues:
         logging.info("No open issues found")
         sys.exit(0)
