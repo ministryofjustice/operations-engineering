@@ -15,9 +15,30 @@ def add_arguments():
 
     parser.add_argument(
         "--repo_id",
+        type=int,
+        default=223385041,  # This is the ID of the "operations-engineering" repo
+        help="The ID of a GitHub repository that exists in your Zenhub workspace.",
+    )
+
+    parser.add_argument(
+        "--label_to_move",
         type=str,
-        default="223385041",  # This is the ID of the "operations-engineering" repo
-        help="The ID of the GitHub Repository to search for the zenhub workspace",
+        default="dependencies",
+        help="The label attached to the GitHub issue.",
+    )
+
+    parser.add_argument(
+        "--pipeline_to_move_from",
+        type=str,
+        default="New Issues",
+        help="The name of the pipeline to move the issue from.",
+    )
+
+    parser.add_argument(
+        "--pipeline_to_move_to",
+        type=str,
+        default="Refined and Ready",
+        help="The name of the pipeline to move the issue to.",
     )
 
     return parser.parse_args()
@@ -44,7 +65,7 @@ def main():
 
     # Get the ID of the pipeline to search in
     try:
-        pipeline_id = zenhub.get_pipeline_id(workspace_id, "Support")
+        pipeline_id = zenhub.get_pipeline_id(workspace_id, args.pipeline_to_move_from)
     except Exception as e:
         logging.error("Failed to get pipeline ID")
         logging.error(e)
@@ -52,10 +73,10 @@ def main():
 
     # Get the issues in the pipeline
     try:
-        issues = zenhub.get_issues_in_pipeline(pipeline_id)
+        issues = zenhub.search_issue_by_label(pipeline_id, args.label_to_move)
     except Exception as e:
         logging.error("Failed to get issues in pipeline")
-        logging.error(e)
+        logging.error(e, exc_info=True)
         return
 
     # Print the issues
@@ -63,3 +84,7 @@ def main():
         logging.info(issue)
 
     logging.info("Finished script")
+
+
+if __name__ == "__main__":
+    main()
