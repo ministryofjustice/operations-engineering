@@ -53,13 +53,14 @@ class TestAssignSupportTicket(unittest.TestCase):
             MagicMock(
                 labels=[
                     MagicMock(name="Support"),
-                    ],
+                ],
                 assignees=[],
                 user=MagicMock(login="test"),
             ),
         ]
 
-        support = assign_support_tickets.identify_support_issues(issues, "Support"),
+        support = assign_support_tickets.identify_support_issues(
+            issues, "Support"),
         print(support, issues)
         self.assertEqual(len(support), 1)
 

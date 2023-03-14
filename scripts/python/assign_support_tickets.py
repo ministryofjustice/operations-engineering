@@ -71,12 +71,14 @@ def main():
         return sys.exit(1)
 
     if not issues:
-        logging.info("An empty list was returned when searching for issues. Nothing to do.")
+        logging.info(
+            "An empty list was returned when searching for issues. Nothing to do.")
         return sys.exit(0)
 
     support_issues = identify_support_issues(issues, args.tag)
     if not support_issues:
-        logging.info(f"An empty list was returned. There were no issues with the tag: {args.tag}.")
+        logging.info(
+            f"An empty list was returned. There were no issues with the tag: {args.tag}.")
         return sys.exit(0)
 
     try:
