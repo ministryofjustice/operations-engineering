@@ -6,6 +6,7 @@ class ZenhubService:
     """
     A service to interact with the Zenhub API.
     """
+
     def __init__(self, api_token: str, organisation_name: str) -> None:
         self.zenhub_client_gql_api: Client = Client(transport=AIOHTTPTransport(
             url="https://api.zenhub.com/public/graphql",
@@ -91,4 +92,3 @@ class ZenhubService:
         """), variable_values={"pipeline_id": pipeline_id, "label": label})
 
         return data["searchIssuesByPipeline"]["nodes"]
-

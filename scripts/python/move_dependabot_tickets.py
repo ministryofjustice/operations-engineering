@@ -63,4 +63,3 @@ def main():
         logging.info(issue)
 
     logging.info("Finished script")
-
