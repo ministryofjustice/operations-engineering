@@ -5,14 +5,12 @@ import sys
 from services.GithubService import GithubService
 
 
-def identify_support_issues(gh: GithubService, args):
-    issues = gh.get_open_issues_from_repo(f"{args.org}/{args.repo}")
-
+def identify_support_issues(issues: list, tag: str) -> list:
     return [
         issue
         for issue in issues
         for label in issue.labels
-        if label.name == args.tag and len(issue.assignees) == 0
+        if label.name == tag and len(issue.assignees) == 0
     ]
 
 
@@ -65,16 +63,28 @@ def main():
 
     gh = GithubService(args.oauth_token, args.org)
 
-    support_issues = identify_support_issues(gh, args)
+    try:
+        issues = gh.get_open_issues_from_repo(f"{args.org}/{args.repo}")
+    except Exception:
+        message = f"An exception occurred while getting issues from {args.repo}"
+        logging.error(message, exc_info=True)
+        return sys.exit(1)
+
+    if not issues:
+        logging.info("An empty list was returned when searching for issues. Nothing to do.")
+        return sys.exit(0)
+
+    support_issues = identify_support_issues(issues, args.tag)
     if not support_issues:
-        logging.info("No support issues found")
-        sys.exit(0)
+        logging.info(f"An empty list was returned. There were no issues with the tag: {args.tag}.")
+        return sys.exit(0)
 
     try:
         assign_issues_to_creator(support_issues)
     except Exception:
-        message = "Error: An exception occurred while assigning issues"
+        message = "An exception occurred while assigning issues"
         logging.error(message, exc_info=True)
+        return sys.exit(1)
 
 
 if __name__ == "__main__":
