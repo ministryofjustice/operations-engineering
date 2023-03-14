@@ -65,7 +65,8 @@ def main():
 
     # Get the ID of the pipeline to search in
     try:
-        pipeline_id = zenhub.get_pipeline_id(workspace_id, args.pipeline_to_move_from)
+        pipeline_id = zenhub.get_pipeline_id(
+            workspace_id, args.pipeline_to_move_from)
     except Exception as e:
         logging.error("Failed to get pipeline ID")
         logging.error(e)
