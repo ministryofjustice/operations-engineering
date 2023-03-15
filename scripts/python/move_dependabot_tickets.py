@@ -1,7 +1,45 @@
 import argparse
 import logging
+import os
 
 from services.ZenhubService import ZenhubService
+
+
+def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Exception:
+    try:
+        from_pipeline_id = zenhub.get_pipeline_id(from_pipeline)
+    except Exception as e:
+        logging.error(f"Failed to get pipeline ID for pipeline {from_pipeline}")
+        logging.error(e)
+        return e
+
+    try:
+        issues = zenhub.search_issues_by_label(from_pipeline_id, label)
+    except Exception as e:
+        logging.error("Failed to get issues in pipeline")
+        return e
+
+    return issues
+
+
+def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception:
+    try:
+        to_pipeline_id = zenhub.get_pipeline_id(to_pipeline)
+    except Exception as e:
+        logging.error(f"Failed to get pipeline ID for pipeline {to_pipeline}")
+        return e
+
+    issues_moved = []
+    for issue in issues_to_move:
+        logging.info(f"Moving issue {issue['id']} to pipeline {to_pipeline}")
+        try:
+            zenhub.move_issue_to_pipeline(issue['id'], to_pipeline_id)
+        except Exception as e:
+            logging.error(f"Failed to move issue {issue['number']}")
+            logging.error(e)
+            return e
+
+    return issues_moved
 
 
 def add_arguments():
@@ -21,21 +59,21 @@ def add_arguments():
     )
 
     parser.add_argument(
-        "--label_to_move",
+        "--label",
         type=str,
         default="dependencies",
         help="The label attached to the GitHub issue.",
     )
 
     parser.add_argument(
-        "--pipeline_to_move_from",
+        "--from_pipeline",
         type=str,
         default="New Issues",
         help="The name of the pipeline to move the issue from.",
     )
 
     parser.add_argument(
-        "--pipeline_to_move_to",
+        "--to_pipeline",
         type=str,
         default="Refined and Ready",
         help="The name of the pipeline to move the issue to.",
@@ -53,38 +91,24 @@ def main():
     )
 
     logging.info("Starting script")
-    zenhub = ZenhubService(args.api_token)
+    zenhub = ZenhubService(args.api_token, args.repo_id)
 
-    # Get the ID of the workspace to search in
+    logging.info("Getting issues")
     try:
-        workspace_id = zenhub.get_workspace_id(args.repo_id)
+        issues = get_issues(zenhub, args.label, args.from_pipeline)
     except Exception as e:
-        logging.error("Failed to get workspace ID")
-        logging.error(e)
+        logging.error(f"Failed to get issues in pipeline because: {e}")
+        os.exit(1)
+    if len(issues) == 0:
+        logging.info("Nothing to move")
         return
 
-    # Get the ID of the pipeline to search in
+    logging.info("Moving issues")
     try:
-        pipeline_id = zenhub.get_pipeline_id(
-            workspace_id, args.pipeline_to_move_from)
+        move_issues(zenhub, issues, args.to_pipeline)
     except Exception as e:
-        logging.error("Failed to get pipeline ID")
-        logging.error(e)
-        return
-
-    # Get the issues in the pipeline
-    try:
-        issues = zenhub.search_issue_by_label(pipeline_id, args.label_to_move)
-    except Exception as e:
-        logging.error("Failed to get issues in pipeline")
-        logging.error(e, exc_info=True)
-        return
-
-    # Print the issues
-    for issue in issues:
-        logging.info(issue)
-
-    logging.info("Finished script")
+        logging.error(f"Failed to move issues to correct pipeline: {e}")
+        os.exit(1)
 
 
 if __name__ == "__main__":
