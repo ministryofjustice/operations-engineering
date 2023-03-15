@@ -9,7 +9,8 @@ def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Excep
     try:
         from_pipeline_id = zenhub.get_pipeline_id(from_pipeline)
     except Exception as e:
-        logging.error(f"Failed to get pipeline ID for pipeline {from_pipeline}")
+        logging.error(
+            f"Failed to get pipeline ID for pipeline {from_pipeline}")
         logging.error(e)
         return e
 
