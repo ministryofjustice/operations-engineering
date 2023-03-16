@@ -9,19 +9,17 @@ class ZenhubService:
     A service to interact with the Zenhub API.
     """
 
-    def __init__(self, api_token: str, repo_id: str) -> None:
+    def __init__(self, api_token: str) -> None:
+        self._workspace_id = None
         self.zenhub_client_gql_api: Client = Client(transport=AIOHTTPTransport(
             url="https://api.zenhub.com/public/graphql",
             headers={"Authorization": f"Bearer {api_token}"},
         ), execute_timeout=60)
-        # set workspace id from GitHub repo id
-        self.workspace_id: str = self.get_workspace_id(repo_id)
 
-    def move_issue_to_pipeline(self, issue_to_move, pipeline_id: str):
-        print(f"Moving issue {issue_to_move} to pipeline {pipeline_id}")
+    def move_issue_to_pipeline(self, issue_to_move, to_pipeline: str) -> bool:
         move_issue_input = {
             "issueId": issue_to_move,
-            "pipelineId": pipeline_id,
+            "pipelineId": to_pipeline,
         }
 
         data = self.zenhub_client_gql_api.execute(gql("""
@@ -42,12 +40,14 @@ class ZenhubService:
                 }
               }
             } 
-        """), variable_values={"workspaceId": self.workspace_id, "moveIssueInput": move_issue_input})
+        """), variable_values={"workspaceId": self._workspace_id, "moveIssueInput": move_issue_input})
 
-        if data["moveIssue"]["issue"]["pipelineIssue"]["pipeline"]["id"] != pipeline_id:
-            return TypeError(f"Could not move issue {issue_to_move} to pipeline {pipeline_id}")
+        if data["moveIssue"]["issue"]["pipelineIssue"]["pipeline"]["id"] != to_pipeline:
+            return False
 
-    def get_pipeline_id(self, pipeline_name: str) -> str | TypeError:
+        return True
+
+    def get_pipeline_id(self, pipeline_name: str) -> str | None:
         data = self.zenhub_client_gql_api.execute(gql("""
             query getPipelinesForWorkspace($workspace_id: ID!) {
               workspace(id: $workspace_id) {
@@ -60,7 +60,7 @@ class ZenhubService:
                 }
               }
             }
-        """), variable_values={"workspace_id": self.workspace_id})
+        """), variable_values={"workspace_id": self._workspace_id})
 
         logging.info(f"Searching for pipeline with name {pipeline_name}")
         if data["workspace"]["pipelinesConnection"]["nodes"] is not None:
@@ -69,25 +69,38 @@ class ZenhubService:
                 if node["name"] == pipeline_name:
                     return node["id"]
 
-        return TypeError(f'Could not find pipeline with name {pipeline_name}')
+        return None
 
-    def get_workspace_id(self, repository_id: int):
+    @property
+    def workspace_id(self) -> int:
+        return self._workspace_id
+
+    @workspace_id.setter
+    def workspace_id(self, workspace_id: int):
+        self._workspace_id = workspace_id
+
+    def get_workspace_id_from_repo(self, repository_id: int):
         data = self.zenhub_client_gql_api.execute(gql("""
-        query getWorkspacesByRepo($repositoryGhId: [Int!]!) {
-          repositoriesByGhId(ghIds: $repositoryGhId) {
-            workspacesConnection(first: 50) {
-              nodes {
-                id
-                name
+            query getWorkspacesByRepo($repositoryGhId: [Int!]!) {
+              repositoriesByGhId(ghIds: $repositoryGhId) {
+                workspacesConnection(first: 50) {
+                  nodes {
+                    id
+                    name
+                  }
+                }
               }
             }
-          }
-        }
         """), variable_values={"repositoryGhId": [repository_id]})
 
-        if data["repositoriesByGhId"][0]["workspacesConnection"]["nodes"] is not None:
-            workspace_id = data["repositoriesByGhId"][0]["workspacesConnection"]["nodes"][0]["id"]
-            return workspace_id
+        try:
+            if data["repositoriesByGhId"][0]["workspacesConnection"]["nodes"] is not None:
+                workspace_id = data["repositoriesByGhId"][0]["workspacesConnection"]["nodes"][0]["id"]
+                return workspace_id
+            else:
+                return Exception(f'Could not find workspace for repository with ID {repository_id}')
+        except IndexError:
+            return Exception(f'Could not find workspace for repository with ID {repository_id}')
 
     def search_issues_by_label(self, pipeline_id: str, label: str):
         """
