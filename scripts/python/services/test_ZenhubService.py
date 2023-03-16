@@ -122,8 +122,10 @@ class TestZenhubMovingIssues(unittest.TestCase):
                 }
             }
         }
-        issue_id = svc.move_issue_to_pipeline("test_issue_id", "pipeline_issue_id")
+        issue_id = svc.move_issue_to_pipeline(
+            "test_issue_id", "pipeline_issue_id")
         self.assertEqual(True, issue_id)
 
-        bad_search = svc.move_issue_to_pipeline("test_issue_id", "wrong_pipeline_issue_id")
+        bad_search = svc.move_issue_to_pipeline(
+            "test_issue_id", "wrong_pipeline_issue_id")
         self.assertEqual(False, bad_search)
