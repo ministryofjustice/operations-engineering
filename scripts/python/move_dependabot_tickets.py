@@ -1,6 +1,5 @@
 import argparse
 import logging
-import os
 
 from services.ZenhubService import ZenhubService
 
@@ -8,27 +7,24 @@ from services.ZenhubService import ZenhubService
 def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Exception:
     from_pipeline_id = zenhub.get_pipeline_id(from_pipeline)
     if from_pipeline_id is None:
-        return Exception(f"Failed to get pipeline ID for pipeline {from_pipeline}")
+        logging.error(f"Failed to get pipeline ID for pipeline {from_pipeline}")
+        raise ValueError
 
-    try:
-        issues = zenhub.search_issues_by_label(from_pipeline_id, label)
-    except Exception as e:
-        logging.error("Failed to get issues in pipeline")
-        return e
-
-    return issues
+    return zenhub.search_issues_by_label(from_pipeline_id, label)
 
 
 def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception:
     to_pipeline_id = zenhub.get_pipeline_id(to_pipeline)
     if to_pipeline_id is None:
-        return Exception(f"Failed to get pipeline ID for pipeline {to_pipeline}")
+        logging.error(f"Failed to get pipeline ID for pipeline {to_pipeline}")
+        raise ValueError
 
     for issue in issues_to_move:
         logging.info(f"Moving issue {issue['id']} to pipeline {to_pipeline}")
         success = zenhub.move_issue_to_pipeline(issue['id'], to_pipeline_id)
         if not success:
-            return Exception(f"Failed to move issue {issue['id']} to pipeline {to_pipeline}")
+            logging.error(f"Failed to move issue {issue['id']} to pipeline {to_pipeline}")
+            return Exception
 
     return None
 
@@ -87,8 +83,9 @@ def main():
     try:
         issues = get_issues(zenhub, args.label, args.from_pipeline)
     except Exception as e:
-        logging.error(f"Failed to get issues in pipeline because: {e}")
-        os.exit(1)
+        return e
+
+    logging.warn(issues)
 
     if len(issues) == 0:
         logging.info("Nothing to move, closing")
@@ -97,8 +94,7 @@ def main():
     try:
         move_issues(zenhub, issues, args.to_pipeline)
     except Exception as e:
-        logging.error(f"Failed to move issues to correct pipeline: {e}")
-        os.exit(1)
+        return e
 
 
 if __name__ == "__main__":
