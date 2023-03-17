@@ -6,7 +6,15 @@ from gql.transport.aiohttp import AIOHTTPTransport
 
 class ZenhubService:
     """
-    A service to interact with the Zenhub API.
+    A class to interact with the Zenhub API using GraphQL queries.
+
+    Args:
+        api_token (str): The API token to use for the Zenhub API. You can generate
+            one from https://app.zenhub.com/dashboard/tokens.
+
+    Attributes:
+        zenhub_client_gql_api (Client): A GraphQL client to interact with the Zenhub API.
+        workspace_id (str): The ID of the workspace to use for queries.
     """
 
     def __init__(self, api_token: str) -> None:
@@ -17,6 +25,18 @@ class ZenhubService:
         ), execute_timeout=60)
 
     def move_issue_to_pipeline(self, issue_to_move, to_pipeline: str) -> bool:
+        """
+        Move a zenhub issue to a pipeline regardless of the current pipeline.
+
+        Args:
+            issue_to_move: a string of the issue ID to move
+            to_pipeline: a string of the pipeline ID to move the issue to
+
+            both of these values can be obtained from the Zenhub API.
+
+        Returns:
+            bool: True if the issue was moved successfully, False otherwise.
+        """
         move_issue_input = {
             "issueId": issue_to_move,
             "pipelineId": to_pipeline,
@@ -110,6 +130,7 @@ class ZenhubService:
             label: The label attached to the GitHub issue.
 
         Returns:
+            A list of issues with the label in the pipeline.
 
         """
         data = self.zenhub_client_gql_api.execute(gql("""
