@@ -7,7 +7,8 @@ from services.ZenhubService import ZenhubService
 def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Exception:
     from_pipeline_id = zenhub.get_pipeline_id(from_pipeline)
     if from_pipeline_id is None:
-        logging.error(f"Failed to get pipeline ID for pipeline {from_pipeline}")
+        logging.error(
+            f"Failed to get pipeline ID for pipeline {from_pipeline}")
         raise ValueError
 
     return zenhub.search_issues_by_label(from_pipeline_id, label)
@@ -23,7 +24,8 @@ def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception
         logging.info(f"Moving issue {issue['id']} to pipeline {to_pipeline}")
         success = zenhub.move_issue_to_pipeline(issue['id'], to_pipeline_id)
         if not success:
-            logging.error(f"Failed to move issue {issue['id']} to pipeline {to_pipeline}")
+            logging.error(
+                f"Failed to move issue {issue['id']} to pipeline {to_pipeline}")
             return Exception
 
     return None
