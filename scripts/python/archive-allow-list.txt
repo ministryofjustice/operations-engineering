@@ -7,3 +7,5 @@ hmpps-terraform-modules
 laa-nolasa
 hmpps-track-a-move
 php-markdown-extra
+wp-rewrite-media-to-s3
+notify-for-wordpress
