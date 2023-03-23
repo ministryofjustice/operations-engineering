@@ -1,13 +1,14 @@
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-import sentry_projects_rate_limiting
+from python.scripts import sentry_projects_rate_limiting
 
 
 @patch("requests.get", new=MagicMock(status_code=200))
 class TestSentryProjectsRateLimiting(unittest.TestCase):
 
-    @patch("sys.argv", ["", "test"])
+    @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
     def test_main_smoke_test(self):
         sentry_projects_rate_limiting.main()
 

@@ -11,7 +11,6 @@ from python.scripts import archive_repositories
 class TestArchiveRepositories(unittest.TestCase):
 
     @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
-    @patch("sys.argv", ["", "test"])
     def test_main_smoke_test(self, mock_github):
         archive_repositories.main()
 
