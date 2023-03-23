@@ -13,11 +13,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
-          architecture: "x64"
+          python-version: "3.11"
           cache: "pip"
-      - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/assign_support_tickets.py
+      - run: pip install -r python/requirements.txt
+      - run: python -m python.scripts.assign_support_tickets
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
   close-support-ticket:
@@ -26,10 +25,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
-          architecture: "x64"
+          python-version: "3.11"
           cache: "pip"
-      - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/close_support_tickets.py
+      - run: pip install -r python/requirements.txt
+      - run: python -m python.scripts.close_support_tickets
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
