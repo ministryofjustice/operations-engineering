@@ -1,18 +1,17 @@
+import os
 import json
-import sys
 import requests
 
 
 def main():
-    if len(sys.argv) == 2:
-        # Get the GH Action token
-        OAUTH_TOKEN = sys.argv[1]
-    else:
-        raise ValueError("Missing a script input parameter")
+    sentry_token = os.getenv("SENTRY_TOKEN")
+    if sentry_token == "" or sentry_token is None:
+        raise ValueError(
+            "The env variable SENTRY_TOKEN is empty or missing")
 
     print("Start \n")
 
-    headers = {"Authorization": "Bearer " + OAUTH_TOKEN}
+    headers = {"Authorization": "Bearer " + sentry_token}
     base_url = "https://sentry.io/api/0"
 
     org_teams_url = f"{base_url}/organizations/ministryofjustice/teams/"
