@@ -1,5 +1,6 @@
-from lib.MoJSlack import MojSlack
 import os
+
+from python.lib.moj_slack import MojSlack
 
 
 def main():
@@ -7,8 +8,13 @@ def main():
     days = 30  # Number of days to search back
     channel_id = "C01BUKJSZD4"  # Channel ID of the channel to target
 
+    slack_token = os.getenv("SLACK_BOT_TOKEN")
+    if slack_token == "" or slack_token is None:
+        raise ValueError(
+            "The env variable SLACK_BOT_TOKEN is empty or missing")
+
     # Setup auth object
-    slack_obj = MojSlack(os.environ["SLACK_BOT_TOKEN"])
+    slack_obj = MojSlack(slack_token)
 
     # Gather all messages from support channel
     all_messages = slack_obj.get_conversation_history(
