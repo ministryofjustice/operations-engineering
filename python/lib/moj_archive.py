@@ -1,3 +1,4 @@
+import os
 from github import Repository
 import logging
 
@@ -17,7 +18,7 @@ class MojArchive:
         self.__repo = repo
         # Not currently used for functionality, included incase we want to perform actions like posting issues to the repo in which we need this to track
         self.__complete = False
-        self.__allow_list_location = "./scripts/python/archive-allow-list.txt"
+        self.__allow_list_location = f"{os.path.dirname(os.path.realpath(__file__))}/../scripts/archive-allow-list.txt"
 
     @property
     def archived(self) -> bool:

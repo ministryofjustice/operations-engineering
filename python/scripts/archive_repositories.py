@@ -5,8 +5,8 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 
-from lib.MojArchive import MojArchive
-from lib.MojGithub import MojGithub
+from python.lib.moj_archive import MojArchive
+from python.lib.moj_github import MojGithub
 
 
 # This file assigns archives all repositories which have had no commits from a certain datetime
@@ -51,7 +51,6 @@ def ready_for_archiving(repository, archive_date) -> bool:
 
 
 def main():
-    # Config
     # Logging Config
     logging.basicConfig(
         format="%(asctime)s %(levelname)-8s %(message)s",
@@ -59,9 +58,12 @@ def main():
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    # Change this to point at a different GitHub organization
+    # TODO: Change this to point at a different GitHub organization
     organization = "ministryofjustice"
     org_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if org_token == "" or org_token is None:
+        raise ValueError(
+            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
     # How long ago in which the repositories should be archived
     archive_date_days = 0

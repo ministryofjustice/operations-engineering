@@ -5,3 +5,4 @@ env
 *.pkg
 .vscode
 .idea/
+*.pyc
