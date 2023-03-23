@@ -1,10 +1,15 @@
-from github import Github
 import os
+from github import Github
 
 
 def main():
     # This file closes any open support tickets as we are testing limited capture of support activities
     # Its goal is to streamline the capture of support tickets as far as possible
+
+    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if org_token == "" or org_token is None:
+        raise ValueError(
+            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
     # Config
     organization = "ministryofjustice"
@@ -14,7 +19,7 @@ def main():
 
     # Create Base Objects
     # Authentication, Repository, Issues
-    git = Github(os.getenv("ADMIN_GITHUB_TOKEN"))
+    git = Github(org_token)
     repo = git.get_repo(project)
     issues = repo.get_issues(state="open")
 
@@ -29,7 +34,6 @@ def main():
     # Assign creator to item
     for issue in support_issues:
         issue.edit(state="closed")
-
 
 
 if __name__ == "__main__":
