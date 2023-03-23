@@ -11,7 +11,6 @@ class TestDeleteCNames(unittest.TestCase):
 
     @patch.dict(os.environ, {"HOSTED_ZONE_1": "123"})
     @patch.dict(os.environ, {"HOSTED_ZONE_2": "123"})
-    @patch("sys.argv", ["", "test"])
     def test_main_smoke_test(self):
         delete_cnames.main()
 
