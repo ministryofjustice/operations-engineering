@@ -1,3 +1,4 @@
+import os
 import boto3
 import json
 import sys
@@ -91,11 +92,6 @@ def delete_cname_records(route53_client: BaseClient, host_zone_id):
         print_stack_trace("Exception: AWS call to delete cname records")
 
 
-def run(route53_client: BaseClient):
-    for i in range(1, len(sys.argv)):
-        delete_cname_records(route53_client, sys.argv[i])
-
-
 def main():
     try:
         route53_client = boto3.client("route53")
@@ -103,8 +99,19 @@ def main():
         print(err)
         print_stack_trace("Exception: Problem with the route53 client.")
 
+    hosted_zone_1 = os.getenv("HOSTED_ZONE_1")
+    if hosted_zone_1 == "" or hosted_zone_1 is None:
+        raise ValueError(
+            "The env variable HOSTED_ZONE_1 is empty or missing")
+
+    hosted_zone_2 = os.getenv("HOSTED_ZONE_2")
+    if hosted_zone_2 == "" or hosted_zone_2 is None:
+        raise ValueError(
+            "The env variable HOSTED_ZONE_2 is empty or missing")
+
     print("Start")
-    run(route53_client)
+    delete_cname_records(route53_client, hosted_zone_1)
+    delete_cname_records(route53_client, hosted_zone_2)
     print("Finished")
 
 
