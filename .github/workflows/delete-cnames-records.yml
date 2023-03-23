@@ -21,8 +21,10 @@ jobs:
           aws-region: eu-west-2
       - uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
-          architecture: "x64"
+          python-version: "3.11"
           cache: "pip"
       - run: pip install -r scripts/python/requirements.txt
-      - run: python scripts/python/delete_cnames.py ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }} ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
+      - run: python -m python.scripts.delete_cnames
+        env:
+          HOSTED_ZONE_1: ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }}
+          HOSTED_ZONE_2: ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
