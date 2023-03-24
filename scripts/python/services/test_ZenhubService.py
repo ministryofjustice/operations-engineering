@@ -73,7 +73,6 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
         issue_id = svc.search_issues_by_label("test_pipeline_id", "test_label")
         self.assertEqual([{'id': 'test_issue_id'}], issue_id)
 
-
     def test_search_issue_by_label_returns_none_when_no_issues_found(self):
         svc = ZenhubService("123")
         svc.zenhub_client_gql_api = MagicMock()
@@ -105,7 +104,8 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
         self.assertEqual("test_pipeline_id", pipeline_id)
 
         # Sad path
-        false_pipeline_id = mock_zenhub_service.get_pipeline_id("test_pipeline_name_false")
+        false_pipeline_id = mock_zenhub_service.get_pipeline_id(
+            "test_pipeline_name_false")
         self.assertEqual(None, false_pipeline_id)
 
 
