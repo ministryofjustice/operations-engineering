@@ -5,7 +5,7 @@ from github import Github
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
-import amend_user_repository_access
+from python.scripts import amend_user_repository_access
 
 
 @patch.object(Github, "__new__")

@@ -5,7 +5,7 @@ from github import Github
 # Its goal is to streamline the capture of support tickets as far as possible
 
 org_token = os.getenv("ADMIN_GITHUB_TOKEN")
-if org_token == "" or org_token is None:
+if not org_token:
     raise ValueError(
         "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 

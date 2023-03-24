@@ -5,7 +5,7 @@ import requests
 
 def main():
     sentry_token = os.getenv("SENTRY_TOKEN")
-    if sentry_token == "" or sentry_token is None:
+    if not sentry_token:
         raise ValueError(
             "The env variable SENTRY_TOKEN is empty or missing")
 

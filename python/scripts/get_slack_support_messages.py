@@ -9,7 +9,7 @@ def main():
     channel_id = "C01BUKJSZD4"  # Channel ID of the channel to target
 
     slack_token = os.getenv("SLACK_BOT_TOKEN")
-    if slack_token == "" or slack_token is None:
+    if not slack_token:
         raise ValueError(
             "The env variable SLACK_BOT_TOKEN is empty or missing")
 
