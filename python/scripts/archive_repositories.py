@@ -61,7 +61,7 @@ def main():
     # TODO: Change this to point at a different GitHub organization
     organization = "ministryofjustice"
     org_token = os.getenv("ADMIN_GITHUB_TOKEN")
-    if org_token == "" or org_token is None:
+    if not org_token:
         raise ValueError(
             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 

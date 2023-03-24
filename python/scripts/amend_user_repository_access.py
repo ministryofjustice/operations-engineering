@@ -1,8 +1,9 @@
+import os
 import logging
 import sys
 import traceback
 
-from services.GithubService import GithubService
+from python.services.github_service import GithubService
 
 
 def print_stack_trace(message):
@@ -462,11 +463,13 @@ def run(github_service: GithubService, badly_named_repositories: list[str], repo
 
 
 def main():
-    if len(sys.argv) == 2:
-        oauth_token = sys.argv[1]
-    else:
-        raise ValueError("Missing a script input parameter")
-    github_service = GithubService(oauth_token, "ministryofjustice")
+
+    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if not org_token:
+        raise ValueError(
+            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
+
+    github_service = GithubService(org_token, "ministryofjustice")
     repo_issues_enabled = {}
     badly_named_repositories = [
         "https---github.com-ministryofjustice-hmpps-incentives-tool",

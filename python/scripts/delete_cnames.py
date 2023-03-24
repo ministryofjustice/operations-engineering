@@ -100,12 +100,12 @@ def main():
         print_stack_trace("Exception: Problem with the route53 client.")
 
     hosted_zone_1 = os.getenv("HOSTED_ZONE_1")
-    if hosted_zone_1 == "" or hosted_zone_1 is None:
+    if not hosted_zone_1:
         raise ValueError(
             "The env variable HOSTED_ZONE_1 is empty or missing")
 
     hosted_zone_2 = os.getenv("HOSTED_ZONE_2")
-    if hosted_zone_2 == "" or hosted_zone_2 is None:
+    if not hosted_zone_2:
         raise ValueError(
             "The env variable HOSTED_ZONE_2 is empty or missing")
 
