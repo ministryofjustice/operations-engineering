@@ -74,7 +74,6 @@ def add_arguments():
 def main():
     args = add_arguments()
     logging.basicConfig(
-        level=logging.INFO,
         format="%(asctime)s %(levelname)-8s %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
@@ -87,10 +86,8 @@ def main():
     except Exception as e:
         return e
 
-    logging.warn(issues)
-
     if len(issues) == 0:
-        logging.info("Nothing to move, closing")
+        logging.warning(f"No issues found with label {args.label}, closing script.")
         return
 
     try:
