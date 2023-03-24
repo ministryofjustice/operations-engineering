@@ -23,7 +23,6 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
 
     def test_gets_workspace_from_repo(self):
         mock = ZenhubService("123")
-        mock.zenhub_client_gql_api = MagicMock()
         mock.zenhub_client_gql_api.execute.return_value = {
             "repositoriesByGhId":
             [
@@ -43,7 +42,6 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
 
     def test_returns_none_when_no_workspace_found(self):
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         svc.zenhub_client_gql_api.execute.return_value = {
             "repositoriesByGhId":
             [
@@ -55,12 +53,11 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
                 }
             ]
         }
-        workspace_id = svc.get_workspace_id_from_repo("test_repo_id")
+        workspace_id = svc.get_workspace_id_from_repo(12)
         self.assertRaises(Exception, workspace_id)
 
     def test_search_issue_by_label(self):
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         svc.zenhub_client_gql_api.execute.return_value = {
             "searchIssuesByPipeline": {
                 "nodes": [
@@ -75,7 +72,6 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
 
     def test_search_issue_by_label_returns_none_when_no_issues_found(self):
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         svc.zenhub_client_gql_api.execute.return_value = {
             "searchIssuesByPipeline": {
                 "nodes": [
@@ -114,7 +110,6 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
 class TestZenhubMovingIssues(unittest.TestCase):
     def test_move_issue_to_pipeline(self):
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         svc.zenhub_client_gql_api.execute.return_value = {
             "moveIssue": {
                 "issue": {
