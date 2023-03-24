@@ -35,16 +35,13 @@ class TestMoveDependabotTickets(unittest.TestCase):
     @patch("gql.Client.__new__")
     def test_get_issues_returns_none_when_no_issues_found(self, mock_gql_client, mock_get_pipeline_id):
         mock_get_pipeline_id.return_value = "test_pipeline_id"
-        mock_gql_client.return_value = MagicMock()
         svc = ZenhubService("123")
         svc.search_issues_by_label = MagicMock(return_value=None)
 
         self.assertEqual(None, move_dependabot_tickets.get_issues(
             svc, "test_repo_id", "test_label"))
 
-    @patch("gql.Client.__new__")
-    def test_get_issues_returns_none_when_no_pipeline_found(self, mock_gql_client):
-        mock_gql_client.return_value = MagicMock()
+    def test_get_issues_returns_none_when_no_pipeline_found(self):
         svc = ZenhubService("123")
         svc.get_pipeline_id = MagicMock(return_value=None)
 
@@ -57,7 +54,6 @@ class TestMoveDependabotTickets(unittest.TestCase):
     def test_move_issues(self, mock_get_pipeline_id):
         mock_get_pipeline_id.return_value = "test_pipeline_id"
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         issues = [{"id": "test_issue_id"}]
         svc.zenhub_client_gql_api.execute.return_value = {
             "moveIssue": {
@@ -76,7 +72,6 @@ class TestMoveDependabotTickets(unittest.TestCase):
 
     def test_move_issues_without_pipeline_id(self):
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         svc.get_pipeline_id = MagicMock(return_value=None)
         issues = [{"id": "test_issue_id"}]
         with self.assertRaises(ValueError):
@@ -87,7 +82,6 @@ class TestMoveDependabotTickets(unittest.TestCase):
     def test_move_issues_without_issue_id(self, mock_get_pipeline_id):
         mock_get_pipeline_id.return_value = "test_pipeline_id"
         svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
         issues = [{"id": None}]
         svc.zenhub_client_gql_api.execute.return_value = {
             "moveIssue": {
