@@ -5,6 +5,8 @@ import move_dependabot_tickets
 from services.ZenhubService import ZenhubService
 
 
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestMoveDependabotTickets(unittest.TestCase):
 
     @patch("sys.argv", ["", "--api_token", "test"])
