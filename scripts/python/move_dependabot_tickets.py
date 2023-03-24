@@ -87,7 +87,8 @@ def main():
         return e
 
     if len(issues) == 0:
-        logging.warning(f"No issues found with label {args.label}, closing script.")
+        logging.warning(
+            f"No issues found with label {args.label}, closing script.")
         return
 
     try:
