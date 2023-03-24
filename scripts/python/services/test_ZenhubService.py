@@ -31,15 +31,15 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
                     "workspacesConnection": {
                         "nodes": [
                             {
-                                "id": "test_workspace_id"
+                                "id": 12
                             }
                         ]
                     }
                 }
             ]
         }
-        workspace_id = mock.get_workspace_id_from_repo("test_repo_id")
-        self.assertEqual("test_workspace_id", workspace_id)
+        workspace_id = mock.get_workspace_id_from_repo(12)
+        self.assertEqual(12, workspace_id)
 
     def test_returns_none_when_no_workspace_found(self):
         svc = ZenhubService("123")
