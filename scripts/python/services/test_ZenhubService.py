@@ -4,20 +4,23 @@ from unittest.mock import patch, MagicMock
 from .ZenhubService import ZenhubService
 
 
-@patch("gql.Client.__new__")
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestZenhubService(unittest.TestCase):
 
-    def test_sets_up_class(self, mock_gql_client):
-        mock_gql_client.return_value = "test_mock_gql_client"
+    def test_sets_up_class(self):
         svc = ZenhubService("123")
         self.assertIsNone(svc._workspace_id)
-        self.assertEqual("test_mock_gql_client", svc.zenhub_client_gql_api)
+        self.assertIsNotNone(svc.zenhub_client_gql_api)
 
         svc._workspace_id = "test_workspace_id"
         self.assertEqual("test_workspace_id", svc._workspace_id)
 
 
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestZenhubIssueRetrieval(unittest.TestCase):
+
     def test_gets_workspace_from_repo(self):
         mock = ZenhubService("123")
         mock.zenhub_client_gql_api = MagicMock()
@@ -70,6 +73,7 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
         issue_id = svc.search_issues_by_label("test_pipeline_id", "test_label")
         self.assertEqual([{'id': 'test_issue_id'}], issue_id)
 
+
     def test_search_issue_by_label_returns_none_when_no_issues_found(self):
         svc = ZenhubService("123")
         svc.zenhub_client_gql_api = MagicMock()
@@ -83,9 +87,8 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
         self.assertEqual([], issue_id)
 
     def test_get_pipeline_id(self):
-        svc = ZenhubService("123")
-        svc.zenhub_client_gql_api = MagicMock()
-        svc.zenhub_client_gql_api.execute.return_value = {
+        mock_zenhub_service = ZenhubService("123")
+        mock_zenhub_service.zenhub_client_gql_api.execute.return_value = {
             "workspace": {
                 "pipelinesConnection": {
                     "nodes": [
@@ -98,14 +101,16 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
             }
         }
         # Happy path
-        pipeline_id = svc.get_pipeline_id("test_pipeline_name")
+        pipeline_id = mock_zenhub_service.get_pipeline_id("test_pipeline_name")
         self.assertEqual("test_pipeline_id", pipeline_id)
 
         # Sad path
-        false_pipeline_id = svc.get_pipeline_id("test_pipeline_name_false")
+        false_pipeline_id = mock_zenhub_service.get_pipeline_id("test_pipeline_name_false")
         self.assertEqual(None, false_pipeline_id)
 
 
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestZenhubMovingIssues(unittest.TestCase):
     def test_move_issue_to_pipeline(self):
         svc = ZenhubService("123")
