@@ -1,4 +1,4 @@
-from .constants import Constants
+from python.lib.constants import Constants
 from python.lib import helpers
 
 

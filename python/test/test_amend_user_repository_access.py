@@ -7,7 +7,7 @@ from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
 from python.scripts import amend_user_repository_access
-from python.lib.organisation import Constants
+from python.lib.constants import Constants
 from python.lib.organisation import Organisation
 
 # Needed to mock the objects in the GithubService class
