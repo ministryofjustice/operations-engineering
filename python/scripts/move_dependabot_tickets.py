@@ -79,7 +79,10 @@ def main():
     )
 
     zenhub = ZenhubService(args.api_token)
-    zenhub.workspace_id = zenhub.get_workspace_id_from_repo(args.repo_id)
+    try:
+        zenhub.workspace_id = zenhub.get_workspace_id_from_repo(args.repo_id)
+    except Exception as e:
+        return e
 
     try:
         issues = get_issues(zenhub, args.label, args.from_pipeline)
