@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from services.ZenhubService import ZenhubService
+from python.services.zenhub_service import ZenhubService
 
 
 def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Exception:

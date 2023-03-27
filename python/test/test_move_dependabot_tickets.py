@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-import move_dependabot_tickets
-from services.ZenhubService import ZenhubService
+from python.scripts import move_dependabot_tickets
+from python.services.zenhub_service import ZenhubService
 
 
 @patch("gql.Client.__new__", new=MagicMock)
