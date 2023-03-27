@@ -93,15 +93,15 @@ class GithubService:
             assignee=user_name,
             body=dedent(f"""
         Hi there
-            
+
         The user {user_name} had Direct Member access to this repository and access via a team.
-             
+
         Access is now only via a team.
-             
+
         You may have less access it is dependant upon the teams access to the repo.
-                   
+
         If you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
-            
+
         This issue can be closed.
         """).strip("\n")
         )
@@ -216,7 +216,7 @@ class GithubService:
                                "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
+    def get_paginated_list_of_user_names_and_permissions_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
             dict[str, Any]:
@@ -234,6 +234,7 @@ class GithubService:
                             node {
                                 login
                             }
+                            permission
                         }
                         pageInfo {
                             hasNextPage
@@ -280,7 +281,7 @@ class GithubService:
         })
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_team_repositories(self, team_name: str, after_cursor: str | None,
+    def get_paginated_list_of_team_repositories_and_permissions(self, team_name: str, after_cursor: str | None,
                                                 page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
             f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}")
@@ -296,6 +297,7 @@ class GithubService:
                             node {
                                 name
                             }
+                            permission
                         }
                         pageInfo {
                             endCursor
