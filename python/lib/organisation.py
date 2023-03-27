@@ -1,11 +1,12 @@
 import logging
-from .constants import Constants
-from .config import Config
-from .repository import Repository
-from .team import Team
-from . import helpers
 
 from python.services.github_service import GithubService
+from python.lib.constants import Constants
+from python.lib.config import Config
+from python.lib.repository import Repository
+from python.lib.team import Team
+from python.lib import helpers
+
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 class Organisation:
     """The Organisation info contains the repositories, collaborators and teams"""
 
-    def __init__(self, github_service: GithubService, org_name: str):
+    def __init__(self, github_service, org_name: str):
         self.constants = Constants()
         self.config = Config()
         self.const_issue_section_enabled = self.constants.issue_section_enabled

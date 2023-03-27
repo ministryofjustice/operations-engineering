@@ -1,5 +1,5 @@
 from .constants import Constants
-from . import helpers
+from python.lib import helpers
 
 
 class Repository:

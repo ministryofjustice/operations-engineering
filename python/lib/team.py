@@ -1,4 +1,4 @@
-from . import helpers
+from python.lib import helpers
 
 
 class Team:
