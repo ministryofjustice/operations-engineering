@@ -1,8 +1,9 @@
+import os
 import logging
 import sys
 import traceback
 
-from services.GithubService import GithubService
+from python.services.github_service import GithubService
 
 
 def print_stack_trace(message):
@@ -395,11 +396,12 @@ def put_users_into_new_team(github_service: GithubService, repository_name, rema
 
                 temp_name = repository_name + "-" + users_permission + "-team"
                 team_name = correct_team_name(temp_name)
-                team_id = github_service.get_team_id_from_team_name(team_name)
 
                 if not github_service.team_exists(team_name):
                     github_service.create_new_team_with_repository(
                         team_name, repository_name)
+                    team_id = github_service.get_team_id_from_team_name(
+                        team_name)
                     # Depends who adds the oauth_token to repo is added to every team
                     github_service.remove_user_from_team(
                         "AntonyBishop", team_id)
@@ -408,6 +410,7 @@ def put_users_into_new_team(github_service: GithubService, repository_name, rema
                     github_service.remove_user_from_team(
                         "moj-operations-engineering-bot", team_id)
 
+                team_id = github_service.get_team_id_from_team_name(team_name)
                 github_service.amend_team_permissions_for_repository(
                     team_id, users_permission, repository_name)
 
@@ -460,11 +463,13 @@ def run(github_service: GithubService, badly_named_repositories: list[str], repo
 
 
 def main():
-    if len(sys.argv) == 2:
-        oauth_token = sys.argv[1]
-    else:
-        raise ValueError("Missing a script input parameter")
-    github_service = GithubService(oauth_token, "ministryofjustice")
+
+    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if not org_token:
+        raise ValueError(
+            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
+
+    github_service = GithubService(org_token, "ministryofjustice")
     repo_issues_enabled = {}
     badly_named_repositories = [
         "https---github.com-ministryofjustice-hmpps-incentives-tool",

@@ -1,8 +1,13 @@
-from github import Github
 import os
+from github import Github
 
 # This file assigns unassigned support tickets to the user that opened the ticket
 # Its goal is to streamline the capture of support tickets as far as possible
+
+org_token = os.getenv("ADMIN_GITHUB_TOKEN")
+if not org_token:
+    raise ValueError(
+        "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
 # Config
 organization = "ministryofjustice"
@@ -12,7 +17,7 @@ support_tag = "Support"
 
 # Create Base Objects
 # Authentication, Repository, Issues
-git = Github(os.getenv("ADMIN_GITHUB_TOKEN"))
+git = Github(org_token)
 repo = git.get_repo(project)
 issues = repo.get_issues(state="open")
 

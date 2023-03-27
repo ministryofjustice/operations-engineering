@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: CircleCI
-last_reviewed_on: 2023-02-03
+last_reviewed_on: 2023-03-16
 review_in: 3 months
 ---
 
@@ -22,6 +22,15 @@ A CircleCI Organization Administrator is a permission level inherited from GitHu
 A CircleCI Project Administrator is the user who adds a GitHub repository to CircleCI as a Project.
 
 A CircleCI User is an individual user within an organization, inherited from GitHub ie GitHub Organisation Members.
+
+## Login
+
+To login to CircleCI:
+
+1. Navigate to [CircleCI](https://circleci.com/)
+2. Click Application at the top right of the page
+3. Click 'Log in with GitHub'
+4. Select 'ministryofjustice'
 
 ## Owner API Token
 
@@ -80,3 +89,9 @@ Create a personal API token for other teams to publish their own Orbs.
 Have created a Context called laa-cla-orbs-token with a Security Group containing LAA Get Access (GH team) and an Environment Variable called CIRCLE_TOKEN which takes the personal token generated above.
 
 This is enough permissions for the team to then publish the Orb from a GH repo.
+
+## Support
+
+User Slack channel: #circleci-users
+Access help channel: #ask-operations-engineering
+Troubleshooting guide: [CircleCI Troubleshooting](circleCI-troubleshoot.html)

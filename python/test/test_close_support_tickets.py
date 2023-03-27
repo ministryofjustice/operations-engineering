@@ -1,19 +1,20 @@
+import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-import sentry_projects_rate_limiting
+from python.scripts import close_support_tickets
 
 
-@patch("requests.get", new=MagicMock(status_code=200))
+@patch("github.Github.__new__", new=MagicMock)
 class TestSentryProjectsRateLimiting(unittest.TestCase):
 
-    @patch("sys.argv", ["", "test"])
+    @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
     def test_main_smoke_test(self):
-        sentry_projects_rate_limiting.main()
+        close_support_tickets.main()
 
     def test_main_returns_error_when_no_token_provided(self):
         self.assertRaises(
-            ValueError, sentry_projects_rate_limiting.main)
+            ValueError, close_support_tickets.main)
 
 
 if __name__ == "__main__":

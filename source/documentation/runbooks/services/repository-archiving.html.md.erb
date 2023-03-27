@@ -21,7 +21,7 @@ There are two main ways to configure this task:
 
 Inside the Python file that controls this process there are 3 variables that dictate how long a repository has been inactive before it gets archived.
 
-In order to change these values, please open a PR editing these 3 variables: [Python archive file](https://github.com/ministryofjustice/operations-engineering/blob/main/scripts/python/archive-repositories.py#L23-L26)
+In order to change these values, please open a PR editing these 3 variables: [Python archive file](https://github.com/ministryofjustice/operations-engineering/blob/main/python/scripts/archive_repositories.py)
 
 > These three values combine to make a time period e.g. if days was 0, months 0 and years 2, it would archive repositories over 2 years old
 
@@ -37,7 +37,7 @@ Once the PR has been merged, the changes will automatically be impacted.
 
 ### Adding a repository to the allow list
 
-Inside this repository [there is a file](https://github.com/ministryofjustice/operations-engineering/blob/main/scripts/python/archive-allow-list.txt) that contains a list of repositories that should be ignored by this process.
+Inside this repository [there is a file](https://github.com/ministryofjustice/operations-engineering/blob/main/python/scripts/archive-allow-list.txt) that contains a list of repositories that should be ignored by this process.
 
 In order to add a repository, please open a PR on this file adding the repositories you want.
 

@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -5,7 +6,7 @@ from github import Github
 from gql import Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
-import add_users_all_org_members_github_team
+from python.scripts import add_users_all_org_members_github_team
 
 
 @patch.object(Github, "__new__")
@@ -13,7 +14,7 @@ import add_users_all_org_members_github_team
 @patch.object(Client, "__new__")
 class TestAddUsersEveryoneGithubTeam(unittest.TestCase):
 
-    @patch("sys.argv", ["", "test"])
+    @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
     def test_main_smoke_test(self, mock1, mock2, mock3):
         add_users_all_org_members_github_team.main()
 
