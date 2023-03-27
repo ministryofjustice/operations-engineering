@@ -1,0 +1,30 @@
+name: Move MoJ Org users to a team 
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  moj-org-move-user-to-team:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r scripts/python/requirements.txt
+      - run: python3 scripts/python/amend_user_repository_access.py
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ORG_NAME: "ministryofjustice"
+          CONFIG_FILE: "move-user-to-team-moj-org-config.yml"
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

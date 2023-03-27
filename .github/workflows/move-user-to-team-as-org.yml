@@ -1,23 +1,24 @@
-name: Amend users access to a repository
+name: Move AS Org users to a team 
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 6 * * *"
   workflow_dispatch:
 
 jobs:
-  remove-duplicated-access:
+  as-org-move-user-to-team:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-          cache: "pip"
       - run: python3 -m pip install -r python/requirements.txt
       - run: python3 -m python.scripts.amend_user_repository_access
-        env: 
+        env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ORG_NAME: "moj-analytical-services"
+          CONFIG_FILE: "move-user-to-team-as-org-config.yml"
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
