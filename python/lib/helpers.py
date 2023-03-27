@@ -125,7 +125,7 @@ def fetch_team_repositories_and_permissions(
     repositories = []
 
     while has_next_page:
-        data = github_service.get_paginated_list_of_team_repositories_and_permissions_and_permissions(
+        data = github_service.get_paginated_list_of_team_repositories_and_permissions(
             team_name, after_cursor
         )
 

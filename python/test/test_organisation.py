@@ -6,7 +6,7 @@ from python.services.github_service import GithubService
 from python.lib.organisation import Organisation
 
 
-@patch.dict(os.environ, {"CONFIG_FILE": "test.yml"})
+@patch.dict(os.environ, {"CONFIG_FILE": "test-config.yml"})
 @patch.dict(os.environ, {"ORG_NAME": "orgname"})
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 class TestOrganisation(unittest.TestCase):
@@ -128,3 +128,7 @@ class TestOrganisation(unittest.TestCase):
 
         org = Organisation(mock_github_service, "some-org")
         org.check_users_access()
+
+
+if __name__ == "__main__":
+    unittest.main()
