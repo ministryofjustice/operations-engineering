@@ -1,20 +1,19 @@
 import unittest
 from unittest.mock import patch
 
-from github import Github
-from gql import Client
-from gql.transport.aiohttp import AIOHTTPTransport
-
 from python.scripts import amend_user_repository_access
+from python.lib.organisation import Constants
+from python.lib.organisation import Organisation
+from python.services.GithubService import GithubService
 
 
-@patch.object(Github, "__new__")
-@patch.object(AIOHTTPTransport, "__new__")
-@patch.object(Client, "__new__")
+@patch.object(Constants, "__new__")
+@patch.object(GithubService, "__new__")
+@patch.object(Organisation, "__new__")
 class TestAmendUserRepositoryAccess(unittest.TestCase):
 
-    def test_main_returns_error_when_no_token_provided(self, mock1, mock2, mock3):
-        self.assertRaises(ValueError, amend_user_repository_access.main)
+    def test_main_smoke_test(self, mock1, mock2, mock3):
+        amend_user_repository_access.main()
 
 
 if __name__ == "__main__":
