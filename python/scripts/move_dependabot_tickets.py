@@ -14,7 +14,7 @@ def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Excep
     return zenhub.search_issues_by_label(from_pipeline_id, label)
 
 
-def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception:
+def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline):
     to_pipeline_id = zenhub.get_pipeline_id(to_pipeline)
     if to_pipeline_id is None:
         logging.error(f"Failed to get pipeline ID for pipeline {to_pipeline}")
@@ -26,9 +26,7 @@ def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception
         if not success:
             logging.error(
                 f"Failed to move issue {issue['id']} to pipeline {to_pipeline}")
-            return Exception
-
-    return None
+            raise ValueError
 
 
 def add_arguments():
