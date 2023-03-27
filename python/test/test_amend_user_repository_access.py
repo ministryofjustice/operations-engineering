@@ -4,7 +4,7 @@ from unittest.mock import patch
 from python.scripts import amend_user_repository_access
 from python.lib.organisation import Constants
 from python.lib.organisation import Organisation
-from python.services.GithubService import GithubService
+from python.services.github_service import GithubService
 
 
 @patch.object(Constants, "__new__")

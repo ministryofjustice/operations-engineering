@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from python.services.GithubService import GithubService
+from python.services.github_service import GithubService
 from python.lib.organisation import Organisation
 
 

@@ -5,7 +5,7 @@ from .repository import Repository
 from .team import Team
 from . import helpers
 
-from python.services.GithubService import GithubService
+from python.services.github_service import GithubService
 
 logger = logging.getLogger(__name__)
 

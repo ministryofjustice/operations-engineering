@@ -1,4 +1,4 @@
-from python.services.GithubService import GithubService
+from python.services.github_service import GithubService
 
 
 def fetch_repo_names_and_issue_section_enabled(github_service: GithubService) -> list:
