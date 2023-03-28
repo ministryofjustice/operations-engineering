@@ -4,6 +4,10 @@ import os
 class Constants:
     """This class defines project-level constants"""
 
+    # Added to fix error in command: python3 -m unittest discover python/test -v
+    def __new__(cls, *_, **__):
+        return super(Constants, cls).__new__(cls)
+
     def __init__(self):
         self.name = 0
         self.issue_section_enabled = 1

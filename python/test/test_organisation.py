@@ -5,12 +5,11 @@ from unittest.mock import MagicMock, patch
 from python.services.github_service import GithubService
 from python.lib.organisation import Organisation
 
-
 @patch.dict(os.environ, {"CONFIG_FILE": "test-config.yml"})
 @patch.dict(os.environ, {"ORG_NAME": "orgname"})
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 class TestOrganisation(unittest.TestCase):
-    # pass
+
     def test_create_object(self):
         mock_github_service = MagicMock(GithubService)
 

@@ -14,6 +14,10 @@ logger = logging.getLogger(__name__)
 class Organisation:
     """The Organisation info contains the repositories, collaborators and teams"""
 
+    # Added to fix error in command: python3 -m unittest discover python/test -v
+    def __new__(cls, *_, **__):
+        return super(Organisation, cls).__new__(cls)
+
     def __init__(self, github_service, org_name: str):
         self.constants = Constants()
         self.config = Config()
