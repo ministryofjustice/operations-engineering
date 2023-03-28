@@ -1,12 +1,13 @@
-name: code-formatter
+name: Format code
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize]
+    types: [opened, edited, reopened, synchronize, ready_for_review]
 
 jobs:
   format-code:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v3
       - uses: ministryofjustice/github-actions/code-formatter@v11
