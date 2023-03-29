@@ -1,34 +1,57 @@
-import os
-from github import Github
+import argparse
+import logging
 
-# This file assigns unassigned support tickets to the user that opened the ticket
-# Its goal is to streamline the capture of support tickets as far as possible
+from python.services.github_service import GithubService
 
-org_token = os.getenv("ADMIN_GITHUB_TOKEN")
-if not org_token:
-    raise ValueError(
-        "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
-# Config
-organization = "ministryofjustice"
-repository = "operations-engineering"
-project = f"{organization}/{repository}"
-support_tag = "Support"
+def add_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--oauth-token",
+        type=str,
+        required=True,
+        help="The GitHub OAuth token to use",
+    )
 
-# Create Base Objects
-# Authentication, Repository, Issues
-git = Github(org_token)
-repo = git.get_repo(project)
-issues = repo.get_issues(state="open")
+    parser.add_argument(
+        "--org",
+        type=str,
+        default="ministryofjustice",
+        help="The GitHub organisation to use",
+    )
 
-# Get only unassigned support issues
-support_issues = [
-    issue
-    for issue in issues
-    for label in issue.labels
-    if label.name == support_tag and len(issue.assignees) == 0
-]
+    parser.add_argument(
+        "--repo",
+        type=str,
+        default="operations-engineering",
+        help="The GitHub repository to use",
+    )
 
-# Assign creator to item
-for issue in support_issues:
-    issue.edit(assignees=[issue.user.login])
+    parser.add_argument(
+        "--tag",
+        type=str,
+        default="Support",
+        help="The GitHub tag to use",
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = add_arguments()
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)-8s %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    gh = GithubService(args.oauth_token, args.org)
+    issues = gh.assign_support_issues_to_self(args.repo, args.org, args.tag)
+    if not issues:
+        logging.warning("No issues found, skipping")
+    for issue in issues:
+        logging.info(f"Assigned issue {issue.number} to {issue.assignee.login}")
+
+
+if __name__ == "__main__":
+    main()
