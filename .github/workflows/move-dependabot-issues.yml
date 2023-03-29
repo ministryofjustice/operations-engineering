@@ -1,0 +1,27 @@
+name: Move all dependabot issues to "Refined and Ready"
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "* */12 * * 1-5" # Every 12 hours, Monday through Friday
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r python/requirements.txt
+      - run: python3 -m python.scripts.move_dependabot_tickets --api_token ${{ secrets.ZENHUB_API_KEY }}
+        env:
+          ZENHUB_API_KEY: ${{ secrets.ZENHUB_API_KEY }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
