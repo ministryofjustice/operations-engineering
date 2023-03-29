@@ -10,6 +10,7 @@ class Constants:
 
     def __init__(self):
         self.name = 0
+        self.permission = 1
         self.issue_section_enabled = 1
 
     def get_org_name(self):
