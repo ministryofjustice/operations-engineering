@@ -1,4 +1,4 @@
-name: Move AS Org users to a team 
+name: Move AS Org users to teams
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  as-org-move-user-to-team:
+  as-org-move-users-to-teams:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -14,11 +14,11 @@ jobs:
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r python/requirements.txt
-      - run: python3 -m python.scripts.amend_user_repository_access
+      - run: python3 -m python.scripts.move_users_to_teams
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
           ORG_NAME: "moj-analytical-services"
-          CONFIG_FILE: "move-user-to-team-as-org-config.yml"
+          CONFIG_FILE: "move-users-to-teams-as-org-config.yml"
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
