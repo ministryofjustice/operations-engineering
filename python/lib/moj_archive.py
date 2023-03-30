@@ -53,7 +53,7 @@ class MojArchive:
         self.__allow_list_location = location
 
     @property
-    def allow_list(self) -> list[str]:
+    def allow_list(self):
         """Returns allow list as a list of strings"""
         with open(self.allow_list_location, "r", encoding="UTF-8") as f:
             lines = f.read().splitlines()
