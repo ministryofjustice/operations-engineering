@@ -61,7 +61,8 @@ class Repository:
                 # Create a team on GitHub
                 team_id = self.create_a_team_on_github(team_name)
                 if team_id > 0:
-                    self.github_service.amend_team_permissions_for_repository(team_id, permission, self.name)
+                    self.github_service.amend_team_permissions_for_repository(
+                        team_id, permission, self.name)
                     self.remove_operations_engineering_team_users_from_team(
                         team_id)
                     # Create and store a Team object locally
@@ -76,7 +77,8 @@ class Repository:
                 expected_team_name = self.form_team_name(permission)
                 if team.name == expected_team_name:
                     if len(team.users_usernames) == 0 or permission == "admin":
-                        self.github_service.add_user_to_team_as_maintainer(username, team.id)
+                        self.github_service.add_user_to_team_as_maintainer(
+                            username, team.id)
                     else:
                         self.github_service.add_user_to_team(username, team.id)
                     team.add_new_team_user(username)
@@ -88,17 +90,19 @@ class Repository:
 
             # raise an issue to say the user has been removed and has access via the team
             if self.issue_section_enabled:
-                self.github_service.create_an_access_removed_issue_for_user_in_repository(username, self.name)
+                self.github_service.create_an_access_removed_issue_for_user_in_repository(
+                    username, self.name)
 
-            self.github_service.remove_user_from_repository(username, self.name)
+            self.github_service.remove_user_from_repository(
+                username, self.name)
 
     def clean_up_direct_users(self):
-        repository_users = self.helper.fetch_repository_users_usernames(self.name)
+        repository_users = self.helper.fetch_repository_users_usernames(
+            self.name)
         for repository_user in repository_users:
             for user in self.direct_users_and_permission:
                 if user[self.constants.username] not in repository_users:
                     self.direct_users_and_permission.remove(user)
-
 
     def remove_operations_engineering_team_users_from_team(self, team_id: int):
         """When team is created GH adds the user who ran the GH action to the team
@@ -110,7 +114,8 @@ class Repository:
     def create_a_team_on_github(self, team_name: str) -> int:
         team_id = 0
         if not self.github_service.team_exists(team_name):
-            self.github_service.create_new_team_with_repository(team_name, self.name)
+            self.github_service.create_new_team_with_repository(
+                team_name, self.name)
             team_id = self.github_service.get_team_id_from_team_name(team_name)
         return team_id
 

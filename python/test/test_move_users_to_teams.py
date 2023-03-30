@@ -2,25 +2,23 @@ import os
 import unittest
 from unittest.mock import patch
 
-from github import Github
-from gql import Client
-from gql.transport.aiohttp import AIOHTTPTransport
+from python.scripts import move_users_to_teams
 
-from python.scripts import add_users_all_org_members_github_team
+from python.services.github_service import GithubService
+from python.lib.constants import Constants
+from python.lib.organisation import Organisation
 
 
-@patch.object(Github, "__new__")
-@patch.object(AIOHTTPTransport, "__new__")
-@patch.object(Client, "__new__")
-class TestAddUsersEveryoneGithubTeam(unittest.TestCase):
+@patch.dict(os.environ, {"CONFIG_FILE": "test-config.yml"})
+@patch.dict(os.environ, {"ORG_NAME": "orgname"})
+@patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
+@patch.object(Constants, "__new__")
+@patch.object(Organisation, "__new__")
+@patch.object(GithubService, "__new__")
+class TestMoveUsersToTeams(unittest.TestCase):
 
-    @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
     def test_main_smoke_test(self, mock1, mock2, mock3):
-        add_users_all_org_members_github_team.main()
-
-    def test_main_returns_error_when_no_token_provided(self, mock1, mock2, mock3):
-        self.assertRaises(
-            ValueError, add_users_all_org_members_github_team.main)
+        move_users_to_teams.main()
 
 
 if __name__ == "__main__":

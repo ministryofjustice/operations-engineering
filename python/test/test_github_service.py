@@ -241,7 +241,7 @@ class TestGithubServiceCreateAnAccessRemovedIssueForUserInRepository(unittest.Te
         github_service.github_client_core_api.get_repo.assert_has_calls(
             [call('moj-analytical-services/test_repository'),
              call().create_issue(title=USER_ACCESS_REMOVED_ISSUE_TITLE, assignee='test_user',
-                                 body='Hi there\n\nThe user test_user had Direct Member access to this repository and access via a team.\n\nAccess is now only via a team.\n\nYou may have less access it is dependant upon the teams access to the repo.\n\nIf you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.\n\nThis issue can be closed.')]
+                                 body='Hi there\n\nThe user test_user either had direct member access to the repository or had direct member access and access via a team.\n\nAccess is now only via a team.\n\nThe user will have been added to an automated generated team named <repository-name>-<read|write|maintain|admin>-team.\n\nThe list of Org teams can be found at https://github.com/orgs/<name-of-org>/teams.\n\nThe user will have the same level of access to the repository via the team.\n\nThe first user added to a team is made a team maintainer, this enables that user to manage the users within the team.\n\nIf you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.\n\nThis issue can be closed.')]
 
         )
 
@@ -324,6 +324,7 @@ class TestGithubServiceRemoveUserFromTeam(unittest.TestCase):
         self.assertRaises(
             ConnectionError, github_service.remove_user_from_team, "test_user", "test_repository")
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -347,6 +348,7 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
         self.assertRaises(
             ConnectionError, github_service.add_user_to_team, "test_user", 1)
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -356,11 +358,11 @@ class TestGithubServiceMakeUserTeamMaintainer(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.add_user_to_team_as_maintainer("test_user", 1)
         github_service.github_client_core_api.get_user.assert_has_calls([
-            call('test_user', 'maintainer')])
+            call('test_user')])
         github_service.github_client_core_api.get_organization.assert_has_calls([
             call('moj-analytical-services'),
             call().get_team(1),
-            call().get_team().add_membership('mock_user')
+            call().get_team().add_membership('mock_user', 'maintainer')
         ])
 
     def test_throws_exception_when_client_throws_exception(self, mock_github_client_core_api):

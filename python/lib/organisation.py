@@ -84,7 +84,8 @@ class Organisation:
 
         # Add ops-eng team user username to repositories
         for repository in self.repositories_with_direct_users:
-            repository.add_ops_eng_team_user_names(self.operations_engineering_team_user_usernames)
+            repository.add_ops_eng_team_user_names(
+                self.operations_engineering_team_user_usernames)
 
     def close_expired_issues(self):
         """Close any previously opened issues that have expired"""

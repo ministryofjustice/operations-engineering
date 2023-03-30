@@ -1,6 +1,7 @@
 from python.services.github_service import GithubService
 from python.lib.helpers import Helpers
 
+
 class Team:
     """A struct to store team info ie name, users, repos, GH ID"""
 
