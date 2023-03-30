@@ -94,13 +94,19 @@ class GithubService:
             body=dedent(f"""
         Hi there
 
-        The user {user_name} had Direct Member access to this repository and access via a team.
+        The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
 
         Access is now only via a team.
 
-        You may have less access it is dependant upon the teams access to the repo.
+        The user will have been added to an automated generated team named <repository-name>-<read|write|maintain|admin>-team.
 
-        If you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
+        The list of Org teams can be found at https://github.com/orgs/<name-of-org>/teams.
+
+        The user will have the same level of access to the repository via the team.
+
+        The first user added to a team is made a team maintainer, this enables that user to manage the users within the team.
+
+        If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
 
         This issue can be closed.
         """).strip("\n")
@@ -134,6 +140,13 @@ class GithubService:
         user = self.github_client_core_api.get_user(user_name)
         self.github_client_core_api.get_organization(
             self.organisation_name).get_team(team_id).add_membership(user)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def add_user_to_team_as_maintainer(self, user_name: str, team_id: int) -> None:
+        logging.info(f"Making user {user_name} a maintainer in team {team_id}")
+        user = self.github_client_core_api.get_user(user_name)
+        self.github_client_core_api.get_organization(
+            self.organisation_name).get_team(team_id).add_membership(user, "maintainer")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def create_new_team_with_repository(self, team_name: str, repository_name: str) -> None:

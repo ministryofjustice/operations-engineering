@@ -14,14 +14,10 @@ class Config:
         self.config = parse_config(
             f"{os.path.dirname(os.path.realpath(__file__))}/../config/{config_file}")
 
-    def get_badly_named_repositories(self):
-        badly_named_repositories = []
+        self.badly_named_repositories = []
         if self.config["badly_named_repositories"] is not None:
-            badly_named_repositories = self.config["badly_named_repositories"]
-        return badly_named_repositories
+            self.badly_named_repositories = self.config["badly_named_repositories"]
 
-    def get_ignore_teams(self):
-        ignore_teams = []
+        self.ignore_teams = []
         if self.config["ignore_teams"] is not None:
-            ignore_teams = self.config["ignore_teams"]
-        return ignore_teams
+            self.ignore_teams = self.config["ignore_teams"]

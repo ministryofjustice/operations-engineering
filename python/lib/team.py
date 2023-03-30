@@ -1,7 +1,6 @@
 from python.services.github_service import GithubService
 from python.lib.helpers import Helpers
 
-
 class Team:
     """A struct to store team info ie name, users, repos, GH ID"""
 
@@ -15,9 +14,5 @@ class Team:
             self.name)
         self.id = self.github_service.get_team_id_from_team_name(self.name)
 
-    def add_new_team_repository_permission(repository_name: str, repository_permission: str):
-        self.repositories_and_permissions.append(
-            (repository_name, repository_permission))
-
-    def add_new_team_user(user_username: str):
+    def add_new_team_user(self, user_username: str):
         self.users_usernames.append(user_username)
