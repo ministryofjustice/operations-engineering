@@ -1,43 +1,46 @@
+from python.services.github_service import GithubService
 from python.lib.constants import Constants
-from python.lib import helpers
+from python.lib.team import Team
+from python.lib.helpers import Helpers
 
 
 class Repository:
     """The repository class"""
 
-    def __init__(self, github_service, name, issue_section_status, collaborators):
+    def __init__(self, github_service: GithubService, name: str, issue_section_status: bool, collaborators: list):
         self.constants = Constants()
+        self.helper = Helpers(github_service)
         self.github_service = github_service
         self.name = name
         self.issue_section_enabled = issue_section_status
-        self.direct_users = helpers.fetch_repository_users_usernames_and_permissions(
-            self.github_service, self.name
-        )
         self.org_collaborators = collaborators
         self.teams = []
 
+        self.__direct_users = self.helper.fetch_repository_users_usernames(
+            self.name)
+
         # Remove a repository collaborator/s from the direct_users list
-        self.direct_users[:] = [
+        self.__direct_users[:] = [
             user_username
-            for user_username in self.direct_users
-            if user_username[self.constants.name] not in self.org_collaborators
+            for user_username in self.__direct_users
+            if user_username not in self.org_collaborators
         ]
 
-    def add_team(self, new_team):
-        """A a Team object to the repository object
-        Args:
-            new_team (Team): a Team object
-        """
+        self.direct_users_and_permission = []
+        for user_username in self.__direct_users:
+            user_permission = github_service.get_user_permission_for_repository(
+                user_username, self.name)
+            self.direct_users_and_permission.append(
+                (user_username, user_permission))
+
+    def add_team(self, new_team: Team):
         self.teams.append(new_team)
 
-    def remove_direct_users(self):
-        """_summary_
-        Returns:
-            _type_: _description_
-        """
-        #     remaining_users = users_not_in_a_team
-
-        #     for username in users_not_in_a_team:
-        #         put_user_into_existing_team(self.github_service, repository.name, username, remaining_users, org_teams)
-
-        #     put_users_into_new_team(github_service, repository.name, remaining_users)
+    def is_new_team_needed(self, permission: str) -> bool:
+        new_team_required = True
+        expected_team_name = self.helper.form_team_name(self.name, permission)
+        for team in self.teams:
+            if team.name == expected_team_name:
+                new_team_required = False
+                break
+        return new_team_required

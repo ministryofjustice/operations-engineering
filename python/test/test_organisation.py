@@ -5,6 +5,7 @@ from unittest.mock import MagicMock, patch
 from python.services.github_service import GithubService
 from python.lib.organisation import Organisation
 
+
 @patch.dict(os.environ, {"CONFIG_FILE": "test-config.yml"})
 @patch.dict(os.environ, {"ORG_NAME": "orgname"})
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
@@ -65,13 +66,14 @@ class TestOrganisation(unittest.TestCase):
             }
         }
 
-        mock_github_service.get_paginated_list_of_user_names_and_permissions_with_direct_access_to_repository.return_value = {
+        mock_github_service.get_paginated_list_of_user_names_with_direct_access_to_repository.return_value = {
             "repository": {
                 "collaborators": {
                     "edges": [
                         {"node": {"login": "some-user1"}, "permission": "ADMIN"},
                         {"node": {"login": "some-user2"}, "permission": "WRITE"},
-                        {"node": {"login": "some-user3"}, "permission": "MAINTAIN"},
+                        {"node": {"login": "some-user3"},
+                            "permission": "MAINTAIN"},
                         {"node": {"login": "some-user4"}, "permission": "READ"},
                         {"node": {"login": "collaborator1"}, "permission": "WRITE"},
                     ],
@@ -124,6 +126,10 @@ class TestOrganisation(unittest.TestCase):
         }
 
         mock_github_service.get_team_id_from_team_name.return_value = 1234
+
+        mock_github_service.get_user_permission_for_repository.return_value = "admin"
+
+        mock_github_service.team_exists.return_value = False
 
         org = Organisation(mock_github_service, "some-org")
         org.check_users_access()

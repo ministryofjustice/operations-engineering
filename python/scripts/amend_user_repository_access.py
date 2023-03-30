@@ -14,10 +14,8 @@ logging.basicConfig(
 def main():
     print("Start")
     constants = Constants()
-    oauth_token = constants.get_oauth_token()
-    org_name = constants.get_org_name()
-    github_service = GithubService(oauth_token, org_name)
-    org = Organisation(github_service, org_name)
+    github_service = GithubService(constants.oauth_token, constants.org_name)
+    org = Organisation(github_service, constants.org_name)
     org.check_users_access()
     print("Finished")
 
