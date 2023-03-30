@@ -11,6 +11,8 @@ from python.lib.constants import Constants
 from python.lib.organisation import Organisation
 
 # Needed to mock the objects in the GithubService class
+
+
 @patch.object(Github, "__new__")
 @patch.object(AIOHTTPTransport, "__new__")
 @patch.object(Client, "__new__")

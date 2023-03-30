@@ -281,7 +281,7 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_team_repositories_and_permissions(self, team_name: str, after_cursor: str | None,
-                                                page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+                                                                page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
             f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
