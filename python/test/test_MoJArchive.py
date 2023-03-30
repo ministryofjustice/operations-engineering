@@ -17,8 +17,8 @@ class TestMojArchive(unittest.TestCase):
     def test_repo_property(self):
         repo_mock = MagicMock(spec=Repository.Repository)
         self.archive._MojArchive__repo = repo_mock
-        self.assertEqual(self.archive.repo, repo_mock)  
-        
+        self.assertEqual(self.archive.repo, repo_mock)
+
     def test_complete_property(self):
         self.archive.complete = True
         self.assertEqual(self.archive.complete, True)
@@ -55,11 +55,11 @@ class TestMojArchive(unittest.TestCase):
 
     def test_archive_method_returns_true_on_successful_archiving(self):
         with unittest.mock.patch.object(self.archive.repo, 'edit',
-                                         return_value=MagicMock(archived=True)):
+                                        return_value=MagicMock(archived=True)):
             self.assertEqual(self.archive.archive(), True)
             self.assertEqual(self.archive.complete, True)
 
     def test_archive_method_returns_false_on_archiving_failure(self):
         with unittest.mock.patch.object(self.archive.repo, 'edit',
-                                         return_value=MagicMock(archived=False)):
+                                        return_value=MagicMock(archived=False)):
             self.assertEqual(self.archive.archive(), True)
