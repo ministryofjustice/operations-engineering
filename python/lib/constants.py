@@ -25,6 +25,3 @@ class Constants:
             raise ValueError(
                 "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
         self.oauth_token = __oauth_token
-
-    def get_oauth_token(self) -> str:
-        return oauth_token
