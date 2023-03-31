@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from .ZenhubService import ZenhubService
+from python.services.zenhub_service import ZenhubService
 
 
 @patch("gql.Client.__new__", new=MagicMock)

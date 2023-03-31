@@ -99,7 +99,7 @@ class ZenhubService:
     def workspace_id(self, workspace_id: int):
         self._workspace_id = workspace_id
 
-    def get_workspace_id_from_repo(self, repository_id: int):
+    def get_workspace_id_from_repo(self, repository_id: int) -> int | Exception:
         data = self.zenhub_client_gql_api.execute(gql("""
             query getWorkspacesByRepo($repositoryGhId: [Int!]!) {
               repositoriesByGhId(ghIds: $repositoryGhId) {

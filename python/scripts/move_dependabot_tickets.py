@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from services.ZenhubService import ZenhubService
+from python.services.zenhub_service import ZenhubService
 
 
 def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Exception:
@@ -14,7 +14,7 @@ def get_issues(zenhub: ZenhubService, label, from_pipeline: str) -> list | Excep
     return zenhub.search_issues_by_label(from_pipeline_id, label)
 
 
-def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception:
+def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline):
     to_pipeline_id = zenhub.get_pipeline_id(to_pipeline)
     if to_pipeline_id is None:
         logging.error(f"Failed to get pipeline ID for pipeline {to_pipeline}")
@@ -26,9 +26,7 @@ def move_issues(zenhub: ZenhubService, issues_to_move, to_pipeline) -> Exception
         if not success:
             logging.error(
                 f"Failed to move issue {issue['id']} to pipeline {to_pipeline}")
-            return Exception
-
-    return None
+            raise ValueError
 
 
 def add_arguments():
@@ -79,7 +77,10 @@ def main():
     )
 
     zenhub = ZenhubService(args.api_token)
-    zenhub.workspace_id = zenhub.get_workspace_id_from_repo(args.repo_id)
+    try:
+        zenhub.workspace_id = zenhub.get_workspace_id_from_repo(args.repo_id)
+    except Exception as e:
+        return e
 
     try:
         issues = get_issues(zenhub, args.label, args.from_pipeline)
