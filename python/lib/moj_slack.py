@@ -17,7 +17,7 @@ class MojSlack:
     def __init__(self, slack_token: str) -> None:
         self.client = WebClient(slack_token)
 
-    def get_conversation_history(self, channel_id, days) -> list[dict]:
+    def get_conversation_history(self, channel_id, days):
         """This method returns a list of all messages sent in a target Slack channel over the past X days
 
         Args:
@@ -125,7 +125,7 @@ class MojSlack:
         return (datetime.now() - timedelta(number_of_days)).timestamp()
 
     @staticmethod
-    def filter_out_subtypes(list_of_messages) -> list[dict]:
+    def filter_out_subtypes(list_of_messages):
         """This function filters out all messages from a list of Slack messages which contain the key subtype.
         This is needed as messages with that key are not real messages (they tend to be bots)
 
