@@ -43,7 +43,7 @@ class MojSlackTestCase(unittest.TestCase):
 
         actual_date = self.slack.generate_datetime(number_of_days)
 
-        self.assertEqual(actual_date.split([0]), expected_date[0])
+        self.assertEqual(int(actual_date), int(expected_date))
 
     def test_filter_out_subtypes(self):
         message1 = {"text": "test message"}
