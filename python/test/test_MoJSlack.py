@@ -38,7 +38,8 @@ class MojSlackTestCase(unittest.TestCase):
 
     def test_generate_datetime(self):
         number_of_days = 7
-        expected_date = (datetime.now() - timedelta(number_of_days)).timestamp()
+        expected_date = (datetime.now() -
+                         timedelta(number_of_days)).timestamp()
 
         actual_date = self.slack.generate_datetime(number_of_days)
 
