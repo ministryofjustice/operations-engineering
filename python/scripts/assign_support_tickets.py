@@ -48,15 +48,17 @@ def main():
     gh = GithubService(args.oauth_token, args.org)
 
     try:
-        issues = gh.assign_support_issues_to_self(args.repo, args.org, args.tag)
+        issues = gh.assign_support_issues_to_self(
+            args.repo, args.org, args.tag)
     except ValueError as error:
         logging.error(f"Failed to assign issues: {error}")
         raise error
-    
+
     if not issues:
         logging.warning("No issues found, skipping")
     for issue in issues:
-        logging.info(f"Assigned issue {issue.number} to {issue.assignee.login}")
+        logging.info(
+            f"Assigned issue {issue.number} to {issue.assignee.login}")
 
 
 if __name__ == "__main__":
