@@ -99,7 +99,8 @@ class GithubService:
         try:
             return self.assign_issues_to_self(support_issues, name)
         except ValueError as error:
-            raise error
+            raise ValueError(
+                f"Failed to assign issues to self in {repository_name}") from error
 
     @staticmethod
     def assign_issues_to_self(issues: list[Issue], repository_name: str) -> list[any]:
