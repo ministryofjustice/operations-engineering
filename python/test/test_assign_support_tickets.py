@@ -5,6 +5,8 @@ import python.scripts.assign_support_tickets as assign_support_tickets
 
 
 @patch("github.Github.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestAssignSupportTicket(unittest.TestCase):
 
     @patch("sys.argv", [
@@ -17,9 +19,7 @@ class TestAssignSupportTicket(unittest.TestCase):
         "fake",
     ])
     def test_call_main_with_arguments(self):
-        with patch("python.services.github_service.GithubService.assign_support_issues_to_self") as mock:
-            mock.return_value = []
-            assign_support_tickets.main()
+        assign_support_tickets.main()
 
     @patch("sys.argv", ["", "--oauth-token"])
     def test_call_main_without_arguments(self):
