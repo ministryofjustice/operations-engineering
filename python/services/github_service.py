@@ -93,23 +93,41 @@ class GithubService:
             :param org_name: The name of the organisation to assign issues in.
             :param tag: The tag to search for.
         """
-        support_issues = [
+        name = f"{org_name}/{repository_name}"
+        support_issues = self.get_support_issues(name, tag)
+
+        try:
+            return self.assign_issues_to_self(support_issues, name)
+        except ValueError as error:
+            raise error
+
+    @staticmethod
+    def assign_issues_to_self(issues: list[Issue], repository_name: str) -> list[any]:
+        for issue in issues:
+            issue.edit(assignees=[issue.user.login])
+            if len(issue.assignees) == 0:
+                raise ValueError(
+                    f"Failed to assign issue {issue.number} to {issue.user.login} in {repository_name}")
+
+        return issues
+
+    def get_support_issues(self, repository_name: str, tag: str) -> list[Issue]:
+        return [
             issue
-            for issue in self.__get_open_issues_from_repo(f"{org_name}/{repository_name}")
+            for issue in self.get_open_issues_from_repo(repository_name)
             for label in issue.labels
             if label.name == tag and len(issue.assignees) == 0
         ]
 
-        for issue in support_issues:
-            issue.edit(assignees=[issue.user.login])
-            if issue.user.login != issue.assignees[0].login:
-                raise ValueError(
-                    f"Failed to assign issue {issue.number} to {issue.user.login} in {repository_name}")
-
-        return support_issues
-
     @retries_github_rate_limit_exception_at_next_reset_once
-    def __get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
+    def get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
+        """
+        Args:
+            repository_name: Should be in the format of "organisation/repository"
+
+        Returns:
+            A list of open issues in the repository from the GitHub API.
+        """
         required_state = "open"
         repo = self.github_client_core_api.get_repo(repository_name)
 
