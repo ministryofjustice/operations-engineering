@@ -34,4 +34,3 @@ class TestAssignSupportTicket(unittest.TestCase):
         self.assertEqual(parser.org, "ministryofjustice")
         self.assertEqual(parser.repo, "operations-engineering")
         self.assertEqual(parser.tag, "Support")
-        
