@@ -98,13 +98,15 @@ class GithubService:
 
         Access is now only via a team.
 
-        The user will have been added to an automated generated team named <repository-name>-<read|write|maintain|admin>-team.
+        The user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team.
 
-        The list of Org teams can be found at https://github.com/orgs/<name-of-org>/teams.
+        The list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.
 
         The user will have the same level of access to the repository via the team.
 
         The first user added to a team is made a team maintainer, this enables that user to manage the users within the team.
+
+        Users with admin access are added to the admin team as a team maintainer.
 
         If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
 
