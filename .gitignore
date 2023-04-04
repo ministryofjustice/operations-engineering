@@ -6,3 +6,6 @@ env
 .vscode
 .idea/
 *.pyc
+coverage.xml
+.coverage
+.tox*
