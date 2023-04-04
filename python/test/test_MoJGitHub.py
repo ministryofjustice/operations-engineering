@@ -18,7 +18,7 @@ class TestMojGithub(unittest.TestCase):
     def test_repos(self):
         self.org.get_repos.return_value = [
             Mock(archived=False, fork=False), Mock(archived=True, fork=False)]
-        self.assertEqual(len(self.mojgithub.repos), 6)
+        self.assertEqual(len(self.mojgithub.repos), 2)
 
     def test_public_repos(self):
         self.org.get_repos.return_value = [
