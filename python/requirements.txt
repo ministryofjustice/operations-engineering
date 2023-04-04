@@ -7,3 +7,4 @@ slack_sdk == 3.20.2
 freezegun==1.2.2
 jwt
 cryptography
+coverage
