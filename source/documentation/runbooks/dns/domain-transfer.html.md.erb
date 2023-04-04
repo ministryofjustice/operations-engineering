@@ -32,7 +32,7 @@ Next obtain the domains DNS record details ie IP address for a A record, any nam
 
 If received a zone file then import that into Route 53. Or in our Route53 account create a new hosted zone and add all the records they provided. AWS will create the NS and SOA records in the new hosted zone, do not modify them.
 
-If the domain is becoming a subdomain on service.justice.gov.uk or justice.gov.uk then you can add a A record to point to an IP address provided by the current provider for example.service.justice.gov.uk then add a CNAME record that points to the new A record for www.example.service.justice.gov.uk. 
+If the domain is becoming a subdomain on service.justice.gov.uk or justice.gov.uk then you can add a A record to point to an IP address provided by the current provider for example.service.justice.gov.uk then add a CNAME record that points to the new A record for www.example.service.justice.gov.uk.
 
 If they provide their own namespace servers this would mean delegating the domain to a third party which we do not do for gov.uk domains. The current domain / web application and the current provider would need to prepare the application so that it would work using the AWS namespace servers. (steps for this are TBC)
 
@@ -44,7 +44,7 @@ Once the user has confirmed the tag has been applied, the NS TTL has been reduce
 
 Lower the TTL for the Namespace server NS records in the new hosted zone on our Route53 account.
 
-The Namespace server records TTL is reduced so that cached requests to the site occur more often than the original 2 days. 
+The Namespace server records TTL is reduced so that cached requests to the site occur more often than the original 2 days.
 
 ## The Transfer
 
@@ -61,14 +61,14 @@ Open Route53, on the left hand side select `Registered Domains`, select the `Tra
 |Country | UK |
 | Privacy protection | On |
 
-To see the progress of the transfer click on left hand menu `Domains` then `Requests`.  
+To see the progress of the transfer click on left hand menu `Domains` then `Requests`.
 
-The transfer should be a “Transfer domain in” type in the `Requests` screen.  
+The transfer should be a “Transfer domain in” type in the `Requests` screen.
 
 On the Route53 dashboard it will display messages and errors regarding the transfer.
 
 The message to look out for to see that the transfer has completed is `Domain transfer successful: Sent email to registrant contact: transfer is complete (step 14 of 14)`.
-  
+
 Now go to the `Registered` domains section in Route54 and search for the domain. Open it and check the domain contact details. If the Registrar contact details are still the previous registrars contact details, then edit the settings and use the contact details to match the table above. AWS will send an email to the current registrar to approve the change. When the current registrar has approved we receive an email from AWS named `Amazon Route 53 successfully changed the registrant contact for DOMAIN-NAME`.  To see status of this request look in the left hand menu `Domains` -> `Requests` and it should be a `Change domain owner` type.
 
 The next step is the cutover...... (TBC ? this part involves changing the NS records to use the AWS provided NS records either from service.justice.gov.uk or justice.gov.uk or from the newly created hosted for the domain)
