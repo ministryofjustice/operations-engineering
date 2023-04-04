@@ -1,6 +1,9 @@
 name: Auto-approve date change only PR
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - "source/**"
 
 env:
   PR_OWNER: ${{ github.event.pull_request.user.login }}
