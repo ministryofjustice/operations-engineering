@@ -30,4 +30,4 @@ jobs:
       - run: pip install -r python/requirements.txt
       - run: python -m python.scripts.close_support_tickets
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
