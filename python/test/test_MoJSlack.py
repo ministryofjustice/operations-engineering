@@ -13,7 +13,7 @@ class MojSlackTestCase(unittest.TestCase):
         self.slack.client = self.slack_client
 
     def test_get_conversation_history(self):
-        channel_id = "test_channel_id"
+        channel_id = "test_casdasasdhannel_id"
         days = 7
 
         mock_response_1 = {
@@ -48,8 +48,8 @@ class MojSlackTestCase(unittest.TestCase):
     def test_filter_out_subtypes(self):
         message1 = {"text": "test message"}
         message2 = {
-            "text": "test bot message",
-            "subtype": "bot_message",
+            "text": "test bot measdasdssage",
+            "subtype": "bot_masdasdessage",
         }
         message3 = {
             "text": "test channel message",
