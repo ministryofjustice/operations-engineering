@@ -59,9 +59,13 @@ Should you require intermediate or root certificates please contact [certificate
 
 ## Renewal Process for Gandi.net SSL Certificates
 
-The Operations Engineering Team will review the list of Gandi.net certificates and identify any that require renewal 4 weeks prior to expiry, and contact the owner of the service to confirm if renewal is required.
+Email reminders requesting new CSRs for Gandi.net certificates are automatically sent out via the [Operations Engineering Certificate Renewal](https://github.com/ministryofjustice/operations-engineering-certificate-renewal) repository to the appropriate recipients 30 days before expiry. 
 
-If a renewal is required the Operations Engineering Team will request a new CSR from the service owner to initiate the renewal.
+The frequency of these reminders can be configured via the `cert_expiry_thresholds` value in the `configs/production.yml` configuration file.
+
+A list of the domains we managed and their respective owners can be found in the `mappings.json` file located in [this S3 bucket](https://s3.console.aws.amazon.com/s3/buckets/operations-engineering-certificate-email?region=eu-west-2&tab=objects).
+
+Once a reply is recieved, the Operations Engineering team can continue with the standard process to intiate the renewal.
 
 ## Revoking Gandi.net certificates
 
