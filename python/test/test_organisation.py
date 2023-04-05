@@ -132,6 +132,7 @@ class TestOrganisation(unittest.TestCase):
         mock_github_service.team_exists.return_value = False
 
         org = Organisation(mock_github_service, "some-org")
+        org.setup()
         org.move_direct_users_to_teams()
 
 

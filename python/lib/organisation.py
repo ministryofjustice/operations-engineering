@@ -29,7 +29,7 @@ class Organisation:
         self.operations_engineering_team_user_usernames = []
         self.repositories_with_direct_users = []
 
-    def setup():
+    def setup(self):
         self.get_outside_collaborators()
         self.create_repositories()
         self.create_teams()
