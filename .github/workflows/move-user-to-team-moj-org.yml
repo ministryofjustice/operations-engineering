@@ -17,8 +17,8 @@ jobs:
       - run: python3 -m python.scripts.move_users_to_teams
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
-          ORG_NAME: "moj-analytical-services"
-          CONFIG_FILE: "move-users-to-teams-as-org-config.yml"
+          ORG_NAME: "ministryofjustice"
+          CONFIG_FILE: "move-users-to-teams-moj-org-config.yml"
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
