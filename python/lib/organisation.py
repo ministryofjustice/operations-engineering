@@ -92,10 +92,9 @@ class Organisation:
         for repository in self.repositories:
             self.github_service.close_expired_issues(repository.name)
 
-    def check_users_access(self):
-        """tbc"""
+    def move_direct_users_to_teams(self):
         for repository in self.repositories_with_direct_users:
             repository.ensure_repository_teams_exists()
             repository.put_direct_users_into_teams()
-            repository.remove_access_and_create_issue()
-            repository.clean_up_direct_users()
+            repository.create_repo_issues_for_direct_users()
+            repository.remove_direct_users_access()

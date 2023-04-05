@@ -8,7 +8,8 @@ from python.lib.helpers import Helpers
 class Repository:
     """The repository class"""
 
-    def __init__(self, github_service: GithubService, name: str, issue_section_status: bool, collaborators: list[str]):
+    def __init__(self, github_service: GithubService, name: str,
+                 issue_section_status: bool, collaborators: list[str]):
         self.constants = Constants()
         self.helper = Helpers(github_service)
         self.github_service = github_service
@@ -84,25 +85,21 @@ class Repository:
                     team.add_new_team_user(username)
                     break
 
-    def remove_access_and_create_issue(self):
+    def create_repo_issues_for_direct_users(self):
+        """Raise an issue to say the user has been removed and
+            that access via the team
+        """
         for user in self.direct_users_and_permission:
             username = user[self.constants.username]
-
-            # raise an issue to say the user has been removed and has access via the team
             if self.issue_section_enabled:
                 self.github_service.create_an_access_removed_issue_for_user_in_repository(
                     username, self.name)
 
+    def remove_direct_users_access(self):
+        for user in self.direct_users_and_permission:
+            username = user[self.constants.username]
             self.github_service.remove_user_from_repository(
                 username, self.name)
-
-    def clean_up_direct_users(self):
-        repository_users = self.helper.fetch_repository_users_usernames(
-            self.name)
-        for repository_user in repository_users:
-            for user in self.direct_users_and_permission:
-                if user[self.constants.username] not in repository_users:
-                    self.direct_users_and_permission.remove(user)
 
     def remove_operations_engineering_team_users_from_team(self, team_id: int):
         """When team is created GH adds the user who ran the GH action to the team
