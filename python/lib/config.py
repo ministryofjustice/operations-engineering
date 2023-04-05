@@ -11,13 +11,13 @@ class Config:
             raise ValueError(
                 "The env variable CONFIG_FILE is empty or missing")
 
-        self.config = parse_config(
+        self.configs = parse_config(
             f"{os.path.dirname(os.path.realpath(__file__))}/../config/{config_file}")
 
         self.badly_named_repositories = []
-        if self.config["badly_named_repositories"] is not None:
-            self.badly_named_repositories = self.config["badly_named_repositories"]
+        if self.configs["badly_named_repositories"] is not None:
+            self.badly_named_repositories = self.configs["badly_named_repositories"]
 
         self.ignore_teams = []
-        if self.config["ignore_teams"] is not None:
-            self.ignore_teams = self.config["ignore_teams"]
+        if self.configs["ignore_teams"] is not None:
+            self.ignore_teams = self.configs["ignore_teams"]

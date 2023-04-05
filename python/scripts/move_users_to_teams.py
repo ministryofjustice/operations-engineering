@@ -17,6 +17,7 @@ def main():
     github_service = GithubService(constants.oauth_token, constants.org_name)
     org = Organisation(github_service, constants.org_name)
     org.move_direct_users_to_teams()
+    org.close_expired_issues()
     print("Finished")
 
 
