@@ -119,3 +119,6 @@ class Helpers:
             ]
 
         return repositories
+
+    def get_team_id_from_team_name(self, name) -> int:
+        return self.github_service.get_team_id_from_team_name(name)

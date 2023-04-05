@@ -18,7 +18,7 @@ class Organisation:
     def __init__(self, github_service: GithubService, org_name: str):
         self.constants = Constants()
         self.config = Config()
-        self.helper = Helpers(github_service)
+        self.helpers = Helpers(github_service)
 
         self.org_name = org_name
         self.github_service = github_service
@@ -29,7 +29,7 @@ class Organisation:
 
         # Create repository objects
         self.repositories = []
-        for repository in self.helper.fetch_repo_names_and_issue_section_enabled():
+        for repository in self.helpers.fetch_repo_names_and_issue_section_enabled():
             self.repositories.append(
                 Repository(
                     self.github_service,
@@ -48,9 +48,9 @@ class Organisation:
 
         # Create team objects
         self.teams = []
-        for team_name in self.helper.fetch_team_names():
+        for team_name in self.helpers.fetch_team_names():
             try:
-                self.teams.append(Team(self.github_service, team_name))
+                self.teams.append(Team(self.helpers, team_name))
             except Exception:
                 logging.exception(
                     f"Exception fetching team name {team_name} information. Skipping iteration."

@@ -11,7 +11,7 @@ class Repository:
     def __init__(self, github_service: GithubService, name: str,
                  issue_section_status: bool, collaborators: list[str]):
         self.constants = Constants()
-        self.helper = Helpers(github_service)
+        self.helpers = Helpers(github_service)
         self.github_service = github_service
         self.name = name
         self.issue_section_enabled = issue_section_status
@@ -19,7 +19,7 @@ class Repository:
         self.ops_eng_team_user_names = []
         self.teams = []
 
-        self.__direct_users = self.helper.fetch_repository_users_usernames(
+        self.__direct_users = self.helpers.fetch_repository_users_usernames(
             self.name)
 
         # Remove a org collaborator/s from the repository direct_users list
@@ -67,7 +67,7 @@ class Repository:
                     self.remove_operations_engineering_team_users_from_team(
                         team_id)
                     # Create and store a Team object locally
-                    new_team = Team(self.github_service, team_name)
+                    new_team = Team(self.helpers, team_name)
                     self.teams.append(new_team)
 
     def put_direct_users_into_teams(self):
