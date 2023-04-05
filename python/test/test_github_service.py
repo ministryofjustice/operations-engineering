@@ -594,5 +594,96 @@ class TestGithubServiceGetPaginatedListOfUserNames(unittest.TestCase):
             101)
 
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
+
+    def test_call_with_nothing_to_assign(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        issues = github_service.assign_support_issues_to_self(
+            "test_repository_name", "test_org", "test_support_label")
+
+        self.assertEqual(issues, [])
+
+    @patch("python.services.github_service.GithubService.get_support_issues")
+    def test_with_correct_issue_but_fail(self, open_issues_mock):
+        mock = MagicMock()
+        open_issues_mock.return_value = [MagicMock()]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        self.assertRaises(ValueError, github_service.assign_support_issues_to_self,
+                          "test_repository_name", "test_org", mock.name)
+
+    @patch("python.services.github_service.GithubService.get_support_issues")
+    def test_with_correct_issue(self, open_issues_mock):
+        mock_issue = MockGithubIssue(
+            123, 456, "test complete", [], ["test_support_label"])
+        open_issues_mock.return_value = [mock_issue]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        issues = github_service.assign_support_issues_to_self(
+            "test_repository_name", "test_org", "test_support_label")
+
+        self.assertEqual(issues, [mock_issue])
+
+    @patch("python.services.github_service.GithubService.get_open_issues_from_repo")
+    def test_get_support_issues(self, mock_get_open_issues_from_repo):
+        mock_issue = MockGithubIssue(
+            123, 456, "test getting issue", [], ["test_support_label"])
+        mock_get_open_issues_from_repo.return_value = [mock_issue]
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        issues = github_service.get_support_issues(
+            "test_org/get_support", mock_issue.labels[0].name)
+
+        self.assertEqual(issues, [mock_issue])
+
+    @patch("python.services.github_service.GithubService.get_open_issues_from_repo")
+    def test_get_support_issues_with_no_issues(self, mock_get_open_issues_from_repo):
+        mock_get_open_issues_from_repo.return_value = []
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        issues = github_service.get_support_issues(
+            "test_org/test_with_no_issues", "test_support_label")
+
+        self.assertEqual(issues, [])
+
+    def test_assign_issues_to_self(self):
+        mock_issue = MockGithubIssue(
+            123, 456, "testing assign", [], ["test_support_label"])
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        issues = github_service.assign_issues_to_self(
+            [mock_issue], "test_org/test_assign")
+
+        self.assertEqual(issues, [mock_issue])
+
+    def test_assign_issues_to_self_with_no_issues(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        issues = github_service.assign_issues_to_self(
+            [], "test_org/test_repository_name")
+
+        self.assertEqual(issues, [])
+
+
+class MockGithubIssue(MagicMock):
+    def __init__(self, id, number, title, assignees, label):
+        mock_label = MagicMock(name="test_support_label")
+        super().__init__()
+        self.id = id
+        self.number = number
+        self.title = title
+        self.assignees = assignees
+        self.labels = [mock_label]
+        self.user = MagicMock()
+
+    def edit(self, assignees):
+        self.assignees = assignees
+
+
 if __name__ == "__main__":
     unittest.main()
