@@ -16,8 +16,10 @@ class Config:
 
         self.badly_named_repositories = []
         if self.configs["badly_named_repositories"] is not None:
-            self.badly_named_repositories = [repo_name.lower() for repo_name in self.configs["badly_named_repositories"]]
+            self.badly_named_repositories = [
+                repo_name.lower() for repo_name in self.configs["badly_named_repositories"]]
 
         self.ignore_teams = []
         if self.configs["ignore_teams"] is not None:
-            self.ignore_teams = [team_name.lower() for team_name in self.configs["ignore_teams"]]
+            self.ignore_teams = [team_name.lower()
+                                 for team_name in self.configs["ignore_teams"]]

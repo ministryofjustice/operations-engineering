@@ -9,44 +9,24 @@ class Repository:
     """The repository class"""
 
     def __init__(self, github_service: GithubService, name: str,
-                 issue_section_status: bool, collaborators: list[str]):
+                 issue_section_status: bool, users_with_direct_access_and_permission: list[(str, str)], ops_eng_team_user_names: list[str]):
         self.constants = Constants()
         self.helpers = Helpers(github_service)
         self.github_service = github_service
-        self.name = name
+        self.name = name.lower()
         self.issue_section_enabled = issue_section_status
-        self.org_collaborators = collaborators
-        self.ops_eng_team_user_names = []
+        self.ops_eng_team_user_names = ops_eng_team_user_names
         self.teams = []
+        self.direct_users_and_permission = users_with_direct_access_and_permission
 
-        self.__direct_users = self.helpers.fetch_repository_users_usernames(
-            self.name)
-
-        # Remove a org collaborator/s from the repository direct_users list
-        self.__direct_users[:] = [
-            user_username
-            for user_username in self.__direct_users
-            if user_username not in self.org_collaborators
-        ]
-
-        self.direct_users_and_permission = []
-        for user_username in self.__direct_users:
-            user_permission = github_service.get_user_permission_for_repository(
-                user_username, self.name)
-            self.direct_users_and_permission.append(
-                (user_username, user_permission))
-
-    def add_ops_eng_team_user_names(self, user_usernames: list[str]):
-        self.ops_eng_team_user_names = user_usernames
-
-    def add_team(self, new_team: Team):
-        self.teams.append(new_team)
+    def add_teams(self, new_team: list[Team]):
+        self.teams = new_team
 
     def is_new_team_needed(self, permission: str) -> bool:
         new_team_required = True
-        expected_team_name = self.form_team_name(permission)
+        expected_team_name = self.form_team_name(permission.lower())
         for team in self.teams:
-            if team.name == expected_team_name:
+            if team.name.lower() == expected_team_name.lower():
                 new_team_required = False
                 break
         return new_team_required

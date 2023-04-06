@@ -37,7 +37,7 @@ class Helpers:
 
         return repositories
 
-    def fetch_repository_users_usernames(self, repository_name: str) -> list[str]:
+    def fetch_repository_users_with_direct_access_to_repository(self, repository_name: str) -> list[str]:
         has_next_page = True
         after_cursor = None
         users_usernames = []
@@ -108,7 +108,8 @@ class Helpers:
             if data["organization"]["team"]["repositories"]["edges"] is not None:
                 for repository in data["organization"]["team"]["repositories"]["edges"]:
                     repositories.append(
-                        (repository["node"]["name"].lower(), repository["permission"])
+                        (repository["node"]["name"].lower(),
+                         repository["permission"])
                     )
 
             has_next_page = data["organization"]["team"]["repositories"]["pageInfo"][
