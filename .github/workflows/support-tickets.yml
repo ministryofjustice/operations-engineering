@@ -1,4 +1,4 @@
-name: Assign Creator if no assignee and is support ticket
+name: Assign support tickets to creator
 
 on:
   issues:
@@ -16,10 +16,10 @@ jobs:
           python-version: "3.11"
           cache: "pip"
       - run: pip install -r python/requirements.txt
-      - run: python -m python.scripts.assign_support_tickets
-        env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+      - run: python -m python.scripts.assign_support_tickets --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }}
   close-support-ticket:
+    if: ${{ always() }}
+    needs: assign-support-tickets-to-creator
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,4 +30,4 @@ jobs:
       - run: pip install -r python/requirements.txt
       - run: python -m python.scripts.close_support_tickets
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}

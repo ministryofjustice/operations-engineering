@@ -84,6 +84,56 @@ class GithubService:
                 and issue.state == "open"
                 and grace_period < datetime.now())
 
+    def assign_support_issues_to_self(self, repository_name, org_name, tag: str) -> list[any]:
+        """
+            Assigns issues with a specific tag to the user who created the issue.
+            This is used to assign support issues to the user who created the issue.
+
+            :param repository_name: The name of the repository to assign issues in.
+            :param org_name: The name of the organisation to assign issues in.
+            :param tag: The tag to search for.
+        """
+        name = f"{org_name}/{repository_name}"
+        support_issues = self.get_support_issues(name, tag)
+
+        try:
+            return self.assign_issues_to_self(support_issues, name)
+        except ValueError as error:
+            raise ValueError(
+                f"Failed to assign issues to self in {repository_name}") from error
+
+    @staticmethod
+    def assign_issues_to_self(issues: list[Issue], repository_name: str) -> list[any]:
+        for issue in issues:
+            issue.edit(assignees=[issue.user.login])
+            if len(issue.assignees) == 0:
+                raise ValueError(
+                    f"Failed to assign issue {issue.number} to {issue.user.login} in {repository_name}")
+
+        return issues
+
+    def get_support_issues(self, repository_name: str, tag: str) -> list[Issue]:
+        return [
+            issue
+            for issue in self.get_open_issues_from_repo(repository_name)
+            for label in issue.labels
+            if label.name == tag and len(issue.assignees) == 0
+        ]
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
+        """
+        Args:
+            repository_name: Should be in the format of "organisation/repository"
+
+        Returns:
+            A list of open issues in the repository from the GitHub API.
+        """
+        required_state = "open"
+        repo = self.github_client_core_api.get_repo(repository_name)
+
+        return repo.get_issues(state=required_state) or []
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def create_an_access_removed_issue_for_user_in_repository(self, user_name: str, repository_name: str) -> None:
         logging.info(

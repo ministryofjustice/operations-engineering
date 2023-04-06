@@ -1,10 +1,13 @@
 name: Auto-approve date change only PR
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - "source/**"
 
 env:
   PR_OWNER: ${{ github.event.pull_request.user.login }}
-  GITHUB_OAUTH_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING }}
+  GITHUB_OAUTH_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
   TEAM_NAME: "operations-engineering"
 
 jobs:

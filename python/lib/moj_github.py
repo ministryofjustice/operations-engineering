@@ -1,5 +1,6 @@
-from github import Github
 import logging
+
+from github import Github
 
 # This class is an interface for interacting with a GitHub org and its repos at an admin level, it can be pointed at any org
 # But please be aware it has been written with the ministryofjustice org in mind
