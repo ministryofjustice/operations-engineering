@@ -1,11 +1,12 @@
+from python.services.github_service import GithubService
 from python.lib.helpers import Helpers
 
 
 class Team:
     """A struct to store team info ie name, users, repos, GH ID"""
 
-    def __init__(self, helpers: Helpers, name: str):
-        self.helpers = helpers
+    def __init__(self, github_service: GithubService, name: str):
+        self.helpers = Helpers(github_service)
         self.name = name.lower()
         self.users_usernames = self.helpers.fetch_team_users_usernames(
             self.name)

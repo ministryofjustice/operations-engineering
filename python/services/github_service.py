@@ -66,7 +66,7 @@ class GithubService:
         logging.info("Getting Outside Collaborators Login Names")
         outside_collaborators = self.github_client_core_api.get_organization(
             self.organisation_name).get_outside_collaborators() or []
-        return [outside_collaborator.login for outside_collaborator in outside_collaborators]
+        return [outside_collaborator.login.lower() for outside_collaborator in outside_collaborators]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def close_expired_issues(self, repository_name: str) -> None:
@@ -411,3 +411,19 @@ class GithubService:
             "page_size": page_size,
             "after_cursor": after_cursor
         })
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repository_teams(self, repository_name: str) -> list:
+        teams = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository_name}").get_teams() or []
+        return teams
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repository_direct_users(self, repository_name: str) -> list:
+        users = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
+        return [member.login.lower() for member in users]
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_a_team_user_usernames(self, team_name: str) -> list[str]:
+        members = self.github_client_core_api.get_organization(
+            self.organisation_name).get_team_by_slug(team_name).get_members() or []
+        return [member.login.lower() for member in members]

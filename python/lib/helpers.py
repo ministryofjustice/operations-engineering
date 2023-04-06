@@ -37,43 +37,6 @@ class Helpers:
 
         return repositories
 
-    def fetch_repository_users_with_direct_access_to_repository(self, repository_name: str) -> list[str]:
-        has_next_page = True
-        after_cursor = None
-        users_usernames = []
-
-        while has_next_page:
-            data = self.github_service.get_paginated_list_of_user_names_with_direct_access_to_repository(
-                repository_name, after_cursor
-            )
-
-            if data["repository"]["collaborators"]["edges"] is not None:
-                for repository in data["repository"]["collaborators"]["edges"]:
-                    users_usernames.append(repository["node"]["login"].lower())
-
-            has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
-            after_cursor = data["repository"]["collaborators"]["pageInfo"]["endCursor"]
-
-        return users_usernames
-
-    def fetch_team_names(self) -> list[str]:
-        has_next_page = True
-        after_cursor = None
-        team_names = []
-
-        while has_next_page:
-            data = self.github_service.get_paginated_list_of_team_names(
-                after_cursor)
-
-            if data["organization"]["teams"]["edges"] is not None:
-                for team in data["organization"]["teams"]["edges"]:
-                    team_names.append(team["node"]["slug"].lower())
-
-            has_next_page = data["organization"]["teams"]["pageInfo"]["hasNextPage"]
-            after_cursor = data["organization"]["teams"]["pageInfo"]["endCursor"]
-
-        return team_names
-
     def fetch_team_users_usernames(self, team_name: str) -> list[str]:
         has_next_page = True
         after_cursor = None
