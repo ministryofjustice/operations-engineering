@@ -20,7 +20,7 @@ class Organisation:
         self.config = Config()
         self.helpers = Helpers(github_service)
 
-        self.org_name = org_name
+        self.org_name = org_name.lower()
         self.github_service = github_service
 
         self.outside_collaborators = []
@@ -39,47 +39,56 @@ class Organisation:
         self.add_ops_eng_team_to_repositories_with_direct_users()
 
     def get_outside_collaborators(self):
-        return self.github_service.get_outside_collaborators_login_names()
+        self.outside_collaborators = [
+            username.lower()
+            for username in self.github_service.get_outside_collaborators_login_names()
+        ]
 
     def create_repositories(self):
-        for repository in self.helpers.fetch_repo_names_and_issue_section_enabled():
-            self.repositories.append(
-                Repository(
+        self.repositories = [
+            Repository(
                     self.github_service,
-                    repository[self.constants.username],
+                    repository[self.constants.username].lower(),
                     repository[self.constants.issue_section_enabled],
                     self.outside_collaborators,
                 )
-            )
+            for repository in self.helpers.fetch_repo_names_and_issue_section_enabled()
+        ]
 
         # Remove repository objects from the list that are in the badly_named_repositories list
         self.repositories[:] = [
             repository
             for repository in self.repositories
-            if repository.name not in self.config.badly_named_repositories
+            if repository.name.lower() not in self.config.badly_named_repositories
         ]
 
     def create_teams(self):
-        for team_name in self.helpers.fetch_team_names():
-            self.teams.append(Team(self.helpers, team_name))
+        self.teams = [
+            Team(self.helpers, team_name.lower())
+            for team_name in self.helpers.fetch_team_names()
+        ]
 
         # Remove teams that are in the ignore list
-        for ignore_team_name in self.config.ignore_teams:
-            self.teams[:] = [
-                team for team in self.teams[:] if team.name != ignore_team_name
-            ]
+        self.teams[:] = [
+            team
+            for team in self.teams[:]
+            for ignore_team_name in self.config.ignore_teams
+            if team.name.lower() != ignore_team_name.lower()
+        ]
 
     def add_teams_to_repositories(self):
         for team in self.teams:
             for team_attached_to_repository in team.repositories_and_permissions:
                 for repository in self.repositories:
-                    if team_attached_to_repository[self.constants.repository_name] == repository.name:
+                    if team_attached_to_repository[self.constants.repository_name] == repository.name.lower():
                         repository.add_team(team)
 
     def get_ops_eng_team_user_usernames(self):
-        for team in self.teams:
-            if team.name == self.constants.operations_engineering_team_name:
-                self.operations_engineering_team_user_usernames = team.users_usernames
+        self.operations_engineering_team_user_usernames = [
+            team
+            for team in self.teams
+            if team.name.lower() == self.constants.operations_engineering_team_name.lower()
+        ]
 
     def find_repositories_with_direct_users(self):
         self.repositories_with_direct_users = [
@@ -95,7 +104,7 @@ class Organisation:
 
     def close_expired_issues(self):
         for repository in self.repositories:
-            self.github_service.close_expired_issues(repository.name)
+            self.github_service.close_expired_issues(repository.name.lower())
 
     def move_direct_users_to_teams(self):
         for repository in self.repositories_with_direct_users:
