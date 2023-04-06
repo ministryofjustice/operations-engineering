@@ -27,7 +27,7 @@ class Helpers:
                     ):
                         repositories.append(
                             (
-                                repository["node"]["name"],
+                                repository["node"]["name"].lower(),
                                 repository["node"]["hasIssuesEnabled"],
                             )
                         )
@@ -49,7 +49,7 @@ class Helpers:
 
             if data["repository"]["collaborators"]["edges"] is not None:
                 for repository in data["repository"]["collaborators"]["edges"]:
-                    users_usernames.append(repository["node"]["login"])
+                    users_usernames.append(repository["node"]["login"].lower())
 
             has_next_page = data["repository"]["collaborators"]["pageInfo"]["hasNextPage"]
             after_cursor = data["repository"]["collaborators"]["pageInfo"]["endCursor"]
@@ -67,7 +67,7 @@ class Helpers:
 
             if data["organization"]["teams"]["edges"] is not None:
                 for team in data["organization"]["teams"]["edges"]:
-                    team_names.append(team["node"]["slug"])
+                    team_names.append(team["node"]["slug"].lower())
 
             has_next_page = data["organization"]["teams"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["teams"]["pageInfo"]["endCursor"]
@@ -86,7 +86,7 @@ class Helpers:
 
             if data["organization"]["team"]["members"]["edges"] is not None:
                 for team in data["organization"]["team"]["members"]["edges"]:
-                    user_usernames.append(team["node"]["login"])
+                    user_usernames.append(team["node"]["login"].lower())
 
             has_next_page = data["organization"]["team"]["members"]["pageInfo"][
                 "hasNextPage"
@@ -108,7 +108,7 @@ class Helpers:
             if data["organization"]["team"]["repositories"]["edges"] is not None:
                 for repository in data["organization"]["team"]["repositories"]["edges"]:
                     repositories.append(
-                        (repository["node"]["name"], repository["permission"])
+                        (repository["node"]["name"].lower(), repository["permission"])
                     )
 
             has_next_page = data["organization"]["team"]["repositories"]["pageInfo"][

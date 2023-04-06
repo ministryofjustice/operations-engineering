@@ -6,7 +6,7 @@ class Team:
 
     def __init__(self, helpers: Helpers, name: str):
         self.helpers = helpers
-        self.name = name
+        self.name = name.lower()
         self.users_usernames = self.helpers.fetch_team_users_usernames(
             self.name)
         self.repositories_and_permissions = self.helpers.fetch_team_repositories_and_permissions(
