@@ -13,6 +13,7 @@ class Constants:
         self.repository_name = 0
         self.permission = 1
         self.issue_section_enabled = 1
+        self.number_of_direct_users = 2
         self.operations_engineering_team_name = "operations-engineering"
 
         __org_name = os.getenv("ORG_NAME")

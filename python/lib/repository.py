@@ -1,6 +1,7 @@
 import logging
 from python.services.github_service import GithubService
 from python.lib.constants import Constants
+from python.lib.config import Config
 from python.lib.team import Team
 
 
@@ -8,13 +9,13 @@ class Repository:
     """The repository class"""
 
     def __init__(self, github_service: GithubService, name: str,
-                 issue_section_status: bool, users_with_direct_access_and_permission: list[(str, str)], ops_eng_team_user_names: list[str]):
+                 issue_section_status: bool, users_with_direct_access: list[(str, str)], ops_eng_team_user_names: list[str]):
         self.constants = Constants()
         self.github_service = github_service
         self.name = name.lower()
         self.issue_section_enabled = issue_section_status
         self.ops_eng_team_user_names = ops_eng_team_user_names
-        self.direct_users_and_permission = users_with_direct_access_and_permission
+        self.direct_users = users_with_direct_access
         self.teams = []
 
     def is_new_team_needed(self, permission: str) -> bool:
@@ -30,8 +31,8 @@ class Repository:
         """ Check if a automated team with the required permission already
             exists and if not create a new team for the repository
         """
-        for user in self.direct_users_and_permission:
-            permission = user[self.constants.permission]
+        for direct_user_username in self.direct_users:
+            permission = self.github_service.get_user_permission_for_repository(direct_user_username, self.name)
             if self.is_new_team_needed(permission):
                 team_name = self.form_team_name(permission)
                 # Create a team on GitHub
@@ -42,39 +43,37 @@ class Repository:
                     self.remove_operations_engineering_team_users_from_team(
                         team_id)
                     # Create and store a Team object locally
-                    new_team = Team(self.github_service, team_name)
-                    self.teams.append(new_team)
+                    for team in self.github_service.get_repository_teams(self.name):
+                        if team.name == team_name:
+                            self.teams.append(Team(team))
 
     def put_direct_users_into_teams(self):
-        for user in self.direct_users_and_permission:
+        for direct_user_username in self.direct_users:
             for team in self.teams:
-                permission = user[self.constants.permission]
-                username = user[self.constants.username]
+                permission = self.github_service.get_user_permission_for_repository(direct_user_username, self.name)
                 expected_team_name = self.form_team_name(permission)
                 if team.name == expected_team_name:
                     if len(team.users_usernames) == 0 or permission == "admin":
                         self.github_service.add_user_to_team_as_maintainer(
-                            username, team.id)
+                            direct_user_username, team.id)
                     else:
-                        self.github_service.add_user_to_team(username, team.id)
-                    team.add_new_team_user(username)
+                        self.github_service.add_user_to_team(direct_user_username, team.id)
+                    team.add_new_team_user(direct_user_username)
                     break
 
     def create_repo_issues_for_direct_users(self):
         """Raise an issue to say the user has been removed and
             that access via the team
         """
-        for user in self.direct_users_and_permission:
-            username = user[self.constants.username]
+        for direct_user_username in self.direct_users:
             if self.issue_section_enabled:
                 self.github_service.create_an_access_removed_issue_for_user_in_repository(
-                    username, self.name)
+                    direct_user_username, self.name)
 
     def remove_direct_users_access(self):
-        for user in self.direct_users_and_permission:
-            username = user[self.constants.username]
+        for direct_user_username in self.direct_users:
             self.github_service.remove_user_from_repository(
-                username, self.name)
+                udirect_user_usernamesername, self.name)
 
     def remove_operations_engineering_team_users_from_team(self, team_id: int):
         """When team is created GH adds the user who ran the GH action to the team
@@ -113,11 +112,10 @@ class Repository:
 
         return temp_name.lower()
 
-    def get_existing_teams(self):
-        teams = self.github_service.get_repository_teams(self.name)
+    def get_existing_teams(self, config: Config):
         self.teams = [
-            Team(self.github_service, team_name.lower())
-            for team_name in teams
+            Team(team)
+            for team in self.github_service.get_repository_teams(self.name)
             # ignore teams in the ignore list
-            if team_name.lower() not in self.config.ignore_teams
+            if team.name.lower() not in config.ignore_teams
         ]

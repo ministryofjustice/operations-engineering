@@ -1,18 +1,16 @@
-from python.services.github_service import GithubService
-from python.lib.helpers import Helpers
-
+from github import Team
 
 class Team:
     """A struct to store team info ie name, users, repos, GH ID"""
 
-    def __init__(self, github_service: GithubService, name: str):
-        self.helpers = Helpers(github_service)
-        self.name = name.lower()
-        self.users_usernames = self.helpers.fetch_team_users_usernames(
-            self.name)
-        self.repositories_and_permissions = self.helpers.fetch_team_repositories_and_permissions(
-            self.name)
-        self.id = self.helpers.get_team_id_from_team_name(self.name)
+    def __init__(self, team: Team):
+        self.name = team.name.lower()
+        self.users_usernames = [
+            member.login.lower()
+            for member in team.get_members()
+        ]
+        self.repository_permission = team.permission
+        self.id = team.id
 
     def add_new_team_user(self, user_username: str):
         self.users_usernames.append(user_username)
