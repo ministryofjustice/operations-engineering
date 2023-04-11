@@ -71,8 +71,7 @@ class Organisation:
     def __fetch_repository_info(self) -> list[tuple]:
         repositories = []
 
-        for repo_type in ["public"]:
-        # for repo_type in ["public", "private", "internal"]:
+        for repo_type in ["public", "private", "internal"]:
             after_cursor = None
             has_next_page = True
             while has_next_page:
