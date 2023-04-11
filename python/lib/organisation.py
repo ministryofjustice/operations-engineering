@@ -25,7 +25,7 @@ class Organisation:
         self.outside_collaborators = self.github_service.get_outside_collaborators_login_names()
         self.repositories = []
         self.repositories_with_direct_users = []
-        self.ops_eng_team_user_usernames = self.github_service.get_a_team_user_usernames(
+        self.ops_eng_team_user_usernames = self.github_service.get_a_team_usernames(
             self.constants.operations_engineering_team_name)
         self.__fetch_repositories()
         self.__create_repositories_with_direct_users()
@@ -43,6 +43,7 @@ class Organisation:
             direct_users = self.github_service.get_repository_direct_users(
                 repository[self.constants.username])
 
+            # Remove users who are outside collaborators
             if len(direct_users) > 0:
                 direct_users[:] = [
                     user
@@ -51,7 +52,6 @@ class Organisation:
                 ]
 
                 if len(direct_users) > 0:
-                    # if direct_users.totalCount != 0:
                     self.repositories_with_direct_users.append(
                         Repository(
                             self.github_service,

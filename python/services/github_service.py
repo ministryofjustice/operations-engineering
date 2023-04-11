@@ -423,7 +423,7 @@ class GithubService:
         return [member.login.lower() for member in users]
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_a_team_user_usernames(self, team_name: str) -> list[str]:
+    def get_a_team_usernames(self, team_name: str) -> list[str]:
         members = self.github_client_core_api.get_organization(
             self.organisation_name).get_team_by_slug(team_name).get_members() or []
         return [member.login.lower() for member in members]
