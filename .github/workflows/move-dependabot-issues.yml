@@ -2,7 +2,7 @@ name: Move all dependabot issues to "Refined and Ready"
 on:
   workflow_dispatch:
   schedule:
-    - cron: "* */12 * * 1-5" # Every 12 hours, Monday through Friday
+    - cron: "15 9 * * mon-fri" # weekdays at 0915. Dependabot runs at 0900.
 
 jobs:
   run-script:
