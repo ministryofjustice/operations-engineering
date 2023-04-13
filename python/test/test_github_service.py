@@ -512,6 +512,7 @@ class TestGithubServiceGetTeamIdFromTeamName(unittest.TestCase):
             call.execute().__getitem__().__getitem__().__getitem__('databaseId')
         ])
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
