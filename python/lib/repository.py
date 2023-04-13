@@ -1,21 +1,33 @@
 import logging
 from python.services.github_service import GithubService
-from python.lib.constants import Constants
-from python.lib.config import Config
-from python.lib.team import Team
-
+from github import Team
 
 class Repository:
     """The repository class"""
 
+    class RepositoryTeam:
+        """A struct to store team info ie name, users, repos, GH ID"""
+
+        def __init__(self, team: Team):
+            self.name = team.name.lower()
+            self.users_usernames = [
+                member.login.lower()
+                for member in team.get_members()
+            ]
+            self.repository_permission = team.permission
+            self.id = team.id
+
+        def add_new_team_user(self, user_username: str):
+            self.users_usernames.append(user_username)
+
     def __init__(self, github_service: GithubService, name: str,
-                 issue_section_status: bool, users_with_direct_access: list[(str, str)], ops_eng_team_user_names: list[str]):
-        self.constants = Constants()
+                 issue_section_status: bool, users_with_direct_access: list[(str, str)], ops_eng_team_user_names: list[str], ignore_teams: list):
         self.github_service = github_service
         self.name = name.lower()
         self.issue_section_enabled = issue_section_status
         self.ops_eng_team_user_names = ops_eng_team_user_names
         self.direct_users = users_with_direct_access
+        self.ignore_teams = ignore_teams
         self.teams = []
 
     def is_new_team_needed(self, permission: str) -> bool:
@@ -45,7 +57,7 @@ class Repository:
                     # Create and store a Team object locally
                     for team in self.github_service.get_repository_teams(self.name):
                         if team.name == team_name:
-                            self.teams.append(Team(team))
+                            self.teams.append(RepositoryTeam(team))
 
     def put_direct_users_into_teams(self):
         for direct_user_username in self.direct_users:
@@ -112,10 +124,17 @@ class Repository:
 
         return temp_name.lower()
 
-    def get_existing_teams(self, config: Config):
+    def get_existing_teams(self, ignore_teams: list):
         self.teams = [
-            Team(team)
+            RepositoryTeam(team)
             for team in self.github_service.get_repository_teams(self.name)
             # ignore teams in the ignore list
-            if team.name.lower() not in config.ignore_teams
+            if team.name.lower() not in ignore_teams
         ]
+
+    def move_direct_users_to_teams():
+        self.get_existing_teams()
+        self.ensure_repository_teams_exists()
+        self.put_direct_users_into_teams()
+        self.create_repo_issues_for_direct_users()
+        self.remove_direct_users_access()
