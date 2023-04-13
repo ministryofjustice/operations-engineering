@@ -1,0 +1,40 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Respond to expired certificates
+last_reviewed_on: 2023-04-05
+review_in: 3 months
+---
+
+# Respond to expired/expiring certificates
+
+This document describes how to respond to expired certificates, or certificates about to expire.
+
+A certificate in this instance is a TLS certificate, created and managed using either [Gandi](https://www.gandi.net/) or [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/).
+
+## How will I know if a certificate is about to expire?
+
+Certificates that are about to expire will be flagged in the [Certificate Alerts Google Group](https://groups.google.com/a/digital.justice.gov.uk/g/certificate_alerts).
+
+The message will appear in the following format:
+
+```
+Certificate for [domain] is about to expire. Please renew it.
+```
+
+## What actions do I take?
+
+### Gandi
+
+If the certificate is managed by Gandi, you should follow the [Renew a Gandi certificate](../dns/manual-ssl-certificate-processes.html#renewing-an-expiring-certificate-via-gandi-net)
+
+### AWS Certificate Manager
+
+This should be an automated process, and no action should be required.
+
+## What if I don't know what to do?
+
+If you're not sure what to do, or you're not sure if the certificate is managed by Gandi or AWS, you should ask the team in the #operations-engineering Slack channel.
+
+## What if I don't have access to Gandi or AWS?
+
+If you don't have access to Gandi or AWS, you should ask the team in the #operations-engineering Slack channel.

@@ -82,6 +82,7 @@ jobs:
           tar -xvf artifact.tar
           npm install linkinator
           npx linkinator . --recurse --markdown \
+            --skip https://groups.google.com/* \
             --skip https://github.com/ministryofjustice/dns \
             --skip https://github.com/ministryofjustice/moj-ip-addresses \
             --skip https://github.com/ministryofjustice/mta-sts \
