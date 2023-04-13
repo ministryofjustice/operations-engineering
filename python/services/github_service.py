@@ -251,12 +251,14 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_repository_teams(self, repository_name: str) -> list:
-        teams = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository_name}").get_teams() or []
+        teams = self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}").get_teams() or []
         return teams
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_repository_direct_users(self, repository_name: str) -> list:
-        users = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
+        users = self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
         return [member.login.lower() for member in users]
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -267,7 +269,7 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
-                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+                                                    page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
             f"Getting paginated list of repositories per type {repo_type}. Page size {page_size}, after cursor {bool(after_cursor)}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
@@ -302,6 +304,6 @@ class GithubService:
                 }
             }
         """)
-        variable_values={"the_query": the_query, "page_size": page_size,
-                               "after_cursor": after_cursor}
+        variable_values = {"the_query": the_query, "page_size": page_size,
+                           "after_cursor": after_cursor}
         return self.github_client_gql_api.execute(query, variable_values)

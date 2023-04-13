@@ -18,7 +18,7 @@ jobs:
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
           ORG_NAME: "ministryofjustice"
-          CONFIG_FILE: "move-users-to-teams-moj-org-config.yml"
+          CONFIG_FILE: "config/move-users-to-teams-moj-org-config.yml"
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

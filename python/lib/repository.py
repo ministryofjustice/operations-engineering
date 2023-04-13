@@ -2,6 +2,7 @@ import logging
 from python.services.github_service import GithubService
 from github import Team
 
+
 class Repository:
     """The repository class"""
 
@@ -44,7 +45,8 @@ class Repository:
             exists and if not create a new team for the repository
         """
         for direct_user_username in self.direct_users:
-            permission = self.github_service.get_user_permission_for_repository(direct_user_username, self.name)
+            permission = self.github_service.get_user_permission_for_repository(
+                direct_user_username, self.name)
             if self.is_new_team_needed(permission):
                 team_name = self.form_team_name(permission)
                 # Create a team on GitHub
@@ -62,14 +64,16 @@ class Repository:
     def put_direct_users_into_teams(self):
         for direct_user_username in self.direct_users:
             for team in self.teams:
-                permission = self.github_service.get_user_permission_for_repository(direct_user_username, self.name)
+                permission = self.github_service.get_user_permission_for_repository(
+                    direct_user_username, self.name)
                 expected_team_name = self.form_team_name(permission)
                 if team.name == expected_team_name:
                     if len(team.users_usernames) == 0 or permission == "admin":
                         self.github_service.add_user_to_team_as_maintainer(
                             direct_user_username, team.id)
                     else:
-                        self.github_service.add_user_to_team(direct_user_username, team.id)
+                        self.github_service.add_user_to_team(
+                            direct_user_username, team.id)
                     team.add_new_team_user(direct_user_username)
                     break
 

@@ -27,7 +27,8 @@ class Organisation:
 
         self.outside_collaborators = self.github_service.get_outside_collaborators_login_names()
 
-        self.ops_eng_team_user_usernames = self.github_service.get_a_team_usernames("operations-engineering")
+        self.ops_eng_team_user_usernames = self.github_service.get_a_team_usernames(
+            "operations-engineering")
 
         # A list of tuples containing pre info for the repository objects
         self.repositories = []
@@ -39,12 +40,18 @@ class Organisation:
 
     def __load_config(self):
         config_file = os.getenv("CONFIG_FILE")
-        if config_file == "" or config_file is None:
+        if not config_file:
             raise ValueError(
-                "The env variable CONFIG_FILE is empty or missing")
+                "The env variable CONFIG_FILE is empty or missing"
+            )
 
-        configs = parse_config(
-            f"{os.path.dirname(os.path.realpath(__file__))}/../config/{config_file}")
+        config_file_path = f"{os.path.dirname(os.path.realpath(__file__))}/../{config_file}"
+        if not os.path.exists(config_file_path):
+            raise ValueError(
+                "Cannot find the config file"
+            )
+
+        configs = parse_config(config_file_path)
 
         if configs["badly_named_repositories"] is not None:
             self.badly_named_repositories = [
@@ -68,7 +75,8 @@ class Organisation:
 
     def __create_repositories_with_direct_users(self):
         for repository in self.repositories:
-            users_with_direct_access = self.__fetch_users_with_direct_access(repository)
+            users_with_direct_access = self.__fetch_users_with_direct_access(
+                repository)
             if len(users_with_direct_access) > 0:
                 self.repositories_with_direct_users.append(
                     Repository(
@@ -101,7 +109,8 @@ class Organisation:
             after_cursor = None
             has_next_page = True
             while has_next_page:
-                data = self.github_service.get_paginated_list_of_repositories_per_type(repo_type, after_cursor)
+                data = self.github_service.get_paginated_list_of_repositories_per_type(
+                    repo_type, after_cursor)
 
                 for repository in data["search"]["repos"]:
                     if not (
