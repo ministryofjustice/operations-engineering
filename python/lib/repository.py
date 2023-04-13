@@ -88,8 +88,7 @@ class Repository:
 
     def remove_direct_users_access(self):
         for direct_user_username in self.direct_users:
-            self.github_service.remove_user_from_repository(
-                udirect_user_usernamesername, self.name)
+            self.github_service.remove_user_from_repository(direct_user_username, self.name)
 
     def remove_operations_engineering_team_users_from_team(self, team_id: int):
         """When team is created GH adds the user who ran the GH action to the team
@@ -136,7 +135,7 @@ class Repository:
             if team.name.lower() not in ignore_teams
         ]
 
-    def move_direct_users_to_teams():
+    def move_direct_users_to_teams(self):
         self.get_existing_teams()
         self.ensure_repository_teams_exists()
         self.put_direct_users_into_teams()
