@@ -1,25 +1,29 @@
-import logging
-from python.services.github_service import GithubService
 from github import Team
+from python.services.github_service import GithubService
+
+
+class RepositoryTeam:
+    """A struct to store team info ie name, users, repos, GH ID"""
+
+    def __init__(self, team: Team):
+        self.name = team.name.lower()
+        self.users_usernames = [
+            member.login.lower()
+            for member in team.get_members()
+        ]
+        self.repository_permission = team.permission
+        self.id = team.id
+
+    def add_new_team_user(self, user_username: str):
+        self.users_usernames.append(user_username)
 
 
 class Repository:
     """The repository class"""
 
-    class RepositoryTeam:
-        """A struct to store team info ie name, users, repos, GH ID"""
-
-        def __init__(self, team: Team):
-            self.name = team.name.lower()
-            self.users_usernames = [
-                member.login.lower()
-                for member in team.get_members()
-            ]
-            self.repository_permission = team.permission
-            self.id = team.id
-
-        def add_new_team_user(self, user_username: str):
-            self.users_usernames.append(user_username)
+    # Added this function to fix error in command: python3 -m unittest discover python/test -v
+    def __new__(cls, *_, **__):
+        return super(Repository, cls).__new__(cls)
 
     def __init__(self, github_service: GithubService, name: str,
                  issue_section_status: bool, users_with_direct_access: list[(str, str)], ops_eng_team_user_names: list[str], ignore_teams: list):
@@ -59,7 +63,10 @@ class Repository:
                     # Create and store a Team object locally
                     for team in self.github_service.get_repository_teams(self.name):
                         if team.name == team_name:
-                            self.teams.append(RepositoryTeam(team))
+                            self.add_team(team)
+
+    def add_team(self, team):
+        self.teams.append(RepositoryTeam(team))
 
     def put_direct_users_into_teams(self):
         for direct_user_username in self.direct_users:
@@ -88,7 +95,8 @@ class Repository:
 
     def remove_direct_users_access(self):
         for direct_user_username in self.direct_users:
-            self.github_service.remove_user_from_repository(direct_user_username, self.name)
+            self.github_service.remove_user_from_repository(
+                direct_user_username, self.name)
 
     def remove_operations_engineering_team_users_from_team(self, team_id: int):
         """When team is created GH adds the user who ran the GH action to the team
@@ -118,21 +126,19 @@ class Repository:
         temp_name = temp_name.replace(" ", "-")
         temp_name = temp_name.replace("---", "-")
         temp_name = temp_name.replace("--", "-")
+        temp_name = temp_name.replace("--", "-")
 
         if temp_name.startswith(".") or temp_name.startswith("-"):
             temp_name = temp_name[1:]
 
-        if temp_name.endswith(".") or temp_name.endswith("-"):
-            temp_name = temp_name[:-1]
-
         return temp_name.lower()
 
-    def get_existing_teams(self, ignore_teams: list):
+    def get_existing_teams(self):
         self.teams = [
             RepositoryTeam(team)
             for team in self.github_service.get_repository_teams(self.name)
             # ignore teams in the ignore list
-            if team.name.lower() not in ignore_teams
+            if team.name.lower() not in self.ignore_teams
         ]
 
     def move_direct_users_to_teams(self):

@@ -1,5 +1,4 @@
 import os
-import logging
 from pyaml_env import parse_config
 
 from python.services.github_service import GithubService

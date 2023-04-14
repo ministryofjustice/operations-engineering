@@ -1,11 +1,9 @@
 import os
-import json
 import unittest
 from unittest.mock import MagicMock, patch, call
 
 from python.services.github_service import GithubService
 from python.lib.organisation import Organisation
-from python.lib.repository import Repository
 
 
 class TestOrganisation1(unittest.TestCase):
@@ -246,14 +244,12 @@ class TestOrganisation4(unittest.TestCase):
         self.mock_github_service.get_repository_direct_users.return_value = [
             "user1"]
 
-    @patch("python.lib.repository.Repository.__new__")
-    def test_create_repo_object(self, mock_repository):
+    def test_create_repo_object(self):
         org = Organisation(self.mock_github_service, "some-org")
         # Creates three repo's x1 public, x1 private and x1 internal
         self.assertEqual(len(org.repositories_with_direct_users), 3)
 
-    @patch("python.lib.repository.Repository.__new__")
-    def test_call_close_expired_issues(self, mock_repository):
+    def test_call_close_expired_issues(self):
         org = Organisation(self.mock_github_service, "some-org")
         org.close_expired_issues()
         self.mock_github_service.close_expired_issues.assert_has_calls(
