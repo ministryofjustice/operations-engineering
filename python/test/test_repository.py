@@ -323,6 +323,45 @@ class TestRepository4(unittest.TestCase):
         self.repo.get_existing_teams()
         self.assertEqual(len(self.repo.teams), 1)
 
+    def test_do_not_remove_user_when_no_teams_exists(self):
+        self.assertEqual(len(self.repo.direct_users), 1)
+        self.repo.remove_users_already_in_existing_teams()
+        self.assertEqual(len(self.repo.direct_users), 1)
+
+    @patch("github.Team")
+    def test_do_not_remove_user_when_teams_exist_but_user_isnt_in_team(self, mock_github_team):
+        mock_github_team.name = "some-repo-maintain-team"
+        self.mock_github_service.get_repository_teams.return_value = [
+            mock_github_team]
+        self.repo.get_existing_teams()
+        self.assertEqual(len(self.repo.direct_users), 1)
+        self.repo.remove_users_already_in_existing_teams()
+        self.assertEqual(len(self.repo.direct_users), 1)
+
+    @patch("python.lib.repository.RepositoryTeam")
+    def test_do_not_remove_user_when_teams_exist_but_user_permission_doesnt_match_the_team(self, mock_repository_team):
+        mock_repository_team.name = "other-team"
+        mock_repository_team.users_usernames = ["user1"]
+        mock_repository_team.permission = "write"
+        self.repo.teams.append(mock_repository_team)
+        self.assertEqual(len(self.repo.direct_users), 1)
+        self.repo.remove_users_already_in_existing_teams()
+        self.assertEqual(len(self.repo.direct_users), 1)
+
+    @patch("python.lib.repository.RepositoryTeam")
+    def test_remove_user_when_teams_exist_and_user_permission_matches_the_team(self, mock_repository_team):
+        mock_repository_team.name = "other-team"
+        mock_repository_team.users_usernames = ["user1"]
+        mock_repository_team.repository_permission = "read"
+        self.repo.teams.append(mock_repository_team)
+        self.assertEqual(len(self.repo.direct_users), 1)
+        self.repo.remove_users_already_in_existing_teams()
+        self.assertEqual(len(self.repo.direct_users), 0)
+        self.mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_called_once_with(
+            "user1", "some-repo")
+        self.mock_github_service.remove_user_from_repository.assert_called_once_with(
+            "user1", "some-repo")
+
 
 class TestRepository5(unittest.TestCase):
 

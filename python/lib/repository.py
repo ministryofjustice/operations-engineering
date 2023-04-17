@@ -26,7 +26,7 @@ class Repository:
         return super(Repository, cls).__new__(cls)
 
     def __init__(self, github_service: GithubService, name: str,
-                 issue_section_status: bool, users_with_direct_access: list[(str, str)], ops_eng_team_user_names: list[str], ignore_teams: list):
+                 issue_section_status: bool, users_with_direct_access: list[str], ops_eng_team_user_names: list[str], ignore_teams: list):
         self.github_service = github_service
         self.name = name.lower()
         self.issue_section_enabled = issue_section_status
@@ -34,6 +34,7 @@ class Repository:
         self.direct_users = users_with_direct_access
         self.ignore_teams = ignore_teams
         self.teams = []
+        self.get_existing_teams()
 
     def is_new_team_needed(self, permission: str) -> bool:
         new_team_required = True
@@ -141,9 +142,30 @@ class Repository:
             if team.name.lower() not in self.ignore_teams
         ]
 
-    def move_direct_users_to_teams(self):
-        self.get_existing_teams()
+    def remove_users_already_in_existing_teams(self):
+        removed_users = []
+        for team in self.teams:
+            for direct_user_username in self.direct_users:
+                if direct_user_username in team.users_usernames:
+                    permission = self.github_service.get_user_permission_for_repository(direct_user_username, self.name)
+                    if permission == team.repository_permission:
+                        self.github_service.create_an_access_removed_issue_for_user_in_repository(direct_user_username, self.name)
+                        self.github_service.remove_user_from_repository(direct_user_username, self.name)
+                        removed_users.append(direct_user_username)
+
+        self.direct_users[:] = [
+            direct_user
+            for direct_user in self.direct_users
+            if direct_user not in removed_users
+        ]
+
+
+    def move_remaining_users_to_new_teams(self):
         self.ensure_repository_teams_exists()
         self.put_direct_users_into_teams()
         self.create_repo_issues_for_direct_users()
         self.remove_direct_users_access()
+
+    def move_direct_users_to_teams(self):
+        self.remove_users_already_in_existing_teams()
+        self.move_remaining_users_to_new_teams()
