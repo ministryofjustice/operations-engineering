@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Gandi.net SSL Certificates
-last_reviewed_on: 2023-02-02
+last_reviewed_on: 2023-04-17
 review_in: 3 months
 ---
 
@@ -21,35 +21,11 @@ Where at all practicable we should utilise [automated certificate management](ht
 
 The MoJ Hosting Service is looking at strategy to move consumers to modern certificate management solutions.
 
-## Gandi SSL Certificate Process
-
-This process specifically relates to [Standard](https://docs.gandi.net/en/ssl/description/standard.html#standard-certificates) certificates issued through [Gandi.net]
-
-1. Gandi send an email notification to the Operations-Engineering team one month prior to the SSL certificate expiry date.
-
-2. The Operations-Engineering team will attempt to contact the SSL certificate responsible person/team. The first point of call is to check the emails from the previous year when the SSL certificate was generated.
-
-3. The Operations-Engineering team will ask for a Certificate Signing Request (CSR).
-
-4. The person/team provide a CSR to the Operations-Engineering team.
-
-5. The Operations-Engineering team will create or renew a SSL certificate in the Gandi portal.
-
-6. Gandi will send an email to the Operations-Engineering team containing a CNAME entry. A CNAME is an alias to a record in a DNS registry.
-
-7. The Operations-Engineering team will add the CNAME entry in AWS Route53 for the hosted zones / domains they are responsible for, or the Operations-Engineering team will email the CNAME entry to the responsible person/team and they will manually add it to their DNS.
-
-8. Gandi will attempt to verify the CNAME against the CSR and once completed send the new SSL Certificate via email to the Operations-Engineering team.
-
-9. The Operations-Engineering team will send the new SSL Certificate via email to the responsible person/team.
-
-10. The person/team manually add the new SSL certificate to their DNS, or share the SSL certificate with a third party.
-
-**The Operations-Engineering team do not handle any pass-phrases or keys regarding the CSR or SSL certificates.**
-
 ## Requesting a new certificate via Gandi.net
 
 Complete the [MoJ Hosting Service SSL Certificate Request Form](https://docs.google.com/document/d/14XbWoudZd-t4-J3mDBcrAeafAbqxwvdkV-u3Zf8eLOs/edit?usp=sharing) and return it with the [Certificate Signing Request (CSR)](https://docs.gandi.net/en/ssl/common_operations/csr.html#generate-csr) (and an authority email approval if not an MoJ employee e.g. 3rd party supplier) to [certificates@digital.justice.gov.uk](mailto:certificates@digital.justice.gov.uk).
+
+**The Operations-Engineering team do not handle any pass-phrases or keys regarding the CSR or SSL certificates. Please do not send any private keys with your request.**
 
 The Operations Engineering Team will create the new certificate and issue it, along with details of the expiry date (which will be in 12 months from date created), to the named contact provided in the request form.
 
