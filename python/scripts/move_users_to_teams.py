@@ -3,6 +3,7 @@ import os
 from python.lib.organisation import Organisation
 from python.services.github_service import GithubService
 
+
 def main():
     print("Start")
 
