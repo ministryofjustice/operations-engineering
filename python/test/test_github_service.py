@@ -645,6 +645,7 @@ class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
 
         self.assertEqual(issues, [])
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -793,6 +794,7 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         self.assertRaises(
             ValueError, github_service.get_paginated_list_of_repositories_per_type, "public", "test_after_cursor", 101)
+
 
 class MockGithubIssue(MagicMock):
     def __init__(self, id, number, title, assignees, label):
