@@ -793,7 +793,7 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         self.assertRaises(
             ValueError, github_service.get_paginated_list_of_repositories_per_type, "public", "test_after_cursor", 101)
-        
+
 class MockGithubIssue(MagicMock):
     def __init__(self, id, number, title, assignees, label):
         mock_label = MagicMock(name="test_support_label")

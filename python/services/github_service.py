@@ -143,9 +143,11 @@ class GithubService:
             assignee=user_name,
             body=dedent(f"""
         Hi there
-            
+
         The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
-     
+
+        Access is now only via a team.
+
         If the user was already in a team, then their direct access to the repository has been removed.
 
         If the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.
@@ -469,4 +471,3 @@ class GithubService:
         variable_values = {"the_query": the_query, "page_size": page_size,
                            "after_cursor": after_cursor}
         return self.github_client_gql_api.execute(query, variable_values)
-        
