@@ -66,7 +66,7 @@ class GithubService:
         logging.info("Getting Outside Collaborators Login Names")
         outside_collaborators = self.github_client_core_api.get_organization(
             self.organisation_name).get_outside_collaborators() or []
-        return [outside_collaborator.login for outside_collaborator in outside_collaborators]
+        return [outside_collaborator.login.lower() for outside_collaborator in outside_collaborators]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def close_expired_issues(self, repository_name: str) -> None:
@@ -143,15 +143,25 @@ class GithubService:
             assignee=user_name,
             body=dedent(f"""
         Hi there
-            
-        The user {user_name} had Direct Member access to this repository and access via a team.
-             
+
+        The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
+
         Access is now only via a team.
-             
-        You may have less access it is dependant upon the teams access to the repo.
-                   
-        If you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
-            
+
+        If the user was already in a team, then their direct access to the repository has been removed.
+
+        If the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.
+
+        The list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.
+
+        The user will have the same level of access to the repository via the team.
+
+        The first user added to a team is made a team maintainer, this enables that user to manage the users within the team.
+
+        Users with admin access are added to the admin team as a team maintainer.
+
+        If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
+
         This issue can be closed.
         """).strip("\n")
         )
@@ -395,3 +405,69 @@ class GithubService:
             "page_size": page_size,
             "after_cursor": after_cursor
         })
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def add_user_to_team_as_maintainer(self, user_name: str, team_id: int) -> None:
+        logging.info(f"Making user {user_name} a maintainer in team {team_id}")
+        user = self.github_client_core_api.get_user(user_name)
+        self.github_client_core_api.get_organization(
+            self.organisation_name).get_team(team_id).add_membership(user, "maintainer")
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repository_teams(self, repository_name: str) -> list:
+        teams = self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}").get_teams() or []
+        return teams
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repository_direct_users(self, repository_name: str) -> list:
+        users = self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
+        return [member.login.lower() for member in users]
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_a_team_usernames(self, team_name: str) -> list[str]:
+        members = self.github_client_core_api.get_organization(
+            self.organisation_name).get_team_by_slug(team_name).get_members() or []
+        return [member.login.lower() for member in members]
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
+                                                    page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated list of repositories per type {repo_type}. Page size {page_size}, after cursor {bool(after_cursor)}")
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        the_query = f"org:{self.organisation_name}, archived:false, is:{repo_type}"
+        query = gql("""
+            query($page_size: Int!, $after_cursor: String, $the_query: String!) {
+                search(
+                    type: REPOSITORY
+                    query: $the_query
+                    first: $page_size
+                    after: $after_cursor
+                ) {
+                repos: edges {
+                    repo: node {
+                        ... on Repository {
+                                name
+                                isDisabled
+                                isLocked
+                                hasIssuesEnabled
+                                collaborators(affiliation: DIRECT) {
+                                    totalCount
+                                }
+                            }
+                        }
+                    }
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                }
+            }
+        """)
+        variable_values = {"the_query": the_query, "page_size": page_size,
+                           "after_cursor": after_cursor}
+        return self.github_client_gql_api.execute(query, variable_values)
