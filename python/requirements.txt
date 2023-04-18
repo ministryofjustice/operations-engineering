@@ -5,6 +5,7 @@ gql
 aiohttp
 slack_sdk == 3.20.2
 freezegun==1.2.2
+pyaml-env
 jwt
 cryptography
 coverage
