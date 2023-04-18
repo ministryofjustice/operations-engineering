@@ -23,6 +23,8 @@ class Organisation:
         self.ops_eng_team_user_usernames = self.github_service.get_a_team_usernames(
             "operations-engineering")
 
+        self.outside_collaborators = self.github_service.get_outside_collaborators_login_names()
+
         # A list of tuples containing pre info for the repository objects
         self.repositories = []
         self.__fetch_repositories()
@@ -85,15 +87,13 @@ class Organisation:
 
     def __fetch_users_with_direct_access(self, repository: tuple):
         users_with_direct_access = []
-        outside_collaborators = self.github_service.get_outside_collaborators_login_names()
-
         number_of_direct_users = 2
         if repository[number_of_direct_users] > 0:
             # Remove users who are outside collaborators
             users_with_direct_access = [
                 user
                 for user in self.github_service.get_repository_direct_users(repository[self.repository_name])
-                if user not in outside_collaborators
+                if user not in self.outside_collaborators
             ]
 
         return users_with_direct_access
