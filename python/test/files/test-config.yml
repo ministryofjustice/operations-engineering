@@ -1,4 +1,4 @@
 ignore_teams:
-      - ignoreteam1
+  - ignoreteam1
 badly_named_repositories:
-      - "repo1234"
+  - "repo1234"

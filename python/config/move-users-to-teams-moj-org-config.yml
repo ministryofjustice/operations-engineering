@@ -1,4 +1,4 @@
 ignore_teams:
-      - organisation-security-auditor
+  - organisation-security-auditor
 badly_named_repositories:
-      - "https---github.com-ministryofjustice-hmpps-incentives-tool"
+  - "https---github.com-ministryofjustice-hmpps-incentives-tool"
