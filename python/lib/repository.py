@@ -3,8 +3,6 @@ from python.services.github_service import GithubService
 
 
 class RepositoryTeam:
-    """A struct to store team info ie name, users, repos, GH ID"""
-
     def __init__(self, team: Team):
         self.name = team.name.lower()
         self.users_usernames = [
@@ -14,13 +12,8 @@ class RepositoryTeam:
         self.repository_permission = team.permission
         self.id = team.id
 
-    def add_new_team_user(self, user_username: str):
-        self.users_usernames.append(user_username)
-
 
 class Repository:
-    """The repository class"""
-
     # Added this function to fix error in command: python3 -m unittest discover python/test -v
     def __new__(cls, *_, **__):
         return super(Repository, cls).__new__(cls)
@@ -47,7 +40,7 @@ class Repository:
 
     def ensure_repository_teams_exists(self):
         """ Check if a automated team with the required permission already
-            exists and if not create a new team for the repository
+            exists and if not creates a new team for the repository
         """
         for direct_user_username in self.direct_users:
             permission = self.github_service.get_user_permission_for_repository(
@@ -82,13 +75,9 @@ class Repository:
                     else:
                         self.github_service.add_user_to_team(
                             direct_user_username, team.id)
-                    team.add_new_team_user(direct_user_username)
                     break
 
     def create_repo_issues_for_direct_users(self):
-        """Raise an issue to say the user has been removed and
-            that access via the team
-        """
         for direct_user_username in self.direct_users:
             if self.issue_section_enabled:
                 self.github_service.create_an_access_removed_issue_for_user_in_repository(
@@ -115,11 +104,8 @@ class Repository:
         return team_id
 
     def form_team_name(self, users_permission: str) -> str:
-        """GH team names use a slug name. This swaps ., _, , with a - and
-        then lower cases the team name
-
-        Returns:
-            string: converted team name
+        """ GH team names use a slug name. This swaps ., _, , with
+            a - and then lower cases the team name
         """
         temp_name = self.name + "-" + users_permission + "-team"
         temp_name = temp_name.replace(".", "-")

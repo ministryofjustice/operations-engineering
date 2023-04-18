@@ -1,15 +1,7 @@
 import os
-import logging
 
 from python.lib.organisation import Organisation
 from python.services.github_service import GithubService
-
-logging.basicConfig(
-    format="%(asctime)s %(levelname)-8s %(message)s",
-    level=logging.WARNING,
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
 
 def main():
     print("Start")

@@ -148,7 +148,9 @@ class GithubService:
 
         Access is now only via a team.
 
-        The user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team.
+        If the user was already in a team, then their direct access to the repository has been removed.
+
+        If the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.
 
         The list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.
 

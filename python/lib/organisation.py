@@ -6,16 +6,12 @@ from python.lib.repository import Repository
 
 
 class Organisation:
-    """The Organisation info contains the repositories, collaborators and teams"""
-
     # Added this function to fix error in command: python3 -m unittest discover python/test -v
     def __new__(cls, *_, **__):
         return super(Organisation, cls).__new__(cls)
 
     def __init__(self, github_service: GithubService, org_name: str):
         self.repository_name = 0
-        self.issue_section_enabled = 1
-        self.number_of_direct_users = 2
 
         self.ignore_teams = []
         self.badly_named_repositories = []
@@ -71,6 +67,7 @@ class Organisation:
         ]
 
     def __create_repositories_with_direct_users(self):
+        issue_section_enabled = 1
         for repository in self.repositories:
             users_with_direct_access = self.__fetch_users_with_direct_access(
                 repository)
@@ -79,7 +76,7 @@ class Organisation:
                     Repository(
                         self.github_service,
                         repository[self.repository_name].lower(),
-                        repository[self.issue_section_enabled],
+                        repository[issue_section_enabled],
                         users_with_direct_access,
                         self.ops_eng_team_user_usernames,
                         self.ignore_teams
@@ -90,7 +87,8 @@ class Organisation:
         users_with_direct_access = []
         outside_collaborators = self.github_service.get_outside_collaborators_login_names()
 
-        if repository[self.number_of_direct_users] > 0:
+        number_of_direct_users = 2
+        if repository[number_of_direct_users] > 0:
             # Remove users who are outside collaborators
             users_with_direct_access = [
                 user
