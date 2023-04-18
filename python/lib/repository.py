@@ -147,10 +147,13 @@ class Repository:
         for team in self.teams:
             for direct_user_username in self.direct_users:
                 if direct_user_username in team.users_usernames:
-                    permission = self.github_service.get_user_permission_for_repository(direct_user_username, self.name)
+                    permission = self.github_service.get_user_permission_for_repository(
+                        direct_user_username, self.name)
                     if permission == team.repository_permission:
-                        self.github_service.create_an_access_removed_issue_for_user_in_repository(direct_user_username, self.name)
-                        self.github_service.remove_user_from_repository(direct_user_username, self.name)
+                        self.github_service.create_an_access_removed_issue_for_user_in_repository(
+                            direct_user_username, self.name)
+                        self.github_service.remove_user_from_repository(
+                            direct_user_username, self.name)
                         removed_users.append(direct_user_username)
 
         self.direct_users[:] = [
@@ -158,7 +161,6 @@ class Repository:
             for direct_user in self.direct_users
             if direct_user not in removed_users
         ]
-
 
     def move_remaining_users_to_new_teams(self):
         self.ensure_repository_teams_exists()

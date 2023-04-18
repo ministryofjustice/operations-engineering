@@ -264,14 +264,12 @@ class TestOrganisation4(unittest.TestCase):
     def test_call_move_users_to_teams(self, mock_repository):
         org = Organisation(self.mock_github_service, "some-org")
         org.move_users_to_teams()
-        mock_repository.move_direct_users_to_teams.assert_has_calls
-        (
-            [
-                call(),
-                call(),
-                call()
-            ]
-        )
+        for repository in org.repositories_with_direct_users:
+            repository.move_direct_users_to_teams.assert_has_calls(
+                [
+                    call()
+                ]
+            )
 
 
 if __name__ == "__main__":
