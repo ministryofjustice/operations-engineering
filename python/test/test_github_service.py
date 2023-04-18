@@ -241,7 +241,7 @@ class TestGithubServiceCreateAnAccessRemovedIssueForUserInRepository(unittest.Te
         github_service.github_client_core_api.get_repo.assert_has_calls(
             [call('moj-analytical-services/test_repository'),
              call().create_issue(title=USER_ACCESS_REMOVED_ISSUE_TITLE, assignee='test_user',
-                                 body='Hi there\n\nThe user test_user had Direct Member access to this repository and access via a team.\n\nAccess is now only via a team.\n\nYou may have less access it is dependant upon the teams access to the repo.\n\nIf you have any questions, please post in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.\n\nThis issue can be closed.')]
+                                 body='Hi there\n\nThe user test_user either had direct member access to the repository or had direct member access and access via a team.\n\nAccess is now only via a team.\n\nIf the user was already in a team, then their direct access to the repository has been removed.\n\nIf the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.\n\nThe list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.\n\nThe user will have the same level of access to the repository via the team.\n\nThe first user added to a team is made a team maintainer, this enables that user to manage the users within the team.\n\nUsers with admin access are added to the admin team as a team maintainer.\n\nIf you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.\n\nThis issue can be closed.')]
 
         )
 
@@ -644,6 +644,156 @@ class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
             [], "test_org/test_repository_name")
 
         self.assertEqual(issues, [])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceMakeUserTeamMaintainer(unittest.TestCase):
+    def test_calls_downstream_services(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_user.return_value = "mock_user"
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.add_user_to_team_as_maintainer("test_user", 1)
+        github_service.github_client_core_api.get_user.assert_has_calls([
+            call('test_user')])
+        github_service.github_client_core_api.get_organization.assert_has_calls([
+            call('moj-analytical-services'),
+            call().get_team(1),
+            call().get_team().add_membership('mock_user', 'maintainer')
+        ])
+
+    def test_throws_exception_when_client_throws_exception(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization = MagicMock(
+            side_effect=ConnectionError)
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ConnectionError, github_service.add_user_to_team_as_maintainer, "test_user", 1)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetRepositoryTeams(unittest.TestCase):
+
+    def test_returns_teams(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_teams.return_value = [
+            Mock(Team),
+            Mock(Team),
+        ]
+        response = GithubService(
+            "", ORGANISATION_NAME).get_repository_teams("some-repo")
+        self.assertEqual(2, len(response))
+
+    def test_calls_downstream_services(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_repository_teams("test_repository")
+        github_service.github_client_core_api.get_repo.assert_has_calls(
+            [call('moj-analytical-services/test_repository').get_teams()])
+
+    def test_returns_empty_list_when_teams_returns_none(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_teams.return_value = None
+        self.assertEqual([], GithubService(
+            "", ORGANISATION_NAME).get_repository_teams("test_repository"))
+
+    def test_returns_exception_when_teams_returns_exception(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo(
+        ).get_teams().side_effect = ConnectionError
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ConnectionError, github_service.get_repository_teams("test_repository"))
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetRepositoryDirectUsers(unittest.TestCase):
+
+    def test_returns_direct_users(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_collaborators.return_value = [
+            Mock(NamedUser),
+            Mock(NamedUser),
+        ]
+        response = GithubService(
+            "", ORGANISATION_NAME).get_repository_direct_users("some-repo")
+        self.assertEqual(2, len(response))
+
+    def test_calls_downstream_services(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_repository_direct_users("test_repository")
+        github_service.github_client_core_api.get_repo.assert_has_calls([
+            call('moj-analytical-services/test_repository'),
+            call().get_collaborators('direct'),
+            call().get_collaborators().__bool__(),
+            call().get_collaborators().__iter__()
+        ])
+
+    def test_returns_empty_list_when_direct_users_returns_none(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo(
+        ).get_collaborators.return_value = None
+        self.assertEqual([], GithubService(
+            "", ORGANISATION_NAME).get_repository_direct_users("test_repository"))
+
+    def test_returns_exception_when_direct_users_returns_exception(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo(
+        ).get_collaborators.side_effect = ConnectionError
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ConnectionError, github_service.get_repository_direct_users, "test_repository")
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetATeamUsernames(unittest.TestCase):
+
+    def test_returns_team_usernames(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization.return_value.get_team_by_slug().get_members.return_value = [
+            Mock(NamedUser),
+            Mock(NamedUser),
+        ]
+        response = GithubService(
+            "", ORGANISATION_NAME).get_a_team_usernames("some-team")
+        self.assertEqual(2, len(response))
+
+    def test_calls_downstream_services(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_a_team_usernames("some-team")
+        github_service.github_client_core_api.get_organization.assert_has_calls([
+            call('moj-analytical-services'),
+            call().get_team_by_slug('some-team'),
+            call().get_team_by_slug().get_members(),
+            call().get_team_by_slug().get_members().__bool__(),
+            call().get_team_by_slug().get_members().__iter__()
+        ])
+
+    def test_returns_empty_list_when_team_usernames_returns_none(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization.return_value.get_team_by_slug(
+        ).get_members.return_value = None
+        self.assertEqual([], GithubService(
+            "", ORGANISATION_NAME).get_a_team_usernames("some-team"))
+
+    def test_returns_exception_when_team_usernames_returns_exception(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization(
+        ).get_team_by_slug().get_members.side_effect = ConnectionError
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ConnectionError, github_service.get_a_team_usernames, "some-team")
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__")
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
+    def test_calls_downstream_services(self, mock_gql_client):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_repositories_per_type(
+            "public", "after_cursor")
+        github_service.github_client_gql_api.execute.assert_called_once()
+
+    def test_throws_value_error_when_page_size_greater_than_limit(self, mock_gql_client):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ValueError, github_service.get_paginated_list_of_repositories_per_type, "public", "test_after_cursor", 101)
 
 
 class MockGithubIssue(MagicMock):
