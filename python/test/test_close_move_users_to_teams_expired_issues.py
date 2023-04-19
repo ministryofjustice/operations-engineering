@@ -21,7 +21,7 @@ class TestCloseMoveUsersToTeamsExpiredIssues1(unittest.TestCase):
 @patch.object(GithubService, "__new__")
 class TestCloseMoveUsersToTeamsExpiredIssues2(unittest.TestCase):
 
-    def test_detect_org_name_env_var_missing(self, mock1, mock2):
+    def test_detect_env_var_missing(self, mock1, mock2):
         self.assertRaises(
             ValueError, close_move_users_to_teams_expired_issues.main)
 
