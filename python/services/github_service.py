@@ -53,6 +53,10 @@ class GithubService:
     GITHUB_GQL_MAX_PAGE_SIZE = 100
     GITHUB_GQL_DEFAULT_PAGE_SIZE = 80
 
+    # Added this function to fix error in command: python3 -m unittest discover python/test -v
+    def __new__(cls, *_, **__):
+        return super(GithubService, cls).__new__(cls)
+
     def __init__(self, org_token: str, organisation_name: str) -> None:
         self.github_client_core_api: Github = Github(org_token)
         self.github_client_gql_api: Client = Client(transport=AIOHTTPTransport(
