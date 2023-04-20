@@ -2,7 +2,7 @@ name: Close the move users to teams expired issues
 
 on:
   schedule:
-    - cron: "0 12 1,8,15,22, * *"
+    - cron: "0 12 1,8,15,22 * *"
   workflow_dispatch:
 
 jobs:
