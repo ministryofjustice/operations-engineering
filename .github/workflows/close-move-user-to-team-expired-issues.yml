@@ -17,6 +17,7 @@ jobs:
       - run: python3 -m python.scripts.close_move_users_to_teams_expired_issues
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          CONFIG_FILE: "config/empty-config.yml"
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
