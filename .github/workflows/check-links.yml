@@ -1,17 +1,27 @@
 name: Check for broken links
 
 on:
+  repository_dispatch:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "source/**"
+  schedule:
+    - cron: "00 18 * * *"
 
 jobs:
-  check_links:
+  linkChecker:
     runs-on: ubuntu-latest
-    container:
-      image: ministryofjustice/tech-docs-github-pages-publisher:v3
     steps:
-      - uses: actions/checkout@v3
-      - name: htmlproofer
-        run: /scripts/check-url-links.sh
+      - uses: actions/checkout@v2
+
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v1.0.9
+        with:
+          args: --verbose --no-progress **/*.md **/*.html **/*.erb --exclude-file .ignore-links --accept 200,429,403,400,301,302 --exclude-mail
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Create Issue From File
+        uses: peter-evans/create-issue-from-file@v3
+        with:
+          title: Link Checker Report
+          content-filepath: ./lychee/out.md
+          labels: documentation
