@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from python.services.github_service import GithubService
+from services.github_service import GithubService
 
 
 def add_arguments():
@@ -48,8 +48,7 @@ def main():
     gh = GithubService(args.oauth_token, args.org)
 
     try:
-        issues = gh.assign_support_issues_to_self(
-            args.repo, args.org, args.tag)
+        issues = gh.assign_support_issues_to_self(args.repo, args.org, args.tag)
     except ValueError as error:
         logging.error(f"Failed to assign issues: {error}")
         raise error
@@ -57,8 +56,15 @@ def main():
     if not issues:
         logging.warning("No issues found, skipping")
     for issue in issues:
-        logging.info(
-            f"Assigned issue {issue.number} to {issue.assignee.login}")
+        logging.info(f"Assigned issue {issue.number} to {issue.assignee.login}")
+
+    for issue in issues:
+        try:
+            name = f"{args.org}/{args.repo}"
+            gh.close_support_tickets(name, issue.number)
+        except ValueError as error:
+            logging.error(f"Failed to close issue {issue.number}: {error}")
+            continue
 
 
 if __name__ == "__main__":

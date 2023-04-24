@@ -30,26 +30,38 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
             return func(*args, **kwargs)
         except (RateLimitExceededException, TransportQueryError) as exception:
             logging.warning(
-                f"Caught {type(exception).__name__}, retrying calls when rate limit resets.")
+                f"Caught {type(exception).__name__}, retrying calls when rate limit resets."
+            )
             rate_limits = args[0].github_client_core_api.get_rate_limit()
-            rate_limit_to_use = rate_limits.core if type(
-                exception) is RateLimitExceededException else rate_limits.graphql
+            rate_limit_to_use = (
+                rate_limits.core
+                if type(exception) is RateLimitExceededException
+                else rate_limits.graphql
+            )
 
             reset_timestamp = timegm(rate_limit_to_use.reset.timetuple())
             now_timestamp = timegm(gmtime())
             time_until_core_api_rate_limit_resets = (
-                reset_timestamp - now_timestamp) if reset_timestamp > now_timestamp else 0
+                (reset_timestamp - now_timestamp)
+                if reset_timestamp > now_timestamp
+                else 0
+            )
 
             wait_time_buffer = 5
-            sleep(time_until_core_api_rate_limit_resets +
-                  wait_time_buffer if time_until_core_api_rate_limit_resets else 0)
+            sleep(
+                time_until_core_api_rate_limit_resets + wait_time_buffer
+                if time_until_core_api_rate_limit_resets
+                else 0
+            )
             return func(*args, **kwargs)
 
     return decorator
 
 
 class GithubService:
-    USER_ACCESS_REMOVED_ISSUE_TITLE: str = "User access removed, access is now via a team"
+    USER_ACCESS_REMOVED_ISSUE_TITLE: str = (
+        "User access removed, access is now via a team"
+    )
     GITHUB_GQL_MAX_PAGE_SIZE = 100
     GITHUB_GQL_DEFAULT_PAGE_SIZE = 80
 
@@ -59,24 +71,38 @@ class GithubService:
 
     def __init__(self, org_token: str, organisation_name: str) -> None:
         self.github_client_core_api: Github = Github(org_token)
-        self.github_client_gql_api: Client = Client(transport=AIOHTTPTransport(
-            url="https://api.github.com/graphql",
-            headers={"Authorization": f"Bearer {org_token}"},
-        ), execute_timeout=60)
+        self.github_client_gql_api: Client = Client(
+            transport=AIOHTTPTransport(
+                url="https://api.github.com/graphql",
+                headers={"Authorization": f"Bearer {org_token}"},
+            ),
+            execute_timeout=60,
+        )
         self.organisation_name: str = organisation_name
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
         logging.info("Getting Outside Collaborators Login Names")
-        outside_collaborators = self.github_client_core_api.get_organization(
-            self.organisation_name).get_outside_collaborators() or []
-        return [outside_collaborator.login.lower() for outside_collaborator in outside_collaborators]
+        outside_collaborators = (
+            self.github_client_core_api.get_organization(
+                self.organisation_name
+            ).get_outside_collaborators()
+            or []
+        )
+        return [
+            outside_collaborator.login.lower()
+            for outside_collaborator in outside_collaborators
+        ]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def close_expired_issues(self, repository_name: str) -> None:
         logging.info(f"Closing expired issues for {repository_name}")
-        issues = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_issues() or []
+        issues = (
+            self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            ).get_issues()
+            or []
+        )
         for issue in issues:
             if self.__is_expired(issue):
                 issue.edit(state="closed")
@@ -84,18 +110,22 @@ class GithubService:
 
     def __is_expired(self, issue: Issue) -> bool:
         grace_period = issue.created_at + timedelta(days=45)
-        return (issue.title == self.USER_ACCESS_REMOVED_ISSUE_TITLE
-                and issue.state == "open"
-                and grace_period < datetime.now())
+        return (
+            issue.title == self.USER_ACCESS_REMOVED_ISSUE_TITLE
+            and issue.state == "open"
+            and grace_period < datetime.now()
+        )
 
-    def assign_support_issues_to_self(self, repository_name, org_name, tag: str) -> list[any]:
+    def assign_support_issues_to_self(
+        self, repository_name, org_name, tag: str
+    ) -> list[any]:
         """
-            Assigns issues with a specific tag to the user who created the issue.
-            This is used to assign support issues to the user who created the issue.
+        Assigns issues with a specific tag to the user who created the issue.
+        This is used to assign support issues to the user who created the issue.
 
-            :param repository_name: The name of the repository to assign issues in.
-            :param org_name: The name of the organisation to assign issues in.
-            :param tag: The tag to search for.
+        :param repository_name: The name of the repository to assign issues in.
+        :param org_name: The name of the organisation to assign issues in.
+        :param tag: The tag to search for.
         """
         name = f"{org_name}/{repository_name}"
         support_issues = self.get_support_issues(name, tag)
@@ -104,7 +134,8 @@ class GithubService:
             return self.assign_issues_to_self(support_issues, name)
         except ValueError as error:
             raise ValueError(
-                f"Failed to assign issues to self in {repository_name}") from error
+                f"Failed to assign issues to self in {repository_name}"
+            ) from error
 
     @staticmethod
     def assign_issues_to_self(issues: list[Issue], repository_name: str) -> list[any]:
@@ -112,7 +143,8 @@ class GithubService:
             issue.edit(assignees=[issue.user.login])
             if len(issue.assignees) == 0:
                 raise ValueError(
-                    f"Failed to assign issue {issue.number} to {issue.user.login} in {repository_name}")
+                    f"Failed to assign issue {issue.number} to {issue.user.login} in {repository_name}"
+                )
 
         return issues
 
@@ -138,14 +170,51 @@ class GithubService:
 
         return repo.get_issues(state=required_state) or []
 
+    def close_support_tickets(self, repository_name: str, tag: str) -> None:
+        """
+        Closes support tickets that have been assigned to a user.
+
+        Args:
+            repository_name: Should be in the format of "organisation/repository"
+            tag: The tag to search for.
+        """
+        issues = self.get_support_issues(repository_name, tag)
+
+        for issue in issues:
+            if self._support_issue_ready_to_close(issue):
+                issue.edit(state="closed")
+            else:
+                raise ValueError(
+                    f"Failed to close issue {issue.number} in {repository_name}"
+                )
+
+    @staticmethod
+    def _support_issue_ready_to_close(issue: Issue) -> bool:
+        if issue.state == "closed":
+            return False
+
+        if len(issue.assignees) != 0:
+            return False
+
+        if len(issue.labels) == 0:
+            return False
+
+        return True
+
     @retries_github_rate_limit_exception_at_next_reset_once
-    def create_an_access_removed_issue_for_user_in_repository(self, user_name: str, repository_name: str) -> None:
+    def create_an_access_removed_issue_for_user_in_repository(
+        self, user_name: str, repository_name: str
+    ) -> None:
         logging.info(
-            f"Creating an access removed issue for user {user_name} in repository {repository_name}")
-        self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository_name}").create_issue(
+            f"Creating an access removed issue for user {user_name} in repository {repository_name}"
+        )
+        self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}"
+        ).create_issue(
             title=self.USER_ACCESS_REMOVED_ISSUE_TITLE,
             assignee=user_name,
-            body=dedent(f"""
+            body=dedent(
+                f"""
         Hi there
 
         The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
@@ -167,45 +236,56 @@ class GithubService:
         If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
 
         This issue can be closed.
-        """).strip("\n")
+        """
+            ).strip("\n"),
         )
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_user_from_repository(self, user_name: str, repository_name: str) -> None:
-        logging.info(
-            f"Removing user {user_name} from repository {repository_name}")
+        logging.info(f"Removing user {user_name} from repository {repository_name}")
         self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").remove_from_collaborators(user_name)
+            f"{self.organisation_name}/{repository_name}"
+        ).remove_from_collaborators(user_name)
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_user_permission_for_repository(self, user_name: str, repository_name: str) -> str:
+    def get_user_permission_for_repository(
+        self, user_name: str, repository_name: str
+    ) -> str:
         logging.info(
-            f"Getting permissions for user {user_name} from repository {repository_name}")
+            f"Getting permissions for user {user_name} from repository {repository_name}"
+        )
         user = self.github_client_core_api.get_user(user_name)
         return self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_collaborator_permission(user)
+            f"{self.organisation_name}/{repository_name}"
+        ).get_collaborator_permission(user)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_user_from_team(self, user_name: str, team_id: int) -> None:
         logging.info(f"Removing user {user_name} from team {team_id}")
         user = self.github_client_core_api.get_user(user_name)
-        self.github_client_core_api.get_organization(self.organisation_name).get_team(team_id).remove_membership(
-            user)
+        self.github_client_core_api.get_organization(self.organisation_name).get_team(
+            team_id
+        ).remove_membership(user)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def add_user_to_team(self, user_name: str, team_id: int) -> None:
         logging.info(f"Adding user {user_name} from team {team_id}")
         user = self.github_client_core_api.get_user(user_name)
-        self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id).add_membership(user)
+        self.github_client_core_api.get_organization(self.organisation_name).get_team(
+            team_id
+        ).add_membership(user)
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def create_new_team_with_repository(self, team_name: str, repository_name: str) -> None:
-        logging.info(
-            f"Creating team {team_name} for repository {repository_name}")
+    def create_new_team_with_repository(
+        self, team_name: str, repository_name: str
+    ) -> None:
+        logging.info(f"Creating team {team_name} for repository {repository_name}")
         repo = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}")
-        self.github_client_core_api.get_organization(self.organisation_name).create_team(
+            f"{self.organisation_name}/{repository_name}"
+        )
+        self.github_client_core_api.get_organization(
+            self.organisation_name
+        ).create_team(
             team_name,
             [repo],
             "",
@@ -216,27 +296,38 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def team_exists(self, team_name) -> bool:
         logging.info(f"Checking if team {team_name} exists")
-        github_teams = self.github_client_core_api.get_organization(
-            self.organisation_name).get_teams() or []
+        github_teams = (
+            self.github_client_core_api.get_organization(
+                self.organisation_name
+            ).get_teams()
+            or []
+        )
         return any(github_team.name == team_name for github_team in github_teams)
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def amend_team_permissions_for_repository(self, team_id: int, permission: str, repository_name: str) -> None:
+    def amend_team_permissions_for_repository(
+        self, team_id: int, permission: str, repository_name: str
+    ) -> None:
         logging.info(
-            f"Amending permissions for team {team_id} in repository {repository_name}")
+            f"Amending permissions for team {team_id} in repository {repository_name}"
+        )
         if permission == "read":
             permission = "pull"
         elif permission == "write":
             permission = "push"
         repo = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}")
+            f"{self.organisation_name}/{repository_name}"
+        )
         self.github_client_core_api.get_organization(self.organisation_name).get_team(
-            team_id).update_team_repository(repo, permission)
+            team_id
+        ).update_team_repository(repo, permission)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_team_id_from_team_name(self, team_name: str) -> int | TypeError:
         logging.info(f"Getting team ID for team name {team_name}")
-        data = self.github_client_gql_api.execute(gql("""
+        data = self.github_client_gql_api.execute(
+            gql(
+                """
             query($organisation_name: String!, $team_name: String!) {
                 organization(login: $organisation_name) {
                     team(slug: $team_name) {
@@ -244,19 +335,30 @@ class GithubService:
                     }
                 }
             }
-        """), variable_values={"organisation_name": self.organisation_name, "team_name": team_name})
+        """
+            ),
+            variable_values={
+                "organisation_name": self.organisation_name,
+                "team_name": team_name,
+            },
+        )
 
         return data["organization"]["team"]["databaseId"]
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_repositories(self, after_cursor: str | None,
-                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+    def get_paginated_list_of_repositories(
+        self, after_cursor: str | None, page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE
+    ) -> dict[str, Any]:
         logging.info(
-            f"Getting paginated list of repositories. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of repositories. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}"
+            )
+        return self.github_client_gql_api.execute(
+            gql(
+                """
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
                     repositories(first: $page_size, after: $after_cursor) {
@@ -276,21 +378,32 @@ class GithubService:
                     }
                 }
             }
-        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
-                               "after_cursor": after_cursor})
+        """
+            ),
+            variable_values={
+                "organisation_name": self.organisation_name,
+                "page_size": page_size,
+                "after_cursor": after_cursor,
+            },
+        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
-                                                                          after_cursor: str | None,
-                                                                          page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-            dict[str, Any]:
+    def get_paginated_list_of_user_names_with_direct_access_to_repository(
+        self,
+        repository_name: str,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}"
+            )
+        return self.github_client_gql_api.execute(
+            gql(
+                """
             query($organisation_name: String!, $repository_name: String!, $page_size: Int!, $after_cursor: String) {
                 repository(name: $repository_name, owner: $organisation_name) {
                     collaborators(first: $page_size, after:$after_cursor, affiliation: DIRECT) {
@@ -306,22 +419,30 @@ class GithubService:
                     }
                 }
             }
-        """), variable_values={
-            "repository_name": repository_name,
-            "organisation_name": self.organisation_name,
-            "page_size": page_size,
-            "after_cursor": after_cursor
-        })
+        """
+            ),
+            variable_values={
+                "repository_name": repository_name,
+                "organisation_name": self.organisation_name,
+                "page_size": page_size,
+                "after_cursor": after_cursor,
+            },
+        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_team_names(self, after_cursor: str | None,
-                                         page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+    def get_paginated_list_of_team_names(
+        self, after_cursor: str | None, page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE
+    ) -> dict[str, Any]:
         logging.info(
-            f"Getting paginated list of team names. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of team names. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}"
+            )
+        return self.github_client_gql_api.execute(
+            gql(
+                """
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
                     teams(first: $page_size, after:$after_cursor) {
@@ -337,21 +458,32 @@ class GithubService:
                     }
                 }
             }
-        """), variable_values={
-            "organisation_name": self.organisation_name,
-            "page_size": page_size,
-            "after_cursor": after_cursor
-        })
+        """
+            ),
+            variable_values={
+                "organisation_name": self.organisation_name,
+                "page_size": page_size,
+                "after_cursor": after_cursor,
+            },
+        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_team_repositories(self, team_name: str, after_cursor: str | None,
-                                                page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+    def get_paginated_list_of_team_repositories(
+        self,
+        team_name: str,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
         logging.info(
-            f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}"
+            )
+        return self.github_client_gql_api.execute(
+            gql(
+                """
         query($organisation_name: String!, $team_name: String!, $page_size: Int!, $after_cursor: String) {
             organization(login: $organisation_name) {
                 team(slug: $team_name) {
@@ -369,23 +501,34 @@ class GithubService:
                 }
             }
         }
-        """), variable_values={
-            "organisation_name": self.organisation_name,
-            "team_name": team_name,
-            "page_size": page_size,
-            "after_cursor": after_cursor
-        })
+        """
+            ),
+            variable_values={
+                "organisation_name": self.organisation_name,
+                "team_name": team_name,
+                "page_size": page_size,
+                "after_cursor": after_cursor,
+            },
+        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_team_user_names(self, team_name: str, after_cursor: str | None,
-                                              page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+    def get_paginated_list_of_team_user_names(
+        self,
+        team_name: str,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
 
         logging.info(
-            f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}"
+            )
+        return self.github_client_gql_api.execute(
+            gql(
+                """
         query($organisation_name: String!, $team_name: String!, $page_size: Int!, $after_cursor: String) {
             organization(login: $organisation_name) {
                 team(slug: $team_name) {
@@ -403,48 +546,71 @@ class GithubService:
                 }
             }
         }
-        """), variable_values={
-            "organisation_name": self.organisation_name,
-            "team_name": team_name,
-            "page_size": page_size,
-            "after_cursor": after_cursor
-        })
+        """
+            ),
+            variable_values={
+                "organisation_name": self.organisation_name,
+                "team_name": team_name,
+                "page_size": page_size,
+                "after_cursor": after_cursor,
+            },
+        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def add_user_to_team_as_maintainer(self, user_name: str, team_id: int) -> None:
         logging.info(f"Making user {user_name} a maintainer in team {team_id}")
         user = self.github_client_core_api.get_user(user_name)
-        self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id).add_membership(user, "maintainer")
+        self.github_client_core_api.get_organization(self.organisation_name).get_team(
+            team_id
+        ).add_membership(user, "maintainer")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_repository_teams(self, repository_name: str) -> list:
-        teams = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_teams() or []
+        teams = (
+            self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            ).get_teams()
+            or []
+        )
         return teams
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_repository_direct_users(self, repository_name: str) -> list:
-        users = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
+        users = (
+            self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            ).get_collaborators("direct")
+            or []
+        )
         return [member.login.lower() for member in users]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_a_team_usernames(self, team_name: str) -> list[str]:
-        members = self.github_client_core_api.get_organization(
-            self.organisation_name).get_team_by_slug(team_name).get_members() or []
+        members = (
+            self.github_client_core_api.get_organization(self.organisation_name)
+            .get_team_by_slug(team_name)
+            .get_members()
+            or []
+        )
         return [member.login.lower() for member in members]
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
-                                                    page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+    def get_paginated_list_of_repositories_per_type(
+        self,
+        repo_type: str,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
         logging.info(
-            f"Getting paginated list of repositories per type {repo_type}. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of repositories per type {repo_type}. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}"
+            )
         the_query = f"org:{self.organisation_name}, archived:false, is:{repo_type}"
-        query = gql("""
+        query = gql(
+            """
             query($page_size: Int!, $after_cursor: String, $the_query: String!) {
                 search(
                     type: REPOSITORY
@@ -471,7 +637,11 @@ class GithubService:
                     }
                 }
             }
-        """)
-        variable_values = {"the_query": the_query, "page_size": page_size,
-                           "after_cursor": after_cursor}
+        """
+        )
+        variable_values = {
+            "the_query": the_query,
+            "page_size": page_size,
+            "after_cursor": after_cursor,
+        }
         return self.github_client_gql_api.execute(query, variable_values)
