@@ -4,6 +4,8 @@ name: Dependency Review
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
+    paths-ignore:
+      - "source/**"
 
 permissions:
   contents: read
