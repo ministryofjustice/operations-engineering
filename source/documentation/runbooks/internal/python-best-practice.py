@@ -1,0 +1,47 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Python best practice
+last_reviewed_on: 2023-04-26
+review_in: 3 months
+---
+
+# Python best practice
+
+## Introduction
+
+This document is a guide to writing Python code in the Operations Engineering team. It is a living document, and will be updated as we develop a greater understanding of the language and how we intend to use it.
+
+## General
+
+### Use `autopep8` for code formatting
+
+We should be using `autopep8` to format our code. This will ensure that all of our code is formatted in the same way, and will make it easier to read.
+
+To install `autopep8`:
+
+```bash
+python -m pip install autopep8
+```
+
+To format a file:
+
+```bash
+autopep8 --in-place <filename>
+```
+
+### Use `pylint` for code linting
+
+We should be using `pylint` to lint our code. This will ensure that our code is written in a consistent way, and will make it easier to read.
+
+To install `pylint`:
+
+```bash
+python -m pip install pylint
+```
+
+To lint a file:
+
+```bash
+pylint <filename>
+```
+
