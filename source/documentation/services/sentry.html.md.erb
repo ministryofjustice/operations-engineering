@@ -23,7 +23,7 @@ All members of the [MoJ GitHub Organization] can create and sign into their Sent
 Our plan includes 30million [transactions](https://docs.sentry.io/product/accounts/quotas/manage-transaction-quota/) and 4million [errors](https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/) per month for all the projects. Once these quotas are exceeded all further transactions or errors are dropped by Sentry until the next renewal on the 14th of each month. To prevent any one project exceeding the quota's rate limiting and filtering should be applied to every project.
 
 > The rate limiting should be enabled on every project.
-> The sample rate should be 5% **your** application’s overall transactions.
+> The sample rate should be 5% of **your** application’s overall transactions.
 > Rate limiting should be applied to each DSN key.
 > The Operations-Engineering team monitor which projects have set up rate limiting enabled
 
@@ -31,7 +31,7 @@ See the Sentry [rate limiting] documentation to set up rate limiting for each pr
 
 Rate limiting allows you to control the amount of events Sentry will handle before dropping further events to prevent being spammed with hundreds of messages when something has gone wrong within the application.
 
-It is possible to implement rate limiting within application code, see some of the following Sentry examples on how to implement this functionally into your application: [Express], [Rails], [Django], and [Django with path filtering].
+It is possible to implement rate limiting within application code, see some of the following Sentry examples on how to implement this functionality into your application: [Express], [Rails], [Django], and [Django with path filtering].
 
 Please contact the Operation-Engineering team on Slack [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) if you have any questions or need assistance in setting up transaction filtering / rate limiting within your Sentry project or your application.
 
