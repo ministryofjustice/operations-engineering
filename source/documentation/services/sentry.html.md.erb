@@ -5,35 +5,46 @@ last_reviewed_on: 2023-04-27
 review_in: 3 months
 ---
 
-# Sentry.io
+# Sentry
 
-We have an enterprise account with [Sentry.io].
+## Enterprise Account
+We have an enterprise account with [Sentry.io] which includes an allowance of 30million [transactions](https://docs.sentry.io/product/performance/transaction-summary/#what-is-a-transaction) and 4million errors each month. This renews on the 14th of each month. This is a shared quota across all the projects in Sentry. We therefore suggest setting up rate limiting and/or filters on transactions and errors within your Sentry project/s.
 
-All members of the [MoJ GitHub Organization] can create/signin to their
-sentry.io account using this [self signup link].
+Our Sentry plan also includes [performance monitoring].
+
+## User access
+All members of the [MoJ GitHub Organization] can create and sign into their Sentry.io account using this [SSO] link.
 
 ![Sentry.io Self Signup Form](../../images/sentry-self-signup.png)
 
-Anyone in the MoJ organisation in Sentry could potentially view the information you send over. While that is presumed a trusted group, it is still advisable to remove any Personal Identifiable Information from your errors and traces. Sentry have [documentation] on how to do that, and there are examples in the code samples linked at the bottom of this page.
+> Anyone in the MoJ Organisation that joins Sentry could potentially view the information sent to it. While this account is a presumed trusted group, it is still advisable to remove any Personal Identifiable Information (PII) from your application transcations and errors that are sent to Sentry. See Sentry's [Advanced Data Scrubbing documentation] to redact sensitive information before it is saved in Sentry.
 
-In addition to error and custom even tracking, our Sentry plan now includes [performance monitoring].
+## Transactions and Errors
+Our plan includes 30million [transactions](https://docs.sentry.io/product/accounts/quotas/manage-transaction-quota/) and 4million [errors](https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/) per month for all the projects. Once these quotas are exceeded all further transactions or errors are dropped by Sentry until the next renewal on the 14th of each month. To prevent any one project exceeding the quota's rate limiting and filtering should be applied to every project. 
 
-Our plan includes 30mil transactions per month for all projects. In order for everyone to be able to make use of it, we recommend a sample rate of 5%.
+> The rate limiting should be enabled on every project. 
+> The sample rate should be 5% **your** application’s overall transactions.
+> Rate limiting should be applied to each DSN key.
+> The Operations-Engineering team monitor which projects have set up rate limiting enabled
 
-There might be limited value in sending transaction information for health and status endpoints and we suggest that those are filtered out.
+See the Sentry [rate limiting] documentation to set up rate limiting for each project.
 
-If you are only interested in a sub-section of your application routes, you can specifically opt in only those routes and increase your sample rate, for example if you're trying to debug a known performance issue and need a larger dataset.
+Rate limiting allows you to control the amount of events Sentry will handle before dropping further events to prevent being spammed with hundreds of messages when something has gone wrong within the application.
 
-If you would like to ensure spikes in errors do not affect Sentry usage, you can set up a [rate limit] per DSN key. This can be useful if you would like to control the amount of events staging or test environments can send, or if you don't want to be spammed with 100s of errors when something goes down for a bit longer. The value depends entirely on your project needs.
+It is possible to implement rate limiting within application code, see some of the following Sentry examples on how to implement this functionally into your application: [Express], [Rails], [Django], and [Django with path filtering].
 
-Below are some examples of performance monitoring config from MoJ projects: [Express], [Rails], [Django], [Django with path filtering].
+Please contact the Operation-Engineering team on Slack [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) if you have any questions or need assistance in setting up transaction filtering / rate limiting within your Sentry project or your application.
+
+## Spike Protection
+The operations-engineering team have enabled the [Spike Protection](https://docs.sentry.io/product/accounts/quotas/spike-protection/) option. This feature activates when a project has a spike in errors that will have an adverse effect on the 4million error quota. Whilst active this feature will drop any errors from all the other projects until the project producing the error has dropped below a threshold. We believe this to be the best option to prevent one project using the 4million error quota leaving all the other projects with no error allowance until the next renewal date.
+
 
 [Sentry.io]: https://sentry.io
 [MoJ GitHub Organization]: https://github.com/ministryofjustice
-[self signup link]: https://sentry.io/auth/login/ministryofjustice/
-[documentation]: https://docs.sentry.io/product/data-management-settings/scrubbing/advanced-datascrubbing/
+[SSO]: https://sentry.io/auth/login/ministryofjustice/
+[Advanced Data Scrubbing documentation]: https://docs.sentry.io/product/data-management-settings/scrubbing/advanced-datascrubbing/
 [performance monitoring]: https://docs.sentry.io/product/performance/
-[rate limit]: https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#6-rate-limiting
+[rate limiting]: https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#6-rate-limiting
 [Express]: https://github.com/ministryofjustice/hmpps-book-secure-move-frontend/blob/501bc4aadfd8626532a61cf1239465c68760427c/server.js#L68-L106
 [Rails]: https://github.com/ministryofjustice/fb-runner/blob/240dd0d39fd9006e63a84804690e223e60bda314/config/initializers/sentry.rb
 [Django]: https://github.com/ministryofjustice/money-to-prisoners-cashbook/blob/d15c7a39a2636f88f71df7c66a7ee1528686b29a/mtp_cashbook/settings/base.py#L201-L213
