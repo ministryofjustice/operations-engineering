@@ -51,7 +51,11 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
 class GithubService:
     USER_ACCESS_REMOVED_ISSUE_TITLE: str = "User access removed, access is now via a team"
     GITHUB_GQL_MAX_PAGE_SIZE = 100
-    GITHUB_GQL_DEFAULT_PAGE_SIZE = 10
+    GITHUB_GQL_DEFAULT_PAGE_SIZE = 80
+
+    # Added this function to fix error in command: python3 -m unittest discover python/test -v
+    def __new__(cls, *_, **__):
+        return super(GithubService, cls).__new__(cls)
 
     def __init__(self, org_token: str, organisation_name: str) -> None:
         self.github_client_core_api: Github = Github(org_token)

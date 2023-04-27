@@ -25,4 +25,5 @@ valid service label options are:
 - `MoJ Acronyms`
 - `CircleCI`
 - `SonarCloud.io`
+- `1Password`
 - `Other Support Request`

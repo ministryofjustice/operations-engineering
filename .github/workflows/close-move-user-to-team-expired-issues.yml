@@ -1,0 +1,29 @@
+name: Close the move users to teams expired issues
+
+on:
+  schedule:
+    - cron: "0 12 1,8,15,22 * *"
+  workflow_dispatch:
+
+jobs:
+  close-move-users-to-teams-expired-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r python/requirements.txt
+      - run: python3 -m python.scripts.close_move_users_to_teams_expired_issues
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          CONFIG_FILE: "config/empty-config.yml"
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

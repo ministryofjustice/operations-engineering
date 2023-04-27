@@ -1,0 +1,30 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: ADR-009 1Password SSO
+last_reviewed_on: 2023-04-26
+review_in: 6 months
+---
+
+# ADR-004 1Password SSO
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Operations Engineering manages the 1Password organisation for the MoJ. 1Password has a [Single Sign-On (SSO)](https://support.1password.com/sso-sign-in/) option for user to authenticate.
+
+There are a number of challenges we face with enabling SSO for the MoJ organisation:
+
+1. MoJ has no single identify provider - We have users using a mix of Azure AD and GSuite. Multiple identity providers would add additional complexity and require multiple SCIM bridges (a bit of extra infrastcuture that the team would need to manage to enable SSO).
+
+2. Limited availability of licences - We only have a limited number of licences which are prioritised for Service Teams that need to share passwords in support of critical MoJ services. There is a risk that enabling SSO would lead to licences being consumed by users who do not meet the criteria.
+
+## Decision
+
+Do not use SSO for 1Password
+
+## Consequences
+
+We will manually provision users via email invite. A runbook for account creation will be made.
