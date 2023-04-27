@@ -5,6 +5,7 @@ import json
 
 import python.scripts.sentry_projects_rate_limiting as sentry_projects_rate_limiting
 
+
 class TestSentry(unittest.TestCase):
 
     @patch.dict('os.environ', {'SENTRY_TOKEN': 'test_token'})
@@ -44,7 +45,8 @@ class TestSentry(unittest.TestCase):
         mock_get.return_value.ok = True
         mock_get.return_value.content = mock_response_json
         mock_get.return_value.json.return_value = mock_response_json
-        project_keys = sentry_projects_rate_limiting.get_project_keys(headers, base_url, project_slug)
+        project_keys = sentry_projects_rate_limiting.get_project_keys(
+            headers, base_url, project_slug)
         self.assertEqual(project_keys, json.loads(mock_response_json))
 
     @patch('requests.get')
@@ -55,5 +57,6 @@ class TestSentry(unittest.TestCase):
         mock_get.return_value.status_code = 404
         mock_get.return_value.ok = False
         mock_get.return_value.raise_for_status.side_effect = requests.exceptions.HTTPError()
-        project_keys = sentry_projects_rate_limiting.get_project_keys(headers, base_url, project_slug)
+        project_keys = sentry_projects_rate_limiting.get_project_keys(
+            headers, base_url, project_slug)
         self.assertIsNone(project_keys)

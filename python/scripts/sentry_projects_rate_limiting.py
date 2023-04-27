@@ -10,6 +10,7 @@ def get_sentry_token():
 
     return sentry_token
 
+
 def get_org_teams(headers, base_url):
     org_teams_url = f"{base_url}/organizations/ministryofjustice/teams/"
     response = requests.get(org_teams_url, headers=headers, timeout=10)
@@ -19,6 +20,7 @@ def get_org_teams(headers, base_url):
     else:
         return None
 
+
 def get_project_keys(headers, base_url, project_slug):
     project_key_url = f"{base_url}/projects/ministryofjustice/{project_slug}/keys/"
     response = requests.get(project_key_url, headers=headers, timeout=10)
@@ -27,6 +29,7 @@ def get_project_keys(headers, base_url, project_slug):
         return project_keys
     else:
         return None
+
 
 def print_project_key_info(project_key):
     project_key_name = project_key["name"]
@@ -44,7 +47,7 @@ def print_project_key_info(project_key):
         print("  Active: True")
     else:
         print("  Active: False")
-        
+
 
 def main():
     sentry_token = get_sentry_token()
@@ -71,7 +74,8 @@ def main():
                 print(f" Project: {project_name}")
                 print(f" Status: {project_status}")
 
-                project_keys = get_project_keys(headers, base_url, project_slug)
+                project_keys = get_project_keys(
+                    headers, base_url, project_slug)
 
                 if project_keys is not None:
                     for project_key in project_keys:
