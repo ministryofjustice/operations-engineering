@@ -3,25 +3,61 @@ import json
 import requests
 
 
-def main():
+def get_sentry_token():
     sentry_token = os.getenv("SENTRY_TOKEN")
     if not sentry_token:
-        raise ValueError(
-            "The env variable SENTRY_TOKEN is empty or missing")
+        raise ValueError("The env variable SENTRY_TOKEN is empty or missing")
 
+    return sentry_token
+
+def get_org_teams(headers, base_url):
+    org_teams_url = f"{base_url}/organizations/ministryofjustice/teams/"
+    response = requests.get(org_teams_url, headers=headers, timeout=10)
+    if response.status_code == 200:
+        teams = json.loads(response.content)
+        return teams
+    else:
+        return None
+
+def get_project_keys(headers, base_url, project_slug):
+    project_key_url = f"{base_url}/projects/ministryofjustice/{project_slug}/keys/"
+    response = requests.get(project_key_url, headers=headers, timeout=10)
+    if response.status_code == 200:
+        project_keys = json.loads(response.content)
+        return project_keys
+    else:
+        return None
+
+def print_project_key_info(project_key):
+    project_key_name = project_key["name"]
+    rate_limit = project_key["rateLimit"]
+
+    print(f"  Key Name: {project_key_name}")
+    print(f"  Rate Limit: {rate_limit}")
+
+    if rate_limit is None:
+        print("  Rate Limited: True")
+    else:
+        print("  Rate Limited: False")
+
+    if project_key["isActive"]:
+        print("  Active: True")
+    else:
+        print("  Active: False")
+        
+
+def main():
+    sentry_token = get_sentry_token()
     print("Start \n")
 
     headers = {"Authorization": "Bearer " + sentry_token}
     base_url = "https://sentry.io/api/0"
 
-    org_teams_url = f"{base_url}/organizations/ministryofjustice/teams/"
-    response = requests.get(org_teams_url, headers=headers, timeout=10)
+    teams = get_org_teams(headers, base_url)
 
-    if response.status_code == 200:
+    if teams is not None:
         rate_limited_keys = 0
         total_keys = 0
-
-        teams = json.loads(response.content)
 
         for team in teams:
             team_name = team["name"]
@@ -35,30 +71,17 @@ def main():
                 print(f" Project: {project_name}")
                 print(f" Status: {project_status}")
 
-                project_key_url = (
-                    f"{base_url}/projects/ministryofjustice/{project_slug}/keys/"
-                )
-                response = requests.get(
-                    project_key_url, headers=headers, timeout=10)
-                if response.status_code == 200:
-                    project_keys = json.loads(response.content)
+                project_keys = get_project_keys(headers, base_url, project_slug)
 
+                if project_keys is not None:
                     for project_key in project_keys:
                         total_keys += 1
 
-                        project_key_name = project_key["name"]
-                        rate_limit = project_key["rateLimit"]
+                        print_project_key_info(project_key)
 
-                        print(f"  Key Name: {project_key_name}")
-                        print(f"  Rate Limit: {rate_limit}")
-
-                        if rate_limit is None:
+                        if project_key["rateLimit"] is None:
                             rate_limited_keys += 1
 
-                        if project_key["isActive"]:
-                            print("  Active: True")
-                        else:
-                            print("  Active: False")
                         print("")
 
         print(f"Total Keys: {total_keys}")
@@ -68,5 +91,5 @@ def main():
     print("\n Finished")
 
 
-if __name__ == "__main__":
+if __name__ == "main":
     main()
