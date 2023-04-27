@@ -20,9 +20,9 @@ All members of the [MoJ GitHub Organization] can create and sign into their Sent
 > Anyone in the MoJ Organisation that joins Sentry could potentially view the information sent to it. While this account is a presumed trusted group, it is still advisable to remove any Personal Identifiable Information (PII) from your application transcations and errors that are sent to Sentry. See Sentry's [Advanced Data Scrubbing documentation] to redact sensitive information before it is saved in Sentry.
 
 ## Transactions and Errors
-Our plan includes 30million [transactions](https://docs.sentry.io/product/accounts/quotas/manage-transaction-quota/) and 4million [errors](https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/) per month for all the projects. Once these quotas are exceeded all further transactions or errors are dropped by Sentry until the next renewal on the 14th of each month. To prevent any one project exceeding the quota's rate limiting and filtering should be applied to every project. 
+Our plan includes 30million [transactions](https://docs.sentry.io/product/accounts/quotas/manage-transaction-quota/) and 4million [errors](https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/) per month for all the projects. Once these quotas are exceeded all further transactions or errors are dropped by Sentry until the next renewal on the 14th of each month. To prevent any one project exceeding the quota's rate limiting and filtering should be applied to every project.
 
-> The rate limiting should be enabled on every project. 
+> The rate limiting should be enabled on every project.
 > The sample rate should be 5% **your** application’s overall transactions.
 > Rate limiting should be applied to each DSN key.
 > The Operations-Engineering team monitor which projects have set up rate limiting enabled
@@ -37,7 +37,6 @@ Please contact the Operation-Engineering team on Slack [#ask-operations-engineer
 
 ## Spike Protection
 The operations-engineering team have enabled the [Spike Protection](https://docs.sentry.io/product/accounts/quotas/spike-protection/) option. This feature activates when a project has a spike in errors that will have an adverse effect on the 4million error quota. Whilst active this feature will drop any errors from all the other projects until the project producing the error has dropped below a threshold. We believe this to be the best option to prevent one project using the 4million error quota leaving all the other projects with no error allowance until the next renewal date.
-
 
 [Sentry.io]: https://sentry.io
 [MoJ GitHub Organization]: https://github.com/ministryofjustice
