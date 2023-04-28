@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Create Manual SSL Certificate Processes
-last_reviewed_on: 2023-02-28
+last_reviewed_on: 2023-04-28
 review_in: 3 months
 ---
 
@@ -23,9 +23,9 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 ## Tips and Need-to-knows
 
-**We are not responsible for any HMCTS owned certificates. These are typically domains in the format `<application>.<environment>.hmcts.net` or `<application>.<environment>.cjscp.org.uk`. For these no action is required. The contact for these certificates is [opsconfman@hmcts.net](mailto:opsconfman@hmcts.net). That Team has access to all the shared mailboxes and gets all the same notifications for renewals.**
+**We are not responsible for any HMCTS owned certificates. These are typically domains in the format `<application>.<environment>.hmcts.net` or `<application>.<environment>.cjscp.org.uk`. For these no action is required. The contact for these certificates is the [HMCTS Domains Team](mailto:DTSOpsConfMan@Justice.gov.uk). That Team has access to all the shared mailboxes and gets all the same notifications for renewals.**
 
-**Other teams have their own AWS Route53 accounts. These are HMCTS (hmcts.net + cjscp.org.uk) at [opsconfman@hmcts.net](mailto:opsconfman@hmcts.net), LAA (legalservices.gov.uk), OPG, more to be confirmed. Either the other team or our team will renew the Gandi certificate. If we do, send the CNAME validation details to the relevant team. If the other team does it they have their own Gandi process or use AWS ACM auto renewal process.**
+**Other teams have their own AWS Route53 accounts. These are HMCTS (hmcts.net + cjscp.org.uk) at [DTSOpsConfMan@Justice.gov.uk](mailto:DTSOpsConfMan@Justice.gov.uk), LAA (legalservices.gov.uk), OPG, more to be confirmed. Either the other team or our team will renew the Gandi certificate. If we do, send the CNAME validation details to the relevant team. If the other team does it they have their own Gandi process or use AWS ACM auto renewal process.**
 
 **To confirm if we manage a domain, check whether the subdomain record exists in AWS as a delegation i.e. a Nameserver(NS) type record. If one exists there is a high likelihood that the management of the domain is managed by another team. For example if it states Azure that is definitely another team. Details of who manages the domain can be found in the history in the Certificates Google Group `https://groups.google.com/u/1/a/digital.justice.gov.uk/g/certificates?hl=en-GB`.**
 **Try the command 'dig -t NS <name>.justice.gov.uk' to find out details about a domain.**
