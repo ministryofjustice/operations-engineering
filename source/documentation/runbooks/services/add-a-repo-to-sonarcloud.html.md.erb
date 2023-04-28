@@ -4,30 +4,59 @@ title: Adding a GitHub repository to MoJ SonarCloud
 last_reviewed_on: 2023-03-15
 review_in: 3 months
 ---
-
 # Adding a GitHub repository to MoJ SonarCloud
 
-The Ministry of Justice has a SonarCloud Organisation which Operations Engineering has recently taking ownership of.
+## SonarCloud
+SonarCloud performs a code analysis on a repository when a pull request is created. The information can be seen within the pull request or on the SonarCloud project page for the repository.
 
-This document shares as an internal runbook for Operations Engineering members on how to add a GitHub repository to SonarCloud so that users can use it.
+The Ministry of Justice has a SonarCloud Organisation account which Operations Engineering has taken ownership of.
+
+All public repositories on the Ministry of Justice GitHub Organisation and the moj-analytical-services GitHub Organisation can use the SonarCloud analysis for free.
+
+This runbook is for the Operations-Engineering team members on how to add a GitHub repository to SonarCloud and how to start an analysis of the repository.
 
 ## Prerequisites
 
-* The repository being added *must* be a public repository
-* GitHub MoJ Org Admin
+* The repository being added **must** be a public repository
+* You are a GitHub MoJ Org Admin
 
-## Process
+## Steps to add repository to the SonarCloud GitHub Integration
 
 1. Navigate to the [SonarCloud MoJ GitHub App](https://github.com/organizations/ministryofjustice/settings/installations/16911235)
 2. Press the "Select repositories" dropdown in the Repository access section
 3. Select the repository you wish to add to SonarCloud
 4. Press "Save"
-5. Navigate to [SonarCloud](https://sonarcloud.io/projects)
-6. Log in with GitHub SSO if not already
-7. Press the "+"" sign at the top left of the screen
-8. Press "Analyze new project"
-9. Select the repository you wish to add to SonarCloud
-10. Press "Set Up" on the right hand side of the screen
+
+## Steps to import a repository in SonarCloud and to start a newly imported repository analysis
+
+1. Open [SonarCloud](https://sonarcloud.io/projects)
+2. Log in with GitHub SSO if not already
+3. Press the "+"" sign at the top right of the screen
+4. Press "Analyze new project"
+5. Select the repository you wish to add to SonarCloud
+6. Press "Set Up" on the right hand side of the screen to start the analysis
+
+## Steps to start an analysis of an already imported repository in SonarCloud
+
+1. Open [SonarCloud](https://sonarcloud.io/projects)
+2. Log in with GitHub SSO if not already
+3. Open the Ministry of Justice section
+4. Find the repository from the list of available repositories
+5. Click Administration in bottom left corner
+6. Go to the Automatic Analysis settings
+7. Click on the swipe button to enable an Automatic Analysis
+8. SonarCloud should interact with the repository and fill out the SonarCloud project page for the repository
+
+## Steps to set up a manual SonarCloud CI integration
+
+1. Open [SonarCloud](https://sonarcloud.io/projects)
+2. Log in with GitHub SSO if not already
+3. Open the Ministry of Justice section
+4. Find the repository from the list of available repositories
+5. Click on Configure analysis
+6. Pick the CI the repository will use
+7. Follow the steps provided by SonarCloud
+8. Send the env var via Slack or email to the repository user
 
 ## Links
 
