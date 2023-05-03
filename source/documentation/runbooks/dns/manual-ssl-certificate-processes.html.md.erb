@@ -119,6 +119,26 @@ If a certificate needs to be revoked before the expiry date then this can be don
 
 **Note that once a certificate has expired or been revoked it cannot be reinstated. If a certificate is required the process to request a new certificate should be followed. If the certificate is being allowed to expire or revoked, it may also mean that the domain can be decommissioned in line with our domain decommissioning process (TBD).**
 
+## Regenerating Certificates
+
+There may be times when we need to regenerate a certificate due to an issue with the original CSRs that were sent over (for example, if the CSRs were sent over with the wrong level of encryption).
+
+**Note that this is a different process from renewing a certificate.**
+
+To regenerate a certificate:
+
+1. Request new CSRs from the users who fulfilled the original request.
+
+2. On Gandi, select the domain name we need to regenerate the certificate for and select the option to 'Regenerate'.
+
+3. Once confirmed, an email will be sent to certificates@digital.justice.gov.uk. Click the link in the email to open up the Certificate Overview (or navigate to this page via Gandi).
+
+4. Next, edit the authentication method and change it from 'Email Authentication' to 'DNS Authentication'.
+
+5. From here you will have to repeat the original authentication method either by creating the CNAMEs in the appropriate Hosted Zone on Route53, or by forwarding the information onto the team that owns the respective Hosted Zone.
+
+6. Once activated, you'll be able to download and forward the certificates to the user as per the usual process.
+
 ## Costs/Funding information
 
 The costs for Gandi.net certificates are met centrally by Platforms & Architecture. There is no cross charge.
