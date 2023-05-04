@@ -1,17 +1,25 @@
 ---
 owner_slack: "#operations-engineering-alerts"
-title: Domain Transfer
-last_reviewed_on: 2023-04-04
+title: Domain Transfers for Non-gov.uk subdomains
+last_reviewed_on: 2023-05-04
 review_in: 3 months
 ---
 
-# Domain Transfer
+# Domain Transfers for Non-gov.uk subdomains
 
 ## Overview
 
-> This document is still WiP
-
 Occasionally the team are asked to transfer a domain or web application into the MoJ AWS Route53 account. This runbook covers the steps to transfer a domain.
+
+**Note - This process does not apply to gov.uk subdomains i.e. `example.gov.uk` or `example.service.gov.uk`. That process is managed via BT. See Domain Transfers for gov.uk subdomains runbook (TBC).**
+
+Domain transfers usually occur for one of three reasons:
+
+1. MoJ is taking ownership of a new service from another organisation.
+
+2. MoJ is Domain Registrar for a domain, but management is being delegated to another Service Team e.g. Cloud Platform, HMCTS Ops
+
+3. MoJ is taking ownership of a new domain for [defensive domain registration](https://github.com/ministryofjustice/dns#defensive-domain-management) purposes.
 
 ## Links
 
@@ -27,15 +35,17 @@ Either or both the Domain Registrar and the domain can be transferred to our Rou
 
 Before the transfer we try and replicate the current DNS set up in our Route 53 account. So that it is running on the current provide and on our Route53 account. This will help reduce downtime when the cutover occurs.
 
+**Note - In the case of transfers for domains that will be delegated to another Service Team we will not need to create a Hostedzone, but we do need details of the Nameservers that the domain will be delegated to. The Registration process will need these Nameserver details when the Transfer process is initiated.**
+
+**Note - In the case of defensive domain registartion you can set up the [standard defensive domain DNS records](https://github.com/ministryofjustice/dns/blob/main/defensive-domains/dns.tmpl.yaml).**
+
 Start by getting the domain / URL from the other person. If the domain is being moved onto `service.justice.gov.uk` or `justice.gov.uk` ensure it meets the [naming standards](https://ministryofjustice.github.io/technical-guidance/documentation/standards/naming-domains.html#naming-domains) .
 
-Next obtain the domains DNS record details ie IP address for a A record, any namespace server details for NS records, TXT and MX records or ask for a zone file from the current provider.
+Next obtain the domains DNS record details i.e. IP address for a A record, any namespace server details for NS records, TXT and MX records or ask for a zone file from the current provider, or create defensive domain records depending on the type of domain.
 
 If received a zone file then import that into Route 53. Or in our Route53 account create a new hosted zone and add all the records they provided. AWS will create the NS and SOA records in the new hosted zone, do not modify them.
 
 If the domain is becoming a subdomain on `service.justice.gov.uk` or `justice.gov.uk` then you can add a A record to point to an IP address provided by the current provider for `example.service.justice.gov.uk` then add a CNAME record that points to the new A record for `www.example.service.justice.gov.uk`.
-
-If they provide their own namespace servers this would mean delegating the domain to a third party which we do not do for `gov.uk` domains. The current domain / web application and the current provider would need to prepare the application so that it would work using the AWS namespace servers. (steps for this are TBC)
 
 If they ask about Google Analytics (GA), point them towards these slack messages: [message1](https://mojdt.slack.com/archives/C0282GUGKL7/p1650625609603759?thread_ts=1650625106.057059&cid=C0282GUGKL7) and [message2](https://mojdt.slack.com/archives/C0282GUGKL7/p1650625106057059).
 
@@ -70,10 +80,4 @@ On the Route53 dashboard it will display messages and errors regarding the trans
 
 The message to look out for to see that the transfer has completed is `Domain transfer successful: Sent email to registrant contact: transfer is complete (step 14 of 14)`.
 
-Now go to the `Registered` domains section in Route54 and search for the domain. Open it and check the domain contact details. If the Registrar contact details are still the previous registrars contact details, then edit the settings and use the contact details to match the table above. AWS will send an email to the current registrar to approve the change. When the current registrar has approved we receive an email from AWS named `Amazon Route 53 successfully changed the registrant contact for DOMAIN-NAME`. To see status of this request look in the left hand menu `Domains` -> `Requests` and it should be a `Change domain owner` type.
-
-The next step is the cutover...... (TBC ? this part involves changing the NS records to use the AWS provided NS records either from `service.justice.gov.uk` or `justice.gov.uk` or from the newly created hosted for the domain)
-
-If the domain is becoming a subdomain on `service.justice.gov.uk` or `justice.gov.uk` then should set up redirects as well. (TBC what the steps are here)
-
-Finally we need to look at creating an SSL certificate for the domain. (TBC what the steps are here)
+Now go to the `Registered` domains section in Route53 and search for the domain. Open it and check the domain contact details. If the Registrar contact details are still the previous registrars contact details, then edit the settings and use the contact details to match the table above. AWS will send an email to the current registrar to approve the change. When the current registrar has approved we receive an email from AWS named `Amazon Route 53 successfully changed the registrant contact for DOMAIN-NAME`. To see status of this request look in the left hand menu `Domains` -> `Requests` and it should be a `Change domain owner` type.
