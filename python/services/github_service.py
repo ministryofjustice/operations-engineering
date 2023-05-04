@@ -266,11 +266,31 @@ class GithubService:
                         }
                         edges {
                             node {
-                                name
-                                isDisabled
                                 isArchived
+                                isDisabled
+                                isPrivate
                                 isLocked
+                                name
+                                pushedAt
+                                url
+                                description
                                 hasIssuesEnabled
+                                defaultBranchRef {
+                                    name
+                                }
+                                licenseInfo {
+                                    name
+                                }
+                                branchProtectionRules(first: 10) {
+                                    edges {
+                                        node {
+                                            isAdminEnforced
+                                            pattern
+                                            requiredApprovingReviewCount
+                                            requiresApprovingReviews
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
