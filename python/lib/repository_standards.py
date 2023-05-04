@@ -3,6 +3,8 @@ This file contains the classes that are used to represent the data
 that will be sent to the Operations Engineering Reports API.
 """
 import os
+
+
 class RepositoryStandards:
     """
     This class represents the object that will be sent to the Operations Engineering Reports API.
@@ -64,31 +66,64 @@ class RepositoryStandards:
             Single repository data as Hash/JSON
             """
             self.repo_data = repo_data
-            self.status = self.status()
 
         def structure(self):
             """
             Returns a Hash of the repository data.
             """
             return {
-                "name": self.repo_data["name"],
-                "default_branch": self.repo_data["default_branch"],
-                "url": self.repo_data["html_url"],
+                "name": self.repo_name(),
+                "default_branch": self.default_branch(),
+                "url": self.url(),
                 "status": self.is_compliant(),
                 "last_push": self.repo_data["pushed_at"],
                 "report": self.report(),
                 "is_private": self.repo_data["private"],
             }
 
+        def repo_name(self) -> str:
+            """
+            Returns the name of the repository.
+            """
+            return self.repo_data["node"]["name"]
+
+        def default_branch(self) -> str:
+            """
+            Returns the default branch of the repository.
+            """
+            return self.repo_data["node"]["default_branch"]["name"]
+
+        def url(self) -> str:
+            """
+            Returns the URL of the repository.
+            """
+            return self.repo_data["node"]["html_url"]
+
         def is_compliant(self) -> bool:
             """
-            Returns the status of the repository.
+            Returns True if the repository is compliant, False otherwise.
             """
-            return False
+            for key, value in self.report().items():
+                if value is False:
+                    return False
 
-        def report(self):
+            return True
+
+        def last_push(self) -> str:
             """
-            Returns the status of the repository report.
+            Returns the last push date of the repository.
+            """
+            return self.repo_data["node"]["pushed_at"]
+
+        def is_private(self) -> bool:
+            """
+            Returns True if the repository is private, False otherwise.
+            """
+            return self.repo_data["node"]["isPrivate"]
+
+        def report(self) -> dict:
+            """
+            Returns the status of the repository.
             """
             return {
                 "default_branch_main": self.default_branch_main(),
@@ -96,7 +131,7 @@ class RepositoryStandards:
                 "requires_approving_reviews": self.has_requires_approving_reviews_enabled(),
                 "administrators_require_review": self.has_admin_requires_reviews_enabled(),
                 "issues_section_enabled": self.has_issues_enabled(),
-                "has_require_approvals_enabled": self.has_required_appproval_review_count_enabled(),
+                "has_require_approvals_enabled": self.has_required_approval_review_count_enabled(),
                 "has_license": self.has_license(),
                 "has_description": self.has_description()
             }
@@ -105,7 +140,7 @@ class RepositoryStandards:
             """
             Returns True if the default branch is main, False otherwise.
             """
-            if self.repo_data.default_branch == "main":
+            if self.repo_data["node"]["defaultBranchRef"]["name"] == "main":
                 return True
             return False
 
@@ -113,7 +148,8 @@ class RepositoryStandards:
             """
             Returns True if the default branch is protected, False otherwise.
             """
-            if self.repo_data["default_branch_protection"] is True:
+            default_branch = self.repo_data["node"]["defaultBranchRef"]["name"]
+            if self.repo_data["node"]["branchProtectionRules"]["edges"]["node"]["pattern"] == default_branch:
                 return True
             return False
 
@@ -121,41 +157,34 @@ class RepositoryStandards:
             """
             Returns True if the repository requires approving reviews, False otherwise.
             """
-            if self.repo_data["requires_approving_reviews"] is True:
-                return True
-            return False
+            return self.repo_data["node"]["branchProtectionRules"]["edges"]["node"]["requiresApprovingReviews"]
 
         def has_admin_requires_reviews_enabled(self) -> bool:
             """
             Returns True if the repository requires admin reviews, False otherwise.
             """
-            if self.repo_data["admin_requires_reviews"] is True:
-                return True
-            return False
+            return self.repo_data["node"]["branchProtectionRules"]["edges"]["node"]["isAdminEnforced"]
 
         def has_issues_enabled(self) -> bool:
             """
             Returns True if the repository has issues enabled, False otherwise.
             """
-            if self.repo_data["has_issues"] is True:
-                return True
-            return False
+            return self.repo_data["node"]["hasIssuesEnabled"]
 
-        def has_required_appproval_review_count_enabled(self) -> bool:
+        def has_required_approval_review_count_enabled(self) -> bool:
             """
             Returns True if the repository has required approving review count enabled,
             False otherwise.
             """
-            if self.repo_data["required_approving_review_count"] is True:
+            if self.repo_data["node"]["branchProtectionRules"]["edges"]["node"]["requiredApprovingReviewCount"] is not None:
                 return True
             return False
-
 
         def has_license(self) -> bool:
             """
             Returns True if the repository has a license, False otherwise.
             """
-            if self.repo_data["license"] is not None:
+            if self.repo_data["node"]["licenceInfo"] is not None:
                 return True
             return False
 
