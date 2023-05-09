@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 import sys
 import traceback
 
@@ -161,7 +161,7 @@ def fetch_team_repos(github_service: GithubService, team_name) -> list:
             team_name, after_cursor)
 
         # Retrieve the name of the teams repos
-        if data["organization"]["team"]["repositories"]["edges"] is not None:
+        if data["data"]["team"]["repositories"]["edges"] is not None:
             for team in data["organization"]["team"]["repositories"]["edges"]:
                 team_repo_list.append(team["node"]["name"])
 
