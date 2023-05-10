@@ -3,7 +3,6 @@ This file contains the classes that are used to represent the data
 that will be sent to the Operations Engineering Reports API.
 """
 import json
-import os
 
 import requests
 from cryptography.fernet import Fernet
@@ -17,24 +16,15 @@ class OrganisationStandardsReport:
         self.report = []
         self.api_endpoint = endpoint
         self.api_key = api_key
-        self.encryption_key = self.get_encryption_key(enc_key)
+        self.encryption_key = enc_key
 
-    def add(self, report):
+    def add(self, report) -> None:
         """
         Add a RepositoryStandards object to the collection
         """
         self.report.append(report)
 
-    def get_encryption_key(self, enc_key: str):
-        """
-        Gets the encryption key from the environment
-        """
-        if enc_key is None:
-            self.api_key = os.getenv("ENCRYPTION_KEY")
-            if self.api_key is None:
-                raise ValueError("API key is not set")
-
-    def send_to_api(self) -> None or ValueError:
+    def send_to_api(self) -> None:
         if self.report is None:
             raise ValueError("Report is empty")
 
@@ -50,8 +40,9 @@ class OrganisationStandardsReport:
             print("Sent data to site")
         else:
             print(f"Error sending data to site, status code: {status_code}")
+            raise ValueError("Error sending data to site")
 
-    def http_post(self, data):
+    def http_post(self, data) -> int:
         """
         Sends the encrypted data to the API
         """
@@ -60,8 +51,11 @@ class OrganisationStandardsReport:
             "X-API-KEY": self.api_key,
         }
 
-        req = requests.post(self.api_endpoint, headers=headers,
+        try:
+            req = requests.post(self.api_endpoint, headers=headers,
                             json=data, timeout=3)
+        except requests.exceptions.Timeout:
+            raise ValueError("Request timed out")
 
         return req.status_code
 
