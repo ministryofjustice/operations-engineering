@@ -34,7 +34,10 @@ class OrganisationStandardsReport:
 
         data = self.encrypt()
 
-        status_code = self.http_post(data)
+        try:
+            status_code = self.http_post(data)
+        except ValueError:
+            raise ValueError("Error sending data to site")
 
         if status_code == 200:
             print("Sent data to site")
