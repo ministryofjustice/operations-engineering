@@ -2,21 +2,97 @@
 This file contains the classes that are used to represent the data
 that will be sent to the Operations Engineering Reports API.
 """
+import json
+import os
+
+import requests
+from cryptography.fernet import Fernet
 
 
-class RepositoryStandards:
+class OrganisationStandardsReport:
+    """
+    A collection of RepositoryStandards objects
+    """
+    def __init__(self, endpoint, api_key, enc_key: str):
+        self.report = []
+        self.api_endpoint = endpoint
+        self.api_key = api_key
+        self.encryption_key = self.get_encryption_key(enc_key)
+
+    def add(self, report):
+        """
+        Add a RepositoryStandards object to the collection
+        """
+        self.report.append(report)
+
+    def get_encryption_key(self, enc_key: str):
+        """
+        Gets the encryption key from the environment
+        """
+        if enc_key is None:
+            self.api_key = os.getenv("ENCRYPTION_KEY")
+            if self.api_key is None:
+                raise ValueError("API key is not set")
+
+    def send_to_api(self) -> None or ValueError:
+        if self.report is None:
+            raise ValueError("Report is empty")
+
+        for r in self.report:
+            print(r.report_output)
+            print("---")
+
+        data = self.encrypt()
+
+        status_code = self.http_post(data)
+
+        if status_code == 200:
+            print("Sent data to site")
+        else:
+            print(f"Error sending data to site, status code: {status_code}")
+
+    def http_post(self, data):
+        """
+        Sends the encrypted data to the API
+        """
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-KEY": self.api_key,
+        }
+
+        req = requests.post(self.api_endpoint, headers=headers,
+                            json=data, timeout=3)
+
+        return req.status_code
+
+    def encrypt(self):
+        key = bytes.fromhex(self.encryption_key)
+        fernet = Fernet(key)
+
+        data_as_string = json.dumps(self.report)
+        data_as_bytes = data_as_string.encode()
+
+        encrypted_data_as_bytes = fernet.encrypt(data_as_bytes)
+        encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
+
+        return encrypted_data_bytes_as_string
+
+
+class RepositoryReport:
     """
     Report of repositories that are maintained in the MinistryOfJustice GitHub organization.
     """
 
     def __init__(self, raw_github_data):
         """
-        Single repository data as Hash/JSON
+        Takes a single json repository object from the GitHub API and returns a report of the repository.
+        This report is used to determine if the repository is compliant with the standards set by Ops Engineering.
+        It will be used to formulate a table of repositories that are compliant and non-compliant.
         """
         self.repo_data = raw_github_data
         self.report_output = self.report()
 
-    def report(self):
+    def report(self) -> dict:
         """
         Returns a Hash of the repository data.
         """
