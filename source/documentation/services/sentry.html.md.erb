@@ -1,50 +1,155 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Sentry.io
-last_reviewed_on: 2023-04-27
+last_reviewed_on: 2023-05-10
 review_in: 3 months
 ---
 
 # Sentry
 
 ## Enterprise Account
-We have an enterprise account with [Sentry.io] which includes an allowance of 30million [transactions](https://docs.sentry.io/product/performance/transaction-summary/#what-is-a-transaction) and 4million errors each month. This renews on the 14th of each month. This is a shared quota across all the projects in Sentry. We therefore suggest setting up rate limiting and/or filters on transactions and errors within your Sentry project/s.
+The Ministry of Justice have an enterprise account with [Sentry.io] which is centrally managed and paid for via the
+Operations Engineering Team within Platforms and Architecture.
+
+The purpose of this is to enable teams to have an easily accessible performance monitoring, alerting and error tracking
+tool for digital products.
+
+### Quota
+
+> The Ministry of Justices' Sentry enterprise account reserves the following usage quotas (per month):
+>
+> - 30Million [Transactions](https://docs.sentry.io/product/performance/transaction-summary/#what-is-a-transaction)
+> - 4Million Errors
+> - 1Gb of Attachments
+>
+> The quota renews on the 14th of each month and is a shared quota across all the projects in Sentry.
+
+Teams are responsible for actively managing their Sentry usage. We have provided [Quota Management](#quota-management)
+guidance around how to manage your teams Sentry usage, to ensure teams get the most value from Sentry.
 
 Our Sentry plan also includes [performance monitoring].
 
-## User access
-All members of the [MoJ GitHub Organization] can create and sign into their Sentry.io account using this [SSO] link.
+### Error Spike Protection
+The Operations Engineering team have enabled
+the [Spike Protection](https://docs.sentry.io/product/accounts/quotas/spike-protection/) feature on an organisational
+level.
+
+Sentry uses an algorithm to keep track of ***normal*** error consumption per project. When there is abnormal amount of
+errors within a project, Sentry will dynamically rate limit the project accordingly.
+
+The purpose of enabling Spike Protection is to prevent an abnormally high volume of errors unnecessarily consuming a
+large portion of the error quota that may have been caused by an intermittent network issue. This also helps in ensure
+protection of the error quota so all teams can make use of it.
+
+## User Access
+All members of the [MoJ GitHub Organization] can create and sign in to their Sentry.io account using this [SSO] link.
 
 ![Sentry.io Self Signup Form](../../images/sentry-self-signup.png)
 
-> Anyone in the MoJ Organisation that joins Sentry could potentially view the information sent to it. While this account is a presumed trusted group, it is still advisable to remove any Personal Identifiable Information (PII) from your application transcations and errors that are sent to Sentry. See Sentry's [Advanced Data Scrubbing documentation] to redact sensitive information before it is saved in Sentry.
+> Anyone in the MoJ Organisation that joins Sentry could potentially view the information sent to it. While this account
+is a presumed trusted group, it is still advisable to remove any Personal Identifiable Information (PII) from your
+application transactions and errors that are sent to Sentry. See Sentry's [Advanced Data Scrubbing documentation] to
+redact sensitive information before it is saved in Sentry.
 
-## Transactions and Errors
-Our plan includes 30million [transactions](https://docs.sentry.io/product/accounts/quotas/manage-transaction-quota/) and 4million [errors](https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/) per month for all the projects. Once these quotas are exceeded all further transactions or errors are dropped by Sentry until the next renewal on the 14th of each month. To prevent any one project exceeding the quota's rate limiting and filtering should be applied to every project.
+## Quota Management
+If a quota is exceeded, all further transactions or errors are dropped by Sentry until the next monthly renewal. To
+prevent exceeding the quota's, teams should actively manage their usage of Sentry to ensure they are getting the most
+value for their consumption. This section details some best practices to help.
 
-> The rate limiting should be enabled on every project.
-> The sample rate should be 5% of **your** application’s overall transactions.
-> Rate limiting should be applied to each DSN key.
-> The Operations-Engineering team monitor which projects have set up rate limiting enabled
+### Error Rate Limiting
+Rate limiting is the best way to manage the error consumption of your project. The feature allows you to define how
+many errors can be sent to Sentry over a period of time. Essentially, enabling a safety net to ensure a predictable
+worse case scenario regarding excessive error consumption.
 
-See the Sentry [rate limiting] documentation to set up rate limiting for each project.
+> Rate limiting should be enabled on every project. Rate limiting should be applied to each DSN key. The
+> Operations Engineering team monitor which projects have set up rate limiting enabled.
 
-Rate limiting allows you to control the amount of events Sentry will handle before dropping further events to prevent being spammed with hundreds of messages when something has gone wrong within the application.
+See the Sentry [Rate limiting] documentation to set up rate limiting for each project.
 
-It is possible to implement rate limiting within application code, see some of the following Sentry examples on how to implement this functionality into your application: [Express], [Rails], [Django], and [Django with path filtering].
+Also see
+the [Setting Useful Rate Limits](https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#-how-to-set-proper-rate-limits)
+documentation to help create a suitable rate limit for your application.
 
-Please contact the Operation-Engineering team on Slack [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) if you have any questions or need assistance in setting up transaction filtering / rate limiting within your Sentry project or your application.
+### Removing/Ignoring Errors
+There will some errors generated by your application that you may be unwilling or unable to resolve. This can be due to
+a technical constraint or an agreement within the team to ignore the error.
 
-## Spike Protection
-The operations-engineering team have enabled the [Spike Protection](https://docs.sentry.io/product/accounts/quotas/spike-protection/) option. This feature activates when a project has a spike in errors that will have an adverse effect on the 4million error quota. Whilst active this feature will drop any errors from all the other projects until the project producing the error has dropped below a threshold. We believe this to be the best option to prevent one project using the 4million error quota leaving all the other projects with no error allowance until the next renewal date.
+For these type of errors, there's typically little value in persistently recording the error in Sentry everytime it
+occurs.
+
+Sentry allows you to [Delete and Discard]() errors. Doing so will ensure these errors are not
+recorded by Sentry, allowing your team to have better visibility of new error within your application.
+
+> We recommend deleting and discarding these type of persistent errors. They can quickly
+consume large portions of the quota for high traffic applications.
+
+You can find a list of deleted and discarded errors in the "Discarded Issues" tab in
+***[Project] > Settings > Inbound Filters***. From here, you can un-discarded any of these issues to receive future
+events.
+
+### Transaction Sampling
+[Transactions] represent interactions with your application, such as users going to a `/account` endpoint. Recording
+transactions are useful for knowing how your application behaves day to day and can create useful insights into how your
+application is used.
+
+Typically, there's little value in recording all transactions of a user for analytical purposes. Transaction sampling is
+used to record a percentage of user activity. This helps reduce the cost of transaction monitoring whilst
+still being able to reap the benefits.
+
+> We recommend a transaction sampling rate of between ***0.01 - 0.05*** for most applications. Teams should review
+the value they get from Sentry transactions and adjust their sampling rates accordingly.
+>
+> For example, if teams don't make use of the feature you can disable it completely.
+>
+> Alternatively, teams may want to temporarily increase sample rates of
+a new feature.
+
+Transaction sampling can be implemented within the application code. See
+the [Example Project Configurations](#example-project-configurations) for a recommended starting point in your SDK.
+
+### Ignoring Transactions on Administrative Endpoints
+Most applications will contain administrative endpoints, which are intended to be used by other applications to check
+monitoring metrics such as health status.
+
+There is little value in recording these transactions in Sentry, and they can very quickly consume large portion of the
+transaction quota. For example, a `/ping` endpoint being called every 2 seconds by 3 application will generate
+**~4Million transactions** a month consuming 10% of the quota.
+
+Here are some examples of administrative
+endpoints `/ping`,`/ping.json`,`/health`,`/health.json`,`/status/**`,`/robots.txt`
+
+Ignoring specific endpoints (or drastically reducing their sampling rates) can be implemented within the application
+code. See the [Example Project Configurations](#example-project-configurations) for a recommended starting point in your
+SDK.
+
+## Example Project Configurations
+
+- [Express]
+- [Rails]
+- [Django]
+
+Please contact the Operation-Engineering team on
+Slack [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) if you have any questions or need
+assistance in setting up transaction filtering / rate limiting within your Sentry project or your application.
+
+[Transactions]: https://docs.sentry.io/product/performance/transaction-summary/#what-is-a-transaction
+
+[Delete and Discard]: https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#:~:text=Delete%20%26%20Discard&text=If%20there%20is%20an%20irrelevant,filter%20out%20future%20matching%20events
 
 [Sentry.io]: https://sentry.io
+
 [MoJ GitHub Organization]: https://github.com/ministryofjustice
+
 [SSO]: https://sentry.io/auth/login/ministryofjustice/
+
 [Advanced Data Scrubbing documentation]: https://docs.sentry.io/product/data-management-settings/scrubbing/advanced-datascrubbing/
+
 [performance monitoring]: https://docs.sentry.io/product/performance/
-[rate limiting]: https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#6-rate-limiting
-[Express]: https://github.com/ministryofjustice/hmpps-book-secure-move-frontend/blob/501bc4aadfd8626532a61cf1239465c68760427c/server.js#L68-L106
-[Rails]: https://github.com/ministryofjustice/fb-runner/blob/240dd0d39fd9006e63a84804690e223e60bda314/config/initializers/sentry.rb
-[Django]: https://github.com/ministryofjustice/money-to-prisoners-cashbook/blob/d15c7a39a2636f88f71df7c66a7ee1528686b29a/mtp_cashbook/settings/base.py#L201-L213
-[Django with path filtering]: https://github.com/ministryofjustice/cla_frontend/blob/51a6c5a05597384c780041dd810c9108c9b575bb/cla_frontend/settings/base.py#L57-L65
+
+[Rate limiting]: https://docs.sentry.io/product/accounts/quotas/manage-event-stream-guide/#6-rate-limiting
+
+[Express]: https://github.com/ministryofjustice/hmpps-book-secure-move-frontend/blob/2ddc0684fb8b2e08642440899d56de8765e509da/server.js#L69-L97
+
+[Rails]: https://github.com/ministryofjustice/hmpps-book-secure-move-api/blob/c2b87a9eede4f140982373ea0d0ca60903cc9132/config/initializers/sentry.rb#L3-L28
+
+[Django]: https://github.com/ministryofjustice/cla_frontend/blob/51a6c5a05597384c780041dd810c9108c9b575bb/cla_frontend/settings/base.py#L57-L65
