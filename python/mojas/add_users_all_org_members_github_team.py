@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import traceback
@@ -81,17 +82,16 @@ def run(github_service: GithubService, gql_client: Client):
 
 
 def main():
-    if len(sys.argv) == 2:
-        # Get the GH Action token
-        oauth_token = sys.argv[1]
-    else:
-        raise ValueError("Missing a script input parameter")
+    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if not org_token:
+        raise ValueError(
+            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
     # Setup a transport and gql_client to interact with the GH GraphQL API
     try:
         transport = AIOHTTPTransport(
             url="https://api.github.com/graphql",
-            headers={"Authorization": "Bearer {}".format(oauth_token)},
+            headers={"Authorization": "Bearer {}".format(org_token)},
         )
     except Exception:
         print_stack_trace("Exception: Problem with the API URL or GH Token")
@@ -102,7 +102,7 @@ def main():
     except Exception:
         print_stack_trace("Exception: Problem with the Client.")
 
-    github_service = GithubService(oauth_token, "moj-analytical-services")
+    github_service = GithubService(org_token, "moj-analytical-services")
 
     print("Start")
     run(github_service, gql_client)
