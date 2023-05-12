@@ -12,11 +12,12 @@ class OrganisationStandardsReport:
     """
     A collection of RepositoryStandards objects
     """
-    def __init__(self, endpoint, api_key, enc_key: str):
+    def __init__(self, endpoint, api_key, enc_key, report_type: str):
         self.report = []
         self.api_endpoint = endpoint
         self.api_key = api_key
         self.encryption_key = enc_key
+        self.report_type = report_type
 
     def add(self, report) -> None:
         """
@@ -88,6 +89,7 @@ class RepositoryReport:
         """
         self.repo_data = raw_github_data
         self.report_output = self.report()
+        self.repository_type = "private" if self.is_private() else "public"
 
     def report(self) -> dict:
         """
@@ -98,6 +100,7 @@ class RepositoryReport:
             "default_branch": self.default_branch(),
             "url": self.url(),
             "status": self.is_compliant(),
+            "report": self.compliance_report(),
             "last_push": self.last_push(),
             "is_private": self.is_private()
         }
