@@ -43,7 +43,6 @@ def get_cname_records_to_delete(route53_client, hosted_zone_id):
             HostedZoneId=hosted_zone_id,
             StartRecordName=next_record_name,
             StartRecordType=next_record_type,
-            StartRecordIdentifier=next_record_id,
             MaxItems="400",
         )
 
@@ -57,7 +56,6 @@ def get_cname_records_to_delete(route53_client, hosted_zone_id):
 
         if response["IsTruncated"]:
             next_record_name = response["NextRecordName"]
-            next_record_id = response["NextRecordIdentifier"]
         else:
             break
 

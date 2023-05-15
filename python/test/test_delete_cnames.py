@@ -20,7 +20,6 @@ class TestDeleteCNames(unittest.TestCase):
         "HostedZoneId": "abc",
         "StartRecordName": "some_value",
         "StartRecordType": "CNAME",
-        "StartRecordIdentifier": "some_value",
         "MaxItems": "400"
     }
 
@@ -28,7 +27,6 @@ class TestDeleteCNames(unittest.TestCase):
         "HostedZoneId": "abc",
         "StartRecordName": "a",
         "StartRecordType": "CNAME",
-        "StartRecordIdentifier": "0",
         "MaxItems": "400"
     }
 
@@ -82,7 +80,6 @@ class TestDeleteCNames(unittest.TestCase):
             "ResourceRecordSets": [],
             "MaxItems": "300",
             "NextRecordName": "some_value",
-            "NextRecordIdentifier": "some_value"
         }
 
         mock_client.return_value = stubbed_client
@@ -112,7 +109,6 @@ class TestDeleteCNames(unittest.TestCase):
             ],
             "MaxItems": "300",
             "NextRecordName": "some_value",
-            "NextRecordIdentifier": "some_value"
         }
 
         mock_client.return_value = stubbed_client
@@ -153,7 +149,6 @@ class TestDeleteCNames(unittest.TestCase):
             ],
             "MaxItems": "300",
             "NextRecordName": "some_value",
-            "NextRecordIdentifier": "some_value"
         }
 
         mock_client.return_value = stubbed_client
