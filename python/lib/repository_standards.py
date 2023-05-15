@@ -2,7 +2,6 @@
 This file contains the classes that are used to represent the data
 that will be sent to the Operations Engineering Reports API.
 """
-import json
 
 import requests
 from cryptography.fernet import Fernet
@@ -17,7 +16,21 @@ class OrganisationStandardsReport:
         self.api_endpoint = endpoint
         self.api_key = api_key
         self.encryption_key = enc_key
-        self.report_type = report_type
+
+        self.report_type = self.validate_report_type(report_type)
+
+    @staticmethod
+    def validate_report_type(report_type: str) -> str:
+        """
+        Validate the type of report being generated. This is used to determine the endpoint sent to.
+        """
+        match report_type:
+            case "public":
+                return "public"
+            case "private":
+                return "private"
+            case _:
+                raise ValueError("Invalid report type")
 
     def add(self, report) -> None:
         """
@@ -26,8 +39,8 @@ class OrganisationStandardsReport:
         self.report.append(report)
 
     def send_to_api(self) -> None:
-        if self.report is None:
-            raise ValueError("Report is empty")
+        if not self.report:
+            raise ValueError("Report is empty, something went wrong, we should have a report to send")
 
         for r in self.report:
             print(r.report_output)
@@ -35,14 +48,8 @@ class OrganisationStandardsReport:
 
         data = self.encrypt()
 
-        try:
-            status_code = self.http_post(data)
-        except ValueError:
-            raise ValueError("Error sending data to site")
-
-        if status_code == 200:
-            print("Sent data to site")
-        else:
+        status_code = self.http_post(data)
+        if status_code != 200:
             print(f"Error sending data to site, status code: {status_code}")
             raise ValueError("Error sending data to site")
 
@@ -55,22 +62,15 @@ class OrganisationStandardsReport:
             "X-API-KEY": self.api_key,
         }
 
-        try:
-            req = requests.post(self.api_endpoint, headers=headers,
+        req = requests.post(self.api_endpoint, headers=headers,
                             json=data, timeout=3)
-        except requests.exceptions.Timeout:
-            raise ValueError("Request timed out")
 
         return req.status_code
 
     def encrypt(self):
-        key = bytes.fromhex(self.encryption_key)
-        fernet = Fernet(key)
+        fernet = Fernet(self.encryption_key)
 
-        data_as_string = json.dumps(self.report)
-        data_as_bytes = data_as_string.encode()
-
-        encrypted_data_as_bytes = fernet.encrypt(data_as_bytes)
+        encrypted_data_as_bytes = fernet.encrypt(bytes(str(self.report), "utf-8"))
         encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
 
         return encrypted_data_bytes_as_string
