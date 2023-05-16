@@ -86,5 +86,91 @@ class TestOrganisationStandardsReport(unittest.TestCase):
         self.assertGreater(len(key), 99)
 
 
+class TestRepositoryReport(unittest.TestCase):
+    def setUp(self):
+        self.repository_data = {
+            "node": {
+                "branchProtectionRules": {
+                    "edges": [
+                        {
+                            "node": {
+                                "pattern": "main",
+                                "requiresApprovingReviews": True,
+                                "isAdminEnforced": True,
+                                "requiresCodeOwnerReviews": True,
+                                "requiredApprovingReviewCount": 1,
+                            }
+                        }
+                    ]
+                },
+                "defaultBranchRef": {"name": "main"},
+                "description": "repo_description",
+                "hasIssuesEnabled": True,
+                "isArchived": False,
+                "isDisabled": False,
+                "isLocked": False,
+                "isPrivate": False,
+                "licenseInfo": None,
+                "name": "repo_name",
+                "pushedAt": "2022-01-01",
+                "url": "https://github.com"
+            }
+        }
+
+        self.repository_report = RepositoryReport(self.repository_data)
+
+    def test_good_data_init(self):
+        self.assertEqual(self.repository_report.repo_name(), self.repository_data['node']['name'])
+        self.assertEqual(self.repository_report.url(), self.repository_data['node']['url'])
+        self.assertEqual(self.repository_report.default_branch(), self.repository_data['node']['defaultBranchRef']['name'])
+        self.assertEqual(self.repository_report.last_push(), self.repository_data['node']['pushedAt'])
+        self.assertEqual(self.repository_report.is_private(), self.repository_data['node']['isPrivate'])
+        self.assertEqual(self.repository_report.has_issues_enabled(), self.repository_data['node']['hasIssuesEnabled'])
+
+    def test_bad_data_init(self):
+        bad_data = {
+            "node": {
+                "hasIssuesEnabled": True,
+                "licenseInfo": None,
+            }
+        }
+        with self.assertRaises(KeyError):
+            RepositoryReport(bad_data)
+
+    def test_private_repo(self):
+        self.repository_data['node']['isPrivate'] = True
+        repository_report = RepositoryReport(self.repository_data)
+        self.assertEqual(repository_report.is_private(), True)
+        self.assertEqual(repository_report.repository_type, 'private')
+
+    def test_public_repo(self):
+        self.repository_data['node']['isPrivate'] = False
+        repository_report = RepositoryReport(self.repository_data)
+        self.assertEqual(repository_report.is_private(), False)
+        self.assertEqual(repository_report.repository_type, 'public')
+
+    def test_report_creation(self):
+        self.assertIsNot(self.repository_report.report, None)
+        self.assertEqual(self.repository_report.report_output['name'], self.repository_data['node']['name'])
+        self.assertEqual(self.repository_report.report_output['url'], self.repository_data['node']['url'])
+        self.assertEqual(self.repository_report.report_output['default_branch'], self.repository_data['node']['defaultBranchRef']['name'])
+        self.assertEqual(self.repository_report.report_output['last_push'], self.repository_data['node']['pushedAt'])
+
+    def test_report_output(self):
+        self.assertIsNot(self.repository_report.report_output['report'], None)
+        self.assertEqual(self.repository_report.report_output['report']['default_branch_main'], True)
+        self.assertEqual(self.repository_report.report_output['report']['has_default_branch_protection'], True)
+        self.assertEqual(self.repository_report.report_output['report']['has_description'], True)
+
+    def test_compliance(self):
+        self.repository_data['node']['description'] = "repo_description"
+        self.repository_data['node']['licenceInfo'] = "MIT"
+        bad_report = RepositoryReport(self.repository_data)
+        self.assertEqual(bad_report.report_output['status'], True)
+
+    def test_non_compliance(self):
+        self.repository_data['node']['description'] = None
+        bad_report = RepositoryReport(self.repository_data)
+        self.assertEqual(bad_report.report_output['status'], False)
 
 

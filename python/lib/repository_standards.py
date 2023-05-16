@@ -129,6 +129,7 @@ class RepositoryReport:
         """
         for key, value in self.compliance_report().items():
             if value is False:
+                print(f"Non-compliant: {key} is {value}")
                 return False
 
         return True
@@ -217,7 +218,7 @@ class RepositoryReport:
         """
         Returns True if the repository has a license, False otherwise.
         """
-        if self.repo_data["node"]["licenseInfo"] is not None:
+        if not self.repo_data["node"]["licenseInfo"]:
             return True
         return False
 
