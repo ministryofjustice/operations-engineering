@@ -17,6 +17,7 @@ class OrganisationStandardsReport:
     The most important aspect of this class is the report collection, which should contain a list of
     RepositoryStandards objects.
     """
+
     def __init__(self, endpoint, api_key, enc_key, report_type: str):
         self.report = []
         self.api_endpoint = endpoint
@@ -52,14 +53,16 @@ class OrganisationStandardsReport:
         endpoint will be different.
         """
         if not self.report:
-            raise ValueError("Report is empty, something went wrong, we should have a report to send")
+            raise ValueError(
+                "Report is empty, something went wrong, we should have a report to send")
 
         # A decision was made to encrypt all repository data, regardless of whether it is public or private.
         data = self.__encrypt()
 
         status_code = self.__http_post(data)
         if status_code != 200:
-            raise ValueError(f"Error sending data to site, status code: {status_code}")
+            raise ValueError(
+                f"Error sending data to site, status code: {status_code}")
 
     def __http_post(self, data) -> int:
         headers = {
@@ -76,7 +79,8 @@ class OrganisationStandardsReport:
     def __encrypt(self):
         fernet = Fernet(self.encryption_key)
 
-        encrypted_data_as_bytes = fernet.encrypt(bytes(str(self.report), "utf-8"))
+        encrypted_data_as_bytes = fernet.encrypt(
+            bytes(str(self.report), "utf-8"))
         encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
 
         return encrypted_data_bytes_as_string
