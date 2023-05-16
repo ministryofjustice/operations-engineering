@@ -4,8 +4,9 @@ import time
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+
+from python.lib.moj_github import MojGithub
 from python.mojas.lib.MojArchive import MojArchive
-from python.mojas.lib.MojGithub import MojGithub
 
 
 # This file assigns archives all repositories which have had no commits from a certain datetime
