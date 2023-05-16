@@ -1,15 +1,21 @@
 """
-This file contains the classes that are used to represent the data
-that will be sent to the Operations Engineering Reports API.
-"""
+This module contains the classes used to generate the repository standards report.
 
+- The OrganisationStandardsReport class is used to generate a report for a given organisation.
+- The RepositoryStandards class is used to generate a report for a given repository.
+
+The report is generated to publish which repositories are compliant with the standards set out by the
+Operations Engineering team. The report is sent to the operations-engineering-reports API.
+"""
 import requests
 from cryptography.fernet import Fernet
 
 
 class OrganisationStandardsReport:
     """
-    A collection of RepositoryStandards objects
+    This class is used to generate a report for a given organisation.
+    The most important aspect of this class is the report collection, which should contain a list of
+    RepositoryStandards objects.
     """
     def __init__(self, endpoint, api_key, enc_key, report_type: str):
         self.report = []
@@ -17,12 +23,14 @@ class OrganisationStandardsReport:
         self.api_key = api_key
         self.encryption_key = enc_key
 
-        self.report_type = self.validate_report_type(report_type)
+        # report_type can be either public or private, this is used to determine the endpoint sent to.
+        self.report_type = self.__validate_report_type(report_type)
 
     @staticmethod
-    def validate_report_type(report_type: str) -> str:
+    def __validate_report_type(report_type: str) -> str:
         """
-        Validate the type of report being generated. This is used to determine the endpoint sent to.
+        Validate the type of report being generated. This can be either public or private and will raise an
+        exception if the report type is invalid.
         """
         match report_type:
             case "public":
@@ -34,32 +42,30 @@ class OrganisationStandardsReport:
 
     def add(self, report) -> None:
         """
-        Add a RepositoryStandards object to the collection
+        Add a RepositoryStandards object to the collection of reports.
         """
         self.report.append(report)
 
     def send_to_api(self) -> None:
+        """
+        Send the report to the operations-engineering-reports API. Depending on the report type, the
+        endpoint will be different.
+        """
         if not self.report:
             raise ValueError("Report is empty, something went wrong, we should have a report to send")
 
-        for r in self.report:
-            print(r.report_output)
-            print("---")
+        # A decision was made to encrypt all repository data, regardless of whether it is public or private.
+        data = self.__encrypt()
 
-        data = self.encrypt()
-
-        status_code = self.http_post(data)
+        status_code = self.__http_post(data)
         if status_code != 200:
-            print(f"Error sending data to site, status code: {status_code}")
-            raise ValueError("Error sending data to site")
+            raise ValueError(f"Error sending data to site, status code: {status_code}")
 
-    def http_post(self, data) -> int:
-        """
-        Sends the encrypted data to the API
-        """
+    def __http_post(self, data) -> int:
         headers = {
             "Content-Type": "application/json",
             "X-API-KEY": self.api_key,
+            "User-Agent": "repository-standards-report",
         }
 
         req = requests.post(self.api_endpoint, headers=headers,
@@ -67,7 +73,7 @@ class OrganisationStandardsReport:
 
         return req.status_code
 
-    def encrypt(self):
+    def __encrypt(self):
         fernet = Fernet(self.encryption_key)
 
         encrypted_data_as_bytes = fernet.encrypt(bytes(str(self.report), "utf-8"))
@@ -78,49 +84,41 @@ class OrganisationStandardsReport:
 
 class RepositoryReport:
     """
-    Report of repositories that are maintained in the MinistryOfJustice GitHub organization.
+    This class is used to generate a report for a given repository. It takes a single json repository object
+    from the GitHub API and returns a report of the repository. This report is used to determine if the
+    repository is compliant with the standards set by Ops Engineering. It will be used to formulate a table
+    of repositories that are compliant and non-compliant.
     """
 
     def __init__(self, raw_github_data):
         """
-        Takes a single json repository object from the GitHub API and returns a report of the repository.
-        This report is used to determine if the repository is compliant with the standards set by Ops Engineering.
-        It will be used to formulate a table of repositories that are compliant and non-compliant.
+        Initialise the class with the raw GitHub data.
         """
         self.repo_data = raw_github_data
-        self.report_output = self.report()
-        self.repository_type = "private" if self.is_private() else "public"
+        self.report_output = self.__generate_report()
+        self.repository_type = "private" if self.__is_private() else "public"
 
-    def report(self) -> dict:
+    def __generate_report(self) -> dict:
         """
-        Returns a Hash of the repository data.
+        Generate the report for the repository, used to determine if the repository is compliant or not.
         """
         return {
-            "name": self.repo_name(),
-            "default_branch": self.default_branch(),
-            "url": self.url(),
+            "name": self.__repo_name(),
+            "default_branch": self.__default_branch(),
+            "url": self.__url(),
             "status": self.is_compliant(),
             "report": self.compliance_report(),
-            "last_push": self.last_push(),
-            "is_private": self.is_private()
+            "last_push": self.__last_push(),
+            "is_private": self.__is_private()
         }
 
-    def repo_name(self) -> str:
-        """
-        Returns the name of the repository.
-        """
+    def __repo_name(self) -> str:
         return self.repo_data["node"]["name"]
 
-    def default_branch(self) -> str:
-        """
-        Returns the default branch of the repository.
-        """
+    def __default_branch(self) -> str:
         return self.repo_data["node"]["defaultBranchRef"]["name"]
 
-    def url(self) -> str:
-        """
-        Returns the URL of the repository.
-        """
+    def __url(self) -> str:
         return self.repo_data["node"]["url"]
 
     def is_compliant(self) -> bool:
@@ -134,44 +132,37 @@ class RepositoryReport:
 
         return True
 
-    def last_push(self) -> str:
-        """
-        Returns the last push date of the repository.
-        """
+    def __last_push(self) -> str:
         return self.repo_data["node"]["pushedAt"]
 
-    def is_private(self) -> bool:
-        """
-        Returns True if the repository is private, False otherwise.
-        """
+    def __is_private(self) -> bool:
         return self.repo_data["node"]["isPrivate"]
 
     def compliance_report(self) -> dict:
         """
-        Returns the status of the repository.
+        Returns a dictionary of the compliance report for the repository. The report is an opinionated
+        view of what is compliant and what is not. This is based on the standards set by Ops Engineering.
         """
         return {
-            "default_branch_main": self.default_branch_main(),
-            "has_default_branch_protection": self.has_default_branch_protection_enabled(),
-            "requires_approving_reviews": self.has_requires_approving_reviews_enabled(),
-            "administrators_require_review": self.has_admin_requires_reviews_enabled(),
-            "issues_section_enabled": self.has_issues_enabled(),
-            "has_require_approvals_enabled": self.has_required_approval_review_count_enabled(),
-            "has_license": self.has_license(),
-            "has_description": self.has_description()
+            "default_branch_main": self.__default_branch_main(),
+            "has_default_branch_protection": self.__has_default_branch_protection_enabled(),
+            "requires_approving_reviews": self.__has_requires_approving_reviews_enabled(),
+            "administrators_require_review": self.__has_admin_requires_reviews_enabled(),
+            "issues_section_enabled": self.__has_issues_enabled(),
+            "has_require_approvals_enabled": self.__has_required_approval_review_count_enabled(),
+            "has_license": self.__has_license(),
+            "has_description": self.__has_description()
         }
 
-    def default_branch_main(self) -> bool:
-        """
-        Returns True if the default branch is main, False otherwise.
-        """
+    def __default_branch_main(self) -> bool:
         if self.repo_data["node"]["defaultBranchRef"]["name"] == "main":
             return True
         return False
 
-    def has_default_branch_protection_enabled(self) -> bool:
+    def __has_default_branch_protection_enabled(self) -> bool:
         """
-        Returns True if the default branch is protected, False otherwise.
+        Sets the default branch and checks if that branch has branch protection enabled. If it does, then
+        return True, otherwise return False.
         """
         default_branch = self.repo_data["node"]["defaultBranchRef"]["name"]
         branch_protection_rules = self.repo_data["node"]["branchProtectionRules"]["edges"]
@@ -181,51 +172,32 @@ class RepositoryReport:
                 return True
             return False
 
-    def has_requires_approving_reviews_enabled(self) -> bool:
-        """
-        Returns True if the repository requires approving reviews, False otherwise.
-        """
+    def __has_requires_approving_reviews_enabled(self) -> bool:
         branch_protection_rules = self.repo_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             return branch_protection_rule["node"]["requiresApprovingReviews"]
 
-    def has_admin_requires_reviews_enabled(self) -> bool:
-        """
-        Returns True if the repository requires admin reviews, False otherwise.
-        """
+    def __has_admin_requires_reviews_enabled(self) -> bool:
         branch_protection_rules = self.repo_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             return branch_protection_rule["node"]["isAdminEnforced"]
 
-    def has_issues_enabled(self) -> bool:
-        """
-        Returns True if the repository has issues enabled, False otherwise.
-        """
+    def __has_issues_enabled(self) -> bool:
         return self.repo_data["node"]["hasIssuesEnabled"]
 
-    def has_required_approval_review_count_enabled(self) -> bool:
-        """
-        Returns True if the repository has required approving review count enabled,
-        False otherwise.
-        """
+    def __has_required_approval_review_count_enabled(self) -> bool:
         branch_protection_rules = self.repo_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             if branch_protection_rule["node"]["requiredApprovingReviewCount"] > 0:
                 return True
             return False
 
-    def has_license(self) -> bool:
-        """
-        Returns True if the repository has a license, False otherwise.
-        """
+    def __has_license(self) -> bool:
         if not self.repo_data["node"]["licenseInfo"]:
             return True
         return False
 
-    def has_description(self) -> bool:
-        """
-        Returns True if the repository has a description, False otherwise.
-        """
+    def __has_description(self) -> bool:
         if self.repo_data["node"]["description"] is not None:
             return True
         return False

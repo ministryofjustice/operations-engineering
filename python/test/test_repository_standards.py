@@ -80,11 +80,6 @@ class TestOrganisationStandardsReport(unittest.TestCase):
         m.post('https://test.com', json={"status": "408"})
         self.assertIsNone(self.mock_report.send_to_api())
 
-    def test_encrypt_string(self):
-        key = self.mock_report.encrypt()
-        self.assertIsInstance(key, str)
-        self.assertGreater(len(key), 99)
-
 
 class TestRepositoryReport(unittest.TestCase):
     def setUp(self):
@@ -120,12 +115,10 @@ class TestRepositoryReport(unittest.TestCase):
         self.repository_report = RepositoryReport(self.repository_data)
 
     def test_good_data_init(self):
-        self.assertEqual(self.repository_report.repo_name(), self.repository_data['node']['name'])
-        self.assertEqual(self.repository_report.url(), self.repository_data['node']['url'])
-        self.assertEqual(self.repository_report.default_branch(), self.repository_data['node']['defaultBranchRef']['name'])
-        self.assertEqual(self.repository_report.last_push(), self.repository_data['node']['pushedAt'])
-        self.assertEqual(self.repository_report.is_private(), self.repository_data['node']['isPrivate'])
-        self.assertEqual(self.repository_report.has_issues_enabled(), self.repository_data['node']['hasIssuesEnabled'])
+        self.assertEqual(self.repository_report.repository_type, 'public')
+        self.assertIsNot(self.repository_report.report_output, None)
+        self.assertIsNot(self.repository_report.repo_data, None)
+        self.assertEqual(self.repository_report.report_output['name'], self.repository_data['node']['name'])
 
     def test_bad_data_init(self):
         bad_data = {
@@ -140,17 +133,15 @@ class TestRepositoryReport(unittest.TestCase):
     def test_private_repo(self):
         self.repository_data['node']['isPrivate'] = True
         repository_report = RepositoryReport(self.repository_data)
-        self.assertEqual(repository_report.is_private(), True)
         self.assertEqual(repository_report.repository_type, 'private')
 
     def test_public_repo(self):
         self.repository_data['node']['isPrivate'] = False
         repository_report = RepositoryReport(self.repository_data)
-        self.assertEqual(repository_report.is_private(), False)
         self.assertEqual(repository_report.repository_type, 'public')
 
     def test_report_creation(self):
-        self.assertIsNot(self.repository_report.report, None)
+        self.assertIsNot(self.repository_report.report_output, None)
         self.assertEqual(self.repository_report.report_output['name'], self.repository_data['node']['name'])
         self.assertEqual(self.repository_report.report_output['url'], self.repository_data['node']['url'])
         self.assertEqual(self.repository_report.report_output['default_branch'], self.repository_data['node']['defaultBranchRef']['name'])
@@ -172,5 +163,3 @@ class TestRepositoryReport(unittest.TestCase):
         self.repository_data['node']['description'] = None
         bad_report = RepositoryReport(self.repository_data)
         self.assertEqual(bad_report.report_output['status'], False)
-
-
