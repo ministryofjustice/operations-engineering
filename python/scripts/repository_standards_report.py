@@ -49,7 +49,8 @@ def main():
     args = add_arguments()
 
     # Fetch all repositories in the org
-    repos = GithubService(args.oauth_token, args.org).fetch_all_repositories_in_org()
+    repos = GithubService(
+        args.oauth_token, args.org).fetch_all_repositories_in_org()
 
     # Generate the report
     report = OrganisationStandardsReport(

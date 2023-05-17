@@ -829,7 +829,7 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
         self.assertEqual(len(self.repos), 1)
         self.assertEqual(self.repos[0]["node"]["name"], "test_repository")
         self.assertFalse("unexpected_data" in self.repos[0])
-        
+
 
 class MockGithubIssue(MagicMock):
     def __init__(self, id, number, title, assignees, label):

@@ -32,7 +32,8 @@ class TestOrganisationStandardsReport(unittest.TestCase):
         # Hex key for testing
         self.encryption_key = "5a5263317379674b64564a62516856656a504a6e4b386a4959544236626f44365631516531534a4c3165773d"
 
-        self.mock_report = OrganisationStandardsReport(self.endpoint, self.api_key, self.encryption_key)
+        self.mock_report = OrganisationStandardsReport(
+            self.endpoint, self.api_key, self.encryption_key)
 
     def testSuccessInit(self):
         self.assertEqual(self.mock_report.api_key, self.api_key)
@@ -54,7 +55,8 @@ class TestOrganisationStandardsReport(unittest.TestCase):
 
     @requests_mock.Mocker()
     def test_send_to_api_with_requests_mock(self, m):
-        self.mock_report.report = [RepositoryReport(self.mock_repo_data()).report_output]
+        self.mock_report.report = [RepositoryReport(
+            self.mock_repo_data()).report_output]
         m.post(self.endpoint, json={"status": "ok"})
         self.assertIsNone(self.mock_report.send_to_api())
 
@@ -114,7 +116,8 @@ class TestRepositoryReport(unittest.TestCase):
         self.assertEqual(self.repository_report.repository_type, 'public')
         self.assertIsNot(self.repository_report.report_output, None)
         self.assertIsNot(self.repository_report.repo_data, None)
-        self.assertEqual(self.repository_report.report_output['name'], self.repository_data['node']['name'])
+        self.assertEqual(
+            self.repository_report.report_output['name'], self.repository_data['node']['name'])
 
     def test_bad_data_init(self):
         bad_data = {
@@ -138,16 +141,23 @@ class TestRepositoryReport(unittest.TestCase):
 
     def test_report_creation(self):
         self.assertIsNot(self.repository_report.report_output, None)
-        self.assertEqual(self.repository_report.report_output['name'], self.repository_data['node']['name'])
-        self.assertEqual(self.repository_report.report_output['url'], self.repository_data['node']['url'])
-        self.assertEqual(self.repository_report.report_output['default_branch'], self.repository_data['node']['defaultBranchRef']['name'])
-        self.assertEqual(self.repository_report.report_output['last_push'], self.repository_data['node']['pushedAt'])
+        self.assertEqual(
+            self.repository_report.report_output['name'], self.repository_data['node']['name'])
+        self.assertEqual(
+            self.repository_report.report_output['url'], self.repository_data['node']['url'])
+        self.assertEqual(
+            self.repository_report.report_output['default_branch'], self.repository_data['node']['defaultBranchRef']['name'])
+        self.assertEqual(
+            self.repository_report.report_output['last_push'], self.repository_data['node']['pushedAt'])
 
     def test_report_output(self):
         self.assertIsNot(self.repository_report.report_output['report'], None)
-        self.assertEqual(self.repository_report.report_output['report']['default_branch_main'], True)
-        self.assertEqual(self.repository_report.report_output['report']['has_default_branch_protection'], True)
-        self.assertEqual(self.repository_report.report_output['report']['has_description'], True)
+        self.assertEqual(
+            self.repository_report.report_output['report']['default_branch_main'], True)
+        self.assertEqual(
+            self.repository_report.report_output['report']['has_default_branch_protection'], True)
+        self.assertEqual(
+            self.repository_report.report_output['report']['has_description'], True)
 
     def test_compliance(self):
         self.repository_data['node']['description'] = "repo_description"
