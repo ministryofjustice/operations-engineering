@@ -796,6 +796,41 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
             ValueError, github_service.get_paginated_list_of_repositories_per_type, "public", "test_after_cursor", 101)
 
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceFetchAllRepositories(unittest.TestCase):
+    def test_returning_correct_data(self):
+        self.github_service = GithubService("", ORGANISATION_NAME)
+        self.github_service.get_paginated_list_of_repositories = MagicMock(
+            return_value={
+                "organization": {
+                    "repositories": {
+                        "edges": [
+                            {
+                                "node": {
+                                    "name": "test_repository",
+                                    "url": "test.com",
+                                    "isArchived": False,
+                                    "isLocked": False,
+                                    "isDisabled": False,
+                                },
+                            },
+                        ],
+                        "pageInfo": {
+                            "hasNextPage": False,
+                            "endCursor": "test_end_cursor",
+                        },
+                    }
+                }
+            }
+        )
+        self.repos = self.github_service.fetch_all_repositories_in_org()
+        self.assertEqual(len(self.repos), 1)
+        self.assertEqual(self.repos[0]["node"]["name"], "test_repository")
+        self.assertFalse("unexpected_data" in self.repos[0])
+        
+
 class MockGithubIssue(MagicMock):
     def __init__(self, id, number, title, assignees, label):
         mock_label = MagicMock(name="test_support_label")
