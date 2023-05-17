@@ -3,10 +3,6 @@ import sys
 import time
 import traceback
 
-from gql import Client, gql
-from gql.transport.aiohttp import AIOHTTPTransport
-from graphql import DocumentNode
-
 from python.services.github_service import GithubService
 
 
@@ -24,49 +20,13 @@ def print_stack_trace(message):
         del exc_info
 
 
-def organisation_team_id_query() -> DocumentNode:
-    """A GraphQL query to get the id of an organisation team
-
-    Returns:
-        gql: The GraphQL query result
-    """
-    query = """
-    query {
-        organization(login: "moj-analytical-services") {
-            team(slug: "everyone") {
-                databaseId
-            }
-        }
-    }
-    """
-
-    return gql(query)
-
-
-def fetch_team_id(gql_client: Client) -> int:
-    """A wrapper function to run a GraphQL query to get the team ID
-
-    Returns:
-        int: The team ID of the team
-    """
-    query = organisation_team_id_query()
-    data = gql_client.execute(query)
-    if (
-        data["organization"]["team"]["databaseId"] is not None
-        and data["organization"]["team"]["databaseId"]
-    ):
-        return data["organization"]["team"]["databaseId"]
-    else:
-        return 0
-
-
-def run(github_service: GithubService, gql_client: Client):
+def run(github_service: GithubService):
     """A function for the main functionality of the script"""
 
     try:
         gh = github_service.github_client_core_api
         org = gh.get_organization("moj-analytical-services")
-        team_id = fetch_team_id(gql_client)
+        team_id = github_service.get_team_id_from_team_name("everyone")
         gh_team = org.get_team(team_id)
         all_org_members = gh_team.get_members()
         org_members = org.get_members()
@@ -86,26 +46,9 @@ def main():
     if not org_token:
         raise ValueError(
             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
-
-    # Setup a transport and gql_client to interact with the GH GraphQL API
-    try:
-        transport = AIOHTTPTransport(
-            url="https://api.github.com/graphql",
-            headers={"Authorization": "Bearer {}".format(org_token)},
-        )
-    except Exception:
-        print_stack_trace("Exception: Problem with the API URL or GH Token")
-
-    try:
-        gql_client = Client(transport=transport,
-                            fetch_schema_from_transport=False)
-    except Exception:
-        print_stack_trace("Exception: Problem with the Client.")
-
     github_service = GithubService(org_token, "moj-analytical-services")
-
     print("Start")
-    run(github_service, gql_client)
+    run(github_service)
     print("Finished")
 
 
