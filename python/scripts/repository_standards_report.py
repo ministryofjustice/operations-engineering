@@ -51,16 +51,14 @@ def main():
     # Fetch all repositories in the org
     repos = GithubService(args.oauth_token, args.org).fetch_all_repositories_in_org()
 
-    repo_types = ["public", "private"]
-    for repo_type in repo_types:
-        report = OrganisationStandardsReport(
-            args.endpoint, args.api_key, args.enc_key, repo_type)
-        repo_reports = [RepositoryReport(repo) for repo in repos if RepositoryReport(repo).repository_type == repo_type]
-        report.add(repo_reports)
-        try:
-            report.send_to_api()
-        except ValueError:
-            print(f"Error sending {repo_type} report to site")
+    # Generate the report
+    report = OrganisationStandardsReport(
+        args.endpoint, args.api_key, args.enc_key)
+    # Generate GitHub standards report for each repository in the org
+    [report.add(RepositoryReport(repo).report_output) for repo in repos]
+
+    # Send the report to the API
+    report.send_to_api()
 
 
 if __name__ == "__main__":

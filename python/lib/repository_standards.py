@@ -21,14 +21,11 @@ class OrganisationStandardsReport:
     RepositoryStandards objects.
     """
 
-    def __init__(self, endpoint, api_key, enc_key, report_type: str):
+    def __init__(self, endpoint: str, api_key: str, enc_key: hex) -> None:
         self.report: list = []
-        self.api_endpoint: str = endpoint
-        self.api_key: str = api_key
-        self.encryption_key: hex = enc_key
-
-        # report_type can be either public or private, this is used to determine the endpoint sent to.
-        self.report_type: str = self.__validate_report_type(report_type)
+        self.api_endpoint = endpoint
+        self.api_key = api_key
+        self.encryption_key = enc_key
 
     def all_reports(self) -> list:
         """
@@ -58,20 +55,6 @@ class OrganisationStandardsReport:
         if status_code != 200:
             raise ValueError(
                 f"Error sending data to site, status code: {status_code}")
-
-    @staticmethod
-    def __validate_report_type(report_type: str) -> str:
-        """
-        Validate the type of report being generated. This can be either public or private and will raise an
-        exception if the report type is invalid.
-        """
-        match report_type:
-            case "public":
-                return "public"
-            case "private":
-                return "private"
-            case _:
-                raise ValueError("Invalid report type")
 
     def __http_post(self, data) -> int:
         headers = {
