@@ -1,5 +1,5 @@
 """
-This module contains the classes used to generate the repository standards report.
+This module contains the classes used to generate the GitHub repository standards report.
 
 - The OrganisationStandardsReport class is used to generate a report for a given organisation.
 - The RepositoryStandards class is used to generate a report for a given repository.
@@ -7,6 +7,9 @@ This module contains the classes used to generate the repository standards repor
 The report is generated to publish which repositories are compliant with the standards set out by the
 Operations Engineering team. The report is sent to the operations-engineering-reports API.
 """
+
+import json
+
 import requests
 from cryptography.fernet import Fernet
 
@@ -19,27 +22,19 @@ class OrganisationStandardsReport:
     """
 
     def __init__(self, endpoint, api_key, enc_key, report_type: str):
-        self.report = []
-        self.api_endpoint = endpoint
-        self.api_key = api_key
-        self.encryption_key = enc_key
+        self.report: list = []
+        self.api_endpoint: str = endpoint
+        self.api_key: str = api_key
+        self.encryption_key: hex = enc_key
 
         # report_type can be either public or private, this is used to determine the endpoint sent to.
-        self.report_type = self.__validate_report_type(report_type)
+        self.report_type: str = self.__validate_report_type(report_type)
 
-    @staticmethod
-    def __validate_report_type(report_type: str) -> str:
+    def all_reports(self) -> list:
         """
-        Validate the type of report being generated. This can be either public or private and will raise an
-        exception if the report type is invalid.
+        Return the collection of reports.
         """
-        match report_type:
-            case "public":
-                return "public"
-            case "private":
-                return "private"
-            case _:
-                raise ValueError("Invalid report type")
+        return self.report
 
     def add(self, report) -> None:
         """
@@ -64,6 +59,20 @@ class OrganisationStandardsReport:
             raise ValueError(
                 f"Error sending data to site, status code: {status_code}")
 
+    @staticmethod
+    def __validate_report_type(report_type: str) -> str:
+        """
+        Validate the type of report being generated. This can be either public or private and will raise an
+        exception if the report type is invalid.
+        """
+        match report_type:
+            case "public":
+                return "public"
+            case "private":
+                return "private"
+            case _:
+                raise ValueError("Invalid report type")
+
     def __http_post(self, data) -> int:
         headers = {
             "Content-Type": "application/json",
@@ -77,10 +86,12 @@ class OrganisationStandardsReport:
         return req.status_code
 
     def __encrypt(self):
-        fernet = Fernet(self.encryption_key)
+        key = bytes.fromhex(self.encryption_key)
+        fernet = Fernet(key)
 
+        json_data = json.dumps(self.all_reports())
         encrypted_data_as_bytes = fernet.encrypt(
-            bytes(str(self.report), "utf-8"))
+            json_data.__str__().encode())
         encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
 
         return encrypted_data_bytes_as_string
