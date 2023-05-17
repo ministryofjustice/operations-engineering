@@ -55,25 +55,25 @@ class TestOrganisationStandardsReport(unittest.TestCase):
     @requests_mock.Mocker()
     def test_send_to_api_with_requests_mock(self, m):
         self.mock_report.report = [RepositoryReport(self.mock_repo_data()).report_output]
-        m.post('https://test.com', json={"status": "ok"})
+        m.post(self.endpoint, json={"status": "ok"})
         self.assertIsNone(self.mock_report.send_to_api())
 
     @requests_mock.Mocker()
     def test_send_to_api_with_empty_report(self, m):
         self.mock_report.report = []
-        m.post('https://test.com', json={"status": "ok"})
+        m.post(self.endpoint, json={"status": "ok"})
         self.assertRaises(ValueError, self.mock_report.send_to_api)
 
     @requests_mock.Mocker()
     def test_send_to_api_with_incorrect_report(self, m):
         self.mock_report.report = [RepositoryReport(self.mock_repo_data())]
-        m.post('https://test.com', json={"status": "ok"})
+        m.post(self.endpoint, json={"status": "ok"})
         self.assertRaises(TypeError, self.mock_report.send_to_api)
 
     @requests_mock.Mocker()
     def test_with_bad_status_code(self, m):
         self.mock_report.report = []
-        m.post('https://test.com', json={"status": "400"})
+        m.post(self.endpoint, json={"status": "400"})
         self.assertRaises(ValueError, self.mock_report.send_to_api)
 
 
