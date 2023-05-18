@@ -95,10 +95,12 @@ def main():
     host_zone_id_1 = get_hosted_zone_id("HOSTED_ZONE_1")
     host_zone_id_2 = get_hosted_zone_id("HOSTED_ZONE_2")
 
-    records_to_delete = get_cname_records_to_delete(route53_client, host_zone_id_1)
+    records_to_delete = get_cname_records_to_delete(
+        route53_client, host_zone_id_1)
     delete_cname_records(route53_client, records_to_delete, host_zone_id_1)
 
-    records_to_delete = get_cname_records_to_delete(route53_client, host_zone_id_2)
+    records_to_delete = get_cname_records_to_delete(
+        route53_client, host_zone_id_2)
     delete_cname_records(route53_client, records_to_delete, host_zone_id_2)
 
     print("Finished")

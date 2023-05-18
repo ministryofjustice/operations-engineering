@@ -8,6 +8,7 @@ from python.scripts import delete_cnames
 import botocore.session
 from botocore.stub import Stubber
 
+
 class TestDeleteCNames(unittest.TestCase):
 
     response_when_false = {
@@ -53,8 +54,10 @@ class TestDeleteCNames(unittest.TestCase):
         }
         mock_client.return_value = stubbed_client
 
-        stubber.add_response('list_resource_record_sets', response, self.expected_params_when_true)
-        stubber.add_response('list_resource_record_sets', response, self.expected_params_when_true)
+        stubber.add_response('list_resource_record_sets',
+                             response, self.expected_params_when_true)
+        stubber.add_response('list_resource_record_sets',
+                             response, self.expected_params_when_true)
         stubber.activate()
 
         delete_cnames.main()
@@ -84,11 +87,14 @@ class TestDeleteCNames(unittest.TestCase):
 
         mock_client.return_value = stubbed_client
 
-        stubber.add_response('list_resource_record_sets', response_when_true, self.expected_params_when_true)
-        stubber.add_response('list_resource_record_sets', self.response_when_false, self.expected_params_when_false)
+        stubber.add_response('list_resource_record_sets',
+                             response_when_true, self.expected_params_when_true)
+        stubber.add_response('list_resource_record_sets',
+                             self.response_when_false, self.expected_params_when_false)
         stubber.activate()
 
-        self.assertEqual(delete_cnames.get_cname_records_to_delete(stubbed_client, "abc"), [])
+        self.assertEqual(delete_cnames.get_cname_records_to_delete(
+            stubbed_client, "abc"), [])
 
     @patch.object(boto3, "client")
     def test_get_cname_records_to_delete_with_pagination_when_cname_records_exist_but_not_ours(self, mock_client):
@@ -113,11 +119,14 @@ class TestDeleteCNames(unittest.TestCase):
 
         mock_client.return_value = stubbed_client
 
-        stubber.add_response('list_resource_record_sets', response_when_true, self.expected_params_when_true)
-        stubber.add_response('list_resource_record_sets', self.response_when_false, self.expected_params_when_false)
+        stubber.add_response('list_resource_record_sets',
+                             response_when_true, self.expected_params_when_true)
+        stubber.add_response('list_resource_record_sets',
+                             self.response_when_false, self.expected_params_when_false)
         stubber.activate()
 
-        self.assertEqual(delete_cnames.get_cname_records_to_delete(stubbed_client, "abc"), [])
+        self.assertEqual(delete_cnames.get_cname_records_to_delete(
+            stubbed_client, "abc"), [])
 
     @patch.object(boto3, "client")
     def test_get_cname_records_to_delete_with_pagination_when_cname_records_exist(self, mock_client):
@@ -153,11 +162,14 @@ class TestDeleteCNames(unittest.TestCase):
 
         mock_client.return_value = stubbed_client
 
-        stubber.add_response('list_resource_record_sets', response_when_true, self.expected_params_when_true)
-        stubber.add_response('list_resource_record_sets', self.response_when_false, self.expected_params_when_false)
+        stubber.add_response('list_resource_record_sets',
+                             response_when_true, self.expected_params_when_true)
+        stubber.add_response('list_resource_record_sets',
+                             self.response_when_false, self.expected_params_when_false)
         stubber.activate()
 
-        records_to_delete = delete_cnames.get_cname_records_to_delete(stubbed_client, "abc")
+        records_to_delete = delete_cnames.get_cname_records_to_delete(
+            stubbed_client, "abc")
         self.assertEqual(len(records_to_delete), 2)
 
     def test_create_delete_cname_record(self):
@@ -172,7 +184,8 @@ class TestDeleteCNames(unittest.TestCase):
             ]
         }
 
-        self.assertEqual(delete_cnames.create_delete_cname_record(cname_input), self.expected_cname_to_delete)
+        self.assertEqual(delete_cnames.create_delete_cname_record(
+            cname_input), self.expected_cname_to_delete)
 
     @patch.object(boto3, "client")
     def test_delete_cname_records(self, mock_client):
@@ -197,11 +210,14 @@ class TestDeleteCNames(unittest.TestCase):
             }
         }
 
-        stubber.add_response('change_resource_record_sets', response, expected_params)
+        stubber.add_response('change_resource_record_sets',
+                             response, expected_params)
         stubber.activate()
         mock_client.return_value = stubbed_client
 
-        delete_cnames.delete_cname_records(stubbed_client, [self.expected_cname_to_delete], "abc")
+        delete_cnames.delete_cname_records(
+            stubbed_client, [self.expected_cname_to_delete], "abc")
+
 
 if __name__ == "__main__":
     unittest.main()
