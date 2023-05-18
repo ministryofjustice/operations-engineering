@@ -1,23 +1,6 @@
 import os
-import boto3
 import json
-import sys
-import traceback
-
-from botocore.client import BaseClient
-
-
-def print_stack_trace(message):
-    """This will attempt to print a stack trace when an exception occurs
-    Args:
-        message (string): A message to print when exception occurs
-    """
-    print(message)
-    try:
-        exc_info = sys.exc_info()
-    finally:
-        traceback.print_exception(*exc_info)
-        del exc_info
+import boto3
 
 
 def create_delete_cname_record(cname):
@@ -25,9 +8,9 @@ def create_delete_cname_record(cname):
     Args:
         cname (string): The cname record from AWS.
     Returns:
-        cname_record: a completed delete cname record
+        (dict): a completed delete cname record
     """
-    cname_record = {
+    return {
         "Action": "DELETE",
         "ResourceRecordSet": {
             "Name": cname["Name"],
@@ -37,81 +20,86 @@ def create_delete_cname_record(cname):
         },
     }
 
-    return cname_record
 
-
-def delete_cname_records(route53_client: BaseClient, host_zone_id):
-    """Delete selected cname records from the AWS Route53 host zone
+def get_cname_records_to_delete(route53_client, hosted_zone_id):
+    """Find which cname records can be deleted
 
     Args:
-        host_zone_id (string): The AWS ID of the host zone that contains the records to delete
         route53_client (BaseClient)
+        hosted_zone_id (string): The id of the hosted zone
+
+    Returns:
+        list[cname_record]: a list of delete cname records to be deleted
     """
-    delete_records = []
+    records_to_delete = []
     next_record_name = "a"
     next_record_type = "CNAME"
 
-    while next_record_name is not None and next_record_type is not None:
-        try:
-            response = route53_client.list_resource_record_sets(
-                HostedZoneId=host_zone_id,
-                StartRecordName=next_record_name,
-                StartRecordType=next_record_type,
-                MaxItems="400",
-            )
+    while True:
+        response = route53_client.list_resource_record_sets(
+            HostedZoneId=hosted_zone_id,
+            StartRecordName=next_record_name,
+            StartRecordType=next_record_type,
+            MaxItems="400",
+        )
 
-            for record_set in response["ResourceRecordSets"]:
-                if record_set["Type"] == "CNAME":
-                    if (
-                        "comodoca" in record_set["ResourceRecords"][0]["Value"]
-                        or "sectigo" in record_set["ResourceRecords"][0]["Value"]
-                    ):
-                        delete_record = create_delete_cname_record(record_set)
-                        delete_records.append(delete_record)
+        for record_set in response["ResourceRecordSets"]:
+            if record_set["Type"] == "CNAME" and (
+                "comodoca" in record_set["ResourceRecords"][0]["Value"] or
+                "sectigo" in record_set["ResourceRecords"][0]["Value"]
+            ):
+                delete_record = create_delete_cname_record(record_set)
+                records_to_delete.append(delete_record)
 
+        if response["IsTruncated"]:
             next_record_name = response["NextRecordName"]
-            next_record_type = response["NextRecordType"]
+        else:
+            break
 
-        except BaseException as err:
-            print(err)
-            next_record_name = None
-            next_record_type = None
+    return records_to_delete
 
-    try:
-        if len(delete_records) != 0:
-            response = route53_client.change_resource_record_sets(
-                ChangeBatch={"Changes": delete_records},
-                HostedZoneId=host_zone_id,
-            )
-            print(response)
 
+def delete_cname_records(route53_client, records_to_delete, hosted_zone_id):
+    """Delete selected cname records from the AWS Route53 host zone
+
+    Args:
+        route53_client (BaseClient)
+        records_to_delete (list[dict]) the list of cname records to delete
+        hosted_zone_id (string): The id of the hosted zone
+    """
+    if len(records_to_delete) != 0:
+        response = route53_client.change_resource_record_sets(
+            ChangeBatch={"Changes": records_to_delete},
+            HostedZoneId=hosted_zone_id,
+        )
+        if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
             print("Deleted records:")
-            print(json.dumps(delete_records, indent=2))
-    except BaseException as err:
-        print(err)
-        print_stack_trace("Exception: AWS call to delete cname records")
+            print(json.dumps(records_to_delete, indent=2))
+
+
+def get_hosted_zone_id(zone_name):
+    hosted_zone_id = os.getenv(zone_name)
+    if not hosted_zone_id:
+        raise ValueError(f"The env variable {zone_name} is empty or missing")
+    return hosted_zone_id
 
 
 def main():
-    try:
-        route53_client = boto3.client("route53")
-    except BaseException as err:
-        print(err)
-        print_stack_trace("Exception: Problem with the route53 client.")
-
-    hosted_zone_1 = os.getenv("HOSTED_ZONE_1")
-    if not hosted_zone_1:
-        raise ValueError(
-            "The env variable HOSTED_ZONE_1 is empty or missing")
-
-    hosted_zone_2 = os.getenv("HOSTED_ZONE_2")
-    if not hosted_zone_2:
-        raise ValueError(
-            "The env variable HOSTED_ZONE_2 is empty or missing")
-
     print("Start")
-    delete_cname_records(route53_client, hosted_zone_1)
-    delete_cname_records(route53_client, hosted_zone_2)
+
+    route53_client = boto3.client("route53")
+
+    host_zone_id_1 = get_hosted_zone_id("HOSTED_ZONE_1")
+    host_zone_id_2 = get_hosted_zone_id("HOSTED_ZONE_2")
+
+    records_to_delete = get_cname_records_to_delete(
+        route53_client, host_zone_id_1)
+    delete_cname_records(route53_client, records_to_delete, host_zone_id_1)
+
+    records_to_delete = get_cname_records_to_delete(
+        route53_client, host_zone_id_2)
+    delete_cname_records(route53_client, records_to_delete, host_zone_id_2)
+
     print("Finished")
 
 
