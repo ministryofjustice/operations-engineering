@@ -17,8 +17,7 @@ def get_org_teams(headers, base_url):
     if response.status_code == 200:
         teams = json.loads(response.content)
         return teams
-    else:
-        return None
+    return None
 
 
 def get_project_keys(headers, base_url, project_slug):
@@ -27,8 +26,7 @@ def get_project_keys(headers, base_url, project_slug):
     if response.status_code == 200:
         project_keys = json.loads(response.content)
         return project_keys
-    else:
-        return None
+    return None
 
 
 def print_project_key_info(project_key):

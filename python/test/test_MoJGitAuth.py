@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from python.lib.moj_git_auth import MoJGitAuth
 
 

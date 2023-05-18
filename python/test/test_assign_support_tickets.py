@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-
-import python.scripts.assign_support_tickets as assign_support_tickets
+from python.scripts import assign_support_tickets
 
 
 @patch("github.Github.__new__", new=MagicMock)
