@@ -6,6 +6,7 @@ from python.scripts import sentry_projects_rate_limiting
 
 SENTRY_URL = "https://sentry.io/api/0"
 
+
 class TestSentry(unittest.TestCase):
 
     @patch.dict('os.environ', {'SENTRY_TOKEN': 'test_token'})
@@ -21,7 +22,8 @@ class TestSentry(unittest.TestCase):
         mock_get.return_value.ok = True
         mock_get.return_value.content = mock_response_json
         mock_get.return_value.json.return_value = mock_response_json
-        teams = sentry_projects_rate_limiting.get_org_teams(headers, SENTRY_URL)
+        teams = sentry_projects_rate_limiting.get_org_teams(
+            headers, SENTRY_URL)
         self.assertEqual(teams, json.loads(mock_response_json))
 
     @patch('requests.get')
@@ -30,7 +32,8 @@ class TestSentry(unittest.TestCase):
         mock_get.return_value.status_code = 404
         mock_get.return_value.ok = False
         mock_get.return_value.raise_for_status.side_effect = requests.exceptions.HTTPError()
-        teams = sentry_projects_rate_limiting.get_org_teams(headers, SENTRY_URL)
+        teams = sentry_projects_rate_limiting.get_org_teams(
+            headers, SENTRY_URL)
         self.assertIsNone(teams)
 
     @patch('requests.get')

@@ -14,6 +14,7 @@ ORGANISATION_NAME = "moj-analytical-services"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
+
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
 
     def test_function_is_only_called_once_with_arguments(self):
