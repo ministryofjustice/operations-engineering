@@ -36,7 +36,6 @@ def get_cname_records_to_delete(route53_client, hosted_zone_id):
     records_to_delete = []
     next_record_name = "a"
     next_record_type = "CNAME"
-    next_record_id = "0"
 
     while True:
         response = route53_client.list_resource_record_sets(
