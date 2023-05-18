@@ -37,7 +37,7 @@ class ReportsService:
         url = self.reports_url+self.endpoint
 
         requests.post(url, headers=headers,
-                            json=data, timeout=3)
+                      json=data, timeout=3)
 
     def __encrypt(self, payload: any):
         key = bytes.fromhex(self.encryption_key)
@@ -50,5 +50,3 @@ class ReportsService:
         encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
 
         return encrypted_data_bytes_as_string
-
-
