@@ -1,7 +1,8 @@
 import argparse
 
-from python.lib.repository_standards import OrganisationStandardsReport, RepositoryReport
 from python.services.github_service import GithubService
+from python.services.reports_service import ReportsService
+from python.services.repository_standards_service import RepositoryReport
 
 
 def add_arguments():
@@ -18,6 +19,13 @@ def add_arguments():
         type=str,
         default="ministryofjustice",
         help="The GitHub organisation to use",
+    )
+
+    parser.add_argument(
+        "--url",
+        type=str,
+        required=True,
+        help="The operations-engineering-reports url to use",
     )
 
     parser.add_argument(
@@ -52,14 +60,10 @@ def main():
     repos = GithubService(
         args.oauth_token, args.org).fetch_all_repositories_in_org()
 
-    # Generate the report
-    report = OrganisationStandardsReport(
-        args.endpoint, args.api_key, args.enc_key)
     # Generate GitHub standards report for each repository in the org
-    [report.add(RepositoryReport(repo).report_output) for repo in repos]
-
-    # Send the report to the API
-    report.send_to_api()
+    reports = [RepositoryReport(repo).report_output for repo in repos]
+    ReportsService(
+        args.url, args.endpoint, args.api_key, args.enc_key).override_repository_standards_reports(reports)
 
 
 if __name__ == "__main__":

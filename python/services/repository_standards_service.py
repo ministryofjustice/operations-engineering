@@ -7,77 +7,24 @@ This module contains the classes used to generate the GitHub repository standard
 The report is generated to publish which repositories are compliant with the standards set out by the
 Operations Engineering team. The report is sent to the operations-engineering-reports API.
 """
-
 import json
-
-import requests
-from cryptography.fernet import Fernet
+from dataclasses import dataclass
 
 
-class OrganisationStandardsReport:
-    """
-    This class is used to generate a report for a given organisation.
-    The most important aspect of this class is the report collection, which should contain a list of
-    RepositoryStandards objects.
-    """
+@dataclass
+class GitHubRepositoryStandardsReport:
+    name: str
+    status: bool
+    last_push: str
+    is_private: bool
+    default_branch: str
+    url: str
+    report: dict
+    infractions: list
 
-    def __init__(self, endpoint: str, api_key: str, enc_key: hex) -> None:
-        self.report: list = []
-        self.api_endpoint = endpoint
-        self.api_key = api_key
-        self.encryption_key = enc_key
-
-    def all_reports(self) -> list:
-        """
-        Return the collection of reports.
-        """
-        return self.report
-
-    def add(self, report) -> None:
-        """
-        Add a RepositoryStandards object to the collection of reports.
-        """
-        self.report.append(report)
-
-    def send_to_api(self) -> None:
-        """
-        Send the report to the operations-engineering-reports API. Depending on the report type, the
-        endpoint will be different.
-        """
-        if not self.report:
-            raise ValueError(
-                "Report is empty, something went wrong, we should have a report to send")
-
-        # A decision was made to encrypt all repository data, regardless of whether it is public or private.
-        data = self.__encrypt()
-
-        status_code = self.__http_post(data)
-        if status_code != 200:
-            raise ValueError(
-                f"Error sending data to site, status code: {status_code}")
-
-    def __http_post(self, data) -> int:
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-KEY": self.api_key,
-            "User-Agent": "repository-standards-report",
-        }
-
-        req = requests.post(self.api_endpoint, headers=headers,
-                            json=data, timeout=3)
-
-        return req.status_code
-
-    def __encrypt(self):
-        key = bytes.fromhex(self.encryption_key)
-        fernet = Fernet(key)
-
-        json_data = json.dumps(self.all_reports())
-        encrypted_data_as_bytes = fernet.encrypt(
-            json_data.__str__().encode())
-        encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
-
-        return encrypted_data_bytes_as_string
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=4)
 
 
 class RepositoryReport:
@@ -88,27 +35,25 @@ class RepositoryReport:
     of repositories that are compliant and non-compliant.
     """
 
-    def __init__(self, raw_github_data):
-        """
-        Initialise the class with the raw GitHub data.
-        """
+    def __init__(self, raw_github_data) -> None:
+        # A list of reasons why the repository is non-compliant
+        self.infractions = []
         self.repo_data = raw_github_data
         self.report_output = self.__generate_report()
+        self.is_compliant = self.__is_compliant()
         self.repository_type = "private" if self.__is_private() else "public"
 
-    def __generate_report(self) -> dict:
-        """
-        Generate the report for the repository, used to determine if the repository is compliant or not.
-        """
-        return {
-            "name": self.__repo_name(),
-            "default_branch": self.__default_branch(),
-            "url": self.__url(),
-            "status": self.is_compliant(),
-            "report": self.compliance_report(),
-            "last_push": self.__last_push(),
-            "is_private": self.__is_private()
-        }
+    def __generate_report(self) -> GitHubRepositoryStandardsReport:
+        return GitHubRepositoryStandardsReport(
+            name=self.__repo_name(),
+            status=self.__is_compliant(),
+            last_push=self.__last_push(),
+            is_private=self.__is_private(),
+            default_branch=self.__default_branch(),
+            url=self.__url(),
+            report=self.__compliance_report(),
+            infractions=self.infractions
+        )
 
     def __repo_name(self) -> str:
         return self.repo_data["node"]["name"]
@@ -119,13 +64,10 @@ class RepositoryReport:
     def __url(self) -> str:
         return self.repo_data["node"]["url"]
 
-    def is_compliant(self) -> bool:
-        """
-        Returns True if the repository is compliant, False otherwise.
-        """
-        for key, value in self.compliance_report().items():
+    def __is_compliant(self) -> bool:
+        for key, value in self.__compliance_report().items():
             if value is False:
-                print(f"Non-compliant: {key} is {value}")
+                self.infractions.append("Non-compliant: {key} is {value}")
                 return False
 
         return True
@@ -136,11 +78,7 @@ class RepositoryReport:
     def __is_private(self) -> bool:
         return self.repo_data["node"]["isPrivate"]
 
-    def compliance_report(self) -> dict:
-        """
-        Returns a dictionary of the compliance report for the repository. The report is an opinionated
-        view of what is compliant and what is not. This is based on the standards set by Ops Engineering.
-        """
+    def __compliance_report(self) -> dict:
         return {
             "default_branch_main": self.__default_branch_main(),
             "has_default_branch_protection": self.__has_default_branch_protection_enabled(),
@@ -153,15 +91,9 @@ class RepositoryReport:
         }
 
     def __default_branch_main(self) -> bool:
-        if self.repo_data["node"]["defaultBranchRef"]["name"] == "main":
-            return True
-        return False
+        return self.repo_data["node"]["defaultBranchRef"]["name"] == "main"
 
     def __has_default_branch_protection_enabled(self) -> bool:
-        """
-        Sets the default branch and checks if that branch has branch protection enabled. If it does, then
-        return True, otherwise return False.
-        """
         default_branch = self.repo_data["node"]["defaultBranchRef"]["name"]
         branch_protection_rules = self.repo_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
