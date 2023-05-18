@@ -1,12 +1,10 @@
 import os
 import unittest
+from unittest.mock import patch
 import boto3
-
-from unittest.mock import MagicMock, patch, Mock
-from python.scripts import delete_cnames
-
 import botocore.session
 from botocore.stub import Stubber
+from python.scripts import delete_cnames
 
 
 class TestDeleteCNames(unittest.TestCase):

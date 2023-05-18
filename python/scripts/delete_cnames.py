@@ -1,7 +1,5 @@
 import os
 import json
-import sys
-import traceback
 import boto3
 
 
