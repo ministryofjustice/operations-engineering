@@ -71,14 +71,13 @@ def delete_cname_records(route53_client, records_to_delete, hosted_zone_id):
         hosted_zone_id (string): The id of the hosted zone
     """
     if len(records_to_delete) != 0:
-        print(json.dumps(records_to_delete, indent=2))
-        # response = route53_client.change_resource_record_sets(
-        #     ChangeBatch={"Changes": records_to_delete},
-        #     HostedZoneId=hosted_zone_id,
-        # )
-        # if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
-        #     print("Deleted records:")
-        #     print(json.dumps(records_to_delete, indent=2))
+        response = route53_client.change_resource_record_sets(
+            ChangeBatch={"Changes": records_to_delete},
+            HostedZoneId=hosted_zone_id,
+        )
+        if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+            print("Deleted records:")
+            print(json.dumps(records_to_delete, indent=2))
 
 
 def get_hosted_zone_id(zone_name):
