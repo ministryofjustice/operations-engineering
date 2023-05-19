@@ -199,6 +199,34 @@ class GithubService:
         self.github_client_core_api.get_organization(
             self.organisation_name).get_team(team_id).add_membership(user)
 
+    def add_all_users_to_team(self, team_name: str) -> None:
+        logging.info(f"Adding all users to {team_name}")
+        team_id = self.get_team_id_from_team_name(team_name)
+        all_users = self.__get_all_users()
+        existing_users_in_team = self.__get_users_from_team(team_id)
+
+        for user in all_users:
+            if user not in existing_users_in_team:
+                self.__add_user_to_team(user["name"], team_id)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def __get_all_users(self) -> list:
+        logging.info("Getting all organization members")
+        return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def __add_user_to_team(self, user_name: str, team_id: int) -> None:
+        logging.info(f"Adding user {user_name} to team {team_id}")
+        user = self.github_client_core_api.get_user(user_name)
+        self.github_client_core_api.get_organization(
+            self.organisation_name).get_team(team_id).add_membership(user)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def __get_users_from_team(self, team_id: int) -> list:
+        logging.info(f"Getting all named users for team {team_id}")
+        return self.github_client_core_api.get_organization(self.organisation_name).get_team(
+            team_id).get_members() or []
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def create_new_team_with_repository(self, team_name: str, repository_name: str) -> None:
         logging.info(
