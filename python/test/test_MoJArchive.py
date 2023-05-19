@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
+
 from github import Repository
+
 from python.lib.moj_archive import MojArchive
 
 
@@ -10,7 +12,7 @@ class TestMojArchive(unittest.TestCase):
         self.file_path = "/usr/local/path/to/allow-list.txt"
         self.repo_data = "repo1\nrepo2\nrepo3\n"
         repo_mock = MagicMock(spec=Repository.Repository)
-        self.archive = MojArchive(repo_mock)
+        self.archive = MojArchive(repo_mock, ["repo_1", "repo_2"])
 
     def test_archived_property(self):
         self.archive.repo.archived = True
@@ -29,19 +31,12 @@ class TestMojArchive(unittest.TestCase):
         self.archive.allow_list_location = self.file_path
         self.assertEqual(self.archive.allow_list_location, self.file_path)
 
-    def test_allow_list_property(self):
-        with unittest.mock.patch('builtins.open',
-                                 unittest.mock.mock_open(read_data=self.repo_data)):
-            self.archive.allow_list_location = self.file_path
-            allow_list = self.archive.allow_list
-        self.assertEqual(allow_list, ['repo1', 'repo2', 'repo3'])
-
     def test_is_on_allow_list_method(self):
         with unittest.mock.patch('builtins.open',
                                  unittest.mock.mock_open(read_data=self.repo_data)):
             self.archive.allow_list_location = self.file_path
             repo_mock = MagicMock(spec=Repository.Repository)
-            repo_mock.name = 'repo2'
+            repo_mock.name = 'repo_2'
             self.archive._MojArchive__repo = repo_mock
             self.assertEqual(self.archive.is_on_allow_list, True)
 

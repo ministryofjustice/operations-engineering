@@ -5,8 +5,8 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 
+from python.lib.moj_archive import MojArchive
 from python.lib.moj_github import MojGithub
-from python.mojas.lib.MojArchive import MojArchive
 
 
 # This file assigns archives all repositories which have had no commits from a certain datetime
@@ -92,8 +92,15 @@ def main():
     logging.info("-----------------------------")
 
     # Archive repos
+    allow_list = [
+        "timeliness_ctx",
+        "GPC-anomalies",
+        "pq-tool",
+        "opg-data-processing",
+        "df_criminal_court_research"
+    ]
     for repo in repos:
-        MojArchive(repo).archive()
+        MojArchive(repo, allow_list).archive()
 
 
 if __name__ == "__main__":

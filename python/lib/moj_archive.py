@@ -1,12 +1,12 @@
-import os
-from github import Repository
 import logging
+
+from github import Repository
+
 
 # This class handles the archiving of one GitHub repository
 
 
 class MojArchive:
-
     # Logging Config
     logging.basicConfig(
         format="%(asctime)s %(levelname)-8s %(message)s",
@@ -14,11 +14,11 @@ class MojArchive:
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    def __init__(self, repo: Repository.Repository) -> None:
+    def __init__(self, repo: Repository.Repository, allow_list: list[str]) -> None:
         self.__repo = repo
         # Not currently used for functionality, included incase we want to perform actions like posting issues to the repo in which we need this to track
         self.__complete = False
-        self.__allow_list_location = f"{os.path.dirname(os.path.realpath(__file__))}/../scripts/archive-allow-list.txt"
+        self.__allow_list = allow_list
 
     @property
     def archived(self) -> bool:
@@ -43,27 +43,9 @@ class MojArchive:
         self.__complete = value
 
     @property
-    def allow_list_location(self) -> str:
-        """Property for getting the location of the allow list"""
-        return self.__allow_list_location
-
-    @allow_list_location.setter
-    def allow_list_location(self, location: str) -> None:
-        """Property for setting the location of the allow list"""
-        self.__allow_list_location = location
-
-    @property
-    def allow_list(self):
-        """Returns allow list as a list of strings"""
-        with open(self.allow_list_location, "r", encoding="UTF-8") as f:
-            lines = f.read().splitlines()
-
-        return lines
-
-    @property
     def is_on_allow_list(self) -> bool:
         """Returns if the target repository is on the allow list or not"""
-        return True if self.repo.name in self.allow_list else False
+        return True if self.repo.name in self.__allow_list else False
 
     def archive(self) -> bool:
         """Archives the target repository.\n
