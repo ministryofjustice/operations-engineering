@@ -94,8 +94,20 @@ def main():
     logging.info("-----------------------------")
 
     # Archive repos
+    allow_list = [
+        "django-pagedown",
+        "govuk-pay-ruby-client",
+        "govuk_notify_rails",
+        "analytics-platform-auth0",
+        "pflr-express-kit",
+        "hmpps-terraform-modules",
+        "laa-nolasa",
+        "hmpps-track-a-move",
+        "notify-for-wordpress",
+        "jwt-laminas-auth"
+    ]
     for repo in repos:
-        MojArchive(repo).archive()
+        MojArchive(repo, allow_list).archive()
 
 
 if __name__ == "__main__":
