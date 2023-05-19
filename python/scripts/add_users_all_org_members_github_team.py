@@ -1,6 +1,3 @@
-"""
-
-"""
 import os
 
 from python.services.github_service import GithubService
