@@ -1,26 +1,39 @@
-import logging
 import os
-import time
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 
+from python.config.logging_config import logging
 from python.lib.moj_archive import MojArchive
 from python.lib.moj_github import MojGithub
 
+MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME = "ministryofjustice"
+MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
+    "django-pagedown",
+    "govuk-pay-ruby-client",
+    "govuk_notify_rails",
+    "analytics-platform-auth0",
+    "pflr-express-kit",
+    "hmpps-terraform-modules",
+    "laa-nolasa",
+    "hmpps-track-a-move",
+    "notify-for-wordpress",
+    "jwt-laminas-auth"
+]
+MINISTRYOFJUSTICE_REPOS_TYPE_TO_CHECK = "public"
 
-# This file assigns archives all repositories which have had no commits from a certain datetime
-# The goal is clean the ministryofjustice GitHub organization.
+MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
+MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
+    "timeliness_ctx",
+    "GPC-anomalies",
+    "pq-tool",
+    "opg-data-processing",
+    "df_criminal_court_research"
+]
+MOJ_ANALYTICAL_SERVICES_REPOS_TYPE_TO_CHECK = "all"
+
 
 def get_commit(repository):
-    """get the last commit from a repository
-
-    Args:
-        repository (Repository): the repository object
-
-    Returns:
-        Commit: if commit exists return the last commit
-    """
     # Try block needed as get_commits() can cause exception when
     # a repository has no commits as GH returns negative result.
     try:
@@ -31,83 +44,65 @@ def get_commit(repository):
 
 
 def ready_for_archiving(repository, archive_date) -> bool:
-    """See if repository is ready for archiving based on last commit date
-
-    Args:
-        repository (Repository): the repository object
-        archive_date (datetime): the archive date
-
-    Returns:
-        bool: true if the last commit date is longer than the archive date
-    """
     commit = get_commit(repository)
     if commit == 0:
-        print("Manually check repository: " + repository.name)
-    else:
-        if commit.commit.author.date < archive_date:
-            time.sleep(1)
-            return True
+        logging.warning(f"Manually check repository: {repository.name}")
+    elif commit.commit.author.date < archive_date:
+        return True
     return False
 
 
-def main():
-    # Logging Config
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)-8s %(message)s",
-        level=logging.INFO,
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
-    # TODO: Change this to point at a different GitHub organization
-    organization = "ministryofjustice"
-    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
-    if not org_token:
+def get_environment_variables() -> tuple[str, str]:
+    github_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if not github_token:
         raise ValueError(
             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
-    # How long ago in which the repositories should be archived
-    archive_date_days = 0
-    archive_date_months = 6
-    archive_date_years = 1
+    github_organization_name = os.getenv("GITHUB_ORGANIZATION_NAME")
+    if not github_organization_name:
+        raise ValueError(
+            "The env variable GITHUB_ORGANIZATION is empty or missing")
 
-    archive_date = datetime.now() - relativedelta(
-        days=archive_date_days, months=archive_date_months, years=archive_date_years
-    )
+    return github_token, github_organization_name
 
-    # Create MoJGithub object
-    moj_gh = MojGithub(org=organization, org_token=org_token)
 
-    # Get all repos that need archiving
+def get_config_for_organization(github_organization_name: str) -> tuple[str, list[str], str] | ValueError:
+    if github_organization_name == MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME:
+        return MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME, MINISTRYOFJUSTICE_REPOS_ALLOW_LIST, MINISTRYOFJUSTICE_REPOS_TYPE_TO_CHECK
+
+    if github_organization_name == MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME:
+        return MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME, MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST, MOJ_ANALYTICAL_SERVICES_REPOS_TYPE_TO_CHECK
+
+    raise ValueError(
+        f"Unsupported Github Organization Name [{github_organization_name}]")
+
+
+def archive_inactive_repositories_by_date_and_type(github_token: str, organization_name: str, archive_date: datetime,
+                                                   allow_list: list[str],
+                                                   repo_type_to_archive: str):
+    moj_gh = MojGithub(org=organization_name, org_token=github_token)
+
     repos = [
         repo
-        for repo in moj_gh.get_unarchived_repos("public")
+        for repo in moj_gh.get_unarchived_repos(repo_type_to_archive)
         if ready_for_archiving(repo, archive_date)
     ]
 
-    # Print repos
-    logging.info(
-        f"Beginning archive of inactive repositories for GitHub organization: {organization}"
-    )
+    logging.info(f"Beginning archive of inactive repositories for GitHub organization: {organization_name}")
     logging.info("-----------------------------")
-    logging.info(
-        f"Searching for inactive repositories from date: {archive_date}")
+    logging.info(f"Searching for inactive repositories from date: {archive_date}")
     logging.info("-----------------------------")
 
-    # Archive repos
-    allow_list = [
-        "django-pagedown",
-        "govuk-pay-ruby-client",
-        "govuk_notify_rails",
-        "analytics-platform-auth0",
-        "pflr-express-kit",
-        "hmpps-terraform-modules",
-        "laa-nolasa",
-        "hmpps-track-a-move",
-        "notify-for-wordpress",
-        "jwt-laminas-auth"
-    ]
     for repo in repos:
         MojArchive(repo, allow_list).archive()
+
+
+def main():
+    github_token, github_organization_name = get_environment_variables()
+    organization_name, allow_list, repo_type_to_archive = get_config_for_organization(github_organization_name)
+    archive_date = datetime.now() - relativedelta(days=0, months=6, years=1)
+    archive_inactive_repositories_by_date_and_type(github_token, organization_name, archive_date, allow_list,
+                                                   repo_type_to_archive)
 
 
 if __name__ == "__main__":
