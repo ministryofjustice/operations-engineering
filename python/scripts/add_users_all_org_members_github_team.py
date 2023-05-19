@@ -3,10 +3,12 @@ import os
 from python.services.github_service import GithubService
 
 MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME = "ministryofjustice"
-MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_BASE_TEAM_NAME = "all-org-members"  # Contains a base set of permissions for all users in MoJ
+# Contains a base set of permissions for all users in MoJ
+MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_BASE_TEAM_NAME = "all-org-members"
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
-MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_BASE_TEAM_NAME = "everyone"  # Contains a base set of permissions for all users in MoJAS
+# Contains a base set of permissions for all users in MoJAS
+MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_BASE_TEAM_NAME = "everyone"
 
 
 def get_environment_variables() -> tuple[str, str]:
@@ -30,13 +32,16 @@ def get_config_for_organization(github_organization_name: str) -> tuple[str, str
     if github_organization_name == MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME:
         return MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME, MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_BASE_TEAM_NAME
 
-    raise ValueError(f"Unsupported Github Organization Name [{github_organization_name}]")
+    raise ValueError(
+        f"Unsupported Github Organization Name [{github_organization_name}]")
 
 
 def main():
     github_token, github_organization_name = get_environment_variables()
-    organization_name, organization_team_name = get_config_for_organization(github_organization_name)
-    GithubService(github_token, organization_name).add_all_users_to_team(organization_team_name)
+    organization_name, organization_team_name = get_config_for_organization(
+        github_organization_name)
+    GithubService(github_token, organization_name).add_all_users_to_team(
+        organization_team_name)
 
 
 if __name__ == "__main__":

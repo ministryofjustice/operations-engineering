@@ -156,10 +156,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-                                        timedelta(days=self.DATE_BOUNDARY + 1)
+            timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-                                         timedelta(days=self.DATE_BOUNDARY - 1)
+            timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
@@ -359,7 +359,8 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
         }
 
     def test_adds_users_not_currently_in_team(self, mock_github_client_core_api, mock_github_client_gql_api):
-        mock_github_client_gql_api.return_value.execute.return_value = {"organization": {"team": {"databaseId": 1}}}
+        mock_github_client_gql_api.return_value.execute.return_value = {
+            "organization": {"team": {"databaseId": 1}}}
         mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
             self.__create_user("user_1"), self.__create_user("user_2"),
             self.__create_user("user_3"), self.__create_user("user_4")
@@ -368,14 +369,17 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
         mock_team.get_members.return_value = [
             self.__create_user("user_1"), self.__create_user("user_2")
         ]
-        mock_github_client_core_api.return_value.get_user.side_effect = ["user_3", "user_4"]
+        mock_github_client_core_api.return_value.get_user.side_effect = [
+            "user_3", "user_4"]
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.add_all_users_to_team("test_team_name")
-        mock_team.assert_has_calls([call.add_membership('user_3'), call.add_membership('user_4')])
+        mock_team.assert_has_calls(
+            [call.add_membership('user_3'), call.add_membership('user_4')])
 
     def test_adds_no_users_when_all_user_already_exist(self, mock_github_client_core_api, mock_github_client_gql_api):
-        mock_github_client_gql_api.return_value.execute.return_value = {"organization": {"team": {"databaseId": 1}}}
+        mock_github_client_gql_api.return_value.execute.return_value = {
+            "organization": {"team": {"databaseId": 1}}}
         mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
             self.__create_user("user_1"), self.__create_user("user_2"),
         ]
