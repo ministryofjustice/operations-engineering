@@ -36,7 +36,7 @@ class TestMojArchive(unittest.TestCase):
                                  unittest.mock.mock_open(read_data=self.repo_data)):
             self.archive.allow_list_location = self.file_path
             repo_mock = MagicMock(spec=Repository.Repository)
-            repo_mock.name = 'repo2'
+            repo_mock.name = 'repo_2'
             self.archive._MojArchive__repo = repo_mock
             self.assertEqual(self.archive.is_on_allow_list, True)
 
