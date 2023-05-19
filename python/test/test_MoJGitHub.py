@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import Mock, patch
-import logging
 from github import Github
 
 from python.lib.moj_github import MojGithub

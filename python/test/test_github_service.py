@@ -12,6 +12,7 @@ from python.services.github_service import GithubService, retries_github_rate_li
 
 ORGANISATION_NAME = "moj-analytical-services"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
+TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
 
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
@@ -36,8 +37,7 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
             GithubService, github_client_core_api=mock_github_client)
         retries_github_rate_limit_exception_at_next_reset_once(
             mock_function)(mock_github_service, "test_arg")
-        mock_function.assert_has_calls([call(mock_github_service, 'test_arg')], [
-                                       call(mock_github_service, 'test_arg')])
+        mock_function.assert_has_calls([call(mock_github_service, 'test_arg')])
 
     @freeze_time("2023-02-01")
     def test_rate_limit_exception_raised_when_rate_limit_exception_raised_twice(self):
@@ -64,8 +64,7 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
             GithubService, github_client_core_api=mock_github_client)
         retries_github_rate_limit_exception_at_next_reset_once(
             mock_function)(mock_github_service, "test_arg")
-        mock_function.assert_has_calls([call(mock_github_service, 'test_arg')], [
-            call(mock_github_service, 'test_arg')])
+        mock_function.assert_has_calls([call(mock_github_service, 'test_arg')])
 
     @freeze_time("2023-02-01")
     def test_rate_limit_exception_raised_when_transport_query_error_raised_twice(self):
@@ -239,7 +238,7 @@ class TestGithubServiceCreateAnAccessRemovedIssueForUserInRepository(unittest.Te
         github_service.create_an_access_removed_issue_for_user_in_repository(
             "test_user", "test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls(
-            [call('moj-analytical-services/test_repository'),
+            [call(TEST_REPOSITORY),
              call().create_issue(title=USER_ACCESS_REMOVED_ISSUE_TITLE, assignee='test_user',
                                  body='Hi there\n\nThe user test_user either had direct member access to the repository or had direct member access and access via a team.\n\nAccess is now only via a team.\n\nIf the user was already in a team, then their direct access to the repository has been removed.\n\nIf the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.\n\nThe list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.\n\nThe user will have the same level of access to the repository via the team.\n\nThe first user added to a team is made a team maintainer, this enables that user to manage the users within the team.\n\nUsers with admin access are added to the admin team as a team maintainer.\n\nIf you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.\n\nThis issue can be closed.')]
 
@@ -263,7 +262,7 @@ class TestGithubServiceRemoveUserFromRepository(unittest.TestCase):
         github_service.remove_user_from_repository(
             "test_user", "test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test_repository'),
+            call(TEST_REPOSITORY),
             call().remove_from_collaborators('test_user')
         ])
 
@@ -288,7 +287,7 @@ class TestGithubServiceGetUserPermissionForRepository(unittest.TestCase):
         github_service.github_client_core_api.get_user.assert_has_calls([
                                                                         call('test_user')])
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test_repository'),
+            call(TEST_REPOSITORY),
             call().get_collaborator_permission('mock_user')
         ])
 
@@ -359,7 +358,7 @@ class TestGithubServiceCreateNewTeamWithRepository(unittest.TestCase):
         github_service.create_new_team_with_repository(
             "test_team", "test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test_repository')
+            call(TEST_REPOSITORY)
         ])
         github_service.github_client_core_api.get_organization.assert_has_calls([
             call('moj-analytical-services'),
@@ -435,7 +434,7 @@ class TestGithubServiceAmendTeamPermissionsForRepository(unittest.TestCase):
         github_service.amend_team_permissions_for_repository(
             1, "test_permission", "test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test_repository')
+            call(TEST_REPOSITORY)
         ])
         github_service.github_client_core_api.get_organization.assert_has_calls([
             call('moj-analytical-services'),
@@ -688,7 +687,7 @@ class TestGithubServiceGetRepositoryTeams(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repository_teams("test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls(
-            [call('moj-analytical-services/test_repository').get_teams()])
+            [call(TEST_REPOSITORY).get_teams()])
 
     def test_returns_empty_list_when_teams_returns_none(self, mock_github_client_core_api):
         mock_github_client_core_api.return_value.get_repo().get_teams.return_value = None
@@ -721,7 +720,7 @@ class TestGithubServiceGetRepositoryDirectUsers(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repository_direct_users("test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test_repository'),
+            call(TEST_REPOSITORY),
             call().get_collaborators('direct'),
             call().get_collaborators().__bool__(),
             call().get_collaborators().__iter__()
@@ -797,10 +796,10 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
 
 
 class MockGithubIssue(MagicMock):
-    def __init__(self, id, number, title, assignees, label):
+    def __init__(self, the_id, number, title, assignees, label):
         mock_label = MagicMock(name="test_support_label")
         super().__init__()
-        self.id = id
+        self.id = the_id
         self.number = number
         self.title = title
         self.assignees = assignees
