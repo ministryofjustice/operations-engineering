@@ -1,8 +1,9 @@
 import argparse
+import logging
 
 from python.services.github_service import GithubService
-from python.services.reports_service import ReportsService
-from python.services.repository_standards_service import RepositoryReport
+from python.services.operations_engineering_reports import OperationsEngineeringReportsService
+from python.services.standards_service import RepositoryReport
 
 
 def add_arguments():
@@ -25,14 +26,14 @@ def add_arguments():
         "--url",
         type=str,
         required=True,
-        help="The operations-engineering-reports url to use",
+        help="The operations-engineering-reports url to use with the leading https:// and without the trailing /",
     )
 
     parser.add_argument(
         "--endpoint",
         type=str,
         required=True,
-        help="The operations-engineering-reports endpoint to use",
+        help="The operations-engineering-reports endpoint to use without the leading /",
     )
 
     parser.add_argument(
@@ -52,18 +53,36 @@ def add_arguments():
     return parser.parse_args()
 
 
+def parse_args(args):
+    if args.url[-1] == "/":
+        args.url = args.url[:-1]
+
+    if args.endpoint[0] == "/":
+        args.endpoint = args.endpoint[1:]
+
+    if args.enc_key[:2] == "0x":
+        args.enc_key = args.enc_key[2:]
+
+    return args
+
+
 def main():
     # Add arguments from the command line
-    args = add_arguments()
+    args = parse_args(add_arguments())
 
     # Fetch all repositories in the org
     repos = GithubService(
         args.oauth_token, args.org).fetch_all_repositories_in_org()
 
     # Generate GitHub standards report for each repository in the org
-    reports = [RepositoryReport(repo).report_output for repo in repos]
-    ReportsService(
-        args.url, args.endpoint, args.api_key, args.enc_key).override_repository_standards_reports(reports)
+    repo_reports = [RepositoryReport(repo).output for repo in repos]
+
+    # Send the reports to the operations-engineering-reports API
+    try:
+        OperationsEngineeringReportsService(args.url, args.endpoint, args.api_key, args.enc_key)\
+            .override_repository_standards_reports(repo_reports)
+    except Exception as error:
+        logging.error(f" A failure occurred communicating with {args.url}/{args.endpoint}: {error}")
 
 
 if __name__ == "__main__":
