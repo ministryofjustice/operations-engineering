@@ -10,14 +10,14 @@ class TestOrganisationStandardsReport(unittest.TestCase):
     def setUp(self):
         self.bad_mock_report = [{1}]
         self.mock_report = [{
-                "default_branch": "master",
-                "infractions": [
-                    "default_branch_main equalling False is not compliant"
-                ],
-                "is_private": True,
-                "last_push": "2023-01-03T14:23:38Z",
-                "name": "test-repo",
-                "report": {
+            "default_branch": "master",
+            "infractions": [
+                "default_branch_main equalling False is not compliant"
+            ],
+            "is_private": True,
+            "last_push": "2023-01-03T14:23:38Z",
+            "name": "test-repo",
+            "report": {
                     "administrators_require_review": False,
                     "default_branch_main": False,
                     "has_default_branch_protection": False,
@@ -26,10 +26,10 @@ class TestOrganisationStandardsReport(unittest.TestCase):
                     "has_require_approvals_enabled": False,
                     "issues_section_enabled": True,
                     "requires_approving_reviews": False,
-                },
-                "status": False,
-                "url": "https://github.com/test/test-repo"
-            }]
+            },
+            "status": False,
+            "url": "https://github.com/test/test-repo"
+        }]
 
         self.url = 'https://test.com'
         self.endpoint = 'test'
@@ -54,7 +54,8 @@ class TestOrganisationStandardsReport(unittest.TestCase):
         url = f"{self.url}/{self.endpoint}"
         m.post(url, status_code=http.HTTPStatus.OK)
         try:
-            self.report_service.override_repository_standards_reports(self.mock_report)
+            self.report_service.override_repository_standards_reports(
+                self.mock_report)
         except Exception as e:
             self.fail(e)
 
@@ -62,19 +63,22 @@ class TestOrganisationStandardsReport(unittest.TestCase):
     def test_non200_override_repository_standards(self, m):
         url = f"{self.url}/{self.endpoint}"
         m.post(url, status_code=http.HTTPStatus.CONFLICT)
-        self.assertRaises(Exception, self.report_service.override_repository_standards_reports, self.mock_report)
+        self.assertRaises(
+            Exception, self.report_service.override_repository_standards_reports, self.mock_report)
 
     @requests_mock.Mocker()
     def test_bad_endpoint_override_repository_standards(self, m):
         url = f"bad/{self.endpoint}"
         m.post(url, status_code=http.HTTPStatus.BAD_REQUEST)
-        self.assertRaises(Exception, self.report_service.override_repository_standards_reports, self.mock_report)
+        self.assertRaises(
+            Exception, self.report_service.override_repository_standards_reports, self.mock_report)
 
     @requests_mock.Mocker()
     def test_bad_payload_override_repository_standards(self, m):
         url = f"{self.url}/{self.endpoint}"
         m.post(url, status_code=http.HTTPStatus.OK)
-        self.assertRaises(TypeError, self.report_service.override_repository_standards_reports('bad_payload'))
+        self.assertRaises(
+            TypeError, self.report_service.override_repository_standards_reports('bad_payload'))
 
     @requests_mock.Mocker()
     def test_bad_encrypt_override_repository_standards(self, m):
@@ -82,13 +86,15 @@ class TestOrganisationStandardsReport(unittest.TestCase):
         m.post(url, status_code=http.HTTPStatus.OK)
         bad_key = OperationsEngineeringReportsService(
             self.url, self.endpoint, self.api_key, 1)
-        self.assertRaises(TypeError, bad_key.override_repository_standards_reports, self.mock_report)
+        self.assertRaises(
+            TypeError, bad_key.override_repository_standards_reports, self.mock_report)
 
     @requests_mock.Mocker()
     def test_bad_report_override_repository_standards(self, m):
         url = f"{self.url}/{self.endpoint}"
         m.post(url, status_code=http.HTTPStatus.OK)
-        self.assertRaises(TypeError, self.report_service.override_repository_standards_reports, self.bad_mock_report)
+        self.assertRaises(
+            TypeError, self.report_service.override_repository_standards_reports, self.bad_mock_report)
 
 
 if __name__ == '__main__':

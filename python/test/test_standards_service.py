@@ -61,9 +61,11 @@ class TestCompliantRepositoryReport(unittest.TestCase):
         self.assertEqual(len(self.to_json.keys()), 8)
 
     def test_compliance_report(self):
-        self.assertEqual(self.to_json['report']['administrators_require_review'], True)
+        self.assertEqual(self.to_json['report']
+                         ['administrators_require_review'], True)
         self.assertEqual(self.to_json['report']['default_branch_main'], True)
-        self.assertEqual(self.to_json['report']['has_default_branch_protection'], True)
+        self.assertEqual(self.to_json['report']
+                         ['has_default_branch_protection'], True)
         self.assertEqual(self.to_json['report']['has_license'], True)
 
 
@@ -108,8 +110,10 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         self.assertEqual(len(self.to_json.keys()), 8)
 
     def test_bad_data_compliance_report(self):
-        self.assertEqual(self.to_json['report']['administrators_require_review'], False)
-        self.assertEqual(self.to_json['report']['has_default_branch_protection'], False)
+        self.assertEqual(self.to_json['report']
+                         ['administrators_require_review'], False)
+        self.assertEqual(self.to_json['report']
+                         ['has_default_branch_protection'], False)
         self.assertEqual(self.to_json['report']['has_license'], False)
 
 

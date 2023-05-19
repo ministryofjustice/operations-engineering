@@ -66,7 +66,8 @@ class RepositoryReport:
     def __check_compliant(self) -> bool:
         for key, value in self.__compliance_report().items():
             if value is False:
-                self.__infractions.append(f"{key} equalling {value} is not compliant")
+                self.__infractions.append(
+                    f"{key} equalling {value} is not compliant")
                 return False
 
         return True
