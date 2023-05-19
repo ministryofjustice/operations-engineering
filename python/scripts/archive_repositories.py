@@ -88,9 +88,11 @@ def archive_inactive_repositories_by_date_and_type(github_token: str, organizati
         if ready_for_archiving(repo, archive_date)
     ]
 
-    logging.info(f"Beginning archive of inactive repositories for GitHub organization: {organization_name}")
+    logging.info(
+        f"Beginning archive of inactive repositories for GitHub organization: {organization_name}")
     logging.info("-----------------------------")
-    logging.info(f"Searching for inactive repositories from date: {archive_date}")
+    logging.info(
+        f"Searching for inactive repositories from date: {archive_date}")
     logging.info("-----------------------------")
 
     for repo in repos:
@@ -99,7 +101,8 @@ def archive_inactive_repositories_by_date_and_type(github_token: str, organizati
 
 def main():
     github_token, github_organization_name = get_environment_variables()
-    organization_name, allow_list, repo_type_to_archive = get_config_for_organization(github_organization_name)
+    organization_name, allow_list, repo_type_to_archive = get_config_for_organization(
+        github_organization_name)
     archive_date = datetime.now() - relativedelta(days=0, months=6, years=1)
     archive_inactive_repositories_by_date_and_type(github_token, organization_name, archive_date, allow_list,
                                                    repo_type_to_archive)
