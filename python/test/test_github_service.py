@@ -156,10 +156,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY + 1)
+                                        timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY - 1)
+                                         timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
@@ -285,7 +285,7 @@ class TestGithubServiceGetUserPermissionForRepository(unittest.TestCase):
         github_service.get_user_permission_for_repository(
             "test_user", "test_repository")
         github_service.github_client_core_api.get_user.assert_has_calls([
-                                                                        call('test_user')])
+            call('test_user')])
         github_service.github_client_core_api.get_repo.assert_has_calls([
             call(TEST_REPOSITORY),
             call().get_collaborator_permission('mock_user')
@@ -309,7 +309,7 @@ class TestGithubServiceRemoveUserFromTeam(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.remove_user_from_team("test_user", "test_repository")
         github_service.github_client_core_api.get_user.assert_has_calls([
-                                                                        call('test_user')])
+            call('test_user')])
         github_service.github_client_core_api.get_organization.assert_has_calls([
             call('moj-analytical-services'),
             call().get_team('test_repository'),
@@ -346,6 +346,55 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         self.assertRaises(
             ConnectionError, github_service.add_user_to_team, "test_user", 1)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__")
+@patch("github.Github.__new__")
+class TestGithubServiceAddUserToTeam(unittest.TestCase):
+
+    def __create_user(self, name: str) -> dict[str, str]:
+        return {
+            "name": name
+        }
+
+    def test_adds_users_not_currently_in_team(self, mock_github_client_core_api, mock_github_client_gql_api):
+        mock_github_client_gql_api.return_value.execute.return_value = {"organization": {"team": {"databaseId": 1}}}
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
+            self.__create_user("user_1"), self.__create_user("user_2"),
+            self.__create_user("user_3"), self.__create_user("user_4")
+        ]
+        mock_team = mock_github_client_core_api.return_value.get_organization().get_team()
+        mock_team.get_members.return_value = [
+            self.__create_user("user_1"), self.__create_user("user_2")
+        ]
+        mock_github_client_core_api.return_value.get_user.side_effect = ["user_3", "user_4"]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.add_all_users_to_team("test_team_name")
+        mock_team.assert_has_calls([call.add_membership('user_3'), call.add_membership('user_4')])
+
+    def test_adds_no_users_when_all_user_already_exist(self, mock_github_client_core_api, mock_github_client_gql_api):
+        mock_github_client_gql_api.return_value.execute.return_value = {"organization": {"team": {"databaseId": 1}}}
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
+            self.__create_user("user_1"), self.__create_user("user_2"),
+        ]
+        mock_team = mock_github_client_core_api.return_value.get_organization().get_team()
+        mock_team.get_members.return_value = [
+            self.__create_user("user_1"), self.__create_user("user_2")
+        ]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.add_all_users_to_team("test_team_name")
+        mock_team.add_membership.assert_not_called()
+
+    def test_throws_exception_when_client_throws_exception(self, mock_github_client_core_api,
+                                                           mock_github_client_gql_api):
+        mock_github_client_core_api.return_value.get_organization = MagicMock(
+            side_effect=ConnectionError)
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ConnectionError, github_service.add_all_users_to_team, "test_team_name")
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)

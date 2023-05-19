@@ -13,9 +13,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r python/requirements.txt
-      - run: python3 -m python.mojas.add_users_all_org_members_github_team
+      - run: python3 -m python.scripts.add_users_all_org_members_github_team
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          GITHUB_ORGANIZATION_NAME: moj-analytical-services
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

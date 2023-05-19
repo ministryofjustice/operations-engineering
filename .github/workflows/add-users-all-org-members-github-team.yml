@@ -16,6 +16,7 @@ jobs:
       - run: python3 -m python.scripts.add_users_all_org_members_github_team
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          GITHUB_ORGANIZATION_NAME: ministryofjustice
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
