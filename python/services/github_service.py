@@ -7,6 +7,7 @@ from typing import Any, Callable
 
 from github import Github, RateLimitExceededException
 from github.Issue import Issue
+from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
@@ -64,6 +65,11 @@ class GithubService:
             headers={"Authorization": f"Bearer {org_token}"},
         ), execute_timeout=60)
         self.organisation_name: str = organisation_name
+
+    def get_repositories_to_consider_for_archiving(self, repository_type: str) -> list[Repository]:
+        repositories = list(
+            self.github_client_core_api.get_organization(self.organisation_name).get_repos(type=repository_type))
+        return [repository for repository in repositories if not (repository.archived or repository.fork)]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
@@ -311,7 +317,7 @@ class GithubService:
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-            dict[str, Any]:
+        dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )

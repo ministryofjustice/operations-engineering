@@ -5,6 +5,7 @@ from unittest.mock import call, MagicMock, Mock, patch
 from freezegun import freeze_time
 from github import Github, RateLimitExceededException
 from github.NamedUser import NamedUser
+from github.Repository import Repository
 from github.Team import Team
 from gql.transport.exceptions import TransportQueryError
 
@@ -102,6 +103,58 @@ class TestGithubServiceInit(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
+class TestGithubServiceGetRepositoriesToConsiderForArchiving(unittest.TestCase):
+
+    def test_filters_out_archived_repositories(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            Mock(Repository, archived=True, fork=False),
+            Mock(Repository, archived=True, fork=False),
+            Mock(Repository, archived=True, fork=False),
+        ]
+        response = GithubService(
+            "", ORGANISATION_NAME).get_repositories_to_consider_for_archiving("all")
+        self.assertEqual([], response)
+
+    def test_filters_out_fork_repositories(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            Mock(Repository, archived=False, fork=True),
+            Mock(Repository, archived=False, fork=True),
+            Mock(Repository, archived=False, fork=True),
+        ]
+        response = GithubService(
+            "", ORGANISATION_NAME).get_repositories_to_consider_for_archiving("all")
+        self.assertEqual([], response)
+
+    def test_returns_repositories_to_consider_for_archiving(self, mock_github_client_core_api):
+        repository_to_consider_for_archiving = Mock(Repository, archived=False, fork=False)
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            repository_to_consider_for_archiving,
+            repository_to_consider_for_archiving,
+        ]
+        response = GithubService("", ORGANISATION_NAME).get_repositories_to_consider_for_archiving("all")
+        self.assertEqual([repository_to_consider_for_archiving, repository_to_consider_for_archiving],
+                         response)
+
+    def test_returns_repositories_to_consider_for_archiving_when_fork_and_archived_present(self,
+                                                                                           mock_github_client_core_api):
+        repository_to_consider_for_archiving = Mock(Repository, archived=False, fork=False)
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            Mock(Repository, archived=False, fork=True),
+            repository_to_consider_for_archiving,
+            Mock(Repository, archived=True, fork=True),
+            Mock(Repository, archived=False, fork=True),
+            repository_to_consider_for_archiving,
+            Mock(Repository, archived=True, fork=True),
+            Mock(Repository, archived=True, fork=False),
+        ]
+        response = GithubService("", ORGANISATION_NAME).get_repositories_to_consider_for_archiving("all")
+        self.assertEqual([repository_to_consider_for_archiving, repository_to_consider_for_archiving],
+                         response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestGithubServiceGetOutsideCollaborators(unittest.TestCase):
 
     def test_returns_login_names(self, mock_github_client_core_api):
@@ -156,10 +209,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY + 1)
+                                        timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY - 1)
+                                         timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:

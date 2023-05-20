@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 from python.config.logging_config import logging
 from python.lib.moj_archive import MojArchive
-from python.lib.moj_github import MojGithub
+from python.services.github_service import GithubService
 
 MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME = "ministryofjustice"
 MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
@@ -77,19 +77,17 @@ def get_config_for_organization(github_organization_name: str) -> tuple[str, lis
         f"Unsupported Github Organization Name [{github_organization_name}]")
 
 
-def archive_inactive_repositories_by_date_and_type(github_token: str, organization_name: str, archive_date: datetime,
+def archive_inactive_repositories_by_date_and_type(github_service: GithubService, archive_date: datetime,
                                                    allow_list: list[str],
-                                                   repo_type_to_archive: str):
-    moj_gh = MojGithub(org=organization_name, org_token=github_token)
-
+                                                   repository_type: str):
     repos = [
         repo
-        for repo in moj_gh.get_unarchived_repos(repo_type_to_archive)
+        for repo in github_service.get_repositories_to_consider_for_archiving(repository_type)
         if ready_for_archiving(repo, archive_date)
     ]
 
     logging.info(
-        f"Beginning archive of inactive repositories for GitHub organization: {organization_name}")
+        f"Beginning archive of inactive repositories for GitHub organization: {github_service.organisation_name}")
     logging.info("-----------------------------")
     logging.info(
         f"Searching for inactive repositories from date: {archive_date}")
@@ -104,7 +102,8 @@ def main():
     organization_name, allow_list, repo_type_to_archive = get_config_for_organization(
         github_organization_name)
     archive_date = datetime.now() - relativedelta(days=0, months=6, years=1)
-    archive_inactive_repositories_by_date_and_type(github_token, organization_name, archive_date, allow_list,
+    archive_inactive_repositories_by_date_and_type(GithubService(github_token, organization_name), archive_date,
+                                                   allow_list,
                                                    repo_type_to_archive)
 
 
