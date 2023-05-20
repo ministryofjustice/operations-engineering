@@ -2,9 +2,9 @@ import os
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
+from github.Repository import Repository
 
 from python.config.logging_config import logging
-from python.lib.moj_archive import MojArchive
 from python.services.github_service import GithubService
 
 MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME = "ministryofjustice"
@@ -77,15 +77,25 @@ def get_config_for_organization(github_organization_name: str) -> tuple[str, lis
         f"Unsupported Github Organization Name [{github_organization_name}]")
 
 
+def archive(repository: Repository, allow_list: list[str]) -> None:
+    if repository.name in allow_list:
+        logging.info(
+            f"Skipping repository: {repository.name}, Reason: Present in allow list "
+        )
+
+    repository.edit(archived=True)
+
+    if repository.archived:
+        logging.info(
+            f"Archiving repository: {repository.name}, Status: Successful")
+    else:
+        logging.error(
+            f"Archiving repository: {repository.name}, Status: Failure")
+
+
 def archive_inactive_repositories_by_date_and_type(github_service: GithubService, archive_date: datetime,
                                                    allow_list: list[str],
                                                    repository_type: str):
-    repos = [
-        repo
-        for repo in github_service.get_repositories_to_consider_for_archiving(repository_type)
-        if ready_for_archiving(repo, archive_date)
-    ]
-
     logging.info(
         f"Beginning archive of inactive repositories for GitHub organization: {github_service.organisation_name}")
     logging.info("-----------------------------")
@@ -93,8 +103,14 @@ def archive_inactive_repositories_by_date_and_type(github_service: GithubService
         f"Searching for inactive repositories from date: {archive_date}")
     logging.info("-----------------------------")
 
-    for repo in repos:
-        MojArchive(repo, allow_list).archive()
+    repositories = [
+        repo
+        for repo in github_service.get_repositories_to_consider_for_archiving(repository_type)
+        if ready_for_archiving(repo, archive_date)
+    ]
+
+    for repository in repositories:
+        archive(repository, allow_list)
 
 
 def main():
