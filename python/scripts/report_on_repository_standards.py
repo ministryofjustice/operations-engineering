@@ -81,7 +81,7 @@ def main():
     try:
         OperationsEngineeringReportsService(args.url, args.endpoint, args.api_key, args.enc_key)\
             .override_repository_standards_reports(repo_reports)
-    except Exception as error:
+    except AssertionError as error:
         logging.error(
             f" A failure occurred communicating with {args.url}/{args.endpoint}: {error}")
 
