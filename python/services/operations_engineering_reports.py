@@ -22,7 +22,7 @@ class OperationsEngineeringReportsService:
         self.__api_key = api_key
         self.__encryption_key = enc_key
 
-    def override_repository_standards_reports(self, reports: list[dict]) -> None:
+    def override_repository_standards_reports(self, reports: list[str]) -> None:
         """Send a list of GitHubRepositoryStandardsReport objects represented as json objects
         to the operations-engineering-reports API endpoint. This will overwrite any existing
         reports for the given repositories.
@@ -39,7 +39,7 @@ class OperationsEngineeringReportsService:
 
         status = self.__http_post(data)
         if status != 200:
-            raise Exception(
+            raise AssertionError(
                 f"Received status code {status} from {self.__reports_url}/{self.__endpoint}")
 
     def __http_post(self, data) -> int:

@@ -40,9 +40,9 @@ class RepositoryReport:
         # A list of reasons why the repository is non-compliant
         self.__infractions = []
         self.__github_data = raw_github_data
-        self.output = self.__generate_report()
+        self.__output = self.__generate_report()
 
-    def __generate_report(self) -> str:
+    def __generate_report(self) -> GitHubRepositoryStandardsReport:
         return GitHubRepositoryStandardsReport(
             name=self.__repo_name(),
             status=self.__check_compliant(),
@@ -52,7 +52,12 @@ class RepositoryReport:
             url=self.__url(),
             report=self.__compliance_report(),
             infractions=self.__infractions
-        ).to_json()
+        )
+
+    @property
+    def output(self) -> str:
+        """Return the report as a json object."""
+        return self.__output.to_json()
 
     def __repo_name(self) -> str:
         return self.__github_data["node"]["name"]
