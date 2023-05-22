@@ -9,3 +9,4 @@ pyaml-env
 jwt
 cryptography
 coverage
+requests-mock

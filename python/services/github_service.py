@@ -294,11 +294,31 @@ class GithubService:
                         }
                         edges {
                             node {
-                                name
-                                isDisabled
                                 isArchived
+                                isDisabled
+                                isPrivate
                                 isLocked
+                                name
+                                pushedAt
+                                url
+                                description
                                 hasIssuesEnabled
+                                defaultBranchRef {
+                                    name
+                                }
+                                licenseInfo {
+                                    name
+                                }
+                                branchProtectionRules(first: 10) {
+                                    edges {
+                                        node {
+                                            isAdminEnforced
+                                            pattern
+                                            requiredApprovingReviewCount
+                                            requiresApprovingReviews
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -403,6 +423,35 @@ class GithubService:
             "page_size": page_size,
             "after_cursor": after_cursor
         })
+
+    def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
+        """A wrapper function to run a GraphQL query to get the list of repo names in the organisation
+
+        Returns:
+            list: A list of the organisation repos names
+        """
+        has_next_page = True
+        after_cursor = None
+        repos = []
+
+        while has_next_page:
+            data = self.get_paginated_list_of_repositories(after_cursor)
+
+            # Retrieve the name of the repos
+            if data["organization"]["repositories"]["edges"] is not None:
+                for repo in data["organization"]["repositories"]["edges"]:
+                    # Skip locked repositories
+                    if not (
+                            repo["node"]["isDisabled"]
+                            or repo["node"]["isArchived"]
+                            or repo["node"]["isLocked"]
+                    ):
+                        repos.append(repo)
+
+            # Read the GH API page info section to see if there is more data to read
+            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+        return repos
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_team_user_names(self, team_name: str, after_cursor: str | None,
