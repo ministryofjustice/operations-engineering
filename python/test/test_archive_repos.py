@@ -51,7 +51,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
     def test_returns_values_ministryofjustice_config(self):
         last_active_cutoff_date, organization_name, allow_list, repository_type_to_archive = archive_repositories.get_config_for_organization(
             "ministryofjustice")
-        self.assertEqual(last_active_cutoff_date, datetime.now() - relativedelta(days=0, months=6, years=1))
+        self.assertEqual(last_active_cutoff_date, datetime.now() -
+                         relativedelta(days=0, months=6, years=1))
         self.assertEqual(organization_name, "ministryofjustice")
         self.assertEqual(allow_list, [
             "django-pagedown",
@@ -71,7 +72,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
     def test_returns_values_moj_analytical_services_config(self):
         last_active_cutoff_date, organization_name, allow_list, repository_type_to_archive = archive_repositories.get_config_for_organization(
             "moj-analytical-services")
-        self.assertEqual(last_active_cutoff_date, datetime.now() - relativedelta(days=0, months=6, years=1))
+        self.assertEqual(last_active_cutoff_date, datetime.now() -
+                         relativedelta(days=0, months=6, years=1))
         self.assertEqual(organization_name, "moj-analytical-services")
         self.assertEqual(allow_list, [
             "timeliness_ctx",

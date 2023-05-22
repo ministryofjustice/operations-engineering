@@ -80,7 +80,8 @@ class GithubService:
 
     def __is_repo_ready_for_archiving(self, repository, last_active_cutoff_date, allow_list: list[str]) -> bool:
         if repository.name in allow_list:
-            logging.info(f"Skipping repository: {repository.name}. Reason: Present in allow list")
+            logging.info(
+                f"Skipping repository: {repository.name}. Reason: Present in allow list")
             return False
 
         latest_commit_position = 0
@@ -88,7 +89,8 @@ class GithubService:
         try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
             commit = repository.get_commits()[latest_commit_position]
         except Exception:
-            logging.warning(f"Manually check repository: {repository.name}. Reason: No commits in repository")
+            logging.warning(
+                f"Manually check repository: {repository.name}. Reason: No commits in repository")
             return False
 
         if commit.author.date < last_active_cutoff_date:
@@ -340,7 +342,7 @@ class GithubService:
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-        dict[str, Any]:
+            dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
