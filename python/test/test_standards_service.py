@@ -81,7 +81,7 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
                                 "requiresApprovingReviews": False,
                                 "isAdminEnforced": False,
                                 "requiresCodeOwnerReviews": True,
-                                "requiredApprovingReviewCount": 1,
+                                "requiredApprovingReviewCount": 0,
                             }
                         }
                     ]
@@ -115,6 +115,26 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         self.assertEqual(self.to_json['report']
                          ['has_default_branch_protection'], False)
         self.assertEqual(self.to_json['report']['has_license'], False)
+        self.assertEqual(self.to_json['report']
+                         ['has_require_approvals_enabled'], False)
+        self.assertEqual(self.to_json['report']
+                         ['administrators_require_review'], False)
+        self.assertEqual(self.to_json['report']
+                         ['requires_approving_reviews'], False)
+
+    def test_empty_admin_approvals(self):
+        self.repository_data['node']['branchProtectionRules']['edges'][0]['node']['requiredApprovingReviewCount'] = None
+        self.repository_report = RepositoryReport(self.repository_data)
+        self.to_json = json.loads(self.repository_report.output)
+        self.assertEqual(self.to_json['report']
+                         ['has_require_approvals_enabled'], False)
+
+    def test_empty_require_approvers(self):
+        self.repository_data['node']['branchProtectionRules']['edges'][0]['node']['requiresApprovingReviews'] = None
+        self.repository_report = RepositoryReport(self.repository_data)
+        self.to_json = json.loads(self.repository_report.output)
+        self.assertEqual(self.to_json['report']
+                         ['has_require_approvals_enabled'], False)
 
 
 if __name__ == '__main__':
