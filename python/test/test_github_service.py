@@ -200,7 +200,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
         GithubService("", ORGANISATION_NAME).archive_inactive_repositories("all", self.last_active_cutoff_date,
                                                                            ["allow_this"])
 
-        active_repository.edit.assert_has_calls(
+        repo.edit.assert_has_calls(
             [call(archived=True), call(archived=True)])
 
 
@@ -261,10 +261,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY + 1)
+                                        timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY - 1)
+                                         timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
