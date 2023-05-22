@@ -54,7 +54,7 @@ class TestOrganisationStandardsReport(unittest.TestCase):
         url = f"{self.url}/{self.endpoint}"
         m.post(url, status_code=http.HTTPStatus.OK)
         self.report_service.override_repository_standards_reports(
-                self.mock_report)
+            self.mock_report)
 
     @requests_mock.Mocker()
     def test_non200_override_repository_standards(self, m):
