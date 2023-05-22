@@ -7,7 +7,7 @@ review_in: 3 months
 
 # Changes to Nameserver Records involving GDS Domains Team
 
-This runbook is created to help with planning and implementation of Nameserver record changes that will involve the GDS Domains Team. This would normally occur when we are migrating a service from one hosting platform to another. 
+This runbook is created to help with planning and implementation of Nameserver record changes that will involve the GDS Domains Team. This would normally occur when we are migrating a service from one hosting platform to another.
 
 This will typically be service that have domain names in the format `example.service.gov.uk`, `example.gov.uk` or `example.independant-inquiry.gov.uk`.
 
@@ -32,9 +32,9 @@ To reduce risk of loss of a service during the cutover you should ensure that cu
 
 If a domain is not in BT-DNS it will be managed directly the the GDS Domains Team.
 
-To arrange delegation to a new set of NS records you should email those details to [hostmaster@digital.cabinet-office.gov.uk](mailto:hostmaster@digital.cabinet-office.gov.uk). In addition to the new nameserver details you should include some justification as to why the changes are required. 
+To arrange delegation to a new set of NS records you should email those details to [hostmaster@digital.cabinet-office.gov.uk](mailto:hostmaster@digital.cabinet-office.gov.uk). In addition to the new nameserver details you should include some justification as to why the changes are required.
 
-You will receive an acknowledgement email and zendesk reference. GDS will confirm when changes have been implemented. 
+You will receive an acknowledgement email and zendesk reference. GDS will confirm when changes have been implemented.
 
 Notify Service Team when changes have been completed.
 
@@ -42,7 +42,7 @@ Notify Service Team when changes have been completed.
 
 If a domain is in BT-DNS it will be managed via BT.
 
-Before submitting a change request via the BT Portal you should read ["BT DNS Change Process Pre-requisites"](https://operations-engineering.service.justice.gov.uk/documentation/runbooks/dns/BT_pre_requisites.html). 
+Before submitting a change request via the BT Portal you should read ["BT DNS Change Process Pre-requisites"](https://operations-engineering.service.justice.gov.uk/documentation/runbooks/dns/BT_pre_requisites.html).
 
 When you are ready you can submit new NS records via the BT-DNS.
 
@@ -53,4 +53,3 @@ Notify Service Team when changes have been completed.
 ## Tidy up
 
 After the NS changes have been completed create a story to tidy up any DNS records in the MoJDSD account and DNS-IAC as required. If there are further migration steps after delegation you should work with the Service Team confirm when DNS records can be deleted.
-
