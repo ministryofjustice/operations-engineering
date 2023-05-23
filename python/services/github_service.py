@@ -96,7 +96,7 @@ class GithubService:
                 return False
             return True
         else:
-            logging.info(
+            logging.debug(
                 f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
             return False
 
