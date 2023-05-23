@@ -156,10 +156,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-                                        timedelta(days=self.DATE_BOUNDARY + 1)
+            timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-                                         timedelta(days=self.DATE_BOUNDARY - 1)
+            timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
@@ -390,7 +390,8 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
             user_1, user_2
         ]
 
-        GithubService("", ORGANISATION_NAME).add_all_users_to_team("test_team_name")
+        GithubService("", ORGANISATION_NAME).add_all_users_to_team(
+            "test_team_name")
         mock_team.add_membership.assert_not_called()
 
     def test_throws_exception_when_client_throws_exception(self, mock_github_client_core_api,
