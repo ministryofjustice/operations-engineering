@@ -5,7 +5,7 @@ from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
-from github import Github, RateLimitExceededException
+from github import Github, NamedUser, RateLimitExceededException
 from github.Issue import Issue
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -207,7 +207,7 @@ class GithubService:
 
         for user in all_users:
             if user not in existing_users_in_team:
-                self.__add_user_to_team(user.name, team_id)
+                self.__add_user_to_team(user, team_id)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_all_users(self) -> list:
@@ -215,9 +215,8 @@ class GithubService:
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def __add_user_to_team(self, user_name: str, team_id: int) -> None:
-        logging.info(f"Adding user {user_name} to team {team_id}")
-        user = self.github_client_core_api.get_user(user_name)
+    def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
+        logging.debug(f"Adding user {user.name} to team {team_id}")
         self.github_client_core_api.get_organization(
             self.organisation_name).get_team(team_id).add_membership(user)
 
@@ -331,7 +330,7 @@ class GithubService:
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-            dict[str, Any]:
+        dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
@@ -442,9 +441,9 @@ class GithubService:
                 for repo in data["organization"]["repositories"]["edges"]:
                     # Skip locked repositories
                     if not (
-                            repo["node"]["isDisabled"]
-                            or repo["node"]["isArchived"]
-                            or repo["node"]["isLocked"]
+                        repo["node"]["isDisabled"]
+                        or repo["node"]["isArchived"]
+                        or repo["node"]["isLocked"]
                     ):
                         repos.append(repo)
 
