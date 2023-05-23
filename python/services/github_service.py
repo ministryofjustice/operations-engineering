@@ -207,7 +207,7 @@ class GithubService:
 
         for user in all_users:
             if user not in existing_users_in_team:
-                self.__add_user_to_team(user["name"], team_id)
+                self.__add_user_to_team(user.name, team_id)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_all_users(self) -> list:
@@ -331,7 +331,7 @@ class GithubService:
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-            dict[str, Any]:
+        dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
