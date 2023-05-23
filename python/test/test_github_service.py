@@ -5,6 +5,7 @@ from unittest.mock import call, MagicMock, Mock, patch
 from freezegun import freeze_time
 from github import Github, RateLimitExceededException
 from github.Commit import Commit
+from github.GitCommit import GitCommit
 from github.NamedUser import NamedUser
 from github.Repository import Repository
 from github.Team import Team
@@ -114,7 +115,8 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             Repository, archived=archived, fork=fork)
         repository_to_consider_for_archiving.name = repo_name
         repository_to_consider_for_archiving.get_commits.return_value = [
-            Mock(Commit, author=Mock(NamedUser, date=last_active_date))] if has_commits else None
+            Mock(Commit,
+                 commit=Mock(GitCommit, author=Mock(NamedUser, date=last_active_date)))] if has_commits else None
         return repository_to_consider_for_archiving
 
     def setUp(self):
