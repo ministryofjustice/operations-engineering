@@ -1,4 +1,3 @@
-import logging
 from calendar import timegm
 from datetime import datetime, timedelta
 from textwrap import dedent
@@ -7,9 +6,12 @@ from typing import Any, Callable
 
 from github import Github, NamedUser, RateLimitExceededException
 from github.Issue import Issue
+from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
+
+from python.config.logging_config import logging
 
 
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
@@ -64,6 +66,38 @@ class GithubService:
             headers={"Authorization": f"Bearer {org_token}"},
         ), execute_timeout=60)
         self.organisation_name: str = organisation_name
+
+    def archive_inactive_repositories(self, repo_type_to_archive: str, last_active_cutoff_date: datetime,
+                                      allow_list: list[str]) -> None:
+        for repo in self.__get_repos_to_consider_for_archiving(repo_type_to_archive):
+            if self.__is_repo_ready_for_archiving(repo, last_active_cutoff_date, allow_list):
+                repo.edit(archived=True)
+
+    def __get_repos_to_consider_for_archiving(self, repository_type: str) -> list[Repository]:
+        repositories = list(
+            self.github_client_core_api.get_organization(self.organisation_name).get_repos(type=repository_type))
+        return [repository for repository in repositories if not (repository.archived or repository.fork)]
+
+    def __is_repo_ready_for_archiving(self, repository, last_active_cutoff_date, allow_list: list[str]) -> bool:
+        latest_commit_position = 0
+        commit = None
+        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
+            commit = repository.get_commits()[latest_commit_position]
+        except Exception:
+            logging.warning(
+                f"Manually check repository: {repository.name}. Reason: No commits in repository")
+            return False
+
+        if commit.author.date < last_active_cutoff_date:
+            if repository.name in allow_list:
+                logging.info(
+                    f"Skipping repository: {repository.name}. Reason: Present in allow list")
+                return False
+            return True
+        else:
+            logging.info(
+                f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+            return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
