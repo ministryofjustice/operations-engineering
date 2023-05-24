@@ -68,9 +68,8 @@ class GithubService:
         ), execute_timeout=60)
         self.organisation_name: str = organisation_name
 
-    def archive_inactive_repositories(self, repo_type_to_archive: str, last_active_cutoff_date: datetime,
-                                      allow_list: list[str]) -> None:
-        for repo in self.__get_repos_to_consider_for_archiving(repo_type_to_archive):
+    def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
+        for repo in self.__get_repos_to_consider_for_archiving("all"):
             if self.__is_repo_ready_for_archiving(repo, last_active_cutoff_date, allow_list):
                 repo.edit(archived=True)
 
