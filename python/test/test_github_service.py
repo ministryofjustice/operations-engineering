@@ -132,8 +132,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories(
-            "all", self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_repo_is_forked(self, mock_github_client_core_api):
@@ -144,8 +143,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories(
-            "all", self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_recently_active(self, mock_github_client_core_api):
@@ -155,8 +153,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories(
-            "all", self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_on_allow_list(self, mock_github_client_core_api):
@@ -167,8 +164,8 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories("all", self.last_active_cutoff_date,
-                                                                           ["allow_me"])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date,
+                                                                               ["allow_me"])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_repo_after_cutoff(self, mock_github_client_core_api):
@@ -179,8 +176,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories(
-            "all", self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_repo_has_no_commits_even_if_before_cutoff(self, mock_github_client_core_api):
@@ -191,8 +187,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories(
-            "all", self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_archives_inactive_repositories_not_on_allow_list(self, mock_github_client_core_api):
@@ -211,8 +206,8 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo_on_allow_list,
         ]
 
-        GithubService("", ORGANISATION_NAME).archive_inactive_repositories("all", self.last_active_cutoff_date,
-                                                                           ["allow_this"])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date,
+                                                                               ["allow_this"])
 
         repo.edit.assert_has_calls(
             [call(archived=True), call(archived=True)])
@@ -275,10 +270,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY + 1)
+                                        timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY - 1)
+                                         timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:

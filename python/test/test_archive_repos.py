@@ -49,7 +49,7 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
 
     @freeze_time("2021-02-01")
     def test_returns_values_ministryofjustice_config(self):
-        last_active_cutoff_date, organization_name, allow_list, repository_type_to_archive = archive_repositories.get_config_for_organization(
+        last_active_cutoff_date, organization_name, allow_list = archive_repositories.get_config_for_organization(
             "ministryofjustice")
         self.assertEqual(last_active_cutoff_date, datetime.now() -
                          relativedelta(days=0, months=6, years=1))
@@ -66,11 +66,10 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
             "notify-for-wordpress",
             "jwt-laminas-auth"
         ])
-        self.assertEqual(repository_type_to_archive, "public")
 
     @freeze_time("2021-02-01")
     def test_returns_values_moj_analytical_services_config(self):
-        last_active_cutoff_date, organization_name, allow_list, repository_type_to_archive = archive_repositories.get_config_for_organization(
+        last_active_cutoff_date, organization_name, allow_list = archive_repositories.get_config_for_organization(
             "moj-analytical-services")
         self.assertEqual(last_active_cutoff_date, datetime.now() -
                          relativedelta(days=0, months=6, years=1))
@@ -82,7 +81,6 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
             "opg-data-processing",
             "df_criminal_court_research"
         ])
-        self.assertEqual(repository_type_to_archive, "all")
 
 
 if __name__ == "__main__":

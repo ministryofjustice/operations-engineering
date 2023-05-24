@@ -18,7 +18,6 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "notify-for-wordpress",
     "jwt-laminas-auth"
 ]
-MINISTRYOFJUSTICE_REPOS_TYPE_TO_CHECK = "public"
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
 MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
@@ -28,7 +27,6 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "opg-data-processing",
     "df_criminal_court_research"
 ]
-MOJ_ANALYTICAL_SERVICES_REPOS_TYPE_TO_CHECK = "all"
 
 
 def get_environment_variables() -> tuple[str, str]:
@@ -45,14 +43,14 @@ def get_environment_variables() -> tuple[str, str]:
     return github_token, github_organization_name
 
 
-def get_config_for_organization(github_organization_name: str) -> tuple[datetime, str, list[str], str] | ValueError:
+def get_config_for_organization(github_organization_name: str) -> tuple[datetime, str, list[str]] | ValueError:
     last_active_cutoff_date = datetime.now() - relativedelta(days=0, months=6, years=1)
 
     if github_organization_name == MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME:
-        return last_active_cutoff_date, MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME, MINISTRYOFJUSTICE_REPOS_ALLOW_LIST, MINISTRYOFJUSTICE_REPOS_TYPE_TO_CHECK
+        return last_active_cutoff_date, MINISTRYOFJUSTICE_GITHUB_ORGANIZATION_NAME, MINISTRYOFJUSTICE_REPOS_ALLOW_LIST
 
     if github_organization_name == MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME:
-        return last_active_cutoff_date, MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME, MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST, MOJ_ANALYTICAL_SERVICES_REPOS_TYPE_TO_CHECK
+        return last_active_cutoff_date, MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME, MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST
 
     raise ValueError(
         f"Unsupported Github Organization Name [{github_organization_name}]")
@@ -60,10 +58,10 @@ def get_config_for_organization(github_organization_name: str) -> tuple[datetime
 
 def main():
     github_token, github_organization_name = get_environment_variables()
-    last_active_cutoff_date, organization_name, allow_list, repository_type_to_archive = get_config_for_organization(
+    last_active_cutoff_date, organization_name, allow_list = get_config_for_organization(
         github_organization_name)
-    GithubService(github_token, organization_name).archive_inactive_repositories(repository_type_to_archive,
-                                                                                 last_active_cutoff_date, allow_list)
+    GithubService(github_token, organization_name).archive_all_inactive_repositories(last_active_cutoff_date,
+                                                                                     allow_list)
 
 
 if __name__ == "__main__":
