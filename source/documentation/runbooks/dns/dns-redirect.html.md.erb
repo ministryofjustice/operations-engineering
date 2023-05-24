@@ -11,13 +11,17 @@ This runbook provides details of approaches to redirecting domains. There are di
 
 ## Why might we need to redirect a domain?
 
-There are a number of scenarios in which we may want to rediect a domain:
+There are a number of scenarios in which we may want to redirect a domain:
 * decommissioning of a service
 * replacement of a non-gov.uk domain with a gov.uk domain
 * migration of a service from one domain name to a new domain name
 * migration of a service to gov.uk
 
 ## CNAME redirection
+
+This is the simplest form of redirect. You can use a [CNAME record](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#CNAMEFormat) to redirect one domain to another e.g. redirect `example.service.justice.gov.uk` to `example.justice.gov.uk`.
+
+This approach won't work where a `CNAME` shares the name with it's `Hostedzone` e.g. you can't create a CNAME `exmaple.justice.gov.uk` in the Hostedzone `exmaple.justice.gov.uk`. In this case you will need to redirect using AWS S3.
 
 ## Redirection with AWS S3 (HTTP traffic)
 
