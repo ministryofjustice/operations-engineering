@@ -25,6 +25,14 @@ This approach won't work where a `CNAME` shares the name with it's `Hostedzone` 
 
 ## Redirection with AWS S3 (HTTP traffic)
 
+A more complex form of redirect will involve using AWS S3 to 'host' your redirection. This process involves creating a public S3 bucket which contains a website redirect. This is a standard feature of AWS S3.
+
+Follow the [AWS documenation](https://repost.aws/knowledge-center/redirect-domain-route-53) to set this up.
+
+Few things to note when creating a redirect:
+* S3 buckets are created in the MoJDSD AWS account
+* This type of redirect won't work for HTTPS traffic. Instead see Redirection with AWS S3 (HTTPS traffic)
+
 ## Redirection with AWS S3 (HTTPS traffic)
 
 ## Redirection to gov.uk
