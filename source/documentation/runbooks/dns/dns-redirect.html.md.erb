@@ -21,7 +21,7 @@ There are a number of scenarios in which we may want to redirect a domain:
 
 This is the simplest form of redirect. You can use a [CNAME record](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#CNAMEFormat) to redirect one domain to another e.g. redirect `example.service.justice.gov.uk` to `example.justice.gov.uk`.
 
-This approach won't work where a `CNAME` shares the name with it's `Hostedzone` e.g. you can't create a CNAME `exmaple.justice.gov.uk` in the Hostedzone `exmaple.justice.gov.uk`. In this case you will need to redirect using AWS S3.
+This approach won't work where a `CNAME` shares the name with it's `Hostedzone` e.g. you can't create a CNAME `example.justice.gov.uk` in the Hostedzone `example.justice.gov.uk`. In this case you will need to redirect using AWS S3.
 
 ## Redirection with AWS S3 (HTTP traffic)
 
