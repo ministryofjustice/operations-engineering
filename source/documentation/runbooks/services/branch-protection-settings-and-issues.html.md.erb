@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Branch Protection Settings and Issues Runbook
-last_reviewed_on: 2023-02-25
+last_reviewed_on: 2023-05-25
 review_in: 3 months
 ---
 
@@ -60,9 +60,9 @@ Two repositories are required to implement a Branch Protection check, raise an i
 
 The github-repository-standards repository contains the check and raises the issue on the repository (currently disabled).
 
-The Operations Engineering Reports repository recieves encrypted json data from github-repository-standards repository to display on [report site](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk).
+The Operations Engineering Reports repository receives encrypted json data from github-repository-standards repository to display on [report site](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk).
 
-The github-repository-standards repository Branch Protection check and raise issue againt a repository are implemented using Ruby. A python script encrypts the json data and sends it to the report website. The report website decrypts the json data. The files to look at are:<br>
+The github-repository-standards repository Branch Protection check and raise issue against a repository are implemented using Ruby. A python script encrypts the json data and sends it to the report website. The report website decrypts the json data. The files to look at are:<br>
 
 Note: Check the contents of the .json file after the script has completed to ensure the expected Branch Protection results are generated correctly.
 
