@@ -16,7 +16,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "laa-nolasa",
     "hmpps-track-a-move",
     "notify-for-wordpress",
-    "jwt-laminas-auth"
+    "jwt-laminas-auth",
+    "laa-eric-emi"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
