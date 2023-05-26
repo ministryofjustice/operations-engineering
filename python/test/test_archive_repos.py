@@ -64,7 +64,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
             "laa-nolasa",
             "hmpps-track-a-move",
             "notify-for-wordpress",
-            "jwt-laminas-auth"
+            "jwt-laminas-auth",
+            "laa-eric-emi"
         ])
 
     @freeze_time("2021-02-01")
