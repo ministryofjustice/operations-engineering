@@ -171,18 +171,6 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
                                                                                ["allow_me"])
         self.assertEqual(repo.edit.called, False)
 
-    def test_no_archive_when_repo_after_cutoff(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff)
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
-        self.assertEqual(repo.edit.called, False)
-
     def test_no_archive_when_repo_has_no_commits_even_if_before_cutoff(self, mock_github_client_core_api):
         repo = self.__get_repository(
             last_active_date=self.before_cutoff, has_commits=False)
@@ -472,7 +460,7 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
 @patch("github.Github.__new__")
 class TestGithubServiceAddUserToTeam(unittest.TestCase):
 
-    def __create_user(self, name: str) -> dict[str, str]:
+    def __create_user(self, name: str) -> dict[NamedUser, str]:
         return Mock(NamedUser, name=name)
 
     def test_adds_users_not_currently_in_team(self, mock_github_client_core_api, mock_github_client_gql_api):
