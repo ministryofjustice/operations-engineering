@@ -27,7 +27,7 @@ This approach won't work where a `CNAME` shares the name with it's `Hostedzone` 
 
 A more complex form of redirect will involve using AWS S3 to 'host' your redirection. This process involves creating a public S3 bucket which contains a website redirect. This is a standard feature of AWS S3.
 
-Follow the [AWS documenation](https://repost.aws/knowledge-center/redirect-domain-route-53) to set this up.
+Follow the [AWS documentation](https://repost.aws/knowledge-center/redirect-domain-route-53) to set this up.
 
 Few things to note when creating a redirect:
 * S3 buckets are created in the MoJDSD AWS account
@@ -35,9 +35,17 @@ Few things to note when creating a redirect:
 
 ## Redirection with AWS S3 (HTTPS traffic)
 
+A more complex form of redirect involving AWS S3. This type of redirect needs to be used where a service needs to process traffic over HTTPS. This type of redirect needs to include a TLS certificate, but that in tern needs the use of AWS CloudFront. This type is more complex as it needs creation of more AWS resources.
+
+Follow the [AWS documentation](https://repost.aws/knowledge-center/redirect-domain-route-53) to set this up.
+
+Few things to note when creating a redirect:
+* All AWS resources are created in the MoJDSD AWS account.
+
 ## Redirection to gov.uk
+
+This approach is required for services that are being [transitioned to gov.uk](https://docs.publishing.service.gov.uk/manual/transition-a-site.html). This approach users a redirection service offered by GDS.
 
 ## Redirection to MoJ Maintenance Pages
 
-
-
+This approach can be used for decommissioned domains or for services that need to be taken down for prolonged periods of time. This approach uses a custom created ["maintenance page"](https://github.com/ministryofjustice/cloud-platform-maintenance-pages) that is hosted on the Cloud Platform.
