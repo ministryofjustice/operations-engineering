@@ -1,0 +1,27 @@
+name: Sentry Usage Alert
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sentry-usage-alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: pip install -r python/requirements.txt
+      - run: python -m python.scripts.sentry_usage_alert
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run: Sentry Usage Alert"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
