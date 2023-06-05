@@ -5,7 +5,7 @@ from requests import Response
 
 
 class SentryClient:
-    def __init__(self, base_url: str, token: str):
+    def __init__(self, base_url: str, token: str) -> None:
         self.__base_url = base_url
         self.__request_headers = {"Authorization": f"Bearer {token}"}
         self.__request_timeout = 10
