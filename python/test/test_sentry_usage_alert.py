@@ -14,7 +14,7 @@ class TestSentryUsageAlertMain(unittest.TestCase):
 
 
 @patch("requests.get", new=MagicMock)
-class TestAddUsersEveryoneGithubTeamGetEnvironmentVariables(unittest.TestCase):
+class TestGetEnvironmentVariables(unittest.TestCase):
     def test_raises_error_when_no_environment_variables_provided(self):
         self.assertRaises(
             ValueError, sentry_usage_alert.get_environment_variables)
