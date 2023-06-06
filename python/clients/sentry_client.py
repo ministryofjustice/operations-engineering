@@ -1,5 +1,3 @@
-from typing import Any
-
 import requests
 from requests import Response
 
@@ -14,6 +12,7 @@ class SentryClient:
         return requests.get(f"{self.__base_url}{endpoint}", headers=self.__request_headers,
                             timeout=self.__request_timeout)
 
-    def get_organization_stats_for_one_day(self) -> Any:
-        return self.__get(
-            "/api/0/organizations/ministryofjustice/stats_v2/?statsPeriod=1d&field=sum(quantity)&groupBy=category").json()
+    def get_usage_total_for_period_in_days(self, category: str, period_in_days: int) -> int:
+        json_data = self.__get(
+            f"/api/0/organizations/ministryofjustice/stats_v2/?statsPeriod={period_in_days}d&field=sum(quantity)&category={category}&outcome=accepted").json()
+        return json_data["groups"][0]['totals']['sum(quantity)']

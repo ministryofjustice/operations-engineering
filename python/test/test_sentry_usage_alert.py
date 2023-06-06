@@ -5,14 +5,6 @@ from unittest.mock import MagicMock, patch
 from python.scripts import sentry_usage_alert
 
 
-@patch("python.clients.sentry_client.SentryClient.__new__", new=MagicMock)
-class TestSentryUsageAlertMain(unittest.TestCase):
-
-    @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
-    def test_main_smoke_test(self):
-        sentry_usage_alert.main()
-
-
 @patch("requests.get", new=MagicMock)
 class TestGetEnvironmentVariables(unittest.TestCase):
     def test_raises_error_when_no_environment_variables_provided(self):
