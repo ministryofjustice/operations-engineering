@@ -1,24 +1,23 @@
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 from python.clients.sentry_client import SentryClient
 
 
 @patch("requests.get")
-class TestSentryClientGetOrganizationStatsForOneDay(unittest.TestCase):
+class TestSentryClientGetOrganizationStats(unittest.TestCase):
 
     def test_returns_response_as_json(self, mock_get: MagicMock):
-        mock_response = Mock(json=Mock())
-        mock_get.return_value.json.return_value = mock_response
+        mock_get.return_value.json.return_value = {"groups": [{"totals": {"sum(quantity)": 100}}]}
         sentry_client = SentryClient("https://test_sentry.com", "test_token")
-        response = sentry_client.get_organization_stats_for_one_day()
-        self.assertEqual(mock_response, response)
+        response = sentry_client.get_usage_total_for_period_in_days("error", 1)
+        self.assertEqual(100, response)
 
     def test_calls_downstream_services(self, mock_get: MagicMock):
         sentry_client = SentryClient("https://test_sentry.com", "test_token")
-        sentry_client.get_organization_stats_for_one_day()
+        sentry_client.get_usage_total_for_period_in_days("error", 1)
         mock_get.assert_called_with(
-            'https://test_sentry.com/api/0/organizations/ministryofjustice/stats_v2/?statsPeriod=1d&field=sum(quantity)&groupBy=category',
+            'https://test_sentry.com/api/0/organizations/ministryofjustice/stats_v2/?statsPeriod=1d&field=sum(quantity)&category=error&outcome=accepted',
             headers={'Authorization': 'Bearer test_token'}, timeout=10)
 
 

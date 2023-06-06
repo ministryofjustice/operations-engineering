@@ -2,6 +2,7 @@ import os
 
 from python.clients.sentry_client import SentryClient
 from python.config.logging_config import logging
+from python.services.sentry_service import SentryService
 
 
 def get_environment_variables() -> str:
@@ -14,8 +15,15 @@ def get_environment_variables() -> str:
 
 def main():
     sentry_token = get_environment_variables()
-    sentry_client = SentryClient("https://sentry.io", sentry_token)
-    logging.info(sentry_client.get_organization_stats_for_one_day())
+    period_in_days = 1
+    sentry_service = SentryService(SentryClient("https://sentry.io", sentry_token))
+    error_usage_stats, transaction_usage_stats = sentry_service.get_quota_usage_for_period_in_days(
+        period_in_days)
+
+    logging.info(
+        f"Error quota consumed over past {period_in_days} days [ {error_usage_stats.total} / {error_usage_stats.max_usage} ]. Percentage consumed: [ {error_usage_stats.percentage_of_quota_used:.2%} ]")
+    logging.info(
+        f"Transaction quota consumed over past {period_in_days} days [ {transaction_usage_stats.total} / {transaction_usage_stats.max_usage} ]. Percentage consumed: [ {transaction_usage_stats.percentage_of_quota_used:.2%} ]")
 
 
 if __name__ == "__main__":
