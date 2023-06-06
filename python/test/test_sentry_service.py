@@ -14,10 +14,12 @@ class TestSentryServiceLogQuotaUsageForPeriodInDays(unittest.TestCase):
             mock_sentry_client).get_quota_usage_for_period_in_days(1)
 
         self.assertEqual(10000, error_usage_stats.total)
-        self.assertEqual(0.08, round(error_usage_stats.percentage_of_quota_used, 2))
+        self.assertEqual(0.08, round(
+            error_usage_stats.percentage_of_quota_used, 2))
         self.assertEqual(129032, error_usage_stats.max_usage)
         self.assertEqual(10000, transaction_usage_stats.total)
-        self.assertEqual(0.01, round(transaction_usage_stats.percentage_of_quota_used, 2))
+        self.assertEqual(0.01, round(
+            transaction_usage_stats.percentage_of_quota_used, 2))
         self.assertEqual(967741, transaction_usage_stats.max_usage)
 
 

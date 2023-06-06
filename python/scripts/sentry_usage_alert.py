@@ -16,7 +16,8 @@ def get_environment_variables() -> str:
 def main():
     sentry_token = get_environment_variables()
     period_in_days = 1
-    sentry_service = SentryService(SentryClient("https://sentry.io", sentry_token))
+    sentry_service = SentryService(
+        SentryClient("https://sentry.io", sentry_token))
     error_usage_stats, transaction_usage_stats = sentry_service.get_quota_usage_for_period_in_days(
         period_in_days)
 
