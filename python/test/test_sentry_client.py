@@ -7,7 +7,7 @@ from python.clients.sentry_client import SentryClient
 @patch("requests.get")
 class TestSentryClientGetOrganizationStats(unittest.TestCase):
 
-    def test_returns_response_as_json(self, mock_get: MagicMock):
+    def test_returns_sum_quantity(self, mock_get: MagicMock):
         mock_get.return_value.json.return_value = {
             "groups": [{"totals": {"sum(quantity)": 100}}]}
         sentry_client = SentryClient("https://test_sentry.com", "test_token")
