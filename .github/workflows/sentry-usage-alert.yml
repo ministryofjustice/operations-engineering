@@ -15,6 +15,7 @@ jobs:
       - run: python -m python.scripts.sentry_usage_alert
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+          SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Report failure to Slack
         if: always()

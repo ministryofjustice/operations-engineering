@@ -7,7 +7,7 @@ from python.clients.sentry_client import SentryClient
 class UsageStats:
     total: int
     max_usage: int
-    percentage_of_quota_used: int
+    percentage_of_quota_used: float
 
 
 class SentryService:
