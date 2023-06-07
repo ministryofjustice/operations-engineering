@@ -56,7 +56,7 @@ class GithubService:
     GITHUB_GQL_MAX_PAGE_SIZE = 100
     GITHUB_GQL_DEFAULT_PAGE_SIZE = 80
 
-    # Added this function to fix error in command: python3 -m unittest discover python/test -v
+    # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
         return super(GithubService, cls).__new__(cls)
 
