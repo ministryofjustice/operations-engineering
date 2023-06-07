@@ -1,4 +1,5 @@
 from github import Team
+
 from python.services.github_service import GithubService
 
 
@@ -14,12 +15,13 @@ class RepositoryTeam:
 
 
 class Repository:
-    # Added this function to fix error in command: python3 -m unittest discover python/test -v
+    # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
         return super(Repository, cls).__new__(cls)
 
     def __init__(self, github_service: GithubService, name: str,
-                 issue_section_status: bool, users_with_direct_access: list[str], ops_eng_team_user_names: list[str], ignore_teams: list):
+                 issue_section_status: bool, users_with_direct_access: list[str], ops_eng_team_user_names: list[str],
+                 ignore_teams: list):
         self.github_service = github_service
         self.name = name.lower()
         self.issue_section_enabled = issue_section_status
