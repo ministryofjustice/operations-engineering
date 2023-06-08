@@ -38,18 +38,20 @@ class SlackService:
                                                    "type": "divider"
                                                },
                                                {
-                                                   "type": "actions",
-                                                   "elements": [
-                                                       {
-                                                           "type": "button",
-                                                           "text": {
-                                                               "type": "plain_text",
-                                                               "text": ":sentry: Error Usage For Period",
-                                                               "emoji": True
-                                                           },
-                                                           "value": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&statsPeriod={period_in_days}d"
-                                                       }
-                                                   ]
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": " Check Sentry for Spikes :eyes:"
+                                                   },
+                                                   "accessory": {
+                                                       "type": "button",
+                                                       "text": {
+                                                           "type": "plain_text",
+                                                           "text": ":sentry: Error Usage For Period",
+                                                           "emoji": True
+                                                       },
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&statsPeriod={period_in_days}d"
+                                                   }
                                                }
                                            ])
 
@@ -76,17 +78,19 @@ class SlackService:
                                                    "type": "divider"
                                                },
                                                {
-                                                   "type": "actions",
-                                                   "elements": [
-                                                       {
-                                                           "type": "button",
-                                                           "text": {
-                                                               "type": "plain_text",
-                                                               "text": ":sentry: Transaction Usage For Period",
-                                                               "emoji": True
-                                                           },
-                                                           "value": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&statsPeriod={period_in_days}d"
-                                                       }
-                                                   ]
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": " Check Sentry for Spikes :eyes:"
+                                                   },
+                                                   "accessory": {
+                                                       "type": "button",
+                                                       "text": {
+                                                           "type": "plain_text",
+                                                           "text": ":sentry: Transaction Usage For Period",
+                                                           "emoji": True
+                                                       },
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&statsPeriod={period_in_days}d"
+                                                   }
                                                }
                                            ])
