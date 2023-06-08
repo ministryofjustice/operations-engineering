@@ -67,7 +67,7 @@ class SlackService:
                                                    "text": {
                                                        "type": "mrkdwn",
                                                        "text": dedent(f"""
-                                                           :sentry: *Sentry Transactions Usage Alert :warning:*
+                                                           :warning: *Sentry Transactions Usage Alert :sentry::warning:*
                                                            - Usage threshold: {usage_threshold:.0%}
                                                            - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
                                                            - Max usage for period: {usage_stats.max_usage} Transactions

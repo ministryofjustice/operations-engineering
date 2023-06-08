@@ -51,7 +51,7 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
                                                      DATE_FORMAT)), 4)
         mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
             {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':sentry: *Sentry Transactions Usage Alert :warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
+                                         'text': ':warning: *Sentry Transactions Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
             {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
                                                               'text': ' Check Sentry for projects consuming excessive transactions :eyes:'},
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
