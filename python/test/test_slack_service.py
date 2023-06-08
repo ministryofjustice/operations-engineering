@@ -37,7 +37,7 @@ class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCa
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Error usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09 00:00:00&sort=-accepted&start=2023-06-08 00:00:00&utc=true'}}])
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
@@ -51,13 +51,13 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
                                                      DATE_FORMAT)), 4)
         mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
             {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':sentry: *Sentry Transactions Usage Alert :warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
+                                         'text': ':warning: *Sentry Transactions Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
             {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
                                                               'text': ' Check Sentry for projects consuming excessive transactions :eyes:'},
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Transaction usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09 00:00:00&sort=-accepted&start=2023-06-08 00:00:00&utc=true'}}])
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}}])
 
 
 if __name__ == "__main__":
