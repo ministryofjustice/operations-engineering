@@ -37,7 +37,7 @@ class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCa
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Error usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09 00:00:00&sort=-accepted&start=2023-06-08 00:00:00&utc=true'}}])
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
@@ -57,7 +57,7 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Transaction usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09 00:00:00&sort=-accepted&start=2023-06-08 00:00:00&utc=true'}}])
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}}])
 
 
 if __name__ == "__main__":

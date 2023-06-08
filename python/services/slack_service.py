@@ -1,4 +1,5 @@
 from textwrap import dedent
+from urllib.parse import quote
 
 from slack_sdk import WebClient
 
@@ -7,6 +8,7 @@ from python.services.sentry_service import UsageStats
 
 class SlackService:
     OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID = "C033QBE511V"
+    DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
@@ -50,7 +52,7 @@ class SlackService:
                                                            "text": ":sentry: Error usage for period",
                                                            "emoji": True
                                                        },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end={usage_stats.end_time}&sort=-accepted&start={usage_stats.start_time}&utc=true"
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
                                                    }
                                                }
                                            ])
@@ -90,7 +92,7 @@ class SlackService:
                                                            "text": ":sentry: Transaction usage for period",
                                                            "emoji": True
                                                        },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end={usage_stats.end_time}&sort=-accepted&start={usage_stats.start_time}&utc=true"
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
                                                    }
                                                }
                                            ])
