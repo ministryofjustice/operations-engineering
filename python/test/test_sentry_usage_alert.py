@@ -18,6 +18,8 @@ class TestSentryUsageAlertMain(unittest.TestCase):
 
     @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
     @patch.dict(os.environ, {"SLACK_TOKEN": "token"})
+    @patch.dict(os.environ, {"PERIOD_IN_DAYS": "1"})
+    @patch.dict(os.environ, {"USAGE_THRESHOLD": "20"})
     def test_sends_notifications_to_slack_when_usage_above_threshold(self, mock_sentry_client: MagicMock,
                                                                      mock_slack_service: MagicMock):
         mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = 10000000
@@ -51,10 +53,14 @@ class TestGetEnvironmentVariables(unittest.TestCase):
 
     @patch.dict(os.environ, {"SLACK_TOKEN": "slack_token"})
     @patch.dict(os.environ, {"SENTRY_TOKEN": "sentry_token"})
+    @patch.dict(os.environ, {"PERIOD_IN_DAYS": "1"})
+    @patch.dict(os.environ, {"USAGE_THRESHOLD": "20"})
     def test_returns_values(self):
-        sentry_token, slack_token = sentry_usage_alert.get_environment_variables()
+        sentry_token, slack_token, period_in_days, usage_threshold = sentry_usage_alert.get_environment_variables()
         self.assertEqual(sentry_token, "sentry_token")
         self.assertEqual(slack_token, "slack_token")
+        self.assertEqual(period_in_days, 1)
+        self.assertEqual(usage_threshold, 0.20)
 
 
 if __name__ == "__main__":

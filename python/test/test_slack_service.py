@@ -21,8 +21,13 @@ class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCa
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
         SlackService("").send_error_usage_alert_to_operations_engineering(
             0, UsageStats(1, 2, 3), 4)
-        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel="C033QBE511V", mrkdown=True,
-                                                                           text="*Sentry Errors have exceeded 400.00% usage in the past 0 days*\n`This is a test message for Sentry Error alerts!` :test_tube:\nError quota consumed over past 0 days [ 1 / 2 ]\nPercentage consumed: [ 300.00% ]")
+        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
+            {'type': 'section', 'text': {'type': 'mrkdwn',
+                                         'text': ':sentry: *Sentry Errors Usage Alert :warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Errors\n- Errors consumed over period: 1\n- Percentage consumed: 300%'}},
+            {'type': 'divider'}, {'type': 'actions', 'elements': [{'type': 'button', 'text': {'type': 'plain_text',
+                                                                                              'text': ':sentry: Error Usage For Period',
+                                                                                              'emoji': True},
+                                                                   'value': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&statsPeriod=0d'}]}])
 
 
 @patch("slack_sdk.WebClient.__new__")
@@ -31,8 +36,13 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
         SlackService("").send_transaction_usage_alert_to_operations_engineering(
             0, UsageStats(1, 2, 3), 4)
-        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel="C033QBE511V", mrkdown=True,
-                                                                           text="*Sentry Transactions have exceeded 400.00% usage in the past 0 days*\n`This is a test message for Sentry Transactions alerts!` :test_tube:\nTransaction quota consumed over past 0 days [ 1 / 2 ]\nPercentage consumed: [ 300.00% ]")
+        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
+            {'type': 'section', 'text': {'type': 'mrkdwn',
+                                         'text': ':sentry: *Sentry Transactions Usage Alert :warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
+            {'type': 'divider'}, {'type': 'actions', 'elements': [{'type': 'button', 'text': {'type': 'plain_text',
+                                                                                              'text': ':sentry: Transaction Usage For Period',
+                                                                                              'emoji': True},
+                                                                   'value': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&statsPeriod=0d'}]}])
 
 
 if __name__ == "__main__":
