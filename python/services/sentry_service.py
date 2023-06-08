@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 from python.clients.sentry_client import SentryClient
 
@@ -8,6 +9,8 @@ class UsageStats:
     total: int
     max_usage: int
     percentage_of_quota_used: float
+    start_time: datetime
+    end_time: datetime
 
 
 class SentryService:
@@ -26,9 +29,9 @@ class SentryService:
         return max_error_usage_for_period, max_transaction_usage_for_period
 
     def get_quota_usage_for_period_in_days(self, period_in_days: int) -> tuple[UsageStats, UsageStats]:
-        error_total = self.sentry_client.get_usage_total_for_period_in_days(
+        error_total, error_start_time, error_end_time = self.sentry_client.get_usage_total_for_period_in_days(
             "error", period_in_days)
-        transaction_total = self.sentry_client.get_usage_total_for_period_in_days(
+        transaction_total, transaction_start_time, transaction_end_time = self.sentry_client.get_usage_total_for_period_in_days(
             "transaction", period_in_days)
 
         max_error_usage, max_transaction_usage = self.__get_max_usage_for_period_in_days(
@@ -37,8 +40,9 @@ class SentryService:
         percentage_of_transaction_quota_used = transaction_total / max_transaction_usage
 
         error_usage_stats = UsageStats(
-            error_total, max_error_usage, percentage_of_error_quota_used)
+            error_total, max_error_usage, percentage_of_error_quota_used, error_start_time, error_end_time)
         transaction_usage_stats = UsageStats(transaction_total, max_transaction_usage,
-                                             percentage_of_transaction_quota_used)
+                                             percentage_of_transaction_quota_used, transaction_start_time,
+                                             transaction_end_time)
 
         return error_usage_stats, transaction_usage_stats

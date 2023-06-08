@@ -25,7 +25,7 @@ class SlackService:
                                                    "text": {
                                                        "type": "mrkdwn",
                                                        "text": dedent(f"""
-                                                           :sentry: *Sentry Errors Usage Alert :warning:*
+                                                           :warning: *Sentry Errors Usage Alert :sentry::warning:*
                                                            - Usage threshold: {usage_threshold:.0%}
                                                            - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
                                                            - Max usage for period: {usage_stats.max_usage} Errors
@@ -41,16 +41,16 @@ class SlackService:
                                                    "type": "section",
                                                    "text": {
                                                        "type": "mrkdwn",
-                                                       "text": " Check Sentry for Spikes :eyes:"
+                                                       "text": " Check Sentry for projects reporting excessive errors :eyes:"
                                                    },
                                                    "accessory": {
                                                        "type": "button",
                                                        "text": {
                                                            "type": "plain_text",
-                                                           "text": ":sentry: Error Usage For Period",
+                                                           "text": ":sentry: Error usage for period",
                                                            "emoji": True
                                                        },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&statsPeriod={period_in_days}d"
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end={usage_stats.end_time}&sort=-accepted&start={usage_stats.start_time}&utc=true"
                                                    }
                                                }
                                            ])
@@ -81,16 +81,16 @@ class SlackService:
                                                    "type": "section",
                                                    "text": {
                                                        "type": "mrkdwn",
-                                                       "text": " Check Sentry for Spikes :eyes:"
+                                                       "text": " Check Sentry for projects consuming excessive transactions :eyes:"
                                                    },
                                                    "accessory": {
                                                        "type": "button",
                                                        "text": {
                                                            "type": "plain_text",
-                                                           "text": ":sentry: Transaction Usage For Period",
+                                                           "text": ":sentry: Transaction usage for period",
                                                            "emoji": True
                                                        },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&statsPeriod={period_in_days}d"
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end={usage_stats.end_time}&sort=-accepted&start={usage_stats.start_time}&utc=true"
                                                    }
                                                }
                                            ])
