@@ -18,7 +18,8 @@ class TestSentryClientGetOrganizationStats(unittest.TestCase):
             "groups": [{"totals": {"sum(quantity)": 100}}]
         }
         sentry_client = SentryClient("https://test_sentry.com", "test_token")
-        total, start_time, end_time = sentry_client.get_usage_total_for_period_in_days("error", 1)
+        total, start_time, end_time = sentry_client.get_usage_total_for_period_in_days(
+            "error", 1)
         self.assertEqual(100, total)
         self.assertEqual(START_TIME, start_time.strftime(DATE_FORMAT))
         self.assertEqual(END_TIME, end_time.strftime(DATE_FORMAT))
