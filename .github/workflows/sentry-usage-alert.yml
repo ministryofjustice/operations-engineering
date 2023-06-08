@@ -1,7 +1,18 @@
 name: Sentry Usage Alert
 
 on:
+  schedule:
+    - cron: "0 6 * * *"
   workflow_dispatch:
+    inputs:
+      period_in_days:
+        description: 'Period in days'
+        required: false
+        type: string
+      usage_threshold:
+        description: 'Usage threshold (%)'
+        required: false
+        type: string
 
 jobs:
   sentry-usage-alert:
@@ -16,6 +27,8 @@ jobs:
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
           SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          PERIOD_IN_DAYS: ${{ inputs.period_in_days }}
+          USAGE_THRESHOLD: ${{ inputs.usage_threshold }}
 
       - name: Report failure to Slack
         if: always()

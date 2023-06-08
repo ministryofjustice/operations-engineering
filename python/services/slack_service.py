@@ -1,3 +1,5 @@
+from textwrap import dedent
+
 from slack_sdk import WebClient
 
 from python.services.sentry_service import UsageStats
@@ -17,10 +19,74 @@ class SlackService:
                                                          usage_threshold: float):
         self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
                                            mrkdown=True,
-                                           text=f"*Sentry Errors have exceeded {usage_threshold:.2%} usage in the past {period_in_days} days*\n`This is a test message for Sentry Error alerts!` :test_tube:\nError quota consumed over past {period_in_days} days [ {usage_stats.total} / {usage_stats.max_usage} ]\nPercentage consumed: [ {usage_stats.percentage_of_quota_used:.2%} ]")
+                                           blocks=[
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": dedent(f"""
+                                                           :sentry: *Sentry Errors Usage Alert :warning:*
+                                                           - Usage threshold: {usage_threshold:.0%}
+                                                           - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
+                                                           - Max usage for period: {usage_stats.max_usage} Errors
+                                                           - Errors consumed over period: {usage_stats.total}
+                                                           - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
+                                                       """).strip("\n")
+                                                   }
+                                               },
+                                               {
+                                                   "type": "divider"
+                                               },
+                                               {
+                                                   "type": "actions",
+                                                   "elements": [
+                                                       {
+                                                           "type": "button",
+                                                           "text": {
+                                                               "type": "plain_text",
+                                                               "text": ":sentry: Error Usage For Period",
+                                                               "emoji": True
+                                                           },
+                                                           "value": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&statsPeriod={period_in_days}d"
+                                                       }
+                                                   ]
+                                               }
+                                           ])
 
     def send_transaction_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
                                                                usage_threshold: float):
         self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
                                            mrkdown=True,
-                                           text=f"*Sentry Transactions have exceeded {usage_threshold:.2%} usage in the past {period_in_days} days*\n`This is a test message for Sentry Transactions alerts!` :test_tube:\nTransaction quota consumed over past {period_in_days} days [ {usage_stats.total} / {usage_stats.max_usage} ]\nPercentage consumed: [ {usage_stats.percentage_of_quota_used:.2%} ]")
+                                           blocks=[
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": dedent(f"""
+                                                           :sentry: *Sentry Transactions Usage Alert :warning:*
+                                                           - Usage threshold: {usage_threshold:.0%}
+                                                           - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
+                                                           - Max usage for period: {usage_stats.max_usage} Transactions
+                                                           - Transactions consumed over period: {usage_stats.total}
+                                                           - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
+                                                       """).strip("\n")
+                                                   }
+                                               },
+                                               {
+                                                   "type": "divider"
+                                               },
+                                               {
+                                                   "type": "actions",
+                                                   "elements": [
+                                                       {
+                                                           "type": "button",
+                                                           "text": {
+                                                               "type": "plain_text",
+                                                               "text": ":sentry: Transaction Usage For Period",
+                                                               "emoji": True
+                                                           },
+                                                           "value": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&statsPeriod={period_in_days}d"
+                                                       }
+                                                   ]
+                                               }
+                                           ])
