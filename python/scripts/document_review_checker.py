@@ -66,11 +66,19 @@ def fix_date(file_name: str) -> None:
     return None
 
 def main():
-    parser = argparse.ArgumentParser(description="Document review checker")
-    parser.add_argument("--fix", action="store_true",
-                        help="Update the document with the current date")
-    parser.add_argument("--file-path", type=str, default=".",
-                        help="Path to the directory containing the documents")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--file-path",
+        type=str,
+        help="The path to the documentation directory",
+        default = os.path.join(os.getcwd(), "source", "documentation"),
+    )
+    parser.add_argument(
+        "--fix",
+        type=bool,
+        help="Update the document with the current date",
+        default=False,
+    )
     args = parser.parse_args()
 
 
@@ -82,5 +90,5 @@ def main():
         for document in docs_to_review:
             fix_date(document)
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     main()
