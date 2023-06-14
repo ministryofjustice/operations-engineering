@@ -1,25 +1,24 @@
 import unittest
 import tempfile
+import os
 
-import python.scripts.document_review_checker as document_review_checker
+from python.scripts import document_review_checker as check
 
 class TestDocumentReviewChecker(unittest.TestCase):
     def setUp(self) -> None:
         self.fix = True
-        self.file_path = "."
+        self.file_path = tempfile.mkdtemp()
 
 
     def test_get_documents_due_for_review(self):
-        # create a test file in the current directory
-        # call the function
-        # assert that the file is in the list
-        # TODO: Make sure you defer the file deletion until after the test
-        file = tempfile.NamedTemporaryFile(dir=self.file_path, delete=False)
-        file.write(b"last_reviewed_on: 2022-03-14")
-        file.close()
+        with tempfile.NamedTemporaryFile(
+            dir=self.file_path, delete=False, suffix=".md.erb") as file:
+            file.write(b"last_reviewed_on: 2020-03-14")
+            file.close()
 
-        documents = document_review_checker.get_documents_due_for_review()
-        print(documents)
+        self.addCleanup(os.remove, file.name)
+
+        documents = check.get_documents_due_for_review(self.file_path)
         self.assertIn(file.name, documents)
 
 
