@@ -10,8 +10,8 @@ that are due for review based on the current date, pass them
 to their editor of choice, and then update the document the date
 as they see fit.
 
-Stript execution:
-python python/scripts/document_review_checker.py --help
+Execution:
+python python.scripts.document_review_checker.py --help
 """
 import argparse
 import os
@@ -52,6 +52,7 @@ def __needs_review(document: str) -> bool:
     return False
 
 def fix_date(file_name: str) -> None:
+    """Update the date in the document to today's date"""
     today = datetime.now().strftime('%Y-%m-%d')
     date_pattern = r'\b\d{4}-\d{2}-\d{2}\b'
 
