@@ -14,23 +14,47 @@ Stript execution:
 python python/scripts/document_review_checker.py --help
 """
 import argparse
+import os
+import re
+from datetime import datetime
 
-def get_documents_due_for_review() -> list[str]:
+def get_documents_due_for_review(file_path: str) -> list[str]:
     """Return a list of documents that are due for review"""
-    # TODO: Get the root of the repository
-    # TODO: Always look in the same place
-    # TODO: Iterate over the files in the directory
+    list_of_documents = []
+    for root, _, files in os.walk(file_path, topdown=True):
+        # if the file is a markdown file
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file.endswith(".md.erb") and __needs_review(file_path):
+                list_of_documents.append(file_path)
 
-    return ["document1", "document2"]
+    return list_of_documents
 
+
+def __needs_review(document: str) -> bool:
+    today = datetime.today()
+    date_pattern = r'\b\d{4}-\d{2}-\d{2}\b'
+    print("checking document", document)
+
+
+    with open(document, 'r') as file:
+        content = file.read()
+        match = re.search(date_pattern, content)
+        if match:
+            date_str = match.group()
+            date_format = "%Y-%m-%d"
+
+            date_obj = datetime.strptime(date_str, date_format)
+            if date_obj < today:
+                return True
+
+    return False
 
 def __fix_document(document: str) -> None:
-    # TODO: Update the document with the current date
     print(f"Fixing document {document}")
     pass
 
 def main():
-    # TODO: Check arguments
     parser = argparse.ArgumentParser(description="Document review checker")
     parser.add_argument("--fix", action="store_true",
                         help="Update the document with the current date")
@@ -39,7 +63,6 @@ def main():
     args = parser.parse_args()
 
 
-    # TODO: Generate list of documents that are due for review
     documents = get_documents_due_for_review()
     # TODO: Output list of documents to stdout
     for document in documents:
