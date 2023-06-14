@@ -37,7 +37,6 @@ def __needs_review(document: str) -> bool:
     today = datetime.today()
     date_pattern = r'\b\d{4}-\d{2}-\d{2}\b'
 
-
     with open(document, 'r') as file:
         content = file.read()
         match = re.search(date_pattern, content)
@@ -50,6 +49,7 @@ def __needs_review(document: str) -> bool:
                 return True
 
     return False
+
 
 def fix_date(file_name: str) -> None:
     """Update the date in the document to today's date"""
@@ -66,13 +66,14 @@ def fix_date(file_name: str) -> None:
 
     return None
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--file-path",
         type=str,
         help="The path to the documentation directory",
-        default = os.path.join(os.getcwd(), "source", "documentation"),
+        default=os.path.join(os.getcwd(), "source", "documentation"),
     )
     parser.add_argument(
         "--fix",
@@ -82,7 +83,6 @@ def main():
     )
     args = parser.parse_args()
 
-
     docs_to_review = get_documents_due_for_review(args.file_path)
     for document in docs_to_review:
         print(document)
@@ -90,6 +90,7 @@ def main():
         print("Fixing documents")
         for document in docs_to_review:
             fix_date(document)
+
 
 if __name__ == "__main__":
     main()
