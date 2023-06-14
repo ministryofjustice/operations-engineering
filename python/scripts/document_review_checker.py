@@ -17,6 +17,8 @@ import argparse
 import os
 import re
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 
 def get_documents_due_for_review(file_path: str) -> list[str]:
     """Return a list of documents that are due for review"""
@@ -34,7 +36,6 @@ def get_documents_due_for_review(file_path: str) -> list[str]:
 def __needs_review(document: str) -> bool:
     today = datetime.today()
     date_pattern = r'\b\d{4}-\d{2}-\d{2}\b'
-    print("checking document", document)
 
 
     with open(document, 'r') as file:
@@ -45,7 +46,7 @@ def __needs_review(document: str) -> bool:
             date_format = "%Y-%m-%d"
 
             date_obj = datetime.strptime(date_str, date_format)
-            if date_obj < today:
+            if date_obj < today - relativedelta(months=3):
                 return True
 
     return False
