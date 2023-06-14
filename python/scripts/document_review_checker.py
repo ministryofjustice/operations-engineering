@@ -51,9 +51,19 @@ def __needs_review(document: str) -> bool:
 
     return False
 
-def __fix_document(document: str) -> None:
-    print(f"Fixing document {document}")
-    pass
+def fix_date(file_name: str) -> None:
+    today = datetime.now().strftime('%Y-%m-%d')
+    date_pattern = r'\b\d{4}-\d{2}-\d{2}\b'
+
+    with open(file_name, 'r') as file:
+        content = file.read()
+
+    updated_content = re.sub(date_pattern, today, content)
+
+    with open(file_name, 'w') as file:
+        file.write(updated_content)
+
+    return None
 
 def main():
     parser = argparse.ArgumentParser(description="Document review checker")
@@ -64,16 +74,13 @@ def main():
     args = parser.parse_args()
 
 
-    documents = get_documents_due_for_review()
-    # TODO: Output list of documents to stdout
-    for document in documents:
+    docs_to_review = get_documents_due_for_review(args.file_path)
+    for document in docs_to_review:
         print(document)
-    # TODO: If fix argument is passed, update the document with the current date
     if args.fix:
         print("Fixing documents")
-        for document in documents:
-            __fix_document(document)
-        # TODO: Update the document with the current date
+        for document in docs_to_review:
+            fix_date(document)
 
 if __name__ == "__name__":
     main()
