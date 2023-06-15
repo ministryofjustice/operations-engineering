@@ -37,7 +37,12 @@ class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCa
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Error usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}}])
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
+            {'type': 'section',
+             'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
+             'accessory': {'type': 'button',
+                           'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
+                           'url': 'https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html'}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
@@ -53,11 +58,16 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
             {'type': 'section', 'text': {'type': 'mrkdwn',
                                          'text': ':warning: *Sentry Transactions Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
             {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
-                                                              'text': ' Check Sentry for projects consuming excessive transactions :eyes:'},
+                                                              'text': 'Check Sentry for projects consuming excessive transactions :eyes:'},
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Transaction usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}}])
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
+            {'type': 'section',
+             'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
+             'accessory': {'type': 'button',
+                           'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
+                           'url': 'https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html'}}])
 
 
 if __name__ == "__main__":

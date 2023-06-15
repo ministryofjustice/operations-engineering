@@ -54,6 +54,22 @@ class SlackService:
                                                        },
                                                        "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
                                                    }
+                                               },
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": "See Sentry usage alert runbook for help with this alert"
+                                                   },
+                                                   "accessory": {
+                                                       "type": "button",
+                                                       "text": {
+                                                           "type": "plain_text",
+                                                           "text": ":blue_book: Runbook",
+                                                           "emoji": True
+                                                       },
+                                                       "url": "https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html"
+                                                   }
                                                }
                                            ])
 
@@ -83,7 +99,7 @@ class SlackService:
                                                    "type": "section",
                                                    "text": {
                                                        "type": "mrkdwn",
-                                                       "text": " Check Sentry for projects consuming excessive transactions :eyes:"
+                                                       "text": "Check Sentry for projects consuming excessive transactions :eyes:"
                                                    },
                                                    "accessory": {
                                                        "type": "button",
@@ -93,6 +109,22 @@ class SlackService:
                                                            "emoji": True
                                                        },
                                                        "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
+                                                   }
+                                               },
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": "See Sentry usage alert runbook for help with this alert"
+                                                   },
+                                                   "accessory": {
+                                                       "type": "button",
+                                                       "text": {
+                                                           "type": "plain_text",
+                                                           "text": ":blue_book: Runbook",
+                                                           "emoji": True
+                                                       },
+                                                       "url": "https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html"
                                                    }
                                                }
                                            ])
