@@ -1,7 +1,6 @@
 import json
 
 import requests
-from cryptography.fernet import Fernet
 
 
 class OperationsEngineeringReportsService:
@@ -16,11 +15,10 @@ class OperationsEngineeringReportsService:
 
     """
 
-    def __init__(self, url: str, endpoint: str, api_key: str, enc_key: hex) -> None:
+    def __init__(self, url: str, endpoint: str, api_key: str) -> None:
         self.__reports_url = url
         self.__endpoint = endpoint
         self.__api_key = api_key
-        self.__encryption_key = enc_key
 
     def override_repository_standards_reports(self, reports: list[str]) -> None:
         """Send a list of GitHubRepositoryStandardsReport objects represented as json objects
@@ -35,14 +33,12 @@ class OperationsEngineeringReportsService:
             Exception: If the status code of the POST request is not 200.
 
         """
-        data = self.__encrypt(reports)
-
-        status = self.__http_post(data)
+        status = self.__http_post(reports)
         if status != 200:
             raise AssertionError(
                 f"Received status code {status} from {self.__reports_url}/{self.__endpoint}")
 
-    def __http_post(self, data) -> int:
+    def __http_post(self, data: list[str]) -> int:
         headers = {
             "Content-Type": "application/json",
             "X-API-KEY": self.__api_key,
@@ -52,14 +48,3 @@ class OperationsEngineeringReportsService:
         url = f"{self.__reports_url}/{self.__endpoint}"
 
         return requests.post(url, headers=headers, json=data, timeout=3).status_code
-
-    def __encrypt(self, payload: any):
-        key = bytes.fromhex(self.__encryption_key)
-        fernet = Fernet(key)
-
-        # The payload must be able to be serialised to json
-        encrypted_data_as_bytes = fernet.encrypt(
-            json.dumps(payload).encode())
-        encrypted_data_bytes_as_string = encrypted_data_as_bytes.decode()
-
-        return encrypted_data_bytes_as_string
