@@ -12,7 +12,6 @@ class TestDocumentReviewChecker(unittest.TestCase):
         with tempfile.NamedTemporaryFile(
             dir=self.file_path, delete=False, suffix=".md.erb") as self.file:
             self.file.write(b"last_reviewed_on: 2020-03-14")
-            self.file.close()
 
 
     def tearDown(self) -> None:
@@ -38,7 +37,6 @@ class TestFixingDocumentDates(unittest.TestCase):
         with tempfile.NamedTemporaryFile(
                 dir=self.file_path, delete=False, suffix=".md.erb") as file:
             file.write(b"last_reviewed_on: 2020-03-14")
-            file.close()
 
         self.addCleanup(os.remove, file.name)
 
