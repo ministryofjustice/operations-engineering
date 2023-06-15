@@ -10,13 +10,11 @@ class TestDocumentReviewChecker(unittest.TestCase):
     def setUp(self) -> None:
         self.file_path = tempfile.mkdtemp()
         with tempfile.NamedTemporaryFile(
-            dir=self.file_path, delete=False, suffix=".md.erb") as self.file:
+                dir=self.file_path, delete=False, suffix=".md.erb") as self.file:
             self.file.write(b"last_reviewed_on: 2020-03-14")
-
 
     def tearDown(self) -> None:
         self.addCleanup(os.remove, self.file.name)
-
 
     def test_documents_due_for_review(self):
         documents = check.get_documents_due_for_review(self.file_path)
