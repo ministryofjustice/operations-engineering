@@ -64,8 +64,6 @@ def fix_date(file_name: str) -> None:
     with open(file_name, 'w') as file:
         file.write(updated_content)
 
-    return None
-
 
 def main():
     parser = argparse.ArgumentParser()
