@@ -265,10 +265,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY + 1)
+                                        timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-            timedelta(days=self.DATE_BOUNDARY - 1)
+                                         timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
@@ -462,7 +462,7 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
 @patch("github.Github.__new__")
 class TestGithubServiceAddUserToTeam(unittest.TestCase):
 
-    def __create_user(self, name: str) -> Mock[NamedUser, str]:
+    def __create_user(self, name: str) -> Mock:
         return Mock(NamedUser, name=name)
 
     def test_adds_users_not_currently_in_team(self, mock_github_client_core_api, mock_github_client_gql_api):
@@ -1012,7 +1012,7 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
 
     def test_closes_open_issues_with_tag(self, mock_github_client_core_api):
         mock_open_issue_with_tag = Mock(Issue, state="open", labels=[
-                                        SimpleNamespace(name="test-tag")])
+            SimpleNamespace(name="test-tag")])
         mock_github_client_core_api.return_value.get_repo.return_value.get_issues.return_value = [
             mock_open_issue_with_tag]
 
@@ -1028,7 +1028,7 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
 
     def test_ignores_issues_without_tag(self, mock_github_client_core_api):
         mock_open_issue_without_tag = Mock(Issue, state="open", labels=[
-                                           SimpleNamespace(name="wrong-tag")])
+            SimpleNamespace(name="wrong-tag")])
         mock_github_client_core_api.return_value.get_repo.return_value.get_issues.return_value = [
             mock_open_issue_without_tag]
 

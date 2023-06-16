@@ -6,6 +6,8 @@ from python.scripts import close_support_tickets
 
 
 @patch("github.Github.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestCloseSupportTicketsMain(unittest.TestCase):
 
     @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
@@ -14,6 +16,8 @@ class TestCloseSupportTicketsMain(unittest.TestCase):
 
 
 @patch("github.Github.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 class TestCloseSupportTickets(unittest.TestCase):
     def test_raises_error_when_no_environment_variables_provided(self):
         self.assertRaises(
