@@ -623,5 +623,5 @@ class GithubService:
     def get_org_members_login_names(self) -> list[str]:
         logging.info("Getting Org Members Login Names")
         members = self.github_client_core_api.get_organization(
-            self.organisation_name).get_members()
+            self.organisation_name).get_members() or []
         return [member.login.lower() for member in members]
