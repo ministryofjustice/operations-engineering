@@ -1087,7 +1087,8 @@ class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
         self.assertEqual(["tom-smith", "john.smith"], response)
 
     def test_returns_empty_list_when_members_returns_none(self, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value = None
+        mock_github_client_core_api.return_value.get_organization(
+        ).get_members.return_value = None
         github_service = GithubService("", ORGANISATION_NAME)
         response = github_service.get_org_members_login_names()
         self.assertEqual([], response)
