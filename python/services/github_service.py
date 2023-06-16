@@ -364,7 +364,7 @@ class GithubService:
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-            dict[str, Any]:
+        dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
@@ -585,3 +585,21 @@ class GithubService:
         variable_values = {"the_query": the_query, "page_size": page_size,
                            "after_cursor": after_cursor}
         return self.github_client_gql_api.execute(query, variable_values)
+
+    def close_repository_open_issues_with_tag(self, repository: str, tag: str) -> None:
+        logging.info(
+            f"Closing open issues in repository {repository} with tag {tag}")
+        open_issues = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository}").get_issues(
+            state="open")
+
+        open_issues_with_tag = [
+            issue
+            for issue in open_issues
+            for label in issue.labels
+            if label.name == tag and issue.state == "open"
+        ]
+
+        for issue in open_issues_with_tag:
+            logging.info(
+                f"Closing issue {issue.title} in repository {issue.repository} because it has tag {tag}")
+            issue.edit(state="closed")

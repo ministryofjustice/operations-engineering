@@ -1,39 +1,24 @@
 import os
-from github import Github
+
+from python.services.github_service import GithubService
+
+ORGANISATION = "ministryofjustice"
+REPOSITORY = "operations-engineering"
+SUPPORT_TAG = "Support"
 
 
-def main():
-    # This file closes any open support tickets as we are testing limited capture of support activities
-    # Its goal is to streamline the capture of support tickets as far as possible
-
-    org_token = os.getenv("ADMIN_GITHUB_TOKEN")
-    if not org_token:
+def get_environment_variables() -> str:
+    github_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if not github_token:
         raise ValueError(
             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
-    # Config
-    organization = "ministryofjustice"
-    repository = "operations-engineering"
-    project = f"{organization}/{repository}"
-    support_tag = "Support"
+    return github_token
 
-    # Create Base Objects
-    # Authentication, Repository, Issues
-    git = Github(org_token)
-    repo = git.get_repo(project)
-    issues = repo.get_issues(state="open")
 
-    # Get only open support issues
-    support_issues = [
-        issue
-        for issue in issues
-        for label in issue.labels
-        if label.name == support_tag and issue.state == "open"
-    ]
-
-    # Assign creator to item
-    for issue in support_issues:
-        issue.edit(state="closed")
+def main():
+    github_token = get_environment_variables()
+    GithubService(github_token, ORGANISATION).close_repository_open_issues_with_tag(REPOSITORY, SUPPORT_TAG)
 
 
 if __name__ == "__main__":
