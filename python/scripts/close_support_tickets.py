@@ -18,7 +18,8 @@ def get_environment_variables() -> str:
 
 def main():
     github_token = get_environment_variables()
-    GithubService(github_token, ORGANISATION).close_repository_open_issues_with_tag(REPOSITORY, SUPPORT_TAG)
+    GithubService(github_token, ORGANISATION).close_repository_open_issues_with_tag(
+        REPOSITORY, SUPPORT_TAG)
 
 
 if __name__ == "__main__":

@@ -265,10 +265,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-                                        timedelta(days=self.DATE_BOUNDARY + 1)
+            timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-                                         timedelta(days=self.DATE_BOUNDARY - 1)
+            timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
@@ -1002,7 +1002,8 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
 class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
     def test_calls_downstream_services_when_no_issues_to_close(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.close_repository_open_issues_with_tag("test-repository", "test-tag")
+        github_service.close_repository_open_issues_with_tag(
+            "test-repository", "test-tag")
         github_service.github_client_core_api.get_repo.assert_has_calls([
             call('moj-analytical-services/test-repository'),
             call().get_issues(state='open'),
@@ -1010,12 +1011,14 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
         ])
 
     def test_closes_open_issues_with_tag(self, mock_github_client_core_api):
-        mock_open_issue_with_tag = Mock(Issue, state="open", labels=[SimpleNamespace(name="test-tag")])
+        mock_open_issue_with_tag = Mock(Issue, state="open", labels=[
+                                        SimpleNamespace(name="test-tag")])
         mock_github_client_core_api.return_value.get_repo.return_value.get_issues.return_value = [
             mock_open_issue_with_tag]
 
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.close_repository_open_issues_with_tag("test-repository", "test-tag")
+        github_service.close_repository_open_issues_with_tag(
+            "test-repository", "test-tag")
 
         github_service.github_client_core_api.get_repo.assert_has_calls([
             call('moj-analytical-services/test-repository'),
@@ -1024,12 +1027,14 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
         mock_open_issue_with_tag.edit.assert_has_calls([call(state='closed')])
 
     def test_ignores_issues_without_tag(self, mock_github_client_core_api):
-        mock_open_issue_without_tag = Mock(Issue, state="open", labels=[SimpleNamespace(name="wrong-tag")])
+        mock_open_issue_without_tag = Mock(Issue, state="open", labels=[
+                                           SimpleNamespace(name="wrong-tag")])
         mock_github_client_core_api.return_value.get_repo.return_value.get_issues.return_value = [
             mock_open_issue_without_tag]
 
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.close_repository_open_issues_with_tag("test-repository", "test-tag")
+        github_service.close_repository_open_issues_with_tag(
+            "test-repository", "test-tag")
 
         self.assertFalse(mock_open_issue_without_tag.edit.called)
 
