@@ -75,7 +75,8 @@ class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
 
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
         users = ["some-user1", "some-user2", "some-user3"]
-        SlackService("").send_unknown_user_alert_to_operations_engineering(users)
+        SlackService(
+            "").send_unknown_user_alert_to_operations_engineering(users)
         mock_slack_client.return_value.chat_postMessage.assert_called_with(
             channel="C033QBE511V",
             mrkdown=True,
@@ -90,11 +91,13 @@ class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
             ]
         )
 
+
 @patch("slack_sdk.WebClient.__new__")
 class SendRemoveUsersFromGithubAlertToOperationsEngineering(unittest.TestCase):
 
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
-        SlackService("").send_remove_users_from_github_alert_to_operations_engineering(3, "some-org")
+        SlackService("").send_remove_users_from_github_alert_to_operations_engineering(
+            3, "some-org")
         mock_slack_client.return_value.chat_postMessage.assert_called_with(
             channel="C033QBE511V",
             mrkdown=True,
@@ -109,12 +112,15 @@ class SendRemoveUsersFromGithubAlertToOperationsEngineering(unittest.TestCase):
             ]
         )
 
+
 @patch("slack_sdk.WebClient.__new__")
 class SendUndeliveredEmailAlertToOperationsEngineering(unittest.TestCase):
 
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
-        email_address = ["some-user1@domain.com", "some-user2@domain.com", "some-user3@domain.com"]
-        SlackService("").send_undelivered_email_alert_to_operations_engineering(email_address, "some-org")
+        email_address = ["some-user1@domain.com",
+                         "some-user2@domain.com", "some-user3@domain.com"]
+        SlackService("").send_undelivered_email_alert_to_operations_engineering(
+            email_address, "some-org")
         mock_slack_client.return_value.chat_postMessage.assert_called_with(
             channel="C033QBE511V",
             mrkdown=True,
@@ -128,6 +134,7 @@ class SendUndeliveredEmailAlertToOperationsEngineering(unittest.TestCase):
                 }
             ]
         )
+
 
 if __name__ == "__main__":
     unittest.main()
