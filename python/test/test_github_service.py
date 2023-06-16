@@ -265,10 +265,10 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
     def setUp(self):
         now = datetime.now()
         self.inside_boundary_criteria = now - \
-                                        timedelta(days=self.DATE_BOUNDARY + 1)
+            timedelta(days=self.DATE_BOUNDARY + 1)
         self.on_boundary_criteria = now - timedelta(days=self.DATE_BOUNDARY)
         self.outside_boundary_criteria = now - \
-                                         timedelta(days=self.DATE_BOUNDARY - 1)
+            timedelta(days=self.DATE_BOUNDARY - 1)
 
     def happy_path_base_issue_mock(self, created_at=None, title=None,
                                    state=None) -> MagicMock:
