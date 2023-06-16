@@ -1,11 +1,13 @@
 import unittest
 from datetime import datetime, timedelta
+from types import SimpleNamespace
 from unittest.mock import call, MagicMock, Mock, patch
 
 from freezegun import freeze_time
 from github import Github, RateLimitExceededException
 from github.Commit import Commit
 from github.GitCommit import GitCommit
+from github.Issue import Issue
 from github.NamedUser import NamedUser
 from github.Repository import Repository
 from github.Team import Team
@@ -460,7 +462,7 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
 @patch("github.Github.__new__")
 class TestGithubServiceAddUserToTeam(unittest.TestCase):
 
-    def __create_user(self, name: str) -> dict[NamedUser, str]:
+    def __create_user(self, name: str) -> Mock[NamedUser, str]:
         return Mock(NamedUser, name=name)
 
     def test_adds_users_not_currently_in_team(self, mock_github_client_core_api, mock_github_client_gql_api):
@@ -992,6 +994,49 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
         self.assertEqual(len(self.repos), 1)
         self.assertEqual(self.repos[0]["node"]["name"], "test_repository")
         self.assertFalse("unexpected_data" in self.repos[0])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
+    def test_calls_downstream_services_when_no_issues_to_close(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.close_repository_open_issues_with_tag(
+            "test-repository", "test-tag")
+        github_service.github_client_core_api.get_repo.assert_has_calls([
+            call('moj-analytical-services/test-repository'),
+            call().get_issues(state='open'),
+            call().get_issues().__iter__()
+        ])
+
+    def test_closes_open_issues_with_tag(self, mock_github_client_core_api):
+        mock_open_issue_with_tag = Mock(Issue, state="open", labels=[
+                                        SimpleNamespace(name="test-tag")])
+        mock_github_client_core_api.return_value.get_repo.return_value.get_issues.return_value = [
+            mock_open_issue_with_tag]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.close_repository_open_issues_with_tag(
+            "test-repository", "test-tag")
+
+        github_service.github_client_core_api.get_repo.assert_has_calls([
+            call('moj-analytical-services/test-repository'),
+            call().get_issues(state='open')
+        ])
+        mock_open_issue_with_tag.edit.assert_has_calls([call(state='closed')])
+
+    def test_ignores_issues_without_tag(self, mock_github_client_core_api):
+        mock_open_issue_without_tag = Mock(Issue, state="open", labels=[
+                                           SimpleNamespace(name="wrong-tag")])
+        mock_github_client_core_api.return_value.get_repo.return_value.get_issues.return_value = [
+            mock_open_issue_without_tag]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.close_repository_open_issues_with_tag(
+            "test-repository", "test-tag")
+
+        self.assertFalse(mock_open_issue_without_tag.edit.called)
 
 
 class MockGithubIssue(MagicMock):
