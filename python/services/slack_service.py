@@ -128,3 +128,59 @@ class SlackService:
                                                    }
                                                }
                                            ])
+
+    def send_unknown_user_alert_to_operations_engineering(self, users: list):
+        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+                                           mrkdown=True,
+                                           blocks=[
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": dedent(f"""
+                                                           *Dormants Users Automation*
+                                                           Remove these users from the Dormants Users allow list:
+                                                           {users}
+                                                       """).strip("\n")
+                                                   }
+                                               }
+                                           ]
+                                           )
+
+    def send_remove_users_from_github_alert_to_operations_engineering(self, number_of_users: int, organisation_name: str):
+        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+                                           mrkdown=True,
+                                           blocks=[
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": dedent(f"""
+                                                           *Dormants Users Automation*
+                                                           Removed {number_of_users} users from the {organisation_name} GitHub Organisation.
+                                                           See the GH Action for more info: https://github.com/ministryofjustice/operations-engineering
+                                                       """).strip("\n")
+                                                   }
+                                               }
+                                           ]
+                                           )
+
+    def send_undelivered_email_alert_to_operations_engineering(self, email_addresses: list, organisation_name: str):
+        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+                                           mrkdown=True,
+                                           blocks=[
+                                               {
+                                                   "type": "section",
+                                                   "text": {
+                                                       "type": "mrkdwn",
+                                                       "text": dedent(f"""
+                                                           *Dormants Users Automation*
+                                                           Undelivered emails for {organisation_name} GitHub Organisation:
+                                                           {email_addresses}
+                                                           Remove these users manually
+                                                       """).strip("\n")
+                                                   }
+                                               }
+                                           ]
+                                           )
+
