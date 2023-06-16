@@ -70,5 +70,64 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
                            'url': 'https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html'}}])
 
 
+@patch("slack_sdk.WebClient.__new__")
+class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
+
+    def test_downstream_services_called(self, mock_slack_client: MagicMock):
+        users = ["some-user1", "some-user2", "some-user3"]
+        SlackService("").send_unknown_user_alert_to_operations_engineering(users)
+        mock_slack_client.return_value.chat_postMessage.assert_called_with(
+            channel="C033QBE511V",
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": '*Dormants Users Automation*\nRemove these users from the Dormants Users allow list:\n[\'some-user1\', \'some-user2\', \'some-user3\']'
+                    }
+                }
+            ]
+        )
+
+@patch("slack_sdk.WebClient.__new__")
+class SendRemoveUsersFromGithubAlertToOperationsEngineering(unittest.TestCase):
+
+    def test_downstream_services_called(self, mock_slack_client: MagicMock):
+        SlackService("").send_remove_users_from_github_alert_to_operations_engineering(3, "some-org")
+        mock_slack_client.return_value.chat_postMessage.assert_called_with(
+            channel="C033QBE511V",
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": '*Dormants Users Automation*\nRemoved 3 users from the some-org GitHub Organisation.\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering'
+                    }
+                }
+            ]
+        )
+
+@patch("slack_sdk.WebClient.__new__")
+class SendUndeliveredEmailAlertToOperationsEngineering(unittest.TestCase):
+
+    def test_downstream_services_called(self, mock_slack_client: MagicMock):
+        email_address = ["some-user1@domain.com", "some-user2@domain.com", "some-user3@domain.com"]
+        SlackService("").send_undelivered_email_alert_to_operations_engineering(email_address, "some-org")
+        mock_slack_client.return_value.chat_postMessage.assert_called_with(
+            channel="C033QBE511V",
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": '*Dormants Users Automation*\nUndelivered emails for some-org GitHub Organisation:\n[\'some-user1@domain.com\', \'some-user2@domain.com\', \'some-user3@domain.com\']\nRemove these users manually'
+                    }
+                }
+            ]
+        )
+
 if __name__ == "__main__":
     unittest.main()
