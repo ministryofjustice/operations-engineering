@@ -4,6 +4,7 @@ from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from datetime import datetime, timedelta
 
+
 class MojSlack:
 
     # Logging Config
@@ -78,11 +79,9 @@ class MojSlack:
         logging.error(f"Function: {function}")
         logging.error(f"Error: {slack_error}")
 
-
-
-    
     # This is quite inefficient/hacky but does seem to run fast enough - room for optimisation at a later day
     # When we decide what we want to do with this data, this is enough to just print for now
+
     @staticmethod
     def print_breakdown(list_of_messages, days) -> None:
         """This method takes a list of Slack messages and a number of days to search back, it will print how many messages in that list
