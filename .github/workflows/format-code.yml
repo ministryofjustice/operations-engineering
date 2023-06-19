@@ -13,7 +13,7 @@ jobs:
       - uses: ministryofjustice/github-actions/code-formatter@v13
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo "$GITHUB_CONTEXT"
+      - run: echo '${{ toJSON(github) }}'
       - name: Dump steps context
         env:
           STEPS_CONTEXT: ${{ toJson(steps) }}
