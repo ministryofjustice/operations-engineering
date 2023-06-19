@@ -1,14 +1,10 @@
 name: Tests
 on:
   push:
-    branches:
-      - main
-    paths-ignore:
-      - "source/**"
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-    paths-ignore:
-      - "source/**"
+    
 jobs:
   sonarcloud:
     name: Run Unit Tests
