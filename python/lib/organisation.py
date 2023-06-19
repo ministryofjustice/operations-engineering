@@ -61,11 +61,6 @@ class Organisation:
                 for team_name in configs["ignore_teams"]
             ]
 
-
-
-
-
-
     def __fetch_repositories(self):
         self.repositories = [
             repository
