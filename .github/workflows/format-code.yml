@@ -10,7 +10,23 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v3
-      - uses: ministryofjustice/github-actions/code-formatter@ben-al-patch-1
+      - uses: ministryofjustice/github-actions/code-formatter@v13
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+      - name: Run tests if needed - Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+        if: steps.format-code.outputs.files_changed == "true"
+      - name: Install tox
+        run: pip install tox
+        if: steps.format-code.outputs.files_changed == "true"
+      - name: Run tox
+        run: tox
+        if: steps.format-code.outputs.files_changed == "true"
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: steps.format-code.outputs.files_changed == "true"
