@@ -10,7 +10,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
     steps:
       - uses: actions/checkout@v3
-      - uses: ministryofjustice/github-actions/code-formatter@v13
+      - uses: ministryofjustice/github-actions/code-formatter@ben-al-patch-1
         id: formatter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
