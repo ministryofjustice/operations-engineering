@@ -2,7 +2,7 @@ name: Format code
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize, ready_for_review]
+    branches: [ "main" ]
 
 jobs:
   format-code:
