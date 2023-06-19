@@ -53,7 +53,7 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
 
 class GithubService:
     USER_ACCESS_REMOVED_ISSUE_TITLE: str = "User access removed, access is now via a team"
-    GITHUB_GQL_MAX_PAGE_SIZE =              100
+    GITHUB_GQL_MAX_PAGE_SIZE = 100
     GITHUB_GQL_DEFAULT_PAGE_SIZE = 80
 
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
