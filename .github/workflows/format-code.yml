@@ -13,6 +13,11 @@ jobs:
       - uses: ministryofjustice/github-actions/code-formatter@v13
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "$GITHUB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
       - name: Run tests if needed - Set up Python
         id: tests
         uses: actions/setup-python@v4
