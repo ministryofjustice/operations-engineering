@@ -15,32 +15,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: echo ${{ steps.formatter.outputs.files_changed }}
-      - run: echo '${{ toJSON(steps) }}'
           
   run_tests:
+    needs: format-code
+    if: ${{ steps.format-code.outputs.files_changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo '${{ toJSON(github) }}'
-      - run: echo '${{ toJSON(steps) }}'
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
       - name: Run tests if needed - Set up Python
-        id: tests
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-        if: steps.format-code.outputs.files_changed == 'true'
       - name: Install tox
         run: pip install tox
-        if: steps.format-code.outputs.files_changed == 'true'
       - name: Run tox
         run: tox
-        if: steps.format-code.outputs.files_changed == 'true'
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        if: steps.format-code.outputs.files_changed == 'true'
+
