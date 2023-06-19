@@ -14,7 +14,7 @@ jobs:
         id: formatter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo '${{ toJSON(github) }}'
+      - run: echo ${{ steps.formatter.outputs.files_changed }}
       - run: echo '${{ toJSON(steps) }}'
           
   run_tests:
