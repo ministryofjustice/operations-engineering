@@ -8,17 +8,18 @@ jobs:
   format-code:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
+    outputs:
+      files_changed: ${{ steps.formatter.outputs.files_changed }}
     steps:
       - uses: actions/checkout@v3
       - uses: ministryofjustice/github-actions/code-formatter@ben-al-patch-1
         id: formatter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: echo ${{ steps.formatter.outputs.files_changed }}
           
   run_tests:
     needs: format-code
-    if: ${{ steps.format-code.outputs.files_changed == 'true' }}
+    if: ${{ needs.format-code.outputs.files_changed == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Run tests if needed - Set up Python

@@ -17,6 +17,10 @@ class MojSlack:
     def __init__(self, slack_token: str) -> None:
         self.client = WebClient(slack_token)
 
+
+
+
+
     def get_conversation_history(self, channel_id, days):
         """This method returns a list of all messages sent in a target Slack channel over the past X days
 
