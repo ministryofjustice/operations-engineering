@@ -1039,6 +1039,61 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
         self.assertFalse(mock_open_issue_without_tag.edit.called)
 
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__")
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
+    def test_calls_downstream_services(self, mock_gql_client):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_user_org_email_address("test_team_name")
+        github_service.github_client_gql_api.assert_has_calls([
+            call.execute().__getitem__('user'),
+            call.execute().__getitem__().__getitem__('organizationVerifiedDomainEmails'),
+            call.execute().__getitem__().__getitem__().__getitem__(0)
+        ])
+
+    def test_returns_email(self, mock_gql_client):
+        mock_gql_client.return_value.execute.return_value = {
+            "user": {"organizationVerifiedDomainEmails": ["test-email"]}}
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_user_org_email_address("test_team_name")
+        self.assertEqual(response, "test-email")
+
+    def test_returns_default_value(self, mock_gql_client):
+        mock_gql_client.return_value.execute.return_value = {
+            "user": {"organizationVerifiedDomainEmails": []}}
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_user_org_email_address("test_team_name")
+        self.assertEqual(response, "-")
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
+    def test_calls_downstream_services(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_org_members_login_names()
+        github_service.github_client_core_api.get_organization.assert_has_calls(
+            [call(ORGANISATION_NAME), call().get_members(), call().get_members().__bool__(), call().get_members().__iter__()])
+
+    def test_returns_login_names(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
+            Mock(NamedUser, login="tom-smith"),
+            Mock(NamedUser, login="john.smith"),
+        ]
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_org_members_login_names()
+        self.assertEqual(["tom-smith", "john.smith"], response)
+
+    def test_returns_empty_list_when_members_returns_none(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization(
+        ).get_members.return_value = None
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_org_members_login_names()
+        self.assertEqual([], response)
+
+
 class MockGithubIssue(MagicMock):
     def __init__(self, the_id, number, title, assignees, label):
         mock_label = MagicMock(name="test_support_label")
