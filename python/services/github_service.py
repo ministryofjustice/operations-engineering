@@ -603,3 +603,25 @@ class GithubService:
             logging.info(
                 f"Closing issue {issue.title} in repository {issue.repository} because it has tag {tag}")
             issue.edit(state="closed")
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_user_org_email_address(self, user_name) -> str | TypeError:
+        logging.info(f"Getting user {user_name} email address")
+        data = self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $user_name: String!) {
+                user(login: $user_name) {
+                    organizationVerifiedDomainEmails(login: $organisation_name)
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "user_name": user_name})
+
+        if data["user"]["organizationVerifiedDomainEmails"]:
+            return data["user"]["organizationVerifiedDomainEmails"][0]
+        return "-"
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_org_members_login_names(self) -> list[str]:
+        logging.info("Getting Org Members Login Names")
+        members = self.github_client_core_api.get_organization(
+            self.organisation_name).get_members() or []
+        return [member.login.lower() for member in members]
