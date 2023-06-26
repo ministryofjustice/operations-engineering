@@ -90,9 +90,10 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__")
+@patch("requests.sessions.Session.__new__")
 class TestGithubServiceInit(unittest.TestCase):
 
-    def test_sets_up_class(self, mock_github_client_core_api, mock_github_client_gql_api):
+    def test_sets_up_class(self,  mock_github_client_rest_api, mock_github_client_core_api, mock_github_client_gql_api):
         mock_github_client_core_api.return_value = "test_mock_github_client_core_api"
         mock_github_client_gql_api.return_value = "test_mock_github_client_gql_api"
         github_service = GithubService("", ORGANISATION_NAME)
@@ -100,6 +101,8 @@ class TestGithubServiceInit(unittest.TestCase):
                          github_service.github_client_core_api)
         self.assertEqual("test_mock_github_client_gql_api",
                          github_service.github_client_gql_api)
+        mock_github_client_rest_api.assert_has_calls([call().headers.update(
+            {'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer '})])
         self.assertEqual(ORGANISATION_NAME,
                          github_service.organisation_name)
 
@@ -1092,6 +1095,40 @@ class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         response = github_service.get_org_members_login_names()
         self.assertEqual([], response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+@patch("requests.sessions.Session.__new__")
+class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
+
+    def test_calls_downstream_services(self, mock_github_client_rest_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.get_user_from_audit_log("some-user")
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.get(
+                    'https://api.github.com/orgs/moj-analytical-services/audit-log?phrase=actor%3Asome-user', timeout=10),
+                call.get().status_code.__eq__(200)
+            ]
+        )
+
+    def test_returns_a_user(self, mock_github_client_rest_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_github_client_rest_api.get().content = b"\"some-user\""
+        mock_github_client_rest_api.get().status_code = 200
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        user = github_service.get_user_from_audit_log("some-user")
+        self.assertEqual(user, "some-user")
+
+    def test_returns_zero_when_response_is_not_okay(self, mock_github_client_rest_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_github_client_rest_api.get().status_code = 404
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        response = github_service.get_user_from_audit_log("some-user")
+        self.assertEqual(0, response)
 
 
 class MockGithubIssue(MagicMock):
