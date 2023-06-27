@@ -77,6 +77,8 @@ class TestSendEmailReplyToOpsEng(unittest.TestCase):
                 self.template_id, self.ops_email, self.data_to_send)
 
 # pylint: disable=W0212
+
+
 @patch("python.services.notify_service.NotificationsAPIClient")
 class TestGetNotificationsByTypeAndStatus(unittest.TestCase):
 
