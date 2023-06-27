@@ -3,14 +3,15 @@ from datetime import datetime, timedelta
 import requests
 
 from python.config.logging_config import logging
+from python.config.constants import (
+    RESPONSE_OKAY,
+    RESPONSE_NO_CONTENT
+)
 
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-RESPONSE_OKAY = 200
-RESPONSE_NO_CONTENT = 204
 
-
-class Auth0_Service:
+class Auth0Service:
     def __init__(self, client_secret: str, client_id: str, domain: str, grant_type: str = 'client_credentials'):
         """
         Args:
@@ -105,7 +106,6 @@ class Auth0_Service:
         Returns:
             requests.Response: Response object
         """
-
         logging.debug(f"Getting data from {endpoint}")
         return self._make_request('GET', endpoint)
 
@@ -118,7 +118,6 @@ class Auth0_Service:
         Returns:
             requests.Response: Response object
         """
-
         logging.debug(f"Deleting data at {endpoint}")
         return self._make_request('DELETE', endpoint)
 
@@ -172,6 +171,7 @@ class Auth0_Service:
                 time.sleep(0.5)
             else:
                 logging.error(f"Error retrieving users: {response.text}")
+                break
 
         return all_users
 
@@ -188,7 +188,7 @@ class Auth0_Service:
         # List to hold inactive users
         users2 = []
         for user in self.get_users():
-            if user['last_login']:
+            if user.get('last_login'):
                 last_login = datetime.strptime(
                     user['last_login'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 if last_login < (datetime.utcnow() - timedelta(days=days_inactive)):
@@ -196,7 +196,6 @@ class Auth0_Service:
             else:
                 # User has never logged in
                 users2.append(user)
-
         return users2
 
     def get_active_users(self, days_inactive: int = 90) -> list[dict[str, any]]:
@@ -212,13 +211,9 @@ class Auth0_Service:
         # List to hold active users
         users2 = []
         for user in self.get_users():
-            if user['last_login']:
+            if user.get('last_login'):
                 last_login = datetime.strptime(
                     user['last_login'], '%Y-%m-%dT%H:%M:%S.%fZ')
                 if last_login > (datetime.utcnow() - timedelta(days=days_inactive)):
                     users2.append(user)
-            else:
-                # User has never logged in
-                users2.append(user)
-
         return users2
