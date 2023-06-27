@@ -1,9 +1,12 @@
+import json
+
 from calendar import timegm
 from datetime import datetime, timedelta
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
+from requests import Session
 from github import Github, NamedUser, RateLimitExceededException
 from github.Commit import Commit
 from github.Issue import Issue
@@ -67,6 +70,13 @@ class GithubService:
             headers={"Authorization": f"Bearer {org_token}"},
         ), execute_timeout=60)
         self.organisation_name: str = organisation_name
+        self.github_client_rest_api = Session()
+        self.github_client_rest_api.headers.update(
+            {
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {org_token}",
+            }
+        )
 
     def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
         for repo in self.__get_repos_to_consider_for_archiving("all"):
@@ -603,3 +613,35 @@ class GithubService:
             logging.info(
                 f"Closing issue {issue.title} in repository {issue.repository} because it has tag {tag}")
             issue.edit(state="closed")
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_user_org_email_address(self, user_name) -> str | TypeError:
+        logging.info(f"Getting user {user_name} email address")
+        data = self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $user_name: String!) {
+                user(login: $user_name) {
+                    organizationVerifiedDomainEmails(login: $organisation_name)
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "user_name": user_name})
+
+        if data["user"]["organizationVerifiedDomainEmails"]:
+            return data["user"]["organizationVerifiedDomainEmails"][0]
+        return "-"
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_org_members_login_names(self) -> list[str]:
+        logging.info("Getting Org Members Login Names")
+        members = self.github_client_core_api.get_organization(
+            self.organisation_name).get_members() or []
+        return [member.login.lower() for member in members]
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_user_from_audit_log(self, username: str):
+        logging.info("Getting User from Audit Log")
+        response_okay = 200
+        url = f"https://api.github.com/orgs/{self.organisation_name}/audit-log?phrase=actor%3A{username}"
+        response = self.github_client_rest_api.get(url, timeout=10)
+        if response.status_code == response_okay:
+            return json.loads(response.content.decode("utf-8"))
+        return 0

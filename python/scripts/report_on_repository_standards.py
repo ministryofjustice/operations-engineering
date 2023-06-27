@@ -6,7 +6,7 @@ from python.services.operations_engineering_reports import OperationsEngineering
 from python.services.standards_service import RepositoryReport
 
 
-def add_arguments():
+def __add_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--oauth-token",
@@ -43,32 +43,22 @@ def add_arguments():
         help="The API key to use for the operations-engineering-reports endpoint",
     )
 
-    parser.add_argument(
-        "--enc-key",
-        type=str,
-        required=True,
-        help="The encryption key to use for the operations-engineering-reports endpoint",
-    )
-
     return parser.parse_args()
 
 
-def parse_args(args):
+def __parse_args(args):
     if args.url[-1] == "/":
         args.url = args.url[:-1]
 
     if args.endpoint[0] == "/":
         args.endpoint = args.endpoint[1:]
 
-    if args.enc_key[:2] == "0x":
-        args.enc_key = args.enc_key[2:]
-
     return args
 
 
 def main():
     # Add arguments from the command line
-    args = parse_args(add_arguments())
+    args = __parse_args(__add_arguments())
 
     # Fetch all repositories in the org
     repos = GithubService(
@@ -79,7 +69,7 @@ def main():
 
     # Send the reports to the operations-engineering-reports API
     try:
-        OperationsEngineeringReportsService(args.url, args.endpoint, args.api_key, args.enc_key)\
+        OperationsEngineeringReportsService(args.url, args.endpoint, args.api_key)\
             .override_repository_standards_reports(repo_reports)
     except AssertionError as error:
         logging.error(

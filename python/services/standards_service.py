@@ -55,7 +55,7 @@ class RepositoryReport:
         )
 
     @property
-    def output(self) -> str:
+    def output(self) -> GitHubRepositoryStandardsReport:
         """Return the report as a json object."""
         return self.__output.to_json()
 
