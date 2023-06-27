@@ -97,7 +97,7 @@ class Auth0Service:
             f"Failed to get access token from Auth0: {response.text}")
         raise Exception("Failed to get access token from Auth0")
 
-    def get(self, endpoint: str) -> requests.Response:
+    def _get(self, endpoint: str) -> requests.Response:
         """Sends a GET request to the API endpoint.
 
         Args:
@@ -109,7 +109,7 @@ class Auth0Service:
         logging.debug(f"Getting data from {endpoint}")
         return self._make_request('GET', endpoint)
 
-    def delete(self, endpoint: str) -> requests.Response:
+    def _delete(self, endpoint: str) -> requests.Response:
         """Sends a DELETE request to the API endpoint.
 
         Args:
@@ -130,7 +130,7 @@ class Auth0Service:
         Returns:
             requests.Response: Response object
         """
-        response = self.delete(f'api/v2/users/{user_id}')
+        response = self._delete(f'api/v2/users/{user_id}')
 
         if response.status_code == RESPONSE_NO_CONTENT:
             logging.info(f"User {user_id} deleted")
@@ -141,7 +141,7 @@ class Auth0Service:
 
         return response.status_code
 
-    def get_users(self, page=0, per_page=100) -> list[dict[str, any]]:
+    def _get_users(self, page=0, per_page=100) -> list[dict[str, any]]:
         """Gets all users from Auth0
 
         Args:
@@ -157,7 +157,7 @@ class Auth0Service:
 
         # Paginate through users
         while True:
-            response = self.get(
+            response = self._get(
                 f'api/v2/users?page={page}&per_page={per_page}')
             if response.status_code == RESPONSE_OKAY:
                 users = response.json()
@@ -187,7 +187,7 @@ class Auth0Service:
 
         # List to hold inactive users
         users2 = []
-        for user in self.get_users():
+        for user in self._get_users():
             if user.get('last_login'):
                 last_login = datetime.strptime(
                     user['last_login'], '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -210,7 +210,7 @@ class Auth0Service:
 
         # List to hold active users
         users2 = []
-        for user in self.get_users():
+        for user in self._get_users():
             if user.get('last_login'):
                 last_login = datetime.strptime(
                     user['last_login'], '%Y-%m-%dT%H:%M:%S.%fZ')
