@@ -29,6 +29,7 @@ class TestUtilities(unittest.TestCase):
         the_date = datetime(2022, 1, 1)
         self.assertEqual(convert_string_to_date("2022-01-01"), the_date)
 
+    @freeze_time("2023-06-27 12:53:22", tz_offset=1)
     def test_convert_timestamp_ms_to_date(self):
         converted_date = convert_timestamp_ms_to_date(1687866802203)
         expected_date = datetime(2023, 6, 27, 12, 53, 22, 203000)
