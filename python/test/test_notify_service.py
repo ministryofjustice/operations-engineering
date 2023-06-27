@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from unittest.mock import patch
 import requests
 from python.services.notify_service import NotifyService
-from python.tests.test_config import test_config
+from python.test.test_config import test_config
 
 
 class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
