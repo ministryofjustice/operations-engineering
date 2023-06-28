@@ -22,7 +22,6 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
         self.assertCountEqual(
             mock_post.call_args[1]['json'], self.reports)
 
-
     @patch('requests.post')
     def test_override_repository_standards_reports_with_non_200(self, mock_post):
         mock_post.return_value.status_code = 500
