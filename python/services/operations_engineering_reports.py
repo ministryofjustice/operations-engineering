@@ -1,5 +1,3 @@
-import json
-
 import requests
 
 
@@ -35,8 +33,8 @@ class OperationsEngineeringReportsService:
         """
         status = self.__http_post(reports)
         if status != 200:
-            raise AssertionError(
-                f"Received status code {status} from {self.__reports_url}/{self.__endpoint}")
+            raise ValueError(
+                f"Failed to send repository standards reports to API. Received: {status}")
 
     def __http_post(self, data: list[dict]) -> int:
         headers = {
