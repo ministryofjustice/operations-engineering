@@ -4,8 +4,6 @@ from unittest.mock import patch
 from python.services.operations_engineering_reports import \
     OperationsEngineeringReportsService
 
-# from python.services.standards_service import GitHubRepositoryStandardsReport
-
 
 class TestOperationsEngineeringReportsService(unittest.TestCase):
     def setUp(self):
