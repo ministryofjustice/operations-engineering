@@ -14,7 +14,6 @@ valid service label options are:
 
 - `Pingdom`
 - `PagerDuty`
-- `LastPass`
 - `Sentry`
 - `OS Data Hub APIs`
 - `SSL Certificate Management`
