@@ -969,8 +969,8 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceFetchAllRepositories(unittest.TestCase):
     def test_returning_correct_data(self):
-        self.github_service = GithubService("", ORGANISATION_NAME)
-        self.github_service.get_paginated_list_of_repositories = MagicMock(
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_repositories = MagicMock(
             return_value={
                 "organization": {
                     "repositories": {
@@ -993,10 +993,57 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
                 }
             }
         )
-        self.repos = self.github_service.fetch_all_repositories_in_org()
-        self.assertEqual(len(self.repos), 1)
-        self.assertEqual(self.repos[0]["node"]["name"], "test_repository")
-        self.assertFalse("unexpected_data" in self.repos[0])
+        repos = github_service.fetch_all_repositories_in_org()
+        self.assertEqual(len(repos), 1)
+        self.assertEqual(repos[0]["node"]["name"], "test_repository")
+        self.assertFalse("unexpected_data" in repos[0])
+
+    def test_nothing_to_return(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_repositories = MagicMock(
+            return_value={
+                "organization": {
+                    "repositories": {
+                        "edges": [],
+                        "pageInfo": {
+                            "hasNextPage": False,
+                            "endCursor": "test_end_cursor",
+                        },
+                    }
+                }
+            }
+        )
+
+        repos = github_service.fetch_all_repositories_in_org()
+        self.assertEqual(len(repos), 0)
+
+    def test_ignore_invalid_data(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_repositories = MagicMock(
+            return_value={
+                "organization": {
+                    "repositories": {
+                        "edges": [
+                            {
+                                "node": {
+                                    "name": "test_repository2",
+                                    "url": "test.couk",
+                                    "isArchived": True,
+                                    "isLocked": False,
+                                    "isDisabled": False,
+                                },
+                            },
+                        ],
+                        "pageInfo": {
+                            "hasNextPage": False,
+                            "endCursor": "test_end_cursor",
+                        },
+                    }
+                }
+            }
+        )
+        repos = github_service.fetch_all_repositories_in_org()
+        self.assertEqual(len(repos), 0)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
