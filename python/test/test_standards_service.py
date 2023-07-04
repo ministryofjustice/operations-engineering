@@ -136,6 +136,38 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         self.assertEqual(self.to_json['report']
                          ['has_require_approvals_enabled'], False)
 
+    def test_empty_branch_condition(self):
+        empty_data_set = {
+            "node": {
+                "branchProtectionRules": {
+                    "edges": [
+                        {
+                            "node": {
+                                "pattern": "not_main",
+                                "requiresApprovingReviews": False,
+                                "isAdminEnforced": False,
+                                "requiresCodeOwnerReviews": True,
+                                "requiredApprovingReviewCount": 0,
+                            }
+                        }
+                    ]
+                },
+                "defaultBranchRef": None,
+                "description": "repo_description",
+                "hasIssuesEnabled": False,
+                "isArchived": False,
+                "isDisabled": False,
+                "isLocked": False,
+                "isPrivate": True,
+                "licenseInfo": None,
+                "name": "repo_name",
+                "pushedAt": "2022-01-01",
+                "url": "https://github.com"
+            }
+        }
+        repository_report = RepositoryReport(empty_data_set)
+        to_json = json.loads(repository_report.output)
+        self.assertEqual(to_json['report']['default_branch_main'], False)
 
 if __name__ == '__main__':
     unittest.main()
