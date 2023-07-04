@@ -55,7 +55,7 @@ class RepositoryReport:
         )
 
     @property
-    def output(self) -> GitHubRepositoryStandardsReport:
+    def output(self) -> str:
         """Return the report as a json object."""
         return self.__output.to_json()
 
@@ -63,6 +63,8 @@ class RepositoryReport:
         return self.__github_data["node"]["name"]
 
     def __default_branch(self) -> str:
+        if self.__github_data["node"]["defaultBranchRef"] is None:
+            return "unknown"
         return self.__github_data["node"]["defaultBranchRef"]["name"]
 
     def __url(self) -> str:
@@ -96,9 +98,14 @@ class RepositoryReport:
         }
 
     def __default_branch_main(self) -> bool:
+        if self.__github_data["node"]["defaultBranchRef"] is None:
+            return False
         return self.__github_data["node"]["defaultBranchRef"]["name"] == "main"
 
     def __has_default_branch_protection_enabled(self) -> bool:
+        if self.__github_data["node"]["defaultBranchRef"] is None:
+            return False
+
         default_branch = self.__github_data["node"]["defaultBranchRef"]["name"]
         branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
