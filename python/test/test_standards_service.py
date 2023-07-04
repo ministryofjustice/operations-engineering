@@ -169,5 +169,6 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         to_json = json.loads(repository_report.output)
         self.assertEqual(to_json['report']['default_branch_main'], False)
 
+
 if __name__ == '__main__':
     unittest.main()
