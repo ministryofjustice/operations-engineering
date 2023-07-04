@@ -2,7 +2,7 @@ import argparse
 import logging
 
 from python.services.github_service import GithubService
-from python.services.operations_engineering_reports import OperationsEngineeringReportsService
+from python.services.operations_engineering_reports import OperationsEngineeringReportsService as reports_service
 from python.services.standards_service import RepositoryReport
 
 
@@ -68,12 +68,8 @@ def main():
     repo_reports = [RepositoryReport(repo).output for repo in repos]
 
     # Send the reports to the operations-engineering-reports API
-    try:
-        OperationsEngineeringReportsService(args.url, args.endpoint, args.api_key)\
-            .override_repository_standards_reports(repo_reports)
-    except AssertionError as error:
-        logging.error(
-            f" A failure occurred communicating with {args.url}/{args.endpoint}: {error}")
+    reports_service(args.url, args.endpoint, args.api_key)\
+        .override_repository_standards_reports(repo_reports)
 
 
 if __name__ == "__main__":
