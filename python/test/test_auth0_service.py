@@ -1,12 +1,15 @@
 import unittest
 from unittest.mock import MagicMock, Mock, patch
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import requests
 from python.services.auth0_service import Auth0Service
-from python.lib.utilities import get_past_date
 from python.config.constants import (
     RESPONSE_OKAY,
     RESPONSE_NO_CONTENT
 )
+
+# pylint: disable=W0212
 
 
 class TestAuth0Service(unittest.TestCase):
@@ -16,10 +19,10 @@ class TestAuth0Service(unittest.TestCase):
         self.domain = "test_domain"
         self.grant_type = "test_grant_type"
         self.endpoint = "test_endpoint"
-        self.datetime = MagicMock()
+        self.the_datetime = MagicMock()
 
         # Pretend it is January 1st, 2022
-        self.fake_date = self.datetime(2022, 1, 1)
+        self.fake_date = self.the_datetime(2022, 1, 1)
 
         self.response = Mock()
         self.response.status_code = RESPONSE_OKAY
@@ -126,9 +129,7 @@ class TestAuth0Service(unittest.TestCase):
         self.assertEqual(users, [])
 
     def test_get_inactive_users_when_user_is_active(self):
-        datetime = MagicMock()
-        fake_date = get_past_date(3, 0, 0)
-        datetime.utcnow.return_value = fake_date
+        fake_date = datetime.now() - relativedelta(days=3)
         the_users = self.expired_users
         the_users[0].update(
             {"last_login": f"{fake_date:%Y-%m-%dT%H:%M:%S.%fZ}"})
@@ -138,7 +139,7 @@ class TestAuth0Service(unittest.TestCase):
         self.assertEqual(users, [])
 
     def test_get_inactive_users(self):
-        self.datetime.utcnow.return_value = self.fake_date
+        self.the_datetime.utcnow.return_value = self.fake_date
         self.response.json.return_value = self.expired_users
         self.auth0._get = MagicMock(return_value=self.response)
         users = self.auth0.get_inactive_users()
@@ -151,36 +152,31 @@ class TestAuth0Service(unittest.TestCase):
         self.assertEqual(users, self.users_with_id)
 
     def test_get_active_users_when_user_has_expired(self):
-        self.datetime.utcnow.return_value = self.fake_date
+        self.the_datetime.utcnow.return_value = self.fake_date
         self.response.json.return_value = self.expired_users
         self.auth0._get = MagicMock(return_value=self.response)
         users = self.auth0.get_active_users()
         self.assertEqual(users, [])
 
     def test_get_active_users_when_user_never_logged_in(self):
-        self.datetime.utcnow.return_value = self.fake_date
+        self.the_datetime.utcnow.return_value = self.fake_date
         self.response.json.return_value = self.users_with_id
         self.auth0._get = MagicMock(return_value=self.response)
         users = self.auth0.get_active_users()
         self.assertEqual(users, [])
 
     def test_get_active_users(self):
-        datetime = MagicMock()
-        fake_date = datetime(2050, 1, 1)
-        datetime.utcnow.return_value = fake_date
         self.response.json.return_value = self.active_users
         self.auth0._get = MagicMock(return_value=self.response)
         users = self.auth0.get_active_users()
         self.assertEqual(users, self.active_users)
 
-    # pylint: disable=W0212
     @patch.object(requests, 'request')
     def test_make_request(self, mock_requests):
         mock_requests.return_value = Mock(status_code=RESPONSE_OKAY)
         response = self.auth0._make_request("POST", "some-endpoint")
         self.assertEqual(RESPONSE_OKAY, response.status_code)
 
-    # pylint: disable=W0212
     @patch.object(requests, 'request')
     def test_make_request_with_data(self, mock_requests):
         mock_requests.return_value = Mock(status_code=RESPONSE_OKAY)
@@ -188,17 +184,22 @@ class TestAuth0Service(unittest.TestCase):
             "POST", self.endpoint, "the-data")
         self.assertEqual(RESPONSE_OKAY, response.status_code)
 
-    # pylint: disable=W0212
     def test_get(self):
         self.auth0._make_request = MagicMock(return_value=self.response)
         res = self.auth0._get(self.endpoint)
         self.assertEqual(res.status_code, self.response.status_code)
 
-    # pylint: disable=W0212
     def test_delete(self):
         self.auth0._make_request = MagicMock(return_value=self.response)
         res = self.auth0._delete(self.endpoint)
         self.assertEqual(res.status_code, self.response.status_code)
+
+    @patch.object(Auth0Service, "get_active_users")
+    def test_get_active_users_usernames(self, mock_get_active_users):
+        mock_get_active_users.return_value = [
+            {"nickname": "some-user-1"}, {"nickname": "Some-useR-2"}]
+        self.assertEqual(self.auth0.get_active_users_usernames(), [
+                         "some-user-1", "some-user-2"])
 
 
 if __name__ == "__main__":
