@@ -183,3 +183,36 @@ class SlackService:
                                                }
                                            ]
                                            )
+
+    def send_remove_users_slack_message(self, number_of_users: int, organisation_name: str):
+        message = f"*Dormants Users Automation*\nRemoved {number_of_users} users from the {organisation_name} GitHub Organisation.\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering"
+        blocks = self._create_block_with_message(message)
+        self._send_alert_to_operations_engineering(blocks)
+
+    def send_unknown_users_slack_message(self, unknown_users: list):
+        message = f"*Dormants Users Automation*\nRemove these users from the Dormants Users allow list:\n{unknown_users}"
+        blocks = self._create_block_with_message(message)
+        self._send_alert_to_operations_engineering(blocks)
+
+    def send_undelivered_emails_slack_message(self, email_addresses: list, organisation_name: str):
+        message = f"*Dormants Users Automation*\nUndelivered emails for {organisation_name} GitHub Organisation:\n{email_addresses}\nRemove these users manually"
+        blocks = self._create_block_with_message(message)
+        self._send_alert_to_operations_engineering(blocks)
+
+    def _send_alert_to_operations_engineering(self, blocks: list[dict]):
+        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+                                           mrkdown=True,
+                                           blocks=blocks
+                                           )
+
+    def _create_block_with_message(self, message):
+        return [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": message
+                }
+            }
+        ]
+
