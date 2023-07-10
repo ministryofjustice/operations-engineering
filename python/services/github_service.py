@@ -2,6 +2,7 @@ import json
 
 from calendar import timegm
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
@@ -637,7 +638,7 @@ class GithubService:
         return [member.login.lower() for member in members]
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_user_from_audit_log(self, username: str):
+    def _get_user_from_audit_log(self, username: str):
         logging.info("Getting User from Audit Log")
         response_okay = 200
         url = f"https://api.github.com/orgs/{self.organisation_name}/audit-log?phrase=actor%3A{username}"
@@ -645,3 +646,25 @@ class GithubService:
         if response.status_code == response_okay:
             return json.loads(response.content.decode("utf-8"))
         return 0
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_audit_log_active_users(self, users: list) -> list:
+        three_months_ago_date = datetime.now() - relativedelta(months=3)
+
+        active_users = []
+        for user in users:
+            audit_log_data = self._get_user_from_audit_log(
+                user["username"])
+            # No data means the user has no activity in the audit log
+            if len(audit_log_data) > 0:
+                last_active_date = datetime.fromtimestamp(
+                    audit_log_data[0]["@timestamp"] / 1000.0)
+                if last_active_date > three_months_ago_date:
+                    active_users.append(user["username"].lower())
+        return active_users
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def remove_user_from_gitub(self, user: str):
+        github_user = self.github_client_core_api.get_user(user)
+        self.github_client_core_api.get_organization(
+            self.organisation_name).remove_from_membership(github_user)
