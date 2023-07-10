@@ -137,6 +137,7 @@ class SendUndeliveredEmailAlertToOperationsEngineering(unittest.TestCase):
             ]
         )
 
+
 class TestSlackService(unittest.TestCase):
 
     @patch("slack_sdk.WebClient.__new__")
