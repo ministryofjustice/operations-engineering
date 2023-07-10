@@ -217,3 +217,6 @@ class Auth0Service:
                 if last_login > (datetime.utcnow() - timedelta(days=days_inactive)):
                     users2.append(user)
         return users2
+
+    def get_active_users_usernames(self) -> list[str]:
+        return [user["nickname"].lower() for user in self.get_active_users()]
