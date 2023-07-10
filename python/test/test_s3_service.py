@@ -24,7 +24,6 @@ class TestS3Service(unittest.TestCase):
         self.builtins = "builtins.open"
         self.fake_datetime = "2023-01-20T14:51:47.000+01:00"
 
-
     def test_download_file_correctly(self):
         # Create a temporary directory
         test_dir = tempfile.mkdtemp()
