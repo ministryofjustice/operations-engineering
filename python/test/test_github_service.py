@@ -19,6 +19,8 @@ ORGANISATION_NAME = "moj-analytical-services"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
+# pylint: disable=W0212
+
 
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
 
@@ -1153,7 +1155,7 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
     def test_calls_downstream_services(self, mock_github_client_rest_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.github_client_rest_api = mock_github_client_rest_api
-        github_service.get_user_from_audit_log("some-user")
+        github_service._get_user_from_audit_log("some-user")
         mock_github_client_rest_api.assert_has_calls(
             [
                 call.get(
@@ -1167,15 +1169,89 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
         mock_github_client_rest_api.get().content = b"\"some-user\""
         mock_github_client_rest_api.get().status_code = 200
         github_service.github_client_rest_api = mock_github_client_rest_api
-        user = github_service.get_user_from_audit_log("some-user")
+        user = github_service._get_user_from_audit_log("some-user")
         self.assertEqual(user, "some-user")
 
     def test_returns_zero_when_response_is_not_okay(self, mock_github_client_rest_api):
         github_service = GithubService("", ORGANISATION_NAME)
         mock_github_client_rest_api.get().status_code = 404
         github_service.github_client_rest_api = mock_github_client_rest_api
-        response = github_service.get_user_from_audit_log("some-user")
+        response = github_service._get_user_from_audit_log("some-user")
         self.assertEqual(0, response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+@patch.object(GithubService, "_get_user_from_audit_log")
+class TestGithubServiceGetAuditLogActiveUsers(unittest.TestCase):
+
+    def test_get_audit_log_active_users_when_no_users_passed_in(self, mock_get_user_from_audit_log):
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_audit_log_active_users([])
+        self.assertEqual(0, len(response))
+        mock_get_user_from_audit_log.assert_not_called()
+
+    def test_get_audit_log_active_users_when_no_user_data_from_audit_log(self, mock_get_user_from_audit_log):
+        github_service = GithubService("", ORGANISATION_NAME)
+        users = [
+            {
+                "username": "some-user",
+                "is_outside_collaborator": False,
+            }
+        ]
+        mock_get_user_from_audit_log.return_value = []
+        response = github_service.get_audit_log_active_users(users)
+        self.assertEqual(0, len(response))
+
+    def test_get_audit_log_active_users_when_user_not_active(self, mock_get_user_from_audit_log):
+        github_service = GithubService("", ORGANISATION_NAME)
+        users = [
+            {
+                "username": "some-user",
+                "is_outside_collaborator": False,
+            }
+        ]
+        mock_get_user_from_audit_log.return_value = [
+            {"@timestamp": 1080866000003}
+        ]
+        response = github_service.get_audit_log_active_users(users)
+        self.assertEqual(0, len(response))
+
+    def test_get_audit_log_active_users_when_user_is_active(self, mock_get_user_from_audit_log):
+        github_service = GithubService("", ORGANISATION_NAME)
+        users = [
+            {
+                "username": "some-user",
+                "is_outside_collaborator": False,
+            }
+        ]
+        current_time = datetime.now(timezone.utc)
+        unix_timestamp = current_time.timestamp() * 1000
+        mock_get_user_from_audit_log.return_value = [
+            {"@timestamp": unix_timestamp}
+        ]
+        response = github_service.get_audit_log_active_users(users)
+        self.assertEqual(1, len(response))
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceRemoveUserFromGitHub(unittest.TestCase):
+    def test_remove_user_from_gitub(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_user.return_value = "mock-user"
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.remove_user_from_gitub("some-user")
+        github_service.github_client_core_api.get_user.assert_has_calls(
+            [call('some-user')]
+        )
+        github_service.github_client_core_api.get_organization.assert_has_calls(
+            [
+                call('moj-analytical-services'),
+                call().remove_from_membership("mock-user"),
+            ]
+        )
 
 
 class MockGithubIssue(MagicMock):
