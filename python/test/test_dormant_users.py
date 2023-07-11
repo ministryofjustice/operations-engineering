@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime
 
 from python.scripts.dormant_users import (
+    main,
     convert_str_to_bool,
     get_username,
     get_allow_list_users,
@@ -12,7 +13,6 @@ from python.scripts.dormant_users import (
     run_step_two,
     run_step_three,
     get_dormant_users,
-    run_dormant_users,
     MINISTRY_OF_JUSTICE_ALLOW_LIST,
     MOJ_ANALYTICAL_SERVICES_ALLOW_LIST,
 )
@@ -62,7 +62,7 @@ class TestDormantUsersMain(unittest.TestCase):
     @patch("python.scripts.dormant_users.run_step_three")
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "true", "", ""])
     def test_main_runs_step_one(self, mock_run_step_three, mock_run_step_two, mock_run_step_one):
-        run_dormant_users()
+        main()
         mock_run_step_one.assert_called_once()
         mock_run_step_two.assert_not_called()
         mock_run_step_three.assert_not_called()
@@ -72,7 +72,7 @@ class TestDormantUsersMain(unittest.TestCase):
     @patch("python.scripts.dormant_users.run_step_three")
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "", "true", ""])
     def test_main_runs_step_two(self, mock_run_step_three, mock_run_step_two, mock_run_step_one):
-        run_dormant_users()
+        main()
         mock_run_step_one.assert_not_called()
         mock_run_step_two.assert_called_once()
         mock_run_step_three.assert_not_called()
@@ -82,7 +82,7 @@ class TestDormantUsersMain(unittest.TestCase):
     @patch("python.scripts.dormant_users.run_step_three")
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "", "", "true"])
     def test_main_runs_step_three(self, mock_run_step_three, mock_run_step_two, mock_run_step_one):
-        run_dormant_users()
+        main()
         mock_run_step_one.assert_not_called()
         mock_run_step_two.assert_not_called()
         mock_run_step_three.assert_called_once()
