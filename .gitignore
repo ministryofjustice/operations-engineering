@@ -9,3 +9,11 @@ env
 coverage.xml
 .coverage
 .tox*
+htmlcov
+*__pycache__*
+
+ministryofjustice_first_email_list.json
+moj-analytical-services_first_email_list.json
+export-ministryofjustice.json
+export-moj-analytical-services.json
+dormant.csv
