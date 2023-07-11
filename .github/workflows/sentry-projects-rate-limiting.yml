@@ -16,6 +16,7 @@ jobs:
       - run: python -m python.scripts.sentry_projects_rate_limiting
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

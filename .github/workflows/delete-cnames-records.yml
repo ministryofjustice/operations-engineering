@@ -28,3 +28,4 @@ jobs:
         env:
           HOSTED_ZONE_1: ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }}
           HOSTED_ZONE_2: ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
+          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}

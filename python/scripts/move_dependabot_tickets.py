@@ -1,5 +1,5 @@
 import argparse
-import logging
+from python.config.logging_config import logging
 
 from python.services.zenhub_service import ZenhubService
 
@@ -71,10 +71,6 @@ def add_arguments():
 
 def main():
     args = add_arguments()
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)-8s %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
 
     zenhub = ZenhubService(args.api_token)
     try:

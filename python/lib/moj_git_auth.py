@@ -1,6 +1,7 @@
 import jwt
 import time
 import requests
+from python.config.logging_config import logging
 
 # This class is used to generate a various GitHub Authentication Tokens
 
@@ -46,7 +47,7 @@ class MoJGitAuth:
         if response.status_code == requests.codes.created:
             return response.json()['token']
         else:
-            print(
+            logging.warning(
                 f"Failed to get installation token with status code {response.status_code}")
 
     @staticmethod
@@ -61,5 +62,5 @@ class MoJGitAuth:
             if installations:
                 return installations[0]["id"]
         else:
-            print(
+            logging.warning(
                 f"Failed to get installations with status code {response.status_code}")

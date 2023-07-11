@@ -1,7 +1,7 @@
 import argparse
-import logging
 
 from python.services.github_service import GithubService
+from python.config.logging_config import logging
 
 
 def add_arguments():
@@ -39,12 +39,6 @@ def add_arguments():
 
 def main():
     args = add_arguments()
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)-8s %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
-
     gh = GithubService(args.oauth_token, args.org)
 
     try:

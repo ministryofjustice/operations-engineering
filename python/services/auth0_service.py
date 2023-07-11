@@ -8,8 +8,6 @@ from python.config.constants import (
     RESPONSE_NO_CONTENT
 )
 
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
 
 class Auth0Service:
     def __init__(self, client_secret: str, client_id: str, domain: str, grant_type: str = 'client_credentials'):

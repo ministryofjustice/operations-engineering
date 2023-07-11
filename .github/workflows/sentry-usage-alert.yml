@@ -29,7 +29,7 @@ jobs:
           SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           PERIOD_IN_DAYS: ${{ inputs.period_in_days }}
           USAGE_THRESHOLD: ${{ inputs.usage_threshold }}
-
+          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
