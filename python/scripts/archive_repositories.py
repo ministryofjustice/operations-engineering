@@ -18,7 +18,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "notify-for-wordpress",
     "jwt-laminas-auth",
     "laa-eric-emi",
-    "hmpps-alfresco"
+    "hmpps-alfresco",
+    "yjaf-mule-mis-processor"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
