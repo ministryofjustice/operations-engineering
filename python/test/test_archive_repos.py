@@ -54,7 +54,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
         self.assertEqual(last_active_cutoff_date, datetime.now() -
                          relativedelta(days=0, months=6, years=1))
         self.assertEqual(organization_name, "ministryofjustice")
-        self.assertEqual(allow_list, archive_repositories.MINISTRYOFJUSTICE_REPOS_ALLOW_LIST)
+        self.assertEqual(
+            allow_list, archive_repositories.MINISTRYOFJUSTICE_REPOS_ALLOW_LIST)
 
     @freeze_time("2021-02-01")
     def test_returns_values_moj_analytical_services_config(self):
@@ -63,7 +64,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
         self.assertEqual(last_active_cutoff_date, datetime.now() -
                          relativedelta(days=0, months=6, years=1))
         self.assertEqual(organization_name, "moj-analytical-services")
-        self.assertEqual(allow_list, archive_repositories.MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST)
+        self.assertEqual(
+            allow_list, archive_repositories.MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST)
 
 
 if __name__ == "__main__":
