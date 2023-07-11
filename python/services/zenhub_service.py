@@ -1,4 +1,4 @@
-import logging
+from python.config.logging_config import logging
 
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -59,7 +59,7 @@ class ZenhubService:
                   }
                 }
               }
-            } 
+            }
         """), variable_values={"workspaceId": self._workspace_id, "moveIssueInput": move_issue_input})
 
         if data["moveIssue"]["issue"]["pipelineIssue"]["pipeline"]["id"] != to_pipeline:

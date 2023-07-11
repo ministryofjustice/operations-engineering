@@ -1,4 +1,4 @@
-import logging
+from python.config.logging_config import logging
 from time import sleep
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -6,13 +6,6 @@ from datetime import datetime, timedelta
 
 
 class MojSlack:
-
-    # Logging Config
-    logging.basicConfig(
-        format="%(asctime)s %(levelname)-8s %(message)s",
-        level=logging.INFO,
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
 
     def __init__(self, slack_token: str) -> None:
         self.client = WebClient(slack_token)

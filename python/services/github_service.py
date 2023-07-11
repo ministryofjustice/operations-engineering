@@ -18,6 +18,8 @@ from gql.transport.exceptions import TransportQueryError
 
 from python.config.logging_config import logging
 
+logging.getLogger("gql").setLevel(logging.WARNING)
+
 
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
     def decorator(*args, **kwargs):
@@ -95,7 +97,7 @@ class GithubService:
         try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
             commit = repository.get_commits()[latest_commit_position]
         except Exception:
-            logging.warning(
+            logging.info(
                 f"Manually check repository: {repository.name}. Reason: No commits in repository")
             return False
 
@@ -106,7 +108,7 @@ class GithubService:
                 return False
             return True
         else:
-            logging.debug(
+            logging.info(
                 f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
             return False
 
@@ -261,7 +263,7 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
-        logging.debug(f"Adding user {user.name} to team {team_id}")
+        logging.info(f"Adding user {user.name} to team {team_id}")
         self.github_client_core_api.get_organization(
             self.organisation_name).get_team(team_id).add_membership(user)
 

@@ -14,6 +14,8 @@ jobs:
           python-version: "3.11"
       - run: python3 -m pip install -r python/requirements.txt
       - run: python3 -m python.scripts.move_dependabot_tickets --api_token ${{ secrets.ZENHUB_API_KEY }}
+        env:
+          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
