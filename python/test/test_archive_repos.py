@@ -66,7 +66,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
             "notify-for-wordpress",
             "jwt-laminas-auth",
             "laa-eric-emi",
-            "hmpps-alfresco"
+            "hmpps-alfresco",
+            "yjaf-mule-mis-processor"
         ])
 
     @freeze_time("2021-02-01")
