@@ -99,8 +99,8 @@ class MojSlack:
 
             # Print the results - need to work out what we want to do with them before adding more functionality
             # Not using logging to make it easier to copy paste
-            logging.debug(date)
-            logging.debug(running_count)
+            print(date)
+            print(running_count)
 
     @staticmethod
     def generate_datetime(number_of_days) -> float:
