@@ -13,7 +13,8 @@ class TestAuth0DeleteInactiveUsers(unittest.TestCase):
 
     @patch("python.services.auth0_service.Auth0Service")
     def test_main_when_users(self, mock_auth0_service):
-        mock_auth0_service.get_inactive_users.return_value = [{"user_id":"some-user"}]
+        mock_auth0_service.get_inactive_users.return_value = [
+            {"user_id": "some-user"}]
         delete_inactive_users(mock_auth0_service)
         mock_auth0_service.delete_user.assert_called_once_with("some-user")
 
