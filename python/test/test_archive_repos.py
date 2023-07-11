@@ -54,20 +54,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
         self.assertEqual(last_active_cutoff_date, datetime.now() -
                          relativedelta(days=0, months=6, years=1))
         self.assertEqual(organization_name, "ministryofjustice")
-        self.assertEqual(allow_list, [
-            "django-pagedown",
-            "govuk-pay-ruby-client",
-            "govuk_notify_rails",
-            "analytics-platform-auth0",
-            "pflr-express-kit",
-            "hmpps-terraform-modules",
-            "laa-nolasa",
-            "hmpps-track-a-move",
-            "notify-for-wordpress",
-            "jwt-laminas-auth",
-            "laa-eric-emi",
-            "hmpps-alfresco"
-        ])
+        self.assertEqual(
+            allow_list, archive_repositories.MINISTRYOFJUSTICE_REPOS_ALLOW_LIST)
 
     @freeze_time("2021-02-01")
     def test_returns_values_moj_analytical_services_config(self):
@@ -76,13 +64,8 @@ class TestAddUsersEveryoneGithubTeamGetConfigForOrganization(unittest.TestCase):
         self.assertEqual(last_active_cutoff_date, datetime.now() -
                          relativedelta(days=0, months=6, years=1))
         self.assertEqual(organization_name, "moj-analytical-services")
-        self.assertEqual(allow_list, [
-            "timeliness_ctx",
-            "GPC-anomalies",
-            "pq-tool",
-            "opg-data-processing",
-            "df_criminal_court_research"
-        ])
+        self.assertEqual(
+            allow_list, archive_repositories.MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST)
 
 
 if __name__ == "__main__":
