@@ -54,36 +54,33 @@ def create_dormant_file_user(username):
 @patch("python.scripts.dormant_users.SlackService", new=MagicMock)
 @patch("python.scripts.dormant_users.NotifyService", new=MagicMock)
 @patch("python.scripts.dormant_users.Auth0Service", new=MagicMock)
-@patch("python.scripts.dormant_users.print_dormant_outside_collaborators", MagicMock)
+@patch("python.scripts.dormant_users.run_step_one")
+@patch("python.scripts.dormant_users.run_step_two")
+@patch("python.scripts.dormant_users.run_step_three")
+@patch("python.scripts.dormant_users.print_dormant_outside_collaborators")
 class TestDormantUsersMain(unittest.TestCase):
 
-    @patch("python.scripts.dormant_users.run_step_one")
-    @patch("python.scripts.dormant_users.run_step_two")
-    @patch("python.scripts.dormant_users.run_step_three")
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "true", "", ""])
-    def test_main_runs_step_one(self, mock_run_step_three, mock_run_step_two, mock_run_step_one):
+    def test_main_runs_step_one(self, mock_print, mock_run_step_three, mock_run_step_two, mock_run_step_one):
         main()
+        mock_print.assert_called_once()
         mock_run_step_one.assert_called_once()
         mock_run_step_two.assert_not_called()
         mock_run_step_three.assert_not_called()
 
-    @patch("python.scripts.dormant_users.run_step_one")
-    @patch("python.scripts.dormant_users.run_step_two")
-    @patch("python.scripts.dormant_users.run_step_three")
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "", "true", ""])
-    def test_main_runs_step_two(self, mock_run_step_three, mock_run_step_two, mock_run_step_one):
+    def test_main_runs_step_two(self, mock_print, mock_run_step_three, mock_run_step_two, mock_run_step_one):
         main()
         mock_run_step_one.assert_not_called()
+        mock_print.assert_not_called()
         mock_run_step_two.assert_called_once()
         mock_run_step_three.assert_not_called()
 
-    @patch("python.scripts.dormant_users.run_step_one")
-    @patch("python.scripts.dormant_users.run_step_two")
-    @patch("python.scripts.dormant_users.run_step_three")
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "", "", "true"])
-    def test_main_runs_step_three(self, mock_run_step_three, mock_run_step_two, mock_run_step_one):
+    def test_main_runs_step_three(self, mock_print, mock_run_step_three, mock_run_step_two, mock_run_step_one):
         main()
         mock_run_step_one.assert_not_called()
+        mock_print.assert_not_called()
         mock_run_step_two.assert_not_called()
         mock_run_step_three.assert_called_once()
 
