@@ -297,7 +297,7 @@ def run_step_three(
     s3_service.delete_emailed_users_file()
 
 
-def run_dormant_users():
+def main():
     logging.info("Start")
 
     organisation_name, admin_github_token, s3_bucket_name, slack_token, notify_token, auth0_client_secret, auth0_client_id, auth0_domain, debug_mode, step_one, step_two, step_three = get_cli_arguments()
@@ -340,10 +340,6 @@ def run_dormant_users():
         )
 
     logging.info("Finished")
-
-
-def main():
-    run_dormant_users()
 
 
 if __name__ == "__main__":
