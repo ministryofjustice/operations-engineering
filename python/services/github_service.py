@@ -19,6 +19,7 @@ from python.config.logging_config import logging
 
 logging.getLogger("gql").setLevel(logging.WARNING)
 
+
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
     def decorator(*args, **kwargs):
         """
