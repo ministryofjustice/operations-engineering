@@ -36,14 +36,17 @@ class NotifyService:
             personalisation
         )
 
-    def _get_first_email_template_id(self) -> str:
+    def _get_first_email_template_id(self) -> str | ValueError:
+        template_id = ""
         if self.organisation_name == MINISTRY_OF_JUSTICE:
-            return "30351e8f-320b-4ebe-b0bf-d6aa0a7c607d"
+            template_id = "30351e8f-320b-4ebe-b0bf-d6aa0a7c607d"
 
         if self.organisation_name == MOJ_ANALYTICAL_SERVICES:
-            return "ac0e8752-f550-4550-bff7-ba739a3f2977"
+            template_id = "ac0e8752-f550-4550-bff7-ba739a3f2977"
 
-        return ""
+        if template_id == "":
+            raise ValueError("Notify template ID missing")
+        return template_id
 
     def send_removed_email(self, email_address: str):
         removed_email_template_id = ""
