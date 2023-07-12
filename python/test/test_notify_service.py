@@ -116,6 +116,7 @@ class TestMissingOrgName(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.notify_service._get_first_email_template_id()
 
+
 class TestNotifyServiceFunctionsForAsOrg(unittest.TestCase):
     @patch("python.services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
