@@ -102,6 +102,7 @@ class TestGetNotificationsByTypeAndStatus(unittest.TestCase):
             'email', 'failed')
         self.assertEqual(result, ["notification1", "notification2"])
 
+
 class TestMissingOrgName(unittest.TestCase):
     @patch("python.services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
@@ -112,7 +113,9 @@ class TestMissingOrgName(unittest.TestCase):
         self.notify_service.client = mock_notifications_api_client
 
     def test_get_first_email_template_id_wrong_org_name(self):
-        self.assertEqual(self.notify_service._get_first_email_template_id(), "")
+        self.assertEqual(
+            self.notify_service._get_first_email_template_id(), "")
+
 
 class TestNotifyServiceFunctionsForAsOrg(unittest.TestCase):
     @patch("python.services.notify_service.NotificationsAPIClient")
