@@ -63,7 +63,7 @@ def main():
         args.oauth_token, args.org).fetch_all_repositories_in_org()
     repo_reports = [RepositoryReport(repo).output for repo in repos]
 
-    # The database can't handle more than 100 at a time
+    #  The database can't handle more than 100 at a time
     # so we need to chunk the list into 100s.
     api = reports_service(args.url, args.endpoint, args.api_key)
     for i in range(0, len(repo_reports), 100):

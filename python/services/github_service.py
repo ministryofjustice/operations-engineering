@@ -476,7 +476,7 @@ class GithubService:
         after_cursor = None
         repos = []
 
-        # Disable logging. The output is too verbose and not required.
+        #  Disable logging. The output is too verbose and not required.
         logging.getLogger("gql").setLevel(logging.CRITICAL)
         logging.disable(logging.INFO)
 
