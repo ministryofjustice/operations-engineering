@@ -45,4 +45,4 @@ class OperationsEngineeringReportsService:
 
         url = f"{self.__reports_url}/{self.__endpoint}"
 
-        return requests.post(url, headers=headers, json=data, timeout=30).status_code
+        return requests.post(url, headers=headers, json=data, timeout=120).status_code
