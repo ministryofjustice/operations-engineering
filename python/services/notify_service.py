@@ -7,16 +7,11 @@ from python.config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 class NotifyService:
     def __init__(self, config, api_key, organisation_name: str):
         self.config = config
-        self.api_key = api_key
+        self.client = NotificationsAPIClient(api_key)
         self.organisation_name = organisation_name.lower()
 
     def send_first_email(self, email_address: str, login_date: str):
-        first_email_template_id = ""
-        if self.organisation_name == MINISTRY_OF_JUSTICE:
-            first_email_template_id = "30351e8f-320b-4ebe-b0bf-d6aa0a7c607d"
-
-        if self.organisation_name == MOJ_ANALYTICAL_SERVICES:
-            first_email_template_id = "ac0e8752-f550-4550-bff7-ba739a3f2977"
+        first_email_template_id = self._get_first_email_template_id()
 
         personalisation = {"login_date": login_date}
         self._send_email_reply_to_ops_eng(
@@ -27,20 +22,31 @@ class NotifyService:
 
     def send_reminder_email(self, email_address: str, login_date: str):
         personalisation = {"login_date": login_date}
+
+        template_id = ""
+        if self.organisation_name == MINISTRY_OF_JUSTICE:
+            template_id = "7405b6f8-9355-4572-8b8c-c73bc8cdee3c"
+
+        if self.organisation_name == MOJ_ANALYTICAL_SERVICES:
+            template_id = "13863d96-7986-4c3b-967e-3123a6773896"
+
         self._send_email_reply_to_ops_eng(
-            self._get_reminder_email_template_id(),
+            template_id,
             email_address,
             personalisation
         )
 
-    def _get_reminder_email_template_id(self) -> str:
+    def _get_first_email_template_id(self) -> str | ValueError:
+        template_id = ""
         if self.organisation_name == MINISTRY_OF_JUSTICE:
-            return "7405b6f8-9355-4572-8b8c-c73bc8cdee3c"
+            template_id = "30351e8f-320b-4ebe-b0bf-d6aa0a7c607d"
 
         if self.organisation_name == MOJ_ANALYTICAL_SERVICES:
-            return "13863d96-7986-4c3b-967e-3123a6773896"
+            template_id = "ac0e8752-f550-4550-bff7-ba739a3f2977"
 
-        return ""
+        if template_id == "":
+            raise ValueError("Notify template ID missing")
+        return template_id
 
     def send_removed_email(self, email_address: str):
         removed_email_template_id = ""
@@ -59,10 +65,10 @@ class NotifyService:
 
     def check_for_undelivered_first_emails(self):
         return self._check_for_undelivered_emails_for_template(
-            self._get_reminder_email_template_id())
+            self._get_first_email_template_id())
 
     def _get_notifications_by_type_and_status(self, template_type, status):
-        return NotificationsAPIClient(self.api_key).get_all_notifications(status=status, template_type=template_type)
+        return self.client.get_all_notifications(status=status, template_type=template_type)
 
     def _check_for_undelivered_emails_for_template(self, template_id):
         notifications = self._get_notifications_by_type_and_status('email', 'failed')[
@@ -87,7 +93,7 @@ class NotifyService:
     def _send_email_reply_to_ops_eng(self, template_id: str, email: str, personalisation: dict):
         operations_engineering_email_id = "6767e190-996f-462c-b7f8-9bafe7b96a01"
         try:
-            NotificationsAPIClient(self.api_key).send_email_notification(
+            self.client.send_email_notification(
                 email_address=email,
                 template_id=template_id,
                 personalisation=personalisation,
