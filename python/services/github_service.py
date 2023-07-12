@@ -67,7 +67,7 @@ class GithubService:
         self.github_client_gql_api: Client = Client(transport=AIOHTTPTransport(
             url="https://api.github.com/graphql",
             headers={"Authorization": f"Bearer {org_token}"},
-        ), execute_timeout=200)
+        ), execute_timeout=120)
         self.organisation_name: str = organisation_name
         self.github_client_rest_api = Session()
         self.github_client_rest_api.headers.update(
