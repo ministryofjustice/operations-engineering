@@ -1,12 +1,10 @@
 import json
-
 from calendar import timegm
 from datetime import datetime, timedelta
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
-from requests import Session
 from github import Github, NamedUser, RateLimitExceededException
 from github.Commit import Commit
 from github.Issue import Issue
@@ -14,6 +12,7 @@ from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
+from requests import Session
 
 from python.config.logging_config import logging
 
@@ -68,7 +67,7 @@ class GithubService:
         self.github_client_gql_api: Client = Client(transport=AIOHTTPTransport(
             url="https://api.github.com/graphql",
             headers={"Authorization": f"Bearer {org_token}"},
-        ), execute_timeout=60)
+        ), execute_timeout=200)
         self.organisation_name: str = organisation_name
         self.github_client_rest_api = Session()
         self.github_client_rest_api.headers.update(
@@ -468,7 +467,7 @@ class GithubService:
         })
 
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
-        """A wrapper function to run a GraphQL query to get the list of repo names in the organisation
+        """A wrapper function to run a GraphQL query to get the list of repositories in the organisation
 
         Returns:
             list: A list of the organisation repos names
@@ -477,13 +476,15 @@ class GithubService:
         after_cursor = None
         repos = []
 
-        while has_next_page:
-            data = self.get_paginated_list_of_repositories(after_cursor)
+        # Disable logging. The output is too verbose and not required.
+        logging.getLogger("gql").setLevel(logging.CRITICAL)
+        logging.disable(logging.INFO)
 
-            # Retrieve the name of the repos
+        while has_next_page:
+            data = self.get_paginated_list_of_repositories(after_cursor, 50)
+
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    # Skip locked repositories
                     if not (
                         repo["node"]["isDisabled"]
                         or repo["node"]["isArchived"]
@@ -491,7 +492,6 @@ class GithubService:
                     ):
                         repos.append(repo)
 
-            # Read the GH API page info section to see if there is more data to read
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
         return repos
