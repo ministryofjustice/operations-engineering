@@ -19,7 +19,10 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "jwt-laminas-auth",
     "laa-eric-emi",
     "hmpps-alfresco",
-    "yjaf-mule-mis-processor"
+    "yjaf-mule-mis-processor",
+    "satis-s3",
+    "wasm",
+    "wp-rewrite-media-to-s3"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
