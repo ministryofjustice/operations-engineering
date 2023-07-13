@@ -31,7 +31,7 @@ class OperationsEngineeringReportsService:
             Exception: If the status code of the POST request is not 200.
 
         """
-        # The database can't handle more than 100 at a time
+        #  The database can't handle more than 100 at a time
         # so we need to chunk the list into 100s.
         for i in range(0, len(reports), 100):
             chunk = reports[i:i+100]
@@ -50,7 +50,8 @@ class OperationsEngineeringReportsService:
         url = f"{self.__reports_url}/{self.__endpoint}"
 
         try:
-            resp = requests.post(url, headers=headers, json=data, timeout=120, stream=True).status_code
+            resp = requests.post(
+                url, headers=headers, json=data, timeout=120, stream=True).status_code
         except requests.exceptions.ChunkedEncodingError:
             resp = self.__http_post(data)
 
