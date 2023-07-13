@@ -1,1 +1,36 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Dormant User Process
+last_reviewed_on: 2023-07-13
+review_in: 3 months
+---
+
+# Dormant User Process
+
+## Dormant User Script Intro
+The [Dormant User script](https://github.com/ministryofjustice/operations-engineering/blob/add-dormant-user-runbook/python/scripts/dormant_users.py) is located within the Operations-Engineering repository.
+The script interacts with GitHub, Notify, AWS S3, Slack and Auth0.
+The script can determine which users and outside collaborators are dormant on each Organisation.
+The script obtains the GitHub Dormant export file and the GitHub People page export file for each Organisation from AWS S3.
+The Dormant export file contains a list of users GitHub believes are inactive. The caveat here is that the Organisation should have SSO enabled, which the AS Organisation does not.
+The GitHub People page export file for each Organisation contains the list of Organisation users and their last active date/time.
+The script uses the Dormant export file as the base and cross references the users within it against the users within the GitHub People page export file.
+The users that are still classed as dormant users after this cross reference are then cross referenced against the GitHub Organisation audit log and Auth0 for any recent activity.
+The users that are still classed as dormant users after the additional check is made, are sent an email via Notify to notify the user they are considered inactive by our automation and have one month to log into Github.
+After the first Notify email is sent to the users, a list of users that were emailed are uploaded to AWS S3 within a json file for each Organisation.
+After the file is uploaded the script will check that all the first emails were delivered successfully or not via Notify. 
+If the script detects any undelivered emails it will raise a Slack alert with the emails addresses that failed. The users of these email addresses have had their email accounts deactivated. You will need to run the Leavers process on these users.
+The script can send out a reminder email via Notify to those users it has emailed already. This reads the json file from AWS S3 for each Organisation.
+The reminder email should be sent a week or so before the deadline specified in the first email to the user. This is a manual step that needs to be scheduled.
+Once the deadline has passed the script can start the final step to remove the dormant users.
+The script reads the json file from S3 for each Organisation, checks if the user is still dormant or not, if the user is still dormant the automation will remove the user and send a final email via Notify to the user to state our team has removed the user for being inactive.
+If any users are removed the script will raise a Slack alert stating the number of users removed it was able to remove.
+After the remove users stage the script will delete the json file containing the list of emailed users from AWS S3.
+The script contains an allow list for each Organisation that is used to ignore bot accounts and users on leave or do not use GitHub much from the removal process.
+The script will check all the users within the allow list still exist within each Organisation. If a user no longers exists then the script will raise a Slack alert to remove that user. This will require a manual change to remove the user from the allow list. 
+
+## Dormant User Steps
+
+The Dormant User script can be executed locally or on Operations-Engineering CI/CD.
+
 
