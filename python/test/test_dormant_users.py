@@ -261,8 +261,7 @@ class TestRunStepOne(unittest.TestCase):
             False
         )
         mock_slack_service.send_unknown_users_slack_message.assert_called_once()
-        mock_notify_service.send_first_email.assert_called_once_with(
-            "some-email", "13/08/2023")
+        mock_notify_service.send_first_email.assert_called_once_with("some-email", "13/09/2023")
         mock_s3_service.save_emailed_users_file.assert_called_once()
         mock_slack_service.send_undelivered_emails_slack_message.assert_called_once()
 
