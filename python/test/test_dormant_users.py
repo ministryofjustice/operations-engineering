@@ -261,7 +261,8 @@ class TestRunStepOne(unittest.TestCase):
             False
         )
         mock_slack_service.send_unknown_users_slack_message.assert_called_once()
-        mock_notify_service.send_first_email.assert_called_once_with("some-email", "13/08/2023")
+        mock_notify_service.send_first_email.assert_called_once_with(
+            "some-email", "13/08/2023")
         mock_s3_service.save_emailed_users_file.assert_called_once()
         mock_slack_service.send_undelivered_emails_slack_message.assert_called_once()
 
@@ -304,7 +305,8 @@ class TestRunStepTwo(unittest.TestCase):
             mock_notify_service,
             False
         )
-        mock_notify_service.send_reminder_email.assert_called_once_with("some-email", "13/07/2023")
+        mock_notify_service.send_reminder_email.assert_called_once_with(
+            "some-email", "13/07/2023")
 
 
 @patch("python.services.auth0_service.Auth0Service")
@@ -380,7 +382,8 @@ class TestRunStepThree(unittest.TestCase):
         # TODO: enable this before production
         # mock_github_service.remove_user_from_gitub.assert_called_once()
         mock_notify_service.send_removed_email.assert_called_once()
-        mock_slack_service.send_remove_users_slack_message.assert_called_once_with(1, MINISTRY_OF_JUSTICE)
+        mock_slack_service.send_remove_users_slack_message.assert_called_once_with(
+            1, MINISTRY_OF_JUSTICE)
         mock_s3_service.delete_emailed_users_file.assert_called_once()
 
 

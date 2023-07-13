@@ -292,7 +292,8 @@ def run_step_three(
             logging.debug(
                 f"Removed {number_of_users} from {organisation_name} GitHub Organisation")
         else:
-            slack_service.send_remove_users_slack_message(number_of_users, organisation_name)
+            slack_service.send_remove_users_slack_message(
+                number_of_users, organisation_name)
 
     s3_service.delete_emailed_users_file()
 
