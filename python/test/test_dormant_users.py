@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime
+from freezegun import freeze_time
 
 from python.scripts.dormant_users import (
     main,
@@ -239,7 +240,8 @@ class TestRunStepOne(unittest.TestCase):
         mock_s3_service.save_emailed_users_file.assert_called_once()
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
 
-    @patch('python.scripts.dormant_users.sleep', return_value=None)
+    @freeze_time("2023-08-13")
+    @patch("python.scripts.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = [
             "full-org-user"]
@@ -259,7 +261,7 @@ class TestRunStepOne(unittest.TestCase):
             False
         )
         mock_slack_service.send_unknown_users_slack_message.assert_called_once()
-        mock_notify_service.send_first_email.assert_called_once()
+        mock_notify_service.send_first_email.assert_called_once_with("some-email", "13/08/2023")
         mock_s3_service.save_emailed_users_file.assert_called_once()
         mock_slack_service.send_undelivered_emails_slack_message.assert_called_once()
 
@@ -290,6 +292,7 @@ class TestRunStepTwo(unittest.TestCase):
         )
         mock_notify_service.send_reminder_email.assert_not_called()
 
+    @freeze_time("2023-07-13")
     def test_run_step_two_in_production_mode(self, mock_notify_service, mock_s3_service):
         mock_s3_service.get_users_have_emailed.return_value = [
             create_saved_json_file_user("full-org-user"),
@@ -301,7 +304,7 @@ class TestRunStepTwo(unittest.TestCase):
             mock_notify_service,
             False
         )
-        mock_notify_service.send_reminder_email.assert_called_once()
+        mock_notify_service.send_reminder_email.assert_called_once_with("some-email", "13/07/2023")
 
 
 @patch("python.services.auth0_service.Auth0Service")
@@ -377,7 +380,7 @@ class TestRunStepThree(unittest.TestCase):
         # TODO: enable this before production
         # mock_github_service.remove_user_from_gitub.assert_called_once()
         mock_notify_service.send_removed_email.assert_called_once()
-        mock_slack_service.send_remove_users_slack_message.assert_called_once()
+        mock_slack_service.send_remove_users_slack_message.assert_called_once_with(1, MINISTRY_OF_JUSTICE)
         mock_s3_service.delete_emailed_users_file.assert_called_once()
 
 
