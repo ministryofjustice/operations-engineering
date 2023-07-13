@@ -1,5 +1,4 @@
 import argparse
-import logging
 
 from python.services.github_service import GithubService
 from python.services.operations_engineering_reports import \
@@ -63,12 +62,8 @@ def main():
         args.oauth_token, args.org).fetch_all_repositories_in_org()
     repo_reports = [RepositoryReport(repo).output for repo in repos]
 
-    #  The database can't handle more than 100 at a time
-    # so we need to chunk the list into 100s.
-    api = reports_service(args.url, args.endpoint, args.api_key)
-    for i in range(0, len(repo_reports), 100):
-        chunk = repo_reports[i:i+100]
-        api.override_repository_standards_reports(chunk)
+    reports_service(args.url, args.endpoint, args.api_key). \
+        override_repository_standards_reports(repo_reports)
 
 
 if __name__ == "__main__":

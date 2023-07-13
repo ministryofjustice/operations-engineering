@@ -31,10 +31,14 @@ class OperationsEngineeringReportsService:
             Exception: If the status code of the POST request is not 200.
 
         """
-        status = self.__http_post(reports)
-        if status != 200:
-            raise ValueError(
-                f"Failed to send repository standards reports to API. Received: {status}")
+        # The database can't handle more than 100 at a time
+        # so we need to chunk the list into 100s.
+        for i in range(0, len(reports), 100):
+            chunk = reports[i:i+100]
+            status = self.__http_post(chunk)
+            if status != 200:
+                raise ValueError(
+                    f"Failed to send repository standards reports to API. Received: {status}")
 
     def __http_post(self, data: list[dict]) -> int:
         headers = {
