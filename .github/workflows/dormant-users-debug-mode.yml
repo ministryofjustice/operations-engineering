@@ -35,6 +35,10 @@ on:
 jobs:
   debug-mode:
     runs-on: ubuntu-latest
+    # These permissions are required to use AWS OIDC federate roles
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
