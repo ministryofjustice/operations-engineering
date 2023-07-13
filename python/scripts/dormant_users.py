@@ -272,12 +272,9 @@ def run_step_three(
         logging.info("Users removed from GitHub:")
 
         for user in users_to_remove:
-            if debug_mode:
-                logging.info("\t" + user["username"])
-            else:
-                pass
-                # TODO: enable this before production
-                # github_service.remove_user_from_gitub(user)
+            logging.info("\t" + user["username"])
+            if not debug_mode:
+                github_service.remove_user_from_gitub(user["username"])
 
             if (email_address := user['email_address']) != MISSING_EMAIL_ADDRESS:
                 if debug_mode:
@@ -292,7 +289,8 @@ def run_step_three(
             logging.debug(
                 f"Removed {number_of_users} from {organisation_name} GitHub Organisation")
         else:
-            slack_service.send_remove_users_slack_message(number_of_users)
+            slack_service.send_remove_users_slack_message(
+                number_of_users, organisation_name)
 
     s3_service.delete_emailed_users_file()
 
