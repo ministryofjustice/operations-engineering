@@ -141,6 +141,7 @@ class TestDormantUsers(unittest.TestCase):
         print_dormant_outside_collaborators(
             mock_github_service, mock_s3_service)
 
+
 @patch("python.services.auth0_service.Auth0Service")
 @patch("python.services.s3_service.S3Service")
 @patch("python.services.github_service.GithubService")
@@ -260,7 +261,8 @@ class TestRunStepOne(unittest.TestCase):
             mock_auth0_service,
             False
         )
-        mock_slack_service.send_unknown_users_slack_message.assert_called_once_with(MINISTRY_OF_JUSTICE_ALLOW_LIST)
+        mock_slack_service.send_unknown_users_slack_message.assert_called_once_with(
+            MINISTRY_OF_JUSTICE_ALLOW_LIST)
         mock_notify_service.send_first_email.assert_not_called()
         mock_s3_service.save_emailed_users_file.assert_not_called()
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
@@ -336,7 +338,6 @@ class TestRunStepOne(unittest.TestCase):
         mock_slack_service.send_undelivered_emails_slack_message.assert_called_once_with(
             ["some-email"], MINISTRY_OF_JUSTICE)
 
-
     @freeze_time("2023-08-13")
     @patch("python.scripts.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode_with_no_undelivered_email(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
@@ -363,6 +364,7 @@ class TestRunStepOne(unittest.TestCase):
         mock_s3_service.save_emailed_users_file.assert_called_once_with(
             [{"email_address": "some-email", "username": "full-org-user", "login_date": "13/09/2023", "is_outside_collaborator": False}])
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
+
 
 @patch("python.services.s3_service.S3Service")
 @patch("python.services.notify_service.NotifyService")
