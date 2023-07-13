@@ -49,4 +49,9 @@ class OperationsEngineeringReportsService:
 
         url = f"{self.__reports_url}/{self.__endpoint}"
 
-        return requests.post(url, headers=headers, json=data, timeout=120).status_code
+        try:
+            resp = requests.post(url, headers=headers, json=data, timeout=120, stream=True).status_code
+        except requests.exceptions.ChunkedEncodingError:
+            resp = self.__http_post(data)
+
+        return resp
