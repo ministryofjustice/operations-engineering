@@ -1,0 +1,67 @@
+[MAIN]
+
+ignore = delete_dormant_users.py, s3.py
+
+ignore-paths =
+
+# Pickle collected data for later comparisons.
+persistent = yes
+
+load-plugins =
+pylint.extensions.check_elif,
+pylint.extensions.bad_builtin,
+pylint.extensions.docparams,
+pylint.extensions.for_any_all,
+pylint.extensions.set_membership,
+pylint.extensions.code_style,
+pylint.extensions.overlapping_exceptions,
+pylint.extensions.typing,
+pylint.extensions.redefined_variable_type,
+pylint.extensions.comparison_placement,
+pylint.extensions.mccabe,
+pylint.extensions.confusing_elif,
+pylint.extensions.consider_refactoring_into_while_condition,
+pylint.extensions.consider_ternary_expression,
+pylint.extensions.dunder,
+pylint.extensions.magic_value,
+pylint.extensions.no_self_use,
+pylint.extensions.private_import,
+pylint.extensions.redefined_loop_name,
+pylint.extensions.while_used
+
+jobs = 0
+
+suggestion-mode = yes
+
+unsafe-load-any-extension = no
+
+py-version = 3.10
+
+fail-under = 9.0
+
+disable =
+line-too-long,
+missing-docstring,
+too-few-public-methods,
+too-many-public-methods,
+logging-fstring-interpolation,
+unnecessary-dunder-call,
+too-many-instance-attributes,
+too-many-arguments,
+no-self-use
+
+[FORMAT]
+
+max-line-length = 120
+
+function-naming-style = snake_case
+
+module-naming-style = snake_case
+
+method-naming-style = snake_case
+
+
+class -naming-style = PascalCase
+
+
+indent-after-paren = 4
