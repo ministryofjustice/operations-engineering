@@ -313,7 +313,6 @@ class TestRunStepOne(unittest.TestCase):
     @patch("python.scripts.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         new_list = MINISTRY_OF_JUSTICE_ALLOW_LIST.copy()
-        # new_list.append("full-org-user")
         mock_github_service.get_org_members_login_names.return_value = new_list
         user = create_saved_json_file_user("full-org-user")
         mock_get_dormant_users.return_value = [user]
