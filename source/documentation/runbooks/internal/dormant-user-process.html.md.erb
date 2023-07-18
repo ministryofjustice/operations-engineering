@@ -34,7 +34,7 @@ review_in: 3 months
 1. Get Tony to create a new GitHub Dormant export and save it as `dormant.csv`.
 2. Generate a People page export file for the [MoJ Org](https://github.com/orgs/ministryofjustice/people) and [AS Org](https://github.com/orgs/moj-analytical-services/people) in json format.
 3. Re-name the files to be `export-ministryofjustice.json` and `export-moj-analytical-services.json`.
-4.  Upload the three files to the AWS S3 bucket `operations-engineering-dormant-users` within our AWS account.
+4. Upload the three files to the AWS S3 bucket `operations-engineering-dormant-users` within our AWS account.
 5. Run the Operations-Engineering GH Action [dormant-users-debug-mode](https://github.com/ministryofjustice/operations-engineering/actions/workflows/dormant-users-debug-mode.yml). Read the GH Action output for the printed list of usernames it detects are dormant. If any usernames appear to be bot accounts, add those usernames to the allow list within the script [file](https://github.com/ministryofjustice/operations-engineering/blob/main/python/scripts/dormant_users.py). 
 6. Re-run step 5 to ensure usernames that should be ignored have been correctly ignored by the script.
 7. Run the Operations-Engineering GH Action [Dormant Users first email](https://github.com/ministryofjustice/operations-engineering/actions/workflows/dormant-users-first-email.yml). This will send the Notify email to the dormant users and upload the list of emailed users within a json file to AWS S3.
