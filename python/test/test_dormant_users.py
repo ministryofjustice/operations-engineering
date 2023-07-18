@@ -285,6 +285,7 @@ class TestRunStepOne(unittest.TestCase):
         mock_s3_service.save_emailed_users_file.assert_not_called()
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
 
+    @freeze_time("2023-07-13")
     def test_run_step_one_in_debug_mode(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = [
             "full-org-user"]
@@ -389,6 +390,7 @@ class TestRunStepTwo(unittest.TestCase):
         )
         mock_notify_service.send_reminder_email.assert_not_called()
 
+    @freeze_time("2023-07-13")
     def test_run_step_two_in_production_mode(self, mock_notify_service, mock_s3_service):
         mock_s3_service.get_users_have_emailed.return_value = [
             create_saved_json_file_user("full-org-user"),
