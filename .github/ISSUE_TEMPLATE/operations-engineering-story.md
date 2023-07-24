@@ -1,36 +1,48 @@
 ---
-name: Operations Engineering Story
-about: Create new Operations Engineering story
-title: ""
-labels: ""
-assignees: ""
+name: User Story
+about: Capture a user story from stakeholders.
+title: ''
+labels: user-story
+assignees: ''
+
 ---
 
-## Background
+**As a** (type of user)
+**I want** (some action)
+**so that** (some result)
 
-<!-- Describe background of the story -->
+**Functional Requirements:**
 
-## Proposed user journey
+1.
+2.
+3.
 
-<!-- Describe user journey and needs for better understanding of the work -->
+**Non-Functional Requirements:**
 
-## Approach
+1.
+2.
+3.
 
-<!-- Describe proposed approach -->
+**Acceptance Criteria:**
 
-## Questions / Assumptions
+1.
+2.
+3.
 
-<!-- Additional information to explain approach taken -->
+**Notes:**
 
-## Acceptance Criteria
+<!-- Here's a brief explanation of each field:
 
-<!-- Checklist for acceptance criteria, for example: -->
+As a (type of user): This is the role that the stakeholder or user plays. It could be a developer, project manager, security team, etc.
 
-- [ ] Enter text
-- [ ] Enter text
-- [ ] Enter text
-- [ ] Enter text
+I want (some action): This describes what the user wants to do. It should be a specific action or feature.
 
-## Reference
+so that (some result): This is the reason or benefit that the user expects from performing the action.
 
-[How to write good user stories](https://www.gov.uk/service-manual/agile-delivery/writing-user-stories)
+Functional Requirements: Here, you list the functional requirements associated with the user story. These could be based on what you learned from the stakeholder interviews.
+
+Non-Functional Requirements: Here, you list the non-functional requirements associated with the user story. These could be about the system's performance, security, usability, etc.
+
+Acceptance Criteria: These are the conditions that must be met for the user story to be considered "done". It should clearly define the boundaries of the user story and help in testing.
+
+Notes: This is for any additional information or details about the user story. -->
