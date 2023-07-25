@@ -1,0 +1,30 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: ADR-009 1Password Manager Permissions
+last_reviewed_on: 2023-07-25
+review_in: 6 months
+---
+
+# ADR-004 1Password Manager Permissions
+
+## Status
+
+✅ Accepted
+
+## Context
+
+Operations Engineering manages the 1Password organisation for the MoJ. 1Password Groups have a Manager role that allows that user to add people to the Group without requesting anything from Operations Engineering.
+
+The main question that needed to be answered before allowing this permission to be assigned was:
+
+**What exactly does this allow the User to do?
+
+The answer to this question was essentially nothing other than Management of the actual Group itself, they can not access Org or Billing settings whatsoever.
+
+## Decision
+
+Allow the existing Group Owner to have the Manager permission
+
+## Consequences
+
+Groups could get messy as we are not directly managing them
