@@ -4,6 +4,7 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import sys
 import time
 
+
 def repository_query(after_cursor=None, repo_name=None) -> gql:
     """A GraphQL query to get the list of outside collaborator in a repo and the locked status
     Args:
@@ -152,6 +153,7 @@ def run(github_gql_client: Client, github_api_client: Github):
             # all repositories are locked so remove the collaborator
             remove_collaborator(outside_collaborator, github_api_client)
 
+
 def main():
     oauth_token = sys.argv[1]
     github_gql_client = Client(transport=AIOHTTPTransport(
@@ -160,6 +162,7 @@ def main():
     ), fetch_schema_from_transport=False)
     github_api_client = Github(oauth_token)
     run(github_gql_client, github_api_client)
+
 
 if __name__ == "__main__":
     main()
