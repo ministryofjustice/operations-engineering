@@ -1,8 +1,8 @@
-from github import Github
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
+from gql import gql
 import sys
 import time
+
+from python.services.github_service import GithubService
 
 
 def repository_query(after_cursor=None, repo_name=None) -> gql:
@@ -47,7 +47,7 @@ def repository_query(after_cursor=None, repo_name=None) -> gql:
     return gql(query)
 
 
-def fetch_repository_data(repository_name, github_gql_client: Client) -> tuple:
+def fetch_repository_data(repository_name, github_service: GithubService) -> tuple:
     """A wrapper function to run a GraphQL query to get the list of outside collaborators of a repository and locked status
     Args:
         repository_name (string): Is the repository within the organisation to check
@@ -62,7 +62,7 @@ def fetch_repository_data(repository_name, github_gql_client: Client) -> tuple:
 
     while has_next_page:
         query = repository_query(after_cursor, repository_name)
-        data = github_gql_client.execute(query)
+        data = github_service.github_client_gql_api.execute(query)
 
         # Retrieve the collaborators
         for repository in data["repository"]["collaborators"]["edges"]:
@@ -96,29 +96,30 @@ class repository:
         self.is_repository_locked = z
 
 
-def fetch_repository_names(github_api_client: Github) -> list:
+def fetch_repository_names(github_service: GithubService) -> list:
     """Get the list of repository names in the organisation via REST API
     Returns:
         list: A list of the organisation repository names
     """
     repo_name_list = []
 
-    org = github_api_client.get_organization("ministryofjustice")
+    org = github_service.github_client_rest_api.get_organization(
+        "ministryofjustice")
     for repo in org.get_repos():
         repo_name_list.append(repo.name)
 
     return repo_name_list
 
 
-def fetch_repositories(github_gql_client: Client, github_api_client: Github) -> list:
+def fetch_repositories(github_service: GithubService) -> list:
     """Wrapper function to retrieve the repositories info ie name, collaborators, locked status
     Returns:
         list: A list that contains all the repositories data ie name, users, locked status
     """
     repositories_list = []
-    for repository_name in fetch_repository_names(github_api_client):
+    for repository_name in fetch_repository_names(github_service):
         collaborators_list, is_repository_locked = fetch_repository_data(
-            repository_name, github_gql_client
+            repository_name, github_service
         )
         time.sleep(1)
         repositories_list.append(
@@ -129,19 +130,20 @@ def fetch_repositories(github_gql_client: Client, github_api_client: Github) -> 
     return repositories_list
 
 
-def remove_collaborator(collaborator, github_api_client: Github):
+def remove_collaborator(collaborator, github_service: GithubService):
     """Remove the collaborator from the organisation
     Args:
         collaborator (collaborator): The collaborator object
     """
     print("Remove user from organisation: " + collaborator.login)
-    org = github_api_client.get_organization("ministryofjustice")
-    org.remove_outside_collaborator(collaborator)
+    org = github_service.github_client_core_api.get_organization(
+        "ministryofjustice")
 
 
-def run(github_gql_client: Client, github_api_client: Github):
-    repositories = fetch_repositories(github_gql_client, github_api_client)
-    org = github_api_client.get_organization("ministryofjustice")
+def run(github_service: GithubService):
+    repositories = fetch_repositories(github_service)
+    org = github_service.github_client_core_api.get_organization(
+        "ministryofjustice")
     # for each collaborator, check if all their repositories are locked
     for outside_collaborator in org.get_outside_collaborators():
         collaborators_repo_list = []
@@ -151,17 +153,13 @@ def run(github_gql_client: Client, github_api_client: Github):
         an_open_repo = False
         if an_open_repo not in collaborators_repo_list:
             # all repositories are locked so remove the collaborator
-            remove_collaborator(outside_collaborator, github_api_client)
+            remove_collaborator(outside_collaborator, github_service)
 
 
 def main():
     oauth_token = sys.argv[1]
-    github_gql_client = Client(transport=AIOHTTPTransport(
-        url="https://api.github.com/graphql",
-        headers={"Authorization": f"Bearer {oauth_token}"},
-    ), fetch_schema_from_transport=False)
-    github_api_client = Github(oauth_token)
-    run(github_gql_client, github_api_client)
+    github_service = GithubService(oauth_token, "ministryofjustice")
+    run(github_service)
 
 
 if __name__ == "__main__":
