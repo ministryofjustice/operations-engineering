@@ -103,7 +103,8 @@ def fetch_repository_names(github_service: GithubService) -> list:
     """
     repo_name_list = []
 
-    org = github_service.github_client_rest_api.get_organization("ministryofjustice")
+    org = github_service.github_client_rest_api.get_organization(
+        "ministryofjustice")
     for repo in org.get_repos():
         repo_name_list.append(repo.name)
 
@@ -135,13 +136,14 @@ def remove_collaborator(collaborator, github_service: GithubService):
         collaborator (collaborator): The collaborator object
     """
     print("Remove user from organisation: " + collaborator.login)
-    org = github_service.github_client_core_api.get_organization("ministryofjustice")
-
+    org = github_service.github_client_core_api.get_organization(
+        "ministryofjustice")
 
 
 def run(github_service: GithubService):
     repositories = fetch_repositories(github_service)
-    org = github_service.github_client_core_api.get_organization("ministryofjustice")
+    org = github_service.github_client_core_api.get_organization(
+        "ministryofjustice")
     # for each collaborator, check if all their repositories are locked
     for outside_collaborator in org.get_outside_collaborators():
         collaborators_repo_list = []
