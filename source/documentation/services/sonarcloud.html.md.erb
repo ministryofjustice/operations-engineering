@@ -1,0 +1,56 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: MoJ SonarCloud Account
+last_reviewed_on: 2023-07-28
+review_in: 3 months
+---
+# SonarCloud
+
+SonarCloud is a powerful cloud-based code analysis and continuous code quality service provided by SonarSource. Designed to enhance your development process, SonarCloud automatically analyzes your code for bugs, security vulnerabilities, code smells, and maintainability issues.
+
+Some of the key features include:
+
+* Code Quality Analysis: Identify coding issues and bugs through static code analysis.
+* Security Vulnerability Detection: Scan your code for potential security issues.
+* Code Smells Detection: Uncover design issues to improve code maintainability and performance.
+* Technical Debt Management: Prioritize and address critical technical debt issues.
+* CI/CD Integration: Integrate SonarCloud into your CI/CD pipeline.
+* Pull Request Analysis: Catch issues in code changes before merging into the main codebase.
+
+## Logging into SonarCloud
+
+To access Sonarcloud, use your existing GitHub account for seamless login through the "Login With GitHub" option on the main page.
+
+If you require a GitHub account or have any other issues logging in, please contact [Operations Engineering](https://operations-engineering.service.justice.gov.uk/#how-to-contact-us)
+
+## Viewing projects
+
+A SonarCloud project represents a specific software codebase or repository that undergoes code analysis on the SonarCloud platform, in our case, it points to a GitHub Repository.
+
+For Ministry of Justice SonarCloud projects, visit: https://sonarcloud.io/organizations/ministryofjustice.
+
+If you cannot see the project you are after, refer to the Adding Repositories below
+
+## Adding projects
+
+> Please note that only public repositories can be added to SonarCloud and everything on SonarCloud is open to the internet.
+
+If you cannot see the project you are after, there is a good chance the repository has to be added to SonarCloud, please contact [Operations Engineering](https://operations-engineering.service.justice.gov.uk/#how-to-contact-us)
+
+Once project is added SonarCloud will automatically begin analyzing the repository and will become part of the pull request automatically. You will see the results within the pull request and via email.
+
+## Adding Code Coverage to CICD and Pull Requests
+
+If you wish Code Coverage to run as part of a CICD process and for checks to be run when pull requests are created, please follow this [guide](https://github.com/SonarSource/sonarcloud-github-action).
+
+For a full example of this for code within the Ministry of Justice GitHub, please refer [here](https://github.com/ministryofjustice/operations-engineering/blob/main/.github/workflows/tests.yml)
+
+To generate a SonarCloud token, press the 'Generate Token' button [here](https://sonarcloud.io/account/security) - you can add this to your GitHub Repository in Settings -> Secrets and Variables -> Actions whilst on your GitHub Repository.
+
+If you have any problems with setting this up please contact [Operations Engineering](https://operations-engineering.service.justice.gov.uk/#how-to-contact-us)
+
+## Changing Quality Controls
+
+You may wish the rules that Sonarcloud uses to test your code to differ from the standard conditions, only Admins can do this so please contact [Operations Engineering](https://operations-engineering.service.justice.gov.uk/#how-to-contact-us)
+
+You can see the existing Quality Gates [here](https://sonarcloud.io/organizations/ministryofjustice/quality_gates/show/9)
