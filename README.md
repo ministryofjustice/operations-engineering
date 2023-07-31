@@ -20,6 +20,7 @@ This mono repository includes code that performs a variety of operations enginee
 - **Dormant User Detection:** Our code can detect inactive GitHub users and remove them from the organisation, keeping our workspace tidy and secure.
 
 These are just a few examples of the useful tools and features available in this repository. For more detailed information about each tool, feature, and how they assist us in our operations, see the GitHub workflows in the `.github/workflows` directory for more information.
+
 ## Getting Started
 
 1. **Clone the Repo:** `git clone https://github.com/operations-engineering.git`
