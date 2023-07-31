@@ -25,13 +25,13 @@ These are just a few examples of the useful tools and features available in this
 1. **Clone the Repo:** `git clone https://github.com/operations-engineering.git`
 2. **Navigate to the Repo:** `cd operations-engineering`
 3. **Install Dependencies:** `pip install -r python/requirements.txt`
-4. **Run a script:** `python python/scripts/<example>.py`
+4. **Run a script:** `python -m python.scripts.dormant_users # for example`
 
 # Documentation Hosting and Updates
 
-Our repository documentation is built using the [Technical Documentation Template](https://tdt-documentation.london.cloudapps.digital/) to provide a user-friendly and consistent experience. The Technical Documentation Template ensures a clear, standardised layout for all our project documentation, enhancing readability and navigation.
+Our repository documentation is built using the [Technical Documentation Template](https://github.com/ministryofjustice/template-documentation-site) to provide a user-friendly and consistent experience. The Technical Documentation Template ensures a clear, standardised layout for all our project documentation, enhancing readability and navigation.
 
-This documentation is then published via GitHub Pages, enabling easy accessibility for everyone. You can view the published documentation [here](https://ministryofjustice.github.io/operations-engineering/#moj-operations-engineering). GitHub Pages offers a streamlined way to host project documentation directly from the repository.
+This documentation is then published via GitHub Pages, enabling easy accessibility for everyone. You can view the published documentation [here](https://operations-engineering.service.justice.gov.uk/#moj-operations-engineering). GitHub Pages offers a streamlined way to host project documentation directly from the repository.
 
 If you wish to update the documentation, start by editing the relevant files in the `source` directory. While making edits, you can preview your changes locally. To do so, run `make preview` in your terminal and open `http://127.0.0.1:4567` in your browser. This allows you to view the impact of your changes in real-time before committing.
 
