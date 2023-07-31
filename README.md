@@ -38,9 +38,9 @@ If you wish to update the documentation, start by editing the relevant files in 
 
 After you've made your changes, use `make check` to compile the site to HTML and validate the URLs. This ensures that all links are working correctly and that the site structure is maintained.
 
-We also provide a `tech-docs.yml` file located in the `config` directory. This file includes layout configuration options to customize the appearance of the documentation. For more details about the configuration options available, check out the official guide [here](https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/).
+We also provide a `tech-docs.yml` file located in the `config` directory. This file includes layout configuration options to customise the appearance of the documentation. For more details about the configuration options available, check out the official guide [here](https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/).
 
-Through the use of the Technical Documentation Template and GitHub Pages, we aim to provide well-organized, easily accessible, and up-to-date documentation for all users.
+Through the use of the Technical Documentation Template and GitHub Pages, we aim to provide well-organised, easily accessible, and up-to-date documentation for all users.
 
 ## Support
 
