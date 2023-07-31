@@ -7,7 +7,7 @@ This repository contains a collection of checks and reports developed and used b
 
 ## Our Vision
 
-The Operations Engineering buy, build, and run tools to help build and operate software at scale. While we primarily use the [Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/) for developing and hosting our services, our goal is to create tools and standards that can be used across multiple platforms and hosting services throughout the organisation.
+The Operations Engineering team buy, build, and run tools to help build and operate software at scale. While we primarily use the [Cloud Platform](https://user-guide.cloud-platform.service.justice.gov.uk/) for developing and hosting our services, our goal is to create tools and standards that can be used across multiple platforms and hosting services throughout the organisation.
 
 ## What's in This Repo
 
