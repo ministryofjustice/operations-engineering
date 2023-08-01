@@ -1,8 +1,11 @@
 ---
 name: GitHub Feature Request
-about: Suggest an idea for the Operations Engineering team to raise with GitH
+about: Suggest an idea to raise with GitHub
 title: ''
-labels: 'github', 'feature request', 'third party'
+labels:
+  - 'github'
+  - 'feature request'
+  - 'third party'
 assignees: ''
 
 ---
@@ -22,11 +25,11 @@ Please provide a clear and concise description of what you want to happen:
 
 ## Notes
 
-Add any additional context or information here.
+Please feel free to add any additional context or information here.
 
 ## Contact Info
 
-Please include your ministry of justice contact information so we can reach out if we need further clarification.
+Please include your Ministry of Justice contact information so we can reach out if we need further clarification.
 
 **Email:** [Your email here]
 
