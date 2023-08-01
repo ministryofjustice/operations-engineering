@@ -1,9 +1,13 @@
 ---
 name: GitHub Feature Request
-about: Suggest a feature request to raise with GitHub
-title: ""
-labels: "github", "feature request", "third party"
-assignees: ""
+about: Suggest an idea to raise with GitHub
+title: ''
+labels:
+  - 'github'
+  - 'feature request'
+  - 'third party'
+assignees: ''
+
 ---
 
 ## User Story
