@@ -27,7 +27,7 @@ These are just a few examples of the useful tools and features available in this
 3. **Install Dependencies:** `pip install -r python/requirements.txt`
 4. **Run a script:** `python -m python.scripts.dormant_users # for example`
 
-# Documentation Hosting and Updates
+## Documentation Hosting and Updates
 
 Our repository documentation is built using the [Technical Documentation Template](https://github.com/ministryofjustice/template-documentation-site) to provide a user-friendly and consistent experience. The Technical Documentation Template ensures a clear, standardised layout for all our project documentation, enhancing readability and navigation.
 
