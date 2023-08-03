@@ -1,4 +1,6 @@
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 
 class OperationsEngineeringReportsService:
@@ -49,10 +51,17 @@ class OperationsEngineeringReportsService:
 
         url = f"{self.__reports_url}/{self.__endpoint}"
 
-        try:
-            resp = requests.post(
-                url, headers=headers, json=data, timeout=120, stream=True).status_code
-        except requests.exceptions.ChunkedEncodingError:
-            resp = self.__http_post(data)
+        session = requests.Session()
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[500, 502, 503, 504],
+            method_whitelist=["POST"],
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+
+        resp = session.post(url, headers=headers, json=data, timeout=180, stream=True).status_code
 
         return resp
