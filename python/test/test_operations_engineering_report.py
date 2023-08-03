@@ -22,13 +22,15 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
         )
 
         # Prepare the data for the test
-        test_data = [{'report_id': 1, 'data': 'report data 1'}, {'report_id': 2, 'data': 'report data 2'}]
+        test_data = [{'report_id': 1, 'data': 'report data 1'},
+                     {'report_id': 2, 'data': 'report data 2'}]
 
         # Call the method being tested
         service.override_repository_standards_reports(test_data)
 
         # Assertions
-        mock_session.assert_called_once()  # Ensure that the Session object is created once
+        # Ensure that the Session object is created once
+        mock_session.assert_called_once()
         mock_session.return_value.post.assert_called_once_with(
             'https://example.com/reports',
             headers={
@@ -56,15 +58,18 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
         )
 
         # Prepare the data for the test
-        test_data = [{'report_id': 1, 'data': 'report data 1'}, {'report_id': 2, 'data': 'report data 2'}]
+        test_data = [{'report_id': 1, 'data': 'report data 1'},
+                     {'report_id': 2, 'data': 'report data 2'}]
 
         # Call the method being tested, and expect an Exception to be raised
         with self.assertRaises(ValueError) as context:
             service.override_repository_standards_reports(test_data)
 
         # Assertions
-        mock_session.assert_called_once()  # Ensure that the Session object is created once
+        # Ensure that the Session object is created once
+        mock_session.assert_called_once()
         mock_session.return_value.post.assert_called_once()
+
 
 if __name__ == '__main__':
     unittest.main()
