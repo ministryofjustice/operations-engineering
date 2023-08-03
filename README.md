@@ -22,7 +22,7 @@ These are just a few examples of the useful tools and features available in this
 
 ## Getting Started
 
-1. **Clone the Repo:** `git clone https://github.com/operations-engineering.git`
+1. **Clone the Repo:** `git clone https://github.com/ministryofjustice/operations-engineering.git`
 2. **Navigate to the Repo:** `cd operations-engineering`
 3. **Install Dependencies:** `pip install -r python/requirements.txt`
 4. **Run a script:** `python -m python.scripts.dormant_users # for example`
