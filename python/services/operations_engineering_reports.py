@@ -62,6 +62,7 @@ class OperationsEngineeringReportsService:
         session.mount("http://", adapter)
         session.mount("https://", adapter)
 
-        resp = session.post(url, headers=headers, json=data, timeout=180, stream=True).status_code
+        resp = session.post(url, headers=headers, json=data,
+                            timeout=180, stream=True).status_code
 
         return resp
