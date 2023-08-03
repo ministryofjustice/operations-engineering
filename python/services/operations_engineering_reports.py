@@ -11,7 +11,6 @@ class OperationsEngineeringReportsService:
         url {str} -- The url of the operations-engineering-reports API.
         endpoint {str} -- The endpoint of the operations-engineering-reports API.
         api_key {str} -- The API key to use for the operations-engineering-reports API.
-        enc_key {hex} -- The encryption key to use for the operations-engineering-reports API.
 
     """
 
