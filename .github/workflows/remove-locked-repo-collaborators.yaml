@@ -13,8 +13,8 @@ jobs:
           python-version: "3.11"
           architecture: "x64"
           cache: "pip"
-      - run: python3 -m pip install -r python/requirements.txt
-      - run: python3 python.scripts.remove_collaborator_locked_repos.py ${{ secrets.OPS_BOT_TOKEN }}
+      - run: pip install -r python/requirements.txt
+      - run: python -m python.scripts.remove_collaborator_locked_repos ${{ secrets.OPS_BOT_TOKEN }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
