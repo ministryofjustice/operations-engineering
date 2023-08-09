@@ -103,8 +103,7 @@ def fetch_repository_names(github_service: GithubService) -> list:
     """
     repo_name_list = []
 
-    org = github_service.github_client_rest_api.get_organization(
-        "ministryofjustice")
+    org = github_service.github_client_core_api.get_organization("ministryofjustice")
     for repo in org.get_repos():
         repo_name_list.append(repo.name)
 
