@@ -1278,7 +1278,6 @@ class TestReportOnInactiveUsers(TestCase):
     @patch.object(GithubService, '_get_repositories_from_team')
     @patch.object(GithubService, '_remove_user')
     def test_report_on_inactive_users(self, mock_remove_user, mock_get_repositories_from_team, mock_get_users_from_team):
-        # Set up mock data
         team_name = 'test_team'
         github_team = 'test_team_id'
         remove_users = True
@@ -1307,14 +1306,105 @@ class TestReportOnInactiveUsers(TestCase):
         mock_get_users_from_team.return_value = users
         mock_get_repositories_from_team.return_value = repositories
 
-        # Call the method under test
         service = GithubService('test_token', 'test_org')
         results = service.report_on_inactive_users({team_name: {'github_team': github_team, 'remove_from_team': remove_users}}, inactivity_months)
 
-        # Check the results
         assert len(results) != 0
         assert results[0].login == 'user1'
         mock_remove_user.assert_called_with(user2, github_team)
+
+    def test_remove_user(self):
+        org_name = 'test_org'
+        team_name = 'test_team'
+
+        org = MagicMock()
+        team = MagicMock()
+        user = MagicMock()
+
+        service = GithubService(org_name, 'test_org')
+        service.github_client_core_api.get_organization.return_value = org
+        org.get_team_by_slug.return_value = team
+        team.has_in_members.return_value = True
+
+        service._remove_user(user, team_name)
+
+        org.get_team_by_slug.assert_called_once_with(team_name)
+        team.has_in_members.assert_called_once_with(user)
+        team.remove_membership.assert_called_once_with(user)
+
+    def test_get_users_from_team(self):
+        org_name = 'test_org'
+        team_name = 'test_team'
+
+        org = MagicMock()
+        team = MagicMock()
+        user1 = MagicMock()
+        user2 = MagicMock()
+
+        service = GithubService('test_token', org_name)
+        service.github_client_core_api.get_organization.return_value = org
+        org.get_teams.return_value = [team]
+        team.name = team_name
+        team.get_members.return_value = [user1, user2]
+
+        users = service._get_users_from_team(team_name)
+
+        org.get_teams.assert_called_once()
+        team.get_members.assert_called_once()
+        assert len(users) == 2
+        assert users[0] == user1
+        assert users[1] == user2
+
+    def test_get_repositories_from_team(self):
+        org_name = 'test_org'
+        team_name = 'test_team'
+
+        org = MagicMock()
+        team = MagicMock()
+        repo1 = MagicMock()
+        repo2 = MagicMock()
+
+        service = GithubService('test_token', org_name)
+        service.github_client_core_api.get_organization.return_value = org
+        org.get_teams.return_value = [team]
+        team.name = team_name
+        team.get_repos.return_value = [repo1, repo2]
+
+        # Call the method under test
+        repos = service._get_repositories_from_team(team_name)
+
+        # Check the results
+        org.get_teams.assert_called_once()
+        team.get_repos.assert_called_once()
+        assert len(repos) == 2
+        assert repos[0] == repo1
+        assert repos[1] == repo2
+
+    def test_is_user_inactive(self):
+        org_name = 'test_org'
+        user_login = 'test_user'
+        inactivity_months = 6
+
+        user = MagicMock()
+        repo1 = MagicMock()
+        repo2 = MagicMock()
+        commit1 = MagicMock()
+        commit2 = MagicMock()
+
+        service = GithubService('test_token', org_name)
+        service.github_client_core_api.get_user.return_value = user
+        service.github_client_core_api.get_repo.side_effect = lambda name: MagicMock(name=name)
+        user.login = user_login
+        repo1.get_commits.return_value = [commit1]
+        repo2.get_commits.return_value = [commit2]
+        commit1.commit.author.date = datetime.now() - timedelta(days=inactivity_months * 30 + 1)
+        commit2.commit.author.date = datetime.now() - timedelta(days=inactivity_months * 30 + 2)
+
+        inactive = service._is_user_inactive(user, inactivity_months, [repo1, repo2])
+
+        repo1.get_commits.assert_called_once_with(author=user)
+        repo2.get_commits.assert_called_once_with(author=user)
+        assert inactive is True
 
 
 if __name__ == "__main__":
