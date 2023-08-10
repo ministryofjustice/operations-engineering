@@ -1,6 +1,7 @@
+from python.config.logging_config import logging
+
 from gql import gql
 import sys
-import time
 
 from python.services.github_service import GithubService
 
@@ -121,7 +122,6 @@ def fetch_repositories(github_service: GithubService) -> list:
         collaborators_list, is_repository_locked = fetch_repository_data(
             repository_name, github_service
         )
-        time.sleep(1)
         repositories_list.append(
             repository(repository_name, collaborators_list,
                        is_repository_locked)
@@ -135,9 +135,10 @@ def remove_collaborator(collaborator, github_service: GithubService):
     Args:
         collaborator (collaborator): The collaborator object
     """
-    print("Remove user from organisation: " + collaborator.login)
+    logging.info("Remove user from organisation: " + collaborator.login)
     org = github_service.github_client_core_api.get_organization(
         "ministryofjustice")
+    org.remove_outside_collaborator(collaborator)
 
 
 def run(github_service: GithubService):
@@ -150,6 +151,7 @@ def run(github_service: GithubService):
         for repository in repositories:
             if outside_collaborator.login in repository.collaborators:
                 collaborators_repo_list.append(repository.is_repository_locked)
+        logging.info(f"Number of collaborators [ {collaborators_repo_list.count} ]")
         an_open_repo = False
         if an_open_repo not in collaborators_repo_list:
             # all repositories are locked so remove the collaborator
