@@ -151,7 +151,8 @@ def run(github_service: GithubService):
         for repository in repositories:
             if outside_collaborator.login in repository.collaborators:
                 collaborators_repo_list.append(repository.is_repository_locked)
-        logging.info(f"Number of collaborators [ {collaborators_repo_list.count} ]")
+        logging.info(
+            f"Number of collaborators [ {collaborators_repo_list.count} ]")
         an_open_repo = False
         if an_open_repo not in collaborators_repo_list:
             # all repositories are locked so remove the collaborator
