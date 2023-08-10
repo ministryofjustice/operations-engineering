@@ -1,11 +1,11 @@
 import json
 from calendar import timegm
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
+from dateutil.relativedelta import relativedelta
 from github import Github, NamedUser, RateLimitExceededException
 from github.Commit import Commit
 from github.Issue import Issue
@@ -729,7 +729,6 @@ class GithubService:
         except Exception as e:
             logging.error(f"An error occurred while removing user {user.login} from team {team_name}: {str(e)}")
 
-
     def _get_users_from_team(self, team_name: str) -> list[NamedUser.NamedUser]:
         org = self.github_client_core_api.get_organization(self.organisation_name)
 
@@ -768,9 +767,9 @@ class GithubService:
             try:
                 for commit in commits:
                     if commit.commit.author.date > cutoff_date:
-                        return False # User has been active in this repo, so not considered inactive
+                        return False  # User has been active in this repo, so not considered inactive
             except Exception:
                 logging.error(f"An exception occurred while getting commit date for user {user.login} in repo {repo.name}")
                 continue
 
-        return True # User is inactive in all given repositories
+        return True  # User is inactive in all given repositories
