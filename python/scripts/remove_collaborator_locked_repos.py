@@ -135,7 +135,7 @@ def remove_collaborator(collaborator, github_service: GithubService):
     Args:
         collaborator (collaborator): The collaborator object
     """
-    logging.info("Remove user from organisation: " + collaborator.login)
+    logging.info(f"Remove user from organisation: {collaborator.login}")
     org = github_service.github_client_core_api.get_organization(
         "ministryofjustice")
     org.remove_outside_collaborator(collaborator)
