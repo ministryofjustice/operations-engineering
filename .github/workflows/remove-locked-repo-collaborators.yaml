@@ -1,6 +1,8 @@
 name: Remove collaborators attached to locked repositories
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 4 1 * *"
 
 jobs:
   remove-locked-repo-collaborators:
