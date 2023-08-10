@@ -1269,5 +1269,35 @@ class MockGithubIssue(MagicMock):
         self.assignees = assignees
 
 
+    def test_report_on_inactive_users(self):
+        # Set up the parameters
+        teams = {
+            'team1': {'github_team': 'github_team1', 'remove_from_team': True},
+            'team2': {'github_team': 'github_team2', 'remove_from_team': False}
+        }
+        inactivity_months = 6
+
+        # Create a GithubService instance
+        service = GithubService('test_token', 'test_org')
+
+        # Mock the methods that are being called within report_on_inactive_users
+        service.get_users_from_team = MagicMock(return_value=['user1', 'user2'])
+        service.get_repositories_from_team = MagicMock(return_value=['repo1', 'repo2'])
+        service.is_user_inactive = MagicMock(side_effect=[False, True])  # First user active, second user inactive
+        service.remove_user = MagicMock()
+
+        # Call the method
+        result = service.report_on_inactive_users(teams, inactivity_months)
+
+        # Validate the result
+        self.assertEqual(result, ['user2'])  # Expecting the second user to be in the result
+
+        # Validate calls to the mocked methods
+        service.get_users_from_team.assert_called_with('github_team1')
+        service.get_repositories_from_team.assert_called_with('github_team1')
+        service.is_user_inactive.assert_called_with('user2', inactivity_months, ['repo1', 'repo2'])
+        service.remove_user.assert_called_with('user2', 'github_team1')
+
+
 if __name__ == "__main__":
     unittest.main()

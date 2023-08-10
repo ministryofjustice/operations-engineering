@@ -670,3 +670,107 @@ class GithubService:
         github_user = self.github_client_core_api.get_user(user)
         self.github_client_core_api.get_organization(
             self.organisation_name).remove_from_membership(github_user)
+
+    def report_on_inactive_users(self, teams: dict[str, dict[str, Any]], inactivity_months: int) -> list[NamedUser.NamedUser]:
+        """
+        Reports on inactive users within the given GitHub teams.
+
+        For each team specified in the 'teams' parameter, this method checks the activity status of each user.
+        If a user is found to be inactive for a period equal to or greater than 'inactivity_months',
+        the user is added to the result list.
+
+        If 'remove_from_team' is set to True for a team in the 'teams' parameter, the inactive user will be removed from the team.
+
+        Parameters:
+            teams (dict[str, dict[str, Any]]): A dictionary containing team configuration.
+                Each entry consists of a team name and a dictionary with 'github_team' (team identifier),
+                'remove_from_team' (boolean flag to remove inactive users), and any additional team-specific configurations.
+            inactivity_months (int): Number of months of inactivity to consider a user as inactive.
+
+        Returns:
+            list[NamedUser.NamedUser]: A list of NamedUser objects representing the inactive users found.
+        """
+        results = []
+
+        for team_name, team_config in teams.items():
+            logging.info(f"Processing team {team_name}")
+
+            github_team = team_config['github_team']
+            remove_users = team_config['remove_from_team']
+
+            users = self._get_users_from_team(github_team)
+            repositories = self._get_repositories_from_team(github_team)
+
+            for user in users:
+                if self._is_user_inactive(user, inactivity_months, repositories):
+                    logging.info(f"User {user} in team {github_team} is inactive for {inactivity_months} months")
+                    results.append(user)
+
+                    if remove_users:
+                        self._remove_user(user, github_team)
+        return results
+
+    def _remove_user(self, user: NamedUser.NamedUser, team_name: str) -> None:
+        try:
+            org = self.github_client_core_api.get_organization(self.organisation_name)
+            team = org.get_team_by_slug(team_name)
+
+            if team is None:
+                logging.warning(f"Team {team_name} not found in organization {self.organisation_name}")
+                return
+
+            if not team.has_in_members(user):
+                logging.warning(f"User {user.login} is not a member of team {team_name}")
+                return
+
+            team.remove_membership(user)
+            logging.info(f"User {user.login} removed from team {team_name}")
+
+        except Exception as e:
+            logging.error(f"An error occurred while removing user {user.login} from team {team_name}: {str(e)}")
+
+
+    def _get_users_from_team(self, team_name: str) -> list[NamedUser.NamedUser]:
+        org = self.github_client_core_api.get_organization(self.organisation_name)
+
+        for team in org.get_teams():
+            if team.name == team_name:
+                logging.info(f"Getting users from team {team.name}")
+                return list(team.get_members())
+
+        # If the team is not found, return an empty list or handle as needed
+        return []
+
+    def _get_repositories_from_team(self, team_name: str) -> list[Repository]:
+        org = self.github_client_core_api.get_organization(self.organisation_name)
+
+        for team in org.get_teams():
+            if team.name == team_name:
+                logging.info(f"Getting repos from team {team.name}")
+                return list(team.get_repos())
+
+        logging.warning(f"Team {team_name} not found in organization {self.organisation_name}")
+        # If the team is not found, return an empty list or handle as needed
+        return []
+
+    def _is_user_inactive(self, user: NamedUser.NamedUser, inactivity_months: int, repositories: list[Repository]) -> bool:
+        cutoff_date = datetime.now() - timedelta(days=inactivity_months * 30) # Roughly calculate the cutoff date
+
+        for repo in repositories:
+            # Get the user's commits in the repo
+            try:
+                commits = repo.get_commits(author=user)
+            except Exception:
+                logging.error(f"An exception occurred while getting commits for user {user.login} in repo {repo.name}")
+                continue
+
+            # Check if any commit is later than the cutoff date
+            try:
+                for commit in commits:
+                    if commit.commit.author.date > cutoff_date:
+                        return False # User has been active in this repo, so not considered inactive
+            except Exception:
+                logging.error(f"An exception occurred while getting commit date for user {user.login} in repo {repo.name}")
+                continue
+
+        return True # User is inactive in all given repositories
