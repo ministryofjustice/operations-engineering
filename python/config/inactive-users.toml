@@ -12,7 +12,7 @@ github_team = "operations-engineering"
 notification_email = "operations-engineering@digital.justice.gov.uk"
 slack_channel = "#test_alarms_2"
 remove_from_team = true
-users_to_ignore = [ "cloud-platform-moj" ]
+users_to_ignore = [ "cloud-platform-moj", "ScottSeaward" ]
 repositories_to_ignore = [ "operations-engineering-reports" ]
 
 # Add more teams here

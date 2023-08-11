@@ -61,13 +61,11 @@ def send_message_to_channel(channel_name, message):
 
 
 def main():
-    # github_token = get_environment_variables()
-    # teams = {k: v for k, v in config['team'].items()}  # Access 'team' sub-dictionary directly
+    github_token, slack_token = get_environment_variables()
+    teams = {k: v for k, v in config['team'].items()}  # Access 'team' sub-dictionary directly
 
-    # print(GithubService(github_token, ORGANISATION).report_on_inactive_users(
-    #     teams, INACTIVITY))
-
-    send_message_to_channel('operations-engineering-test-notifcations', 'Hello, world!')
+    GithubService(github_token, ORGANISATION).report_on_inactive_users(
+        teams, INACTIVITY, slack_token)
 
 if __name__ == "__main__":
     main()

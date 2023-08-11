@@ -1,3 +1,4 @@
+import logging
 from textwrap import dedent
 from urllib.parse import quote
 
@@ -16,6 +17,32 @@ class SlackService:
 
     def __init__(self, slack_token: str) -> None:
         self.slack_client = WebClient(slack_token)
+
+    def send_message_to_channel(self, channel_name, message: str):
+        # Lookup the channel ID by its name
+        channel_id = None
+        response = self.slack_client.conversations_list(limit=200)
+        while response['response_metadata']['next_cursor'] != '':
+            for channel in response['channels']:
+                if channel['name'] == channel_name:
+                    channel_id = channel['id']
+                    break
+
+            if channel_id is not None:
+                break
+
+            response = self.slack_client.conversations_list(limit=200, cursor=response['response_metadata']['next_cursor'])
+
+        if channel_id is None:
+            logging.error(f"Could not find channel {channel_name}")
+            return
+
+        # Send the message to the channel
+        response = self.slack_client.chat_postMessage(channel=channel_id, text=message)
+        if not response['ok']:
+            logging.error(f"Error sending message to channel {channel_name}: {response['error']}")
+        else:
+            logging.info(f"Message sent to channel {channel_name}")
 
     def send_error_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
                                                          usage_threshold: float):
