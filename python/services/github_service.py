@@ -728,7 +728,7 @@ class GithubService:
                         users_to_remove.append(user)
 
             if slack_channel and users_to_remove or users_removed:
-                SlackService(slack_token).send_message_to_channel(slack_channel, self._message_to_users(users_removed, users_to_remove, team_name))
+                SlackService(slack_token).send_message_to_channel(slack_channel, self._message_to_users(users_removed, users_to_remove, github_team))
 
     def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str) -> str:
         message = ""
@@ -740,6 +740,10 @@ class GithubService:
             message += f"\n\nUsers identified for removal from team {team_name} but not removed:"
             for user in users_to_remove:
                 message += f"\n- {user.login}"
+
+        if message != "":
+            message += "\n\n:page_facing_up: Please contact Operations Engineering if you believe this is an error."
+
         return message
 
     def _remove_user(self, user: NamedUser.NamedUser, team_name: str) -> None:
