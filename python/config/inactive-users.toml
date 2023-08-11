@@ -1,7 +1,3 @@
-# [github]
-# organisation_name = "ministryofjustice"
-# github_teams = [ "WebOps", "operations-engineering" ]
-
 # [activity_check]
 # inactivity_months = 18
 
@@ -11,15 +7,13 @@ organisation_name = "ministryofjustice"
 [activity_check]
 inactivity_months = 18
 
-# [team.webops]
-# github_team = "webops"
-# slack_channel = "#webops"
-
 [team.operations_engineering]
 github_team = "operations-engineering"
 notification_email = "operations-engineering@digital.justice.gov.uk"
 slack_channel = "#operations-engineering-alerts"
 remove_from_team = true
+users_to_ignore = [ "cloud-platform-moj" ]
+repositories_to_ignore = [ "operations-engineering-reports" ]
 
 # Add more teams here
 

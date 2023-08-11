@@ -1313,6 +1313,46 @@ class TestReportOnInactiveUsers(TestCase):
         assert results[0].login == 'user1'
         mock_remove_user.assert_called_with(user2, github_team)
 
+    @patch.object(GithubService, '_get_users_from_team')
+    @patch.object(GithubService, '_get_repositories_from_team')
+    @patch.object(GithubService, '_remove_user')
+    def test_report_on_inactive_users_ignore_lists(self, mock_remove_user, mock_get_repositories_from_team, mock_get_users_from_team):
+        team_name = 'test_team'
+        github_team = 'test_team_id'
+        remove_users = True
+        inactivity_months = 6
+        ignore_users = ['user1']
+        ignore_repositories = ['repo1']
+
+        user1 = MagicMock()
+        user1.login = 'user1'
+        user1.last_active_date = datetime.now() - timedelta(days=180)
+
+        user2 = MagicMock()
+        user2.login = 'user2'
+        user2.last_active_date = datetime.now() - timedelta(days=90)
+
+        users = [user1, user2]
+
+        repository1 = MagicMock()
+        repository1.name = 'repo1'
+        repository1.last_commit_date = datetime.now() - timedelta(days=180)
+
+        repository2 = MagicMock()
+        repository2.name = 'repo2'
+        repository2.last_commit_date = datetime.now() - timedelta(days=90)
+
+        repositories = [repository1, repository2]
+
+        mock_get_users_from_team.return_value = users
+        mock_get_repositories_from_team.return_value = repositories
+
+        service = GithubService('test_token', 'test_org')
+        results = service.report_on_inactive_users({team_name: {'github_team': github_team, 'remove_from_team': remove_users, 'users_to_ignore': ignore_users, 'repositories_to_ignore': ignore_repositories}}, inactivity_months)
+
+        assert len(results) != 0
+        assert results[0].login == 'user2'
+
     def test_remove_user(self):
         org_name = 'test_org'
         team_name = 'test_team'

@@ -697,13 +697,22 @@ class GithubService:
 
             github_team = team_config['github_team']
             remove_users = team_config['remove_from_team']
+            ignore_users = team_config.get('users_to_ignore', [])
+            ignore_repositories = team_config.get('repositories_to_ignore', [])
+            logging.info(f"Team {team_name} has {len(ignore_users)} users to ignore")
 
             users = self._get_users_from_team(github_team)
             repositories = self._get_repositories_from_team(github_team)
+            if ignore_repositories:
+                repositories = [
+                    repo for repo in repositories if repo.name not in ignore_repositories]
 
             for user in users:
+                if user.login in ignore_users:
+                    logging.info(f"User {user.login} in team {github_team} is ignored")
+                    continue
                 if self._is_user_inactive(user, inactivity_months, repositories):
-                    logging.info(f"User {user} in team {github_team} is inactive for {inactivity_months} months")
+                    logging.info(f"User {user.login} in team {github_team} is inactive for {inactivity_months} months")
                     results.append(user)
 
                     if remove_users:
