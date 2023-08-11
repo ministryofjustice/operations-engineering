@@ -10,7 +10,7 @@ inactivity_months = 18
 [team.operations_engineering]
 github_team = "operations-engineering"
 notification_email = "operations-engineering@digital.justice.gov.uk"
-slack_channel = "#operations-engineering-alerts"
+slack_channel = "#test_alarms_2"
 remove_from_team = true
 users_to_ignore = [ "cloud-platform-moj" ]
 repositories_to_ignore = [ "operations-engineering-reports" ]
