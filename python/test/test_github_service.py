@@ -1,3 +1,4 @@
+import re
 import unittest
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -1445,6 +1446,25 @@ class TestReportOnInactiveUsers(TestCase):
         repo1.get_commits.assert_called_once_with(author=user)
         repo2.get_commits.assert_called_once_with(author=user)
         assert inactive is True
+
+    def test_message_to_users(self):
+        user1 = MagicMock()
+        user1.login = 'user1'
+        user2 = MagicMock()
+        user2.login = 'user2'
+        users_removed = []
+        users_removed.append(user1)
+        users_to_remove = []
+        users_to_remove.append(user2)
+        team_name = 'test_team'
+
+
+        service = GithubService('test_token', 'test_org')
+        message = service._message_to_users(users_removed, users_to_remove, team_name)
+
+        expected_message = 'Users removed from team test_team:\n- user1\n\nUsers identified for removal from team test_team but not removed:\n- user2'
+
+        self.assertEqual(re.sub(r'\s+', '', message), re.sub(r'\s+', '', expected_message))
 
 
 if __name__ == "__main__":
