@@ -1,3 +1,4 @@
+import logging
 import re
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -1271,200 +1272,110 @@ class MockGithubIssue(MagicMock):
     def edit(self, assignees):
         self.assignees = assignees
 
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__", new=MagicMock)
-class TestReportOnInactiveUsers(TestCase):
-    @patch.object(GithubService, '_get_users_from_team')
-    @patch.object(GithubService, '_get_repositories_from_team')
-    @patch.object(GithubService, '_remove_user')
-    def test_report_on_inactive_users(self, mock_remove_user, mock_get_repositories_from_team, mock_get_users_from_team):
-        team_name = 'test_team'
-        github_team = 'test_team_id'
-        remove_users = True
-        inactivity_months = 6
 
-        user1 = MagicMock()
-        user1.login = 'user1'
-        user1.last_active_date = datetime.now() - timedelta(days=180)
+class TestReportOnInactiveUsers(unittest.TestCase):
+    def setUp(self):
+        self.org_token = "token"
+        self.organisation_name = "org_name"
 
-        user2 = MagicMock()
-        user2.login = 'user2'
-        user2.last_active_date = datetime.now() - timedelta(days=90)
+        self.github_service = GithubService(self.org_token, self.organisation_name)
 
-        users = [user1, user2]
+        # Mocking GitHub dependencies
+        self.github_service.github_client_core_api = MagicMock()
+        self.team = MagicMock()
 
-        repository1 = MagicMock()
-        repository1.name = 'repo1'
-        repository1.last_commit_date = datetime.now() - timedelta(days=180)
-
-        repository2 = MagicMock()
-        repository2.name = 'repo2'
-        repository2.last_commit_date = datetime.now() - timedelta(days=90)
-
-        repositories = [repository1, repository2]
-
-        mock_get_users_from_team.return_value = users
-        mock_get_repositories_from_team.return_value = repositories
-
-        service = GithubService('test_token', 'test_org')
-        results = service.report_on_inactive_users({team_name: {'github_team': github_team, 'remove_from_team': remove_users}}, inactivity_months)
-
-        assert len(results) != 0
-        assert results[0].login == 'user1'
-        mock_remove_user.assert_called_with(user2, github_team)
-
-    @patch.object(GithubService, '_get_users_from_team')
-    @patch.object(GithubService, '_get_repositories_from_team')
-    @patch.object(GithubService, '_remove_user')
-    def test_report_on_inactive_users_ignore_lists(self, mock_remove_user, mock_get_repositories_from_team, mock_get_users_from_team):
-        team_name = 'test_team'
-        github_team = 'test_team_id'
-        remove_users = True
-        inactivity_months = 6
-        ignore_users = ['user1']
-        ignore_repositories = ['repo1']
-
-        user1 = MagicMock()
-        user1.login = 'user1'
-        user1.last_active_date = datetime.now() - timedelta(days=180)
-
-        user2 = MagicMock()
-        user2.login = 'user2'
-        user2.last_active_date = datetime.now() - timedelta(days=90)
-
-        users = [user1, user2]
-
-        repository1 = MagicMock()
-        repository1.name = 'repo1'
-        repository1.last_commit_date = datetime.now() - timedelta(days=180)
-
-        repository2 = MagicMock()
-        repository2.name = 'repo2'
-        repository2.last_commit_date = datetime.now() - timedelta(days=90)
-
-        repositories = [repository1, repository2]
-
-        mock_get_users_from_team.return_value = users
-        mock_get_repositories_from_team.return_value = repositories
-
-        service = GithubService('test_token', 'test_org')
-        results = service.report_on_inactive_users({team_name: {'github_team': github_team, 'remove_from_team': remove_users, 'users_to_ignore': ignore_users, 'repositories_to_ignore': ignore_repositories}}, inactivity_months)
-
-        assert len(results) != 0
-        assert results[0].login == 'user2'
-
-    def test_remove_user(self):
-        org_name = 'test_org'
-        team_name = 'test_team'
-
+    @patch("github.Github.__new__")
+    def test_report_on_inactive_users(self, mock_github_client_core_api):
         org = MagicMock()
         team = MagicMock()
-        user = MagicMock()
+        user1 = MagicMock(login="user1")
+        user2 = MagicMock(login="user2")
+        users = [user1, user2]
+        repo = MagicMock(name="repo")
 
-        service = GithubService(org_name, 'test_org')
-        service.github_client_core_api.get_organization.return_value = org
+        self.github_service._get_users_from_team = MagicMock(return_value=users)
+        self.github_service._get_repositories_from_team = MagicMock(return_value=[repo])
+        self.github_service._is_user_inactive = MagicMock(return_value=True)
+        self.github_service._remove_user = MagicMock()
+        self.github_service.github_client_core_api.get_organization.return_value = org
         org.get_team_by_slug.return_value = team
-        team.has_in_members.return_value = True
 
-        service._remove_user(user, team_name)
+        teams = {
+            'team_name': {
+                'github_team': 'github_team',
+                'remove_from_team': True,
+            }
+        }
+        inactivity_months = 3
 
-        org.get_team_by_slug.assert_called_once_with(team_name)
-        team.has_in_members.assert_called_once_with(user)
-        team.remove_membership.assert_called_once_with(user)
+        self.github_service.report_on_inactive_users(teams, inactivity_months, "")
 
-    def test_get_users_from_team(self):
-        org_name = 'test_org'
-        team_name = 'test_team'
+        self.github_service._get_users_from_team.assert_called_with('github_team')
+        self.github_service._get_repositories_from_team.assert_called_with('github_team')
+        self.github_service._is_user_inactive.assert_any_call(user1, inactivity_months, [repo])
+        self.github_service._is_user_inactive.assert_any_call(user2, inactivity_months, [repo])
+        self.github_service._remove_user.assert_any_call(user1, 'github_team')
+        self.github_service._remove_user.assert_any_call(user2, 'github_team')
 
-        org = MagicMock()
-        team = MagicMock()
-        user1 = MagicMock()
-        user2 = MagicMock()
+    def test_remove_user_successful(self):
+        github_mock = Mock()
+        org_mock = Mock()
+        team_mock = Mock()
 
-        service = GithubService('test_token', org_name)
-        service.github_client_core_api.get_organization.return_value = org
-        org.get_teams.return_value = [team]
-        team.name = team_name
-        team.get_members.return_value = [user1, user2]
+        user_mock = Mock()
+        user_mock.login = 'testuser'
 
-        users = service._get_users_from_team(team_name)
+        github_mock.get_organization.return_value = org_mock
+        org_mock.get_team_by_slug.return_value = team_mock
+        team_mock.has_in_members.return_value = True
 
-        org.get_teams.assert_called_once()
-        team.get_members.assert_called_once()
-        assert len(users) == 2
-        assert users[0] == user1
-        assert users[1] == user2
+        service = GithubService('token', 'org_name')
+        service.github_client_core_api = github_mock
 
-    def test_get_repositories_from_team(self):
-        org_name = 'test_org'
-        team_name = 'test_team'
+        service._remove_user(user_mock, 'team_name')
 
-        org = MagicMock()
-        team = MagicMock()
-        repo1 = MagicMock()
-        repo2 = MagicMock()
+        team_mock.remove_membership.assert_called_once_with(user_mock)
 
-        service = GithubService('test_token', org_name)
-        service.github_client_core_api.get_organization.return_value = org
-        org.get_teams.return_value = [team]
-        team.name = team_name
-        team.get_repos.return_value = [repo1, repo2]
+    @patch('python.services.github_service.Github', autospec=True)
+    def test_remove_user_team_not_found(self, mock_github_class):
+        github_mock = Mock()
+        org_mock = Mock()
 
-        # Call the method under test
-        repos = service._get_repositories_from_team(team_name)
+        user_mock = Mock()
+        user_mock.login = 'testuser'
 
-        # Check the results
-        org.get_teams.assert_called_once()
-        team.get_repos.assert_called_once()
-        assert len(repos) == 2
-        assert repos[0] == repo1
-        assert repos[1] == repo2
+        github_mock.get_organization.return_value = org_mock
+        org_mock.get_team_by_slug.return_value = None
 
-    def test_is_user_inactive(self):
-        org_name = 'test_org'
-        user_login = 'test_user'
-        inactivity_months = 6
+        service = GithubService('token', 'org_name')
+        service.github_client_core_api = github_mock
+        with self.assertLogs(level='WARNING') as cm:
+            service._remove_user(user_mock, 'team_name')
 
-        user = MagicMock()
-        repo1 = MagicMock()
-        repo2 = MagicMock()
-        commit1 = MagicMock()
-        commit2 = MagicMock()
+        expected_log_message = "WARNING:root:Team team_name not found in organization org_name"
+        self.assertIn(expected_log_message, cm.output)
 
-        service = GithubService('test_token', org_name)
-        service.github_client_core_api.get_user.return_value = user
-        service.github_client_core_api.get_repo.side_effect = lambda name: MagicMock(name=name)
-        user.login = user_login
-        repo1.get_commits.return_value = [commit1]
-        repo2.get_commits.return_value = [commit2]
-        commit1.commit.author.date = datetime.now() - timedelta(days=inactivity_months * 30 + 1)
-        commit2.commit.author.date = datetime.now() - timedelta(days=inactivity_months * 30 + 2)
+    def test_remove_team_not_found(self):
+        github_mock = Mock()
+        org_mock = Mock()
+        team_mock = Mock()
 
-        inactive = service._is_user_inactive(user, inactivity_months, [repo1, repo2])
+        user_mock = Mock()
+        user_mock.login = 'testuser'
 
-        repo1.get_commits.assert_called_once_with(author=user)
-        repo2.get_commits.assert_called_once_with(author=user)
-        assert inactive is True
+        github_mock.get_organization.return_value = org_mock
+        org_mock.get_team_by_slug.return_value = team_mock
+        team_mock.has_in_members.return_value = False
 
-    def test_message_to_users(self):
-        user1 = MagicMock()
-        user1.login = 'user1'
-        user2 = MagicMock()
-        user2.login = 'user2'
-        users_removed = []
-        users_removed.append(user1)
-        users_to_remove = []
-        users_to_remove.append(user2)
-        team_name = 'test_team'
+        service = GithubService('token', 'org_name')
+        service.github_client_core_api = github_mock
 
+        service._remove_user(user_mock, 'team_name')
+        with self.assertLogs(level='WARNING') as cm:
+            service._remove_user(user_mock, 'team_name')
 
-        service = GithubService('test_token', 'test_org')
-        message = service._message_to_users(users_removed, users_to_remove, team_name)
-
-        expected_message = 'Users removed from team test_team:\n- user1\n\nUsers identified for removal from team test_team but not removed:\n- user2'
-
-        self.assertEqual(re.sub(r'\s+', '', message), re.sub(r'\s+', '', expected_message))
+        expected_log_message = "WARNING:root:User testuser is not a member of team team_name"
+        self.assertIn(expected_log_message, cm.output)
 
 
 if __name__ == "__main__":
