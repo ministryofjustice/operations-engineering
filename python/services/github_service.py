@@ -727,7 +727,8 @@ class GithubService:
                     else:
                         users_to_remove.append(user)
 
-            if slack_channel and users_to_remove or users_removed:
+            if slack_channel and users_to_remove or slack_channel and users_removed:
+                logging.info(f"Sending message to slack channel {slack_channel}")
                 SlackService(slack_token).send_message_to_channel(slack_channel, self._message_to_users(users_removed, users_to_remove, github_team))
 
     def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str) -> str:
@@ -747,6 +748,7 @@ class GithubService:
         return message
 
     def _remove_user(self, user: NamedUser.NamedUser, team_name: str) -> None:
+        logging.info(f"Removing user {user.login} from team {team_name}")
         try:
             org = self.github_client_core_api.get_organization(self.organisation_name)
             team = org.get_team_by_slug(team_name)
