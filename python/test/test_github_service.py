@@ -7,7 +7,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, Mock, call, patch
 
 from freezegun import freeze_time
-from github import Github, RateLimitExceededException
+from github import Github, GithubException, RateLimitExceededException
 from github.Commit import Commit
 from github.GitCommit import GitCommit
 from github.Issue import Issue
@@ -1438,6 +1438,62 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         result = github_service._get_repositories_from_team("test_team")
 
         self.assertEqual(result, [])
+
+    @patch("python.services.github_service.Github")
+    def test_is_user_inactive_true(self, mock_github):
+        # Mocking user and repo
+        user = Mock()
+        repo = Mock()
+        repo.get_commits.return_value = []
+
+        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service.github_client_core_api = mock_github
+
+        result = github_service._is_user_inactive(user, 3, [repo])
+
+        self.assertTrue(result)
+
+    @patch("python.services.github_service.Github")
+    def test_is_user_inactive_false(self, mock_github):
+        user = Mock()
+        repo = Mock()
+        commit = Mock()
+        commit.commit.author.date = datetime.now()
+        repo.get_commits.return_value = [commit]
+
+        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service.github_client_core_api = mock_github
+
+        result = github_service._is_user_inactive(user, 3, [repo])
+
+        self.assertFalse(result)
+
+    @patch("python.services.github_service.Github")
+    def test_is_user_inactive_get_commits_exception(self, mock_github):
+        user = Mock()
+        repo = Mock()
+        repo.get_commits.side_effect = GithubException(status=404, data=None, headers=None)
+
+        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service.github_client_core_api = mock_github
+
+        result = github_service._is_user_inactive(user, 3, [repo])
+
+        self.assertTrue(result)
+
+    @patch("python.services.github_service.Github")
+    def test_exception_while_getting_commit_date(self, mock_github):
+        repo = Mock()
+        user = Mock()
+        commit = Mock()
+        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service.github_client_core_api = mock_github
+
+        author_mock = Mock()
+        author_mock.date = property(lambda self: 1 / 0)  # raise a ZeroDivisionError
+        commit.commit.author = author_mock.repo.get_commits.return_value = [commit]
+
+        self.assertTrue(github_service._is_user_inactive(user, 6, [repo]))
 
 
 if __name__ == "__main__":
