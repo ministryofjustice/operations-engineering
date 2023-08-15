@@ -1377,6 +1377,37 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         expected_log_message = "WARNING:root:User testuser is not a member of team team_name"
         self.assertIn(expected_log_message, cm.output)
 
+    @patch("python.services.github_service.Github")
+    def test_get_users_from_team_found(self, mock_github):
+        # Mocking organization, team, and user
+        user = Mock()
+        team = Mock()
+        team.get_members.return_value = [user]
+        org = Mock()
+        org.get_teams.return_value = [team]
+        mock_github.get_organization.return_value = org
+
+        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service.github_client_core_api = mock_github
+
+        result = github_service._get_users_from_team(team.name)
+
+        self.assertEqual(result, [user])
+
+    @patch("python.services.github_service.Github")
+    def test_get_users_from_team_not_found(self, mock_github):
+        team = MagicMock()
+        team.name = "different_team"
+        org = MagicMock()
+        org.get_teams.return_value = [team]
+        mock_github.get_organization.return_value = org
+
+        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+
+        result = github_service._get_users_from_team("test_team")
+
+        self.assertEqual(result, [])
+
 
 if __name__ == "__main__":
     unittest.main()
