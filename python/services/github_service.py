@@ -700,6 +700,24 @@ class GithubService:
             self.organisation_name).remove_from_membership(github_user)
 
     def report_on_inactive_users(self, teams: dict[str, dict[str, Any]], inactivity_months: int, slack_token: str) -> None:
+        """
+        Processes a list of GitHub teams to identify inactive users based on their commit activity within the given time frame.
+
+        For each team, the method:
+        - Loads the specific configuration related to that team (e.g., whether to remove users from the team, specific users or repositories to ignore, Slack channel for notifications, etc.).
+        - Retrieves the users and repositories associated with the team, considering any specified ignore settings.
+        - Determines which users are inactive according to the inactivity threshold in months.
+        - If configured to do so, removes inactive users from the team and/or accumulates them for later notification.
+        - If a Slack channel is configured for the team, sends a notification about the removed and/or to-be-removed users.
+
+        Parameters:
+        - teams (dict[str, dict[str, Any]]): A dictionary mapping team names to configuration dictionaries for processing each team.
+        - inactivity_months (int): The number of months of inactivity to use as the threshold for determining whether a user is considered inactive.
+        - slack_token (str): The authentication token for sending messages to Slack if configured for a team.
+
+        Returns:
+        None: This method performs its actions as side effects, updating team memberships and sending Slack notifications as configured.
+        """
         users_to_remove = []
         users_removed = []
 
