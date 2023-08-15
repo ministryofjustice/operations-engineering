@@ -723,6 +723,7 @@ class GithubService:
 
                     if remove_users:
                         self._remove_user(user, github_team)
+                        logging.info(f"User {user.login} removed from team {github_team}")
                         users_removed.append(user)
                     else:
                         users_to_remove.append(user)
