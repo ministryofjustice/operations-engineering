@@ -32,5 +32,6 @@ def main():
     GithubService(github_token, ORGANISATION).report_on_inactive_users(
         teams, INACTIVITY, slack_token)
 
+
 if __name__ == "__main__":
     main()
