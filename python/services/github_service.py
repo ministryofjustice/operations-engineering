@@ -1,9 +1,10 @@
 import json
 from calendar import timegm
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from textwrap import dedent
 from time import gmtime, sleep
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from dateutil.relativedelta import relativedelta
 from github import Github, NamedUser, RateLimitExceededException
@@ -19,6 +20,32 @@ from python.config.logging_config import logging
 from python.services.slack_service import SlackService
 
 logging.getLogger("gql").setLevel(logging.WARNING)
+
+
+@dataclass
+class SelfManagedGitHubTeam:
+    """
+    Represents the configuration for managing a GitHub team within the this service.
+    Example features:
+        - Remove users from the team if they are not active in any of the team's repositories.
+        - Notify a Slack channel when users are removed from the team.
+
+    Attributes:
+        github_team (str): The name of the GitHub team.
+        remove_users (bool): Flag indicating whether users should be removed from the team.
+        ignore_users (list[str]): A list of usernames to ignore when processing the team.
+        ignore_repositories (list[str]): A list of repositories to ignore when checking user activity.
+        slack_channel (Optional[str]): The Slack channel to notify; None if no notification is needed.
+
+    This class encapsulates the various settings related to a specific GitHub team, such as
+    the rules for removing users and the repositories to be ignored. It can be instantiated
+    from a TOML configuration file, allowing for easy management of these settings.
+    """
+    github_team: str
+    remove_users: bool
+    ignore_users: list = field(default_factory=list)
+    ignore_repositories: list = field(default_factory=list)
+    slack_channel: Optional[str] = None
 
 
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
@@ -673,64 +700,55 @@ class GithubService:
             self.organisation_name).remove_from_membership(github_user)
 
     def report_on_inactive_users(self, teams: dict[str, dict[str, Any]], inactivity_months: int, slack_token: str) -> None:
-        """
-        Reports on inactive users within the given GitHub teams.
-
-        For each team specified in the 'teams' parameter, this method checks the activity status of each user.
-        If a user is found to be inactive for a period equal to or greater than 'inactivity_months',
-        the user is added to the result list.
-
-        If 'remove_from_team' is set to True for a team in the 'teams' parameter, the inactive user will be removed from the team.
-
-        If slack_channel is provided, a message will be sent to the channel with the list of inactive users.
-
-        Parameters:
-            teams (dict[str, dict[str, Any]]): A dictionary containing team configuration.
-                Each entry consists of a team name and a dictionary with 'github_team' (team identifier),
-                'remove_from_team' (boolean flag to remove inactive users), and any additional team-specific configurations.
-            inactivity_months (int): Number of months of inactivity to consider a user as inactive.
-            slack_token (str): Slack token to use for sending messages.
-
-        Returns:
-            None
-        """
         users_to_remove = []
         users_removed = []
 
         for team_name, team_config in teams.items():
             logging.info(f"Processing team {team_name}")
+            config = self._load_team_config(team_config)
 
-            github_team = team_config['github_team']
-            remove_users = team_config['remove_from_team']
-            ignore_users = team_config.get('users_to_ignore', [])
-            ignore_repositories = team_config.get('repositories_to_ignore', [])
-            slack_channel = team_config.get('slack_channel', None)
-            if slack_channel is not None and slack_channel.startswith('#'):
-                slack_channel = slack_channel.lstrip('#')
+            users = self._get_users_from_team(config.github_team)
+            repositories = self._get_repositories_from_team(config.github_team, config.ignore_repositories)
 
-            users = self._get_users_from_team(github_team)
-            repositories = self._get_repositories_from_team(github_team)
-            if ignore_repositories:
-                repositories = [
-                    repo for repo in repositories if repo.name not in ignore_repositories]
+            users_removed, users_to_remove = self._process_users(users, repositories, config, inactivity_months)
 
-            for user in users:
-                if user.login in ignore_users:
-                    logging.info(f"User {user.login} in team {github_team} is ignored")
-                    continue
-                if self._is_user_inactive(user, inactivity_months, repositories):
-                    logging.info(f"User {user.login} in team {github_team} is inactive for {inactivity_months} months")
+            if config.slack_channel and users_to_remove or config.slack_channel and users_removed:
+                logging.info(f"Sending message to slack channel {config.slack_channel}")
+                SlackService(slack_token).send_message_to_channel(config.slack_channel, self._message_to_users(users_removed, users_to_remove, config.github_team))
 
-                    if remove_users:
-                        self._remove_user(user, github_team)
-                        logging.info(f"User {user.login} removed from team {github_team}")
-                        users_removed.append(user)
-                    else:
-                        users_to_remove.append(user)
+    def _process_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], config: SelfManagedGitHubTeam, inactivity_months) -> tuple[list[NamedUser.NamedUser], list[NamedUser.NamedUser]]:
+        users_to_remove = []
+        users_removed = []
+        for user in users:
+            if user.login in config.ignore_users:
+                logging.info(f"User {user.login} in team {config.github_team} is ignored")
+                continue
 
-            if slack_channel and users_to_remove or slack_channel and users_removed:
-                logging.info(f"Sending message to slack channel {slack_channel}")
-                SlackService(slack_token).send_message_to_channel(slack_channel, self._message_to_users(users_removed, users_to_remove, github_team))
+            if self._is_user_inactive(user, inactivity_months, repositories):
+                logging.info(f"User {user.login} in team {config.github_team} is inactive for {inactivity_months} months")
+
+                if config.remove_users:
+                    self._remove_user(user, config.github_team)
+                    logging.info(f"User {user.login} removed from team {config.github_team}")
+                    users_removed.append(user)
+                else:
+                    users_to_remove.append(user)
+
+        return users_removed, users_to_remove
+
+    def _load_team_config(self, team_config: dict[str, Any]) -> SelfManagedGitHubTeam:
+        # Ignore the # channel prefix if it exists.
+        slack_channel_name = team_config.get('slack_channel', None)
+        if slack_channel_name is not None and slack_channel_name.startswith('#'):
+            slack_channel_name = slack_channel_name.lstrip('#')
+
+        return SelfManagedGitHubTeam(
+            github_team=team_config['github_team'],
+            remove_users=team_config['remove_from_team'],
+            ignore_users=team_config.get('users_to_ignore', list[str]),
+            ignore_repositories=team_config.get('repositories_to_ignore', list[str]),
+            slack_channel=slack_channel_name
+        )
 
     def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str) -> str:
         message = ""
@@ -779,11 +797,11 @@ class GithubService:
         # If the team is not found, return an empty list or handle as needed
         return []
 
-    def _get_repositories_from_team(self, team_name: str) -> list[Repository]:
+    def _get_repositories_from_team(self, team_name: str, ignore_repositories: list[str]) -> list[Repository]:
         org = self.github_client_core_api.get_organization(self.organisation_name)
 
         for team in org.get_teams():
-            if team.name == team_name:
+            if team.name == team_name and team.name not in ignore_repositories:
                 logging.info(f"Getting repos from team {team.name}")
                 return list(team.get_repos())
 

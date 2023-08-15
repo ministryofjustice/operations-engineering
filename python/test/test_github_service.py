@@ -17,7 +17,8 @@ from github.Team import Team
 from gql.transport.exceptions import TransportQueryError
 
 from python.services.github_service import (
-    GithubService, retries_github_rate_limit_exception_at_next_reset_once)
+    GithubService, SelfManagedGitHubTeam,
+    retries_github_rate_limit_exception_at_next_reset_once)
 
 ORGANISATION_NAME = "moj-analytical-services"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
@@ -1314,6 +1315,55 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(1, github_service._remove_user.call_count)
 
+    def test_process_users(self, mock_github_client_core_api):
+        user1 = Mock()
+        user1.login = "user1"
+        user2 = Mock()
+        user2.login = "user2"
+        users = [user1, user2]
+
+        inactivity_months = 3
+
+        repo1 = Mock()
+        repo1.name = "repo1"
+        repo2 = Mock()
+        repo2.name = "repo2"
+        repos = [repo1, repo2]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service._is_user_inactive = Mock(return_value=True)
+        github_service._remove_user = Mock()
+
+        config = SelfManagedGitHubTeam(
+            github_team="team1",
+            remove_users=True,
+            ignore_users=["user2"],
+            ignore_repositories=["repo2"],
+            slack_channel=None
+        )
+
+        users_removed, users_to_remove = github_service._process_users(users, repos, config, inactivity_months)
+
+        self.assertEqual(1, len(users_removed))
+        self.assertEqual(0, len(users_to_remove))
+
+    def test_load_team_config(self, mock_github_client_core_api):
+        config = {
+            'github_team': 'github_team',
+            'remove_from_team': True,
+            'ignore_users': ['user1'],
+            'ignore_repositories': ['repo1'],
+            'slack_channel': '#slack_channel'
+        }
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        team = github_service._load_team_config(config)
+
+        self.assertEqual('github_team', team.github_team)
+        self.assertEqual(True, team.remove_users)
+        self.assertEqual('slack_channel', team.slack_channel)
+
     def test_remove_user_successful(self, mock_github_class):
         org_mock = Mock()
         team_mock = Mock()
@@ -1372,7 +1422,6 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.assertIn(expected_log_message, cm.output)
 
     def test_get_users_from_team_found(self, mock_github):
-        # Mocking organization, team, and user
         user = Mock()
         team = Mock()
         team.get_members.return_value = [user]
@@ -1401,7 +1450,6 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_get_repositories_from_team_found(self, mock_github):
-        # Mocking organization, team, and repo
         repo = Mock()
         team = Mock()
         team.get_repos.return_value = [repo]
@@ -1412,7 +1460,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         github_service = GithubService(org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
-        result = github_service._get_repositories_from_team(team.name)
+        result = github_service._get_repositories_from_team(team.name, [])
 
         self.assertEqual(result, [repo])
 
@@ -1425,7 +1473,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         github_service = GithubService(org_token="test_token", organisation_name="test_org")
 
-        result = github_service._get_repositories_from_team("test_team")
+        result = github_service._get_repositories_from_team("test_team", [])
 
         self.assertEqual(result, [])
 
