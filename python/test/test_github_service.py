@@ -1488,6 +1488,26 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertTrue(result)
 
+    def test_message_creation(self, mock_github):
+        user1 = Mock()
+        user1.login = "test_user1"
+        user2 = Mock()
+        user2.login = "test_user2"
+
+        users_removed = [user1]
+        users_not_removed = [user2]
+        team_name = "test_team"
+        inactivity_months = 3
+
+        service = GithubService('token', 'org_name')
+        service.github_client_core_api = mock_github
+
+        result = service._message_to_users(users_removed, users_not_removed, team_name, inactivity_months)
+
+        self.assertIsNot(result, "")
+
+
+
     def test_is_user_inactive_false(self, mock_github):
         user = Mock()
         repo = Mock()

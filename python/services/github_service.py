@@ -732,7 +732,7 @@ class GithubService:
 
             if config.slack_channel and users_to_remove or config.slack_channel and users_removed:
                 logging.info(f"Sending message to slack channel {config.slack_channel}")
-                SlackService(slack_token).send_message_to_channel(config.slack_channel, self._message_to_users(users_removed, users_to_remove, config.github_team))
+                SlackService(slack_token).send_message_to_channel(config.slack_channel, self._message_to_users(users_removed, users_to_remove, config.github_team, inactivity_months))
 
     def _process_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], config: SelfManagedGitHubTeam, inactivity_months) -> tuple[list[NamedUser.NamedUser], list[NamedUser.NamedUser]]:
         users_to_remove = []
@@ -768,19 +768,30 @@ class GithubService:
             slack_channel=slack_channel_name
         )
 
-    def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str) -> str:
-        message = ""
-        if users_removed:
-            message = f"Users removed from team {team_name}:"
-            for user in users_removed:
-                message += f"\n- {user.login}"
-        if users_to_remove:
-            message += f"\n\nUsers identified for removal from team {team_name} but not removed:"
-            for user in users_to_remove:
-                message += f"\n- {user.login}"
+    def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str, inactivity_months: int) -> str:
+        removed_names = "\n".join([f"- {user.login}" for user in users_removed]) if users_removed else "None"
+        to_remove_names = "\n".join([f"- {user.login}" for user in users_to_remove]) if users_to_remove else "None"
 
-        if message != "":
-            message += "\n\n:page_facing_up: Please contact Operations Engineering if you believe this is an error."
+        message = ""
+        if removed_names or to_remove_names:
+            message = (
+                f"Hi team :wave:,\n\n"
+                f"As part of our ongoing efforts to maintain the integrity of our GitHub teams, we have analysed user activity for the last {inactivity_months} months. Here's the summary:\n\n"
+            )
+            if users_removed:
+                message += (
+                    f":outbox_tray: Users Removed:\n{removed_names}\n"
+                    f"*(These users have been automatically removed from the '{team_name}' team due to inactivity.)*\n\n"
+                )
+            if users_to_remove:
+                message += (
+                    f":eyes: Users Seen but Not Removed:\n{to_remove_names}\n"
+                    f"*(These users were identified as inactive in the '{team_name}' team but were not automatically removed. Please review and take appropriate actions.)*\n\n"
+                )
+            message += (
+                "If you have any questions or concerns, please feel free to reach out.\n\n"
+                "Best,\nThe Operations Engineering Bot"
+            )
 
         return message
 
