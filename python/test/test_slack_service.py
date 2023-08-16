@@ -20,7 +20,7 @@ class TestSlackServiceInit(unittest.TestCase):
                          slack_service.slack_client)
 
 
-@patch("slack_sdk.WebClient")
+@patch("slack_sdk.WebClient.__new__")
 class TestSendMessageToPlainTextChannelName(unittest.TestCase):
 
     def test_send_message_to_plaintext_channel_name(self, mock_web_client):

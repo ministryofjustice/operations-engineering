@@ -1506,8 +1506,6 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertIsNot(result, "")
 
-
-
     def test_is_user_inactive_false(self, mock_github):
         user = Mock()
         repo = Mock()
