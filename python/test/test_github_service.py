@@ -1305,10 +1305,12 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         github_service._is_user_inactive = Mock(return_value=True)
         github_service._remove_user = Mock()
 
-        github_service.report_on_inactive_users(teams, inactivity_months, slack_token)
+        github_service.report_on_inactive_users(
+            teams, inactivity_months, slack_token)
 
         self.assertEqual(1, github_service._get_users_from_team.call_count)
-        self.assertEqual(1, github_service._get_repositories_from_team.call_count)
+        self.assertEqual(
+            1, github_service._get_repositories_from_team.call_count)
         self.assertEqual(1, github_service._is_user_inactive.call_count)
 
         self.assertEqual(1, github_service._remove_user.call_count)
@@ -1341,7 +1343,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
             slack_channel=None
         )
 
-        users_removed, users_to_remove = github_service._process_users(users, repos, config, inactivity_months)
+        users_removed, users_to_remove = github_service._process_users(
+            users, repos, config, inactivity_months)
 
         self.assertEqual(1, len(users_removed))
         self.assertEqual(0, len(users_to_remove))
@@ -1427,7 +1430,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         org.get_teams.return_value = [team]
         mock_github.get_organization.return_value = org
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
         result = github_service._get_users_from_team(team.name)
@@ -1441,7 +1445,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         org.get_teams.return_value = [team]
         mock_github.get_organization.return_value = org
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
 
         result = github_service._get_users_from_team("test_team")
 
@@ -1455,7 +1460,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         org.get_teams.return_value = [team]
         mock_github.get_organization.return_value = org
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
         result = github_service._get_repositories_from_team(team.name, [])
@@ -1469,7 +1475,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         org.get_teams.return_value = [team]
         mock_github.get_organization.return_value = org
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
 
         result = github_service._get_repositories_from_team("test_team", [])
 
@@ -1481,7 +1488,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         repo = Mock()
         repo.get_commits.return_value = []
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
         result = github_service._is_user_inactive(user, 3, [repo])
@@ -1502,7 +1510,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         service = GithubService('token', 'org_name')
         service.github_client_core_api = mock_github
 
-        result = service._message_to_users(users_removed, users_not_removed, team_name, inactivity_months)
+        result = service._message_to_users(
+            users_removed, users_not_removed, team_name, inactivity_months)
 
         self.assertIsNot(result, "")
 
@@ -1513,7 +1522,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         commit.commit.author.date = datetime.now()
         repo.get_commits.return_value = [commit]
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
         result = github_service._is_user_inactive(user, 3, [repo])
@@ -1523,9 +1533,11 @@ class TestReportOnInactiveUsers(unittest.TestCase):
     def test_is_user_inactive_get_commits_exception(self, mock_github):
         user = Mock()
         repo = Mock()
-        repo.get_commits.side_effect = GithubException(status=404, data=None, headers=None)
+        repo.get_commits.side_effect = GithubException(
+            status=404, data=None, headers=None)
 
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
         result = github_service._is_user_inactive(user, 3, [repo])
@@ -1536,12 +1548,15 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         repo = Mock()
         user = Mock()
         commit = Mock()
-        github_service = GithubService(org_token="test_token", organisation_name="test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
         github_service.github_client_core_api = mock_github
 
         author_mock = Mock()
-        author_mock.date = property(lambda self: 1 / 0)  # raise a ZeroDivisionError
-        commit.commit.author = author_mock.repo.get_commits.return_value = [commit]
+        # raise a ZeroDivisionError
+        author_mock.date = property(lambda self: 1 / 0)
+        commit.commit.author = author_mock.repo.get_commits.return_value = [
+            commit]
 
         self.assertTrue(github_service._is_user_inactive(user, 6, [repo]))
 

@@ -726,28 +726,35 @@ class GithubService:
             config = self._load_team_config(team_config)
 
             users = self._get_users_from_team(config.github_team)
-            repositories = self._get_repositories_from_team(config.github_team, config.ignore_repositories)
+            repositories = self._get_repositories_from_team(
+                config.github_team, config.ignore_repositories)
 
-            users_removed, users_to_remove = self._process_users(users, repositories, config, inactivity_months)
+            users_removed, users_to_remove = self._process_users(
+                users, repositories, config, inactivity_months)
 
             if config.slack_channel and users_to_remove or config.slack_channel and users_removed:
-                logging.info(f"Sending message to slack channel {config.slack_channel}")
-                SlackService(slack_token).send_message_to_plaintext_channel_name(self._message_to_users(users_removed, users_to_remove, config.github_team, inactivity_months), config.slack_channel)
+                logging.info(
+                    f"Sending message to slack channel {config.slack_channel}")
+                SlackService(slack_token).send_message_to_plaintext_channel_name(self._message_to_users(
+                    users_removed, users_to_remove, config.github_team, inactivity_months), config.slack_channel)
 
     def _process_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], config: SelfManagedGitHubTeam, inactivity_months) -> tuple[list[NamedUser.NamedUser], list[NamedUser.NamedUser]]:
         users_to_remove = []
         users_removed = []
         for user in users:
             if user.login in config.ignore_users:
-                logging.info(f"User {user.login} in team {config.github_team} is ignored")
+                logging.info(
+                    f"User {user.login} in team {config.github_team} is ignored")
                 continue
 
             if self._is_user_inactive(user, inactivity_months, repositories):
-                logging.info(f"User {user.login} in team {config.github_team} is inactive for {inactivity_months} months")
+                logging.info(
+                    f"User {user.login} in team {config.github_team} is inactive for {inactivity_months} months")
 
                 if config.remove_users:
                     self._remove_user(user, config.github_team)
-                    logging.info(f"User {user.login} removed from team {config.github_team}")
+                    logging.info(
+                        f"User {user.login} removed from team {config.github_team}")
                     users_removed.append(user)
                 else:
                     users_to_remove.append(user)
@@ -764,13 +771,16 @@ class GithubService:
             github_team=team_config['github_team'],
             remove_users=team_config['remove_from_team'],
             ignore_users=team_config.get('users_to_ignore', list[str]),
-            ignore_repositories=team_config.get('repositories_to_ignore', list[str]),
+            ignore_repositories=team_config.get(
+                'repositories_to_ignore', list[str]),
             slack_channel=slack_channel_name
         )
 
     def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str, inactivity_months: int) -> str:
-        removed_names = "\n".join([f"- {user.login}" for user in users_removed]) if users_removed else "None"
-        to_remove_names = "\n".join([f"- {user.login}" for user in users_to_remove]) if users_to_remove else "None"
+        removed_names = "\n".join(
+            [f"- {user.login}" for user in users_removed]) if users_removed else "None"
+        to_remove_names = "\n".join(
+            [f"- {user.login}" for user in users_to_remove]) if users_to_remove else "None"
 
         message = ""
         if removed_names or to_remove_names:
@@ -798,25 +808,30 @@ class GithubService:
     def _remove_user(self, user: NamedUser.NamedUser, team_name: str) -> None:
         logging.info(f"Removing user {user.login} from team {team_name}")
         try:
-            org = self.github_client_core_api.get_organization(self.organisation_name)
+            org = self.github_client_core_api.get_organization(
+                self.organisation_name)
             team = org.get_team_by_slug(team_name)
 
             if team is None:
-                logging.warning(f"Team {team_name} not found in organization {self.organisation_name}")
+                logging.warning(
+                    f"Team {team_name} not found in organization {self.organisation_name}")
                 return
 
             if not team.has_in_members(user):
-                logging.warning(f"User {user.login} is not a member of team {team_name}")
+                logging.warning(
+                    f"User {user.login} is not a member of team {team_name}")
                 return
 
             team.remove_membership(user)
             logging.info(f"User {user.login} removed from team {team_name}")
 
         except Exception as e:
-            logging.error(f"An error occurred while removing user {user.login} from team {team_name}: {str(e)}")
+            logging.error(
+                f"An error occurred while removing user {user.login} from team {team_name}: {str(e)}")
 
     def _get_users_from_team(self, team_name: str) -> list[NamedUser.NamedUser]:
-        org = self.github_client_core_api.get_organization(self.organisation_name)
+        org = self.github_client_core_api.get_organization(
+            self.organisation_name)
 
         for team in org.get_teams():
             if team.name == team_name:
@@ -827,26 +842,30 @@ class GithubService:
         return []
 
     def _get_repositories_from_team(self, team_name: str, ignore_repositories: list[str]) -> list[Repository]:
-        org = self.github_client_core_api.get_organization(self.organisation_name)
+        org = self.github_client_core_api.get_organization(
+            self.organisation_name)
 
         for team in org.get_teams():
             if team.name == team_name and team.name not in ignore_repositories:
                 logging.info(f"Getting repos from team {team.name}")
                 return list(team.get_repos())
 
-        logging.warning(f"Team {team_name} not found in organization {self.organisation_name}")
+        logging.warning(
+            f"Team {team_name} not found in organization {self.organisation_name}")
         # If the team is not found, return an empty list or handle as needed
         return []
 
     def _is_user_inactive(self, user: NamedUser.NamedUser, inactivity_months: int, repositories: list[Repository]) -> bool:
-        cutoff_date = datetime.now() - timedelta(days=inactivity_months * 30) # Roughly calculate the cutoff date
+        cutoff_date = datetime.now() - timedelta(days=inactivity_months *
+                                                 30)  # Roughly calculate the cutoff date
 
         for repo in repositories:
             # Get the user's commits in the repo
             try:
                 commits = repo.get_commits(author=user)
             except Exception:
-                logging.error(f"An exception occurred while getting commits for user {user.login} in repo {repo.name}")
+                logging.error(
+                    f"An exception occurred while getting commits for user {user.login} in repo {repo.name}")
                 continue
 
             # Check if any commit is later than the cutoff date
@@ -855,7 +874,8 @@ class GithubService:
                     if commit.commit.author.date > cutoff_date:
                         return False  # User has been active in this repo, so not considered inactive
             except Exception:
-                logging.error(f"An exception occurred while getting commit date for user {user.login} in repo {repo.name}")
+                logging.error(
+                    f"An exception occurred while getting commit date for user {user.login} in repo {repo.name}")
                 continue
 
         return True  # User is inactive in all given repositories

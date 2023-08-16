@@ -32,22 +32,26 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
         response = {'ok': True}
         slack_client = MagicMock()
         mock_web_client.return_value = slack_client
-        slack_client.conversations_list.return_value = {'channels': [channel], 'response_metadata': response_metadata}
+        slack_client.conversations_list.return_value = {
+            'channels': [channel], 'response_metadata': response_metadata}
         slack_client.chat_postMessage.return_value = response
 
         service = SlackService("")
         service.slack_client = slack_client
         service.send_message_to_plaintext_channel_name(message, channel_name)
 
-        slack_client.conversations_list.assert_called_once_with(limit=200, cursor='')
-        slack_client.chat_postMessage.assert_called_once_with(channel=channel_id, text=message)
+        slack_client.conversations_list.assert_called_once_with(
+            limit=200, cursor='')
+        slack_client.chat_postMessage.assert_called_once_with(
+            channel=channel_id, text=message)
 
     def test_lookup_channel_id(self, mock_web_client):
         channel_name = 'test_channel'
         channel_id = 'test_channel_id'
         response_metadata = {'next_cursor': ''}
         channel = {'name': channel_name, 'id': channel_id}
-        response = {'channels': [channel], 'response_metadata': response_metadata}
+        response = {'channels': [channel],
+                    'response_metadata': response_metadata}
         slack_client = MagicMock()
         mock_web_client.return_value = slack_client
         slack_client.conversations_list.return_value = response
@@ -56,7 +60,8 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
         service.slack_client = slack_client
         result = service._lookup_channel_id(channel_name)
 
-        slack_client.conversations_list.assert_called_once_with(limit=200, cursor='')
+        slack_client.conversations_list.assert_called_once_with(
+            limit=200, cursor='')
         self.assertEqual(result, channel_id)
 
     def test_lookup_channel_id_not_found(self, mock_web_client):
@@ -71,7 +76,8 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
         service.slack_client = slack_client
         result = service._lookup_channel_id(channel_name)
 
-        slack_client.conversations_list.assert_called_once_with(limit=200, cursor='')
+        slack_client.conversations_list.assert_called_once_with(
+            limit=200, cursor='')
         self.assertIsNone(result)
 
 
