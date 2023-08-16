@@ -9,8 +9,6 @@ START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
-# pylint: disable=W0212, W0221
-
 
 @patch("slack_sdk.WebClient.__new__")
 class TestSlackServiceInit(unittest.TestCase):
@@ -20,6 +18,61 @@ class TestSlackServiceInit(unittest.TestCase):
         slack_service = SlackService("")
         self.assertEqual("test_mock",
                          slack_service.slack_client)
+
+
+@patch("slack_sdk.WebClient")
+class TestSendMessageToPlainTextChannelName(unittest.TestCase):
+
+    def test_send_message_to_plaintext_channel_name(self, mock_web_client):
+        channel_name = 'test_channel'
+        message = 'test message'
+        channel_id = 'test_channel_id'
+        response_metadata = {'next_cursor': ''}
+        channel = {'name': channel_name, 'id': channel_id}
+        response = {'ok': True}
+        slack_client = MagicMock()
+        mock_web_client.return_value = slack_client
+        slack_client.conversations_list.return_value = {'channels': [channel], 'response_metadata': response_metadata}
+        slack_client.chat_postMessage.return_value = response
+
+        service = SlackService("")
+        service.slack_client = slack_client
+        service.send_message_to_plaintext_channel_name(message, channel_name)
+
+        slack_client.conversations_list.assert_called_once_with(limit=200, cursor='')
+        slack_client.chat_postMessage.assert_called_once_with(channel=channel_id, text=message)
+
+    def test_lookup_channel_id(self, mock_web_client):
+        channel_name = 'test_channel'
+        channel_id = 'test_channel_id'
+        response_metadata = {'next_cursor': ''}
+        channel = {'name': channel_name, 'id': channel_id}
+        response = {'channels': [channel], 'response_metadata': response_metadata}
+        slack_client = MagicMock()
+        mock_web_client.return_value = slack_client
+        slack_client.conversations_list.return_value = response
+
+        service = SlackService("")
+        service.slack_client = slack_client
+        result = service._lookup_channel_id(channel_name)
+
+        slack_client.conversations_list.assert_called_once_with(limit=200, cursor='')
+        self.assertEqual(result, channel_id)
+
+    def test_lookup_channel_id_not_found(self, mock_web_client):
+        channel_name = 'test_channel'
+        response_metadata = {'next_cursor': ''}
+        response = {'channels': [], 'response_metadata': response_metadata}
+        slack_client = MagicMock()
+        mock_web_client.return_value = slack_client
+        slack_client.conversations_list.return_value = response
+
+        service = SlackService("")
+        service.slack_client = slack_client
+        result = service._lookup_channel_id(channel_name)
+
+        slack_client.conversations_list.assert_called_once_with(limit=200, cursor='')
+        self.assertIsNone(result)
 
 
 @patch("slack_sdk.WebClient.__new__")

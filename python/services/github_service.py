@@ -732,7 +732,7 @@ class GithubService:
 
             if config.slack_channel and users_to_remove or config.slack_channel and users_removed:
                 logging.info(f"Sending message to slack channel {config.slack_channel}")
-                SlackService(slack_token).send_message_to_channel(config.slack_channel, self._message_to_users(users_removed, users_to_remove, config.github_team, inactivity_months))
+                SlackService(slack_token).send_message_to_plaintext_channel_name(self._message_to_users(users_removed, users_to_remove, config.github_team, inactivity_months), config.slack_channel)
 
     def _process_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], config: SelfManagedGitHubTeam, inactivity_months) -> tuple[list[NamedUser.NamedUser], list[NamedUser.NamedUser]]:
         users_to_remove = []
