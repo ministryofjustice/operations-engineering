@@ -31,14 +31,17 @@ class SlackService:
             logging.error(f"Could not find channel {channel_name}")
             return
 
-        response = self.slack_client.chat_postMessage(channel=channel_id, text=message)
+        response = self.slack_client.chat_postMessage(
+            channel=channel_id, text=message)
         if not response['ok']:
-            logging.error(f"Error sending message to channel {channel_name}: {response['error']}")
+            logging.error(
+                f"Error sending message to channel {channel_name}: {response['error']}")
         else:
             logging.info(f"Message sent to channel {channel_name}")
 
     def _lookup_channel_id(self, channel_name, cursor=''):
-        response = self.slack_client.conversations_list(limit=200, cursor=cursor)
+        response = self.slack_client.conversations_list(
+            limit=200, cursor=cursor)
         for channel in response['channels']:
             if channel['name'] == channel_name:
                 return channel['id']
