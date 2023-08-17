@@ -46,7 +46,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         team_name = "team1"
         inactivity_months = 1
 
-        message = report_test._message_to_users(users, remove, team_name, inactivity_months)
+        message = report_test._message_to_users(
+            users, remove, team_name, inactivity_months)
 
         self.assertIn("user1", message)
         self.assertIn("1 months", message)
@@ -58,7 +59,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         team_name = "team1"
         inactivity_months = 1
 
-        message = report_test._message_to_users(users, remove, team_name, inactivity_months)
+        message = report_test._message_to_users(
+            users, remove, team_name, inactivity_months)
 
         self.assertEqual(message, "")
 
@@ -68,6 +70,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.assertEqual('github_team', team.github_team)
         self.assertEqual(True, team.remove_users)
         self.assertEqual('slack_channel', team.slack_channel)
+
 
 if __name__ == '__main__':
     unittest.main()
