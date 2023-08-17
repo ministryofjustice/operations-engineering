@@ -107,7 +107,6 @@ def main():
     github = GithubService(github_token, ORGANISATION)
     slack = SlackService(slack_token)
 
-    print("BALLS", config['team'].items())
     for team, settings in config['team'].items():
         logging.info(f"Checking for inactive users in team {team}")
         team_data = _load_team_config(settings)
