@@ -58,9 +58,9 @@ def get_environment_variables() -> tuple:
 
 def _message_to_users(users: list[NamedUser], remove: bool, team_name: str, inactivity_months: int) -> str:
     removed_names = "\n".join(
-        [f"- {user.login}" for user in users]) if remove else "None"
+        [f"- {user.login}" for user in users]) if remove and users else None
     to_remove_names = "\n".join(
-        [f"- {user.login}" for user in users]) if not remove else "None"
+        [f"- {user.login}" for user in users]) if not remove and users else None
 
     message = ""
     if removed_names or to_remove_names:
@@ -107,6 +107,7 @@ def main():
     github = GithubService(github_token, ORGANISATION)
     slack = SlackService(slack_token)
 
+    print("BALLS", config['team'].items())
     for team, settings in config['team'].items():
         logging.info(f"Checking for inactive users in team {team}")
         team_data = _load_team_config(settings)
