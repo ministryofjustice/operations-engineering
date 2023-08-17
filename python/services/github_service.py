@@ -678,6 +678,23 @@ class GithubService:
             self.organisation_name).remove_from_membership(github_user)
 
     def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str], inactivity_months: int) -> list[NamedUser.NamedUser]:
+        """
+        Identifies and returns a list of inactive users from a specified GitHub team based on a given inactivity period.
+
+            :param team_name: The name of the GitHub team to check for inactive users.
+            :type team_name: str
+            :param users_to_ignore: A list of usernames to ignore during the inactivity check.
+            :type users_to_ignore: list[str]
+            :param repositories_to_ignore: A list of repository names to exclude from the inactivity check.
+            :type repositories_to_ignore: list[str]
+            :param inactivity_months: The threshold for user inactivity, specified in months. Users inactive for longer than this period are considered inactive.
+            :type inactivity_months: int
+            :return: A list of NamedUser objects representing the users who are identified as inactive.
+            :rtype: list[NamedUser.NamedUser]
+
+        Example Usage:
+            inactive_users = get_inactive_users("operations-engineering", ["user1"], ["repo1"], 18)
+        """
         team_id = self.get_team_id_from_team_name(team_name)
         logging.info(
             f"Identifying inactive users in team {team_name}, id = {team_id}")
@@ -731,6 +748,20 @@ class GithubService:
         return True  # User is inactive in all given repositories
 
     def remove_list_of_users_from_team(self, team_name: str, users: list[NamedUser.NamedUser]) -> None:
+        """
+        Removes a list of specified users from a given team within the organisation.
+
+            This method takes a team name and a list of GitHub user objects (NamedUser)
+            to be removed from the team. If any exception occurs during the removal process,
+            an error message is logged, but the method continues to attempt removal of
+            the other users in the list.
+
+            :param team_name: The name of the team from which the users will be removed.
+            :type team_name: str
+            :param users: A list of GitHub user objects (NamedUser) representing the users to be removed.
+            :type users: list[NamedUser.NamedUser]
+            :return: None
+        """
         logging.info(f"Removing users {users} from team {team_name}")
         team_id = self.get_team_id_from_team_name(team_name)
         team = self.github_client_core_api.get_organization(
