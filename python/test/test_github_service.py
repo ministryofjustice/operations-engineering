@@ -15,8 +15,7 @@ from github.Team import Team
 from gql.transport.exceptions import TransportQueryError
 
 from python.services.github_service import (
-    GithubService, SelfManagedGitHubTeam,
-    retries_github_rate_limit_exception_at_next_reset_once)
+    GithubService, retries_github_rate_limit_exception_at_next_reset_once)
 
 ORGANISATION_NAME = "moj-analytical-services"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
@@ -1277,289 +1276,143 @@ class MockGithubIssue(MagicMock):
 @patch("python.services.github_service.Github")
 class TestReportOnInactiveUsers(unittest.TestCase):
 
-    def test_report_on_inactive_users(self, mock_github_client_core_api):
-        team1 = Mock()
-        team1.name = "team1"
+    def setUp(self) -> None:
+        self.team = Mock()
+        self.team.name = "team1"
+        self.team.id = 1
 
-        teams = {
-            'team1': {
-                'github_team': 'github_team',
-                'remove_from_team': True,
-            }
-        }
+        self.user1 = Mock()
+        self.user1.login = "user1"
+        self.user1.comm
+        self.user2 = Mock()
+        self.user2.login = "user2"
 
-        user = Mock()
-        user.login = "user1"
-        user.name = "User One"
+        self.repository1 = Mock()
+        self.repository1.name = "repo1"
+        self.repository2 = Mock()
+        self.repository2.name = "repo2"
 
-        users = [user]
-        inactivity_months = 3
-        slack_token = "slack-token"
-        repo = Mock()
-        repo.name = "repo"
-        repos = [repo]
+        self.users = [self.user1, self.user2]
+        self.repositories = [self.repository1, self.repository2]
+        self.ignored_users = ["user2"]
+        self.ignored_repositories = ["repo2"]
+
+        self.inactivity_months = 18
+
+    def test_identify_inactive_users_in_a_team(self, mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service._get_users_from_team = Mock(return_value=users)
-        github_service._get_repositories_from_team = Mock(return_value=repos)
-        github_service._is_user_inactive = Mock(return_value=True)
-        github_service._remove_user = Mock()
+        github_service._get_repositories_managed_by_team = Mock(return_value=self.repositories)
+        github_service._get_unignored_users_from_team = Mock(return_value=self.users)
 
-        github_service.report_on_inactive_users(
-            teams, inactivity_months, slack_token)
+        inactive_users = github_service.get_inactive_users(
+            self.team.id, self.ignored_users, self.ignored_repositories, self.inactivity_months)
 
-        self.assertEqual(1, github_service._get_users_from_team.call_count)
-        self.assertEqual(
-            1, github_service._get_repositories_from_team.call_count)
-        self.assertEqual(1, github_service._is_user_inactive.call_count)
+        self.assertEqual(2, len(inactive_users))
+        self.assertEqual("user1", inactive_users[0].login)
 
-        self.assertEqual(1, github_service._remove_user.call_count)
+    def test_identify_no_inactive_users_in_a_team(self, mock_github_client_core_api):
+        self.commit = Mock()
+        self.commit.commit.author.date = datetime.now()
+        self.repository1.get_commits.return_value = [self.commit]
 
-    def test_process_users(self, mock_github_client_core_api):
-        user1 = Mock()
-        user1.login = "user1"
-        user2 = Mock()
-        user2.login = "user2"
-        users = [user1, user2]
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_repositories_managed_by_team = Mock(return_value=self.repositories)
+        github_service._get_unignored_users_from_team = Mock(return_value=self.users)
 
-        inactivity_months = 3
+        inactive_users = github_service.get_inactive_users(
+            self.team.id, self.ignored_users, self.ignored_repositories, self.inactivity_months)
 
-        repo1 = Mock()
-        repo1.name = "repo1"
-        repo2 = Mock()
-        repo2.name = "repo2"
-        repos = [repo1, repo2]
+        self.assertEqual(0, len(inactive_users))
+
+    def test_identify_inactive_users(self, mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
 
         github_service._is_user_inactive = Mock(return_value=True)
-        github_service._remove_user = Mock()
 
-        config = SelfManagedGitHubTeam(
-            github_team="team1",
-            remove_users=True,
-            ignore_users=["user2"],
-            ignore_repositories=["repo2"],
-            slack_channel=None
+        inactive_users = github_service._identify_inactive_users(
+            self.users, self.repositories, self.inactivity_months)
+
+        self.assertEqual(2, len(inactive_users))
+        self.assertEqual("user1", inactive_users[0].login)
+
+    def test_get_users_from_team_found(self, mock_github_client_core_api):
+
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
+            self.user1, self.user2
+        ]
+        mock_team = mock_github_client_core_api.return_value.get_organization().get_team()
+        mock_team.get_members.return_value = [
+            self.user1, self.user2
+        ]
+        mock_github_client_core_api.return_value.get_user.side_effect = [
+            self.user1, self.user2
+        ]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
+
+        result = github_service._get_unignored_users_from_team(self.team.id, self.ignored_users)
+
+        self.assertEqual(1, len(result))
+
+    def test_user_is_inactive(self, mock_github_client_core_api):
+
+        self.commit = Mock()
+        self.commit.commit.author.date = datetime.now() - timedelta(days=self.inactivity_months * 30)
+
+        self.repository1.get_commits.return_value = [self.commit]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        result = github_service._is_user_inactive(self.user1, self.repositories, self.inactivity_months)
+
+        self.assertEqual(True, result)
+
+    def test_user_is_active(self, mock_github_client_core_api):
+
+        self.commit = Mock()
+        self.commit.commit.author.date = datetime.now()
+
+        self.repository1.get_commits.return_value = [self.commit]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        result = github_service._is_user_inactive(self.user1, self.repositories, self.inactivity_months)
+
+        self.assertEqual(False, result)
+
+    def test_remove_list_of_users_from_team(self, mock_github_client_core_api):
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.remove_list_of_users_from_team(self.team.name, self.users)
+        team_id = github_service.get_team_id_from_team_name(self.team.name)
+
+        mock_github_client_core_api.return_value.get_organization.assert_has_calls(
+            [
+                call(ORGANISATION_NAME),
+                call().get_team(team_id),
+                call().get_team().remove_membership(self.user1),
+                call().get_team().remove_membership(self.user2),
+            ]
         )
 
-        users_removed, users_to_remove = github_service._process_users(
-            users, repos, config, inactivity_months)
-
-        self.assertEqual(1, len(users_removed))
-        self.assertEqual(0, len(users_to_remove))
-
-    def test_load_team_config(self, mock_github_client_core_api):
-        config = {
-            'github_team': 'github_team',
-            'remove_from_team': True,
-            'ignore_users': ['user1'],
-            'ignore_repositories': ['repo1'],
-            'slack_channel': '#slack_channel'
-        }
+    def test_remove_list_of_users_from_team_no_users(self, mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
-        team = github_service._load_team_config(config)
+        team_id = github_service.get_team_id_from_team_name(self.team.name)
 
-        self.assertEqual('github_team', team.github_team)
-        self.assertEqual(True, team.remove_users)
-        self.assertEqual('slack_channel', team.slack_channel)
+        github_service.remove_list_of_users_from_team(self.team.name, [])
 
-    def test_remove_user_successful(self, mock_github_class):
-        org_mock = Mock()
-        team_mock = Mock()
-
-        user_mock = Mock()
-        user_mock.login = 'testuser'
-
-        mock_github_class.get_organization.return_value = org_mock
-        org_mock.get_team_by_slug.return_value = team_mock
-        team_mock.has_in_members.return_value = True
-
-        service = GithubService('token', 'org_name')
-        service.github_client_core_api = mock_github_class
-
-        service._remove_user(user_mock, 'team_name')
-
-        team_mock.remove_membership.assert_called_once_with(user_mock)
-
-    def test_remove_user_team_not_found(self, mock_github_class):
-        github_mock = Mock()
-        org_mock = Mock()
-
-        user_mock = Mock()
-        user_mock.login = 'testuser'
-
-        github_mock.get_organization.return_value = org_mock
-        org_mock.get_team_by_slug.return_value = None
-
-        service = GithubService('token', 'org_name')
-        service.github_client_core_api = github_mock
-        with self.assertLogs(level='WARNING') as cm:
-            service._remove_user(user_mock, 'team_name')
-
-        expected_log_message = "WARNING:root:Team team_name not found in organization org_name"
-        self.assertIn(expected_log_message, cm.output)
-
-    def test_remove_team_not_found(self, mock_github_class):
-        org_mock = Mock()
-        team_mock = Mock()
-
-        user_mock = Mock()
-        user_mock.login = 'testuser'
-
-        mock_github_class.get_organization.return_value = org_mock
-        org_mock.get_team_by_slug.return_value = team_mock
-        team_mock.has_in_members.return_value = False
-
-        service = GithubService('token', 'org_name')
-        service.github_client_core_api = mock_github_class
-
-        service._remove_user(user_mock, 'team_name')
-        with self.assertLogs(level='WARNING') as cm:
-            service._remove_user(user_mock, 'team_name')
-
-        expected_log_message = "WARNING:root:User testuser is not a member of team team_name"
-        self.assertIn(expected_log_message, cm.output)
-
-    def test_get_users_from_team_found(self, mock_github):
-        user = Mock()
-        team = Mock()
-        team.get_members.return_value = [user]
-        org = Mock()
-        org.get_teams.return_value = [team]
-        mock_github.get_organization.return_value = org
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-        github_service.github_client_core_api = mock_github
-
-        result = github_service._get_users_from_team(team.name)
-
-        self.assertEqual(result, [user])
-
-    def test_get_users_from_team_not_found(self, mock_github):
-        team = MagicMock()
-        team.name = "different_team"
-        org = MagicMock()
-        org.get_teams.return_value = [team]
-        mock_github.get_organization.return_value = org
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-
-        result = github_service._get_users_from_team("test_team")
-
-        self.assertEqual(result, [])
-
-    def test_get_repositories_from_team_found(self, mock_github):
-        repo = Mock()
-        team = Mock()
-        team.get_repos.return_value = [repo]
-        org = Mock()
-        org.get_teams.return_value = [team]
-        mock_github.get_organization.return_value = org
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-        github_service.github_client_core_api = mock_github
-
-        result = github_service._get_repositories_from_team(team.name, [])
-
-        self.assertEqual(result, [repo])
-
-    def test_get_repositories_from_team_not_found(self, mock_github):
-        team = MagicMock()
-        team.name = "different_team"
-        org = MagicMock()
-        org.get_teams.return_value = [team]
-        mock_github.get_organization.return_value = org
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-
-        result = github_service._get_repositories_from_team("test_team", [])
-
-        self.assertEqual(result, [])
-
-    def test_is_user_inactive_true(self, mock_github):
-        # Mocking user and repo
-        user = Mock()
-        repo = Mock()
-        repo.get_commits.return_value = []
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-        github_service.github_client_core_api = mock_github
-
-        result = github_service._is_user_inactive(user, 3, [repo])
-
-        self.assertTrue(result)
-
-    def test_message_creation(self, mock_github):
-        user1 = Mock()
-        user1.login = "test_user1"
-        user2 = Mock()
-        user2.login = "test_user2"
-
-        users_removed = [user1]
-        users_not_removed = [user2]
-        team_name = "test_team"
-        inactivity_months = 3
-
-        service = GithubService('token', 'org_name')
-        service.github_client_core_api = mock_github
-
-        result = service._message_to_users(
-            users_removed, users_not_removed, team_name, inactivity_months)
-
-        self.assertIsNot(result, "")
-
-    def test_is_user_inactive_false(self, mock_github):
-        user = Mock()
-        repo = Mock()
-        commit = Mock()
-        commit.commit.author.date = datetime.now()
-        repo.get_commits.return_value = [commit]
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-        github_service.github_client_core_api = mock_github
-
-        result = github_service._is_user_inactive(user, 3, [repo])
-
-        self.assertFalse(result)
-
-    def test_is_user_inactive_get_commits_exception(self, mock_github):
-        user = Mock()
-        repo = Mock()
-        repo.get_commits.side_effect = GithubException(
-            status=404, data=None, headers=None)
-
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-        github_service.github_client_core_api = mock_github
-
-        result = github_service._is_user_inactive(user, 3, [repo])
-
-        self.assertTrue(result)
-
-    def test_exception_while_getting_commit_date(self, mock_github):
-        repo = Mock()
-        user = Mock()
-        commit = Mock()
-        github_service = GithubService(
-            org_token="test_token", organisation_name="test_org")
-        github_service.github_client_core_api = mock_github
-
-        author_mock = Mock()
-        # raise a ZeroDivisionError
-        author_mock.date = property(lambda self: 1 / 0)
-        commit.commit.author = author_mock.repo.get_commits.return_value = [
-            commit]
-
-        self.assertTrue(github_service._is_user_inactive(user, 6, [repo]))
-
+        mock_github_client_core_api.return_value.get_organization.assert_has_calls(
+            [
+                call(ORGANISATION_NAME),
+                call().get_team(team_id),
+            ]
+        )
 
 if __name__ == "__main__":
     unittest.main()

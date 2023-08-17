@@ -1,10 +1,9 @@
 import json
 from calendar import timegm
-from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from textwrap import dedent
 from time import gmtime, sleep
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import Github, NamedUser, RateLimitExceededException
@@ -17,35 +16,8 @@ from gql.transport.exceptions import TransportQueryError
 from requests import Session
 
 from python.config.logging_config import logging
-from python.services.slack_service import SlackService
 
 logging.getLogger("gql").setLevel(logging.WARNING)
-
-
-@dataclass
-class SelfManagedGitHubTeam:
-    """
-    Represents the configuration for managing a GitHub team within the this service.
-    Example features:
-        - Remove users from the team if they are not active in any of the team's repositories.
-        - Notify a Slack channel when users are removed from the team.
-
-    Attributes:
-        github_team (str): The name of the GitHub team.
-        remove_users (bool): Flag indicating whether users should be removed from the team.
-        ignore_users (list[str]): A list of usernames to ignore when processing the team.
-        ignore_repositories (list[str]): A list of repositories to ignore when checking user activity.
-        slack_channel (Optional[str]): The Slack channel to notify; None if no notification is needed.
-
-    This class encapsulates the various settings related to a specific GitHub team, such as
-    the rules for removing users and the repositories to be ignored. It can be instantiated
-    from a TOML configuration file, allowing for easy management of these settings.
-    """
-    github_team: str
-    remove_users: bool
-    ignore_users: list = field(default_factory=list)
-    ignore_repositories: list = field(default_factory=list)
-    slack_channel: Optional[str] = None
 
 
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
@@ -293,6 +265,12 @@ class GithubService:
         logging.info(f"Adding user {user.name} to team {team_id}")
         self.github_client_core_api.get_organization(
             self.organisation_name).get_team(team_id).add_membership(user)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def __get_repositories_from_team(self, team_id: int) -> list[Repository]:
+        logging.info(f"Getting all repositories for team {team_id}")
+        return self.github_client_core_api.get_organization(self.organisation_name).get_team(
+            team_id).get_repos() or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_users_from_team(self, team_id: int) -> list:
@@ -699,165 +677,34 @@ class GithubService:
         self.github_client_core_api.get_organization(
             self.organisation_name).remove_from_membership(github_user)
 
-    def report_on_inactive_users(self, teams: dict[str, dict[str, Any]], inactivity_months: int, slack_token: str) -> None:
-        """
-        Processes a list of GitHub teams to identify inactive users based on their commit activity within the given time frame.
+    def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str], inactivity_months: int) -> list[NamedUser.NamedUser]:
+        team_id = self.get_team_id_from_team_name(team_name)
+        logging.info(f"Identifying inactive users in team {team_name}, id = {team_id}")
+        users = self._get_unignored_users_from_team(team_id, users_to_ignore)
+        repositories = self._get_repositories_managed_by_team(team_id, repositories_to_ignore)
+        return self._identify_inactive_users(users, repositories, inactivity_months)
 
-        For each team, the method:
-        - Loads the specific configuration related to that team (e.g., whether to remove users from the team, specific users or repositories to ignore, Slack channel for notifications, etc.).
-        - Retrieves the users and repositories associated with the team, considering any specified ignore settings.
-        - Determines which users are inactive according to the inactivity threshold in months.
-        - If configured to do so, removes inactive users from the team and/or accumulates them for later notification.
-        - If a Slack channel is configured for the team, sends a notification about the removed and/or to-be-removed users.
-
-        Parameters:
-        - teams (dict[str, dict[str, Any]]): A dictionary mapping team names to configuration dictionaries for processing each team.
-        - inactivity_months (int): The number of months of inactivity to use as the threshold for determining whether a user is considered inactive.
-        - slack_token (str): The authentication token for sending messages to Slack if configured for a team.
-
-        Returns:
-        None: This method performs its actions as side effects, updating team memberships and sending Slack notifications as configured.
-        """
+    def _identify_inactive_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], inactivity_months: int) -> list[NamedUser.NamedUser]:
         users_to_remove = []
-        users_removed = []
-
-        for team_name, team_config in teams.items():
-            logging.info(f"Processing team {team_name}")
-            config = self._load_team_config(team_config)
-
-            users = self._get_users_from_team(config.github_team)
-            repositories = self._get_repositories_from_team(
-                config.github_team, config.ignore_repositories)
-
-            users_removed, users_to_remove = self._process_users(
-                users, repositories, config, inactivity_months)
-
-            if config.slack_channel and users_to_remove or config.slack_channel and users_removed:
-                logging.info(
-                    f"Sending message to slack channel {config.slack_channel}")
-                SlackService(slack_token).send_message_to_plaintext_channel_name(self._message_to_users(
-                    users_removed, users_to_remove, config.github_team, inactivity_months), config.slack_channel)
-
-    def _process_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], config: SelfManagedGitHubTeam, inactivity_months) -> tuple[list[NamedUser.NamedUser], list[NamedUser.NamedUser]]:
-        users_to_remove = []
-        users_removed = []
         for user in users:
-            if user.login in config.ignore_users:
+            if self._is_user_inactive(user, repositories, inactivity_months):
                 logging.info(
-                    f"User {user.login} in team {config.github_team} is ignored")
-                continue
+                    f"User {user.login} is inactive for {inactivity_months} months")
+                users_to_remove.append(user)
+        return users_to_remove
 
-            if self._is_user_inactive(user, inactivity_months, repositories):
-                logging.info(
-                    f"User {user.login} in team {config.github_team} is inactive for {inactivity_months} months")
+    def _get_unignored_users_from_team(self, team_id: int, users_to_ignore: list[str]) -> list[NamedUser.NamedUser]:
+        logging.info(f"Ignoring users {users_to_ignore}")
+        users = self.__get_users_from_team(team_id)
+        return [user for user in users if user.login not in users_to_ignore]
 
-                if config.remove_users:
-                    self._remove_user(user, config.github_team)
-                    logging.info(
-                        f"User {user.login} removed from team {config.github_team}")
-                    users_removed.append(user)
-                else:
-                    users_to_remove.append(user)
+    def _get_repositories_managed_by_team(self, team_id: int, repositories_to_ignore: list[str]) -> list[Repository]:
+        logging.info(f"Ignoring repositories {repositories_to_ignore}")
+        repositories = self.__get_repositories_from_team(team_id)
+        return [repo for repo in repositories if repo.name.lower() not in repositories_to_ignore]
 
-        return users_removed, users_to_remove
-
-    def _load_team_config(self, team_config: dict[str, Any]) -> SelfManagedGitHubTeam:
-        # Ignore the # channel prefix if it exists.
-        slack_channel_name = team_config.get('slack_channel', None)
-        if slack_channel_name is not None and slack_channel_name.startswith('#'):
-            slack_channel_name = slack_channel_name.lstrip('#')
-
-        return SelfManagedGitHubTeam(
-            github_team=team_config['github_team'],
-            remove_users=team_config['remove_from_team'],
-            ignore_users=team_config.get('users_to_ignore', list[str]),
-            ignore_repositories=team_config.get(
-                'repositories_to_ignore', list[str]),
-            slack_channel=slack_channel_name
-        )
-
-    def _message_to_users(self, users_removed: list[NamedUser.NamedUser], users_to_remove: list[NamedUser.NamedUser], team_name: str, inactivity_months: int) -> str:
-        removed_names = "\n".join(
-            [f"- {user.login}" for user in users_removed]) if users_removed else "None"
-        to_remove_names = "\n".join(
-            [f"- {user.login}" for user in users_to_remove]) if users_to_remove else "None"
-
-        message = ""
-        if removed_names or to_remove_names:
-            message = (
-                f"Hi team :wave:,\n\n"
-                f"As part of our ongoing efforts to maintain the integrity of our GitHub teams, we have analysed user activity for the last {inactivity_months} months. Here's the summary:\n\n"
-            )
-            if users_removed:
-                message += (
-                    f":outbox_tray: Users Removed:\n{removed_names}\n"
-                    f"*(These users have been automatically removed from the '{team_name}' team due to inactivity.)*\n\n"
-                )
-            if users_to_remove:
-                message += (
-                    f":eyes: Users Seen but Not Removed:\n{to_remove_names}\n"
-                    f"*(These users were identified as inactive in the '{team_name}' team but were not automatically removed. Please review and take appropriate actions.)*\n\n"
-                )
-            message += (
-                "If you have any questions or concerns, please feel free to reach out.\n\n"
-                "Best,\nThe Operations Engineering Bot"
-            )
-
-        return message
-
-    def _remove_user(self, user: NamedUser.NamedUser, team_name: str) -> None:
-        logging.info(f"Removing user {user.login} from team {team_name}")
-        try:
-            org = self.github_client_core_api.get_organization(
-                self.organisation_name)
-            team = org.get_team_by_slug(team_name)
-
-            if team is None:
-                logging.warning(
-                    f"Team {team_name} not found in organization {self.organisation_name}")
-                return
-
-            if not team.has_in_members(user):
-                logging.warning(
-                    f"User {user.login} is not a member of team {team_name}")
-                return
-
-            team.remove_membership(user)
-            logging.info(f"User {user.login} removed from team {team_name}")
-
-        except Exception as e:
-            logging.error(
-                f"An error occurred while removing user {user.login} from team {team_name}: {str(e)}")
-
-    def _get_users_from_team(self, team_name: str) -> list[NamedUser.NamedUser]:
-        org = self.github_client_core_api.get_organization(
-            self.organisation_name)
-
-        for team in org.get_teams():
-            if team.name == team_name:
-                logging.info(f"Getting users from team {team.name}")
-                return list(team.get_members())
-
-        # If the team is not found, return an empty list or handle as needed
-        return []
-
-    def _get_repositories_from_team(self, team_name: str, ignore_repositories: list[str]) -> list[Repository]:
-        org = self.github_client_core_api.get_organization(
-            self.organisation_name)
-
-        for team in org.get_teams():
-            if team.name == team_name and team.name not in ignore_repositories:
-                logging.info(f"Getting repos from team {team.name}")
-                return list(team.get_repos())
-
-        logging.warning(
-            f"Team {team_name} not found in organization {self.organisation_name}")
-        # If the team is not found, return an empty list or handle as needed
-        return []
-
-    def _is_user_inactive(self, user: NamedUser.NamedUser, inactivity_months: int, repositories: list[Repository]) -> bool:
-        cutoff_date = datetime.now() - timedelta(days=inactivity_months *
-                                                 30)  # Roughly calculate the cutoff date
+    def _is_user_inactive(self, user: NamedUser.NamedUser, repositories: list[Repository], inactivity_months: int) -> bool:
+        cutoff_date = datetime.now() - timedelta(days=inactivity_months * 30)  # Roughly calculate the cutoff date
 
         for repo in repositories:
             # Get the user's commits in the repo
@@ -879,3 +726,16 @@ class GithubService:
                 continue
 
         return True  # User is inactive in all given repositories
+
+    def remove_list_of_users_from_team(self, team_name: str, users: list[NamedUser.NamedUser]) -> None:
+        logging.info(f"Removing users {users} from team {team_name}")
+        team_id = self.get_team_id_from_team_name(team_name)
+        team = self.github_client_core_api.get_organization(
+            self.organisation_name).get_team(team_id)
+        for user in users:
+            try:
+                team.remove_membership(user)
+                logging.info(f"Removed user {user.login} from team {team_id}")
+            except Exception:
+                logging.error(
+                    f"An exception occurred while removing user {user.login} from team {team_id}")
