@@ -679,9 +679,11 @@ class GithubService:
 
     def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str], inactivity_months: int) -> list[NamedUser.NamedUser]:
         team_id = self.get_team_id_from_team_name(team_name)
-        logging.info(f"Identifying inactive users in team {team_name}, id = {team_id}")
+        logging.info(
+            f"Identifying inactive users in team {team_name}, id = {team_id}")
         users = self._get_unignored_users_from_team(team_id, users_to_ignore)
-        repositories = self._get_repositories_managed_by_team(team_id, repositories_to_ignore)
+        repositories = self._get_repositories_managed_by_team(
+            team_id, repositories_to_ignore)
         return self._identify_inactive_users(users, repositories, inactivity_months)
 
     def _identify_inactive_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], inactivity_months: int) -> list[NamedUser.NamedUser]:
@@ -704,7 +706,8 @@ class GithubService:
         return [repo for repo in repositories if repo.name.lower() not in repositories_to_ignore]
 
     def _is_user_inactive(self, user: NamedUser.NamedUser, repositories: list[Repository], inactivity_months: int) -> bool:
-        cutoff_date = datetime.now() - timedelta(days=inactivity_months * 30)  # Roughly calculate the cutoff date
+        cutoff_date = datetime.now() - timedelta(days=inactivity_months *
+                                                 30)  # Roughly calculate the cutoff date
 
         for repo in repositories:
             # Get the user's commits in the repo

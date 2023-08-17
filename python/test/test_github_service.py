@@ -1302,8 +1302,10 @@ class TestReportOnInactiveUsers(unittest.TestCase):
     def test_identify_inactive_users_in_a_team(self, mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service._get_repositories_managed_by_team = Mock(return_value=self.repositories)
-        github_service._get_unignored_users_from_team = Mock(return_value=self.users)
+        github_service._get_repositories_managed_by_team = Mock(
+            return_value=self.repositories)
+        github_service._get_unignored_users_from_team = Mock(
+            return_value=self.users)
 
         inactive_users = github_service.get_inactive_users(
             self.team.id, self.ignored_users, self.ignored_repositories, self.inactivity_months)
@@ -1317,8 +1319,10 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.repository1.get_commits.return_value = [self.commit]
 
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service._get_repositories_managed_by_team = Mock(return_value=self.repositories)
-        github_service._get_unignored_users_from_team = Mock(return_value=self.users)
+        github_service._get_repositories_managed_by_team = Mock(
+            return_value=self.repositories)
+        github_service._get_unignored_users_from_team = Mock(
+            return_value=self.users)
 
         inactive_users = github_service.get_inactive_users(
             self.team.id, self.ignored_users, self.ignored_repositories, self.inactivity_months)
@@ -1354,20 +1358,23 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         github_service = GithubService(
             org_token="test_token", organisation_name="test_org")
 
-        result = github_service._get_unignored_users_from_team(self.team.id, self.ignored_users)
+        result = github_service._get_unignored_users_from_team(
+            self.team.id, self.ignored_users)
 
         self.assertEqual(1, len(result))
 
     def test_user_is_inactive(self, mock_github_client_core_api):
 
         self.commit = Mock()
-        self.commit.commit.author.date = datetime.now() - timedelta(days=self.inactivity_months * 30)
+        self.commit.commit.author.date = datetime.now(
+        ) - timedelta(days=self.inactivity_months * 30)
 
         self.repository1.get_commits.return_value = [self.commit]
 
         github_service = GithubService("", ORGANISATION_NAME)
 
-        result = github_service._is_user_inactive(self.user1, self.repositories, self.inactivity_months)
+        result = github_service._is_user_inactive(
+            self.user1, self.repositories, self.inactivity_months)
 
         self.assertEqual(True, result)
 
@@ -1380,7 +1387,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
 
-        result = github_service._is_user_inactive(self.user1, self.repositories, self.inactivity_months)
+        result = github_service._is_user_inactive(
+            self.user1, self.repositories, self.inactivity_months)
 
         self.assertEqual(False, result)
 
@@ -1388,7 +1396,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
 
-        github_service.remove_list_of_users_from_team(self.team.name, self.users)
+        github_service.remove_list_of_users_from_team(
+            self.team.name, self.users)
         team_id = github_service.get_team_id_from_team_name(self.team.name)
 
         mock_github_client_core_api.return_value.get_organization.assert_has_calls(
@@ -1413,6 +1422,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
                 call().get_team(team_id),
             ]
         )
+
 
 if __name__ == "__main__":
     unittest.main()
