@@ -115,7 +115,8 @@ def main():
             team_data.github_team, team_data.ignore_users, team_data.ignore_repositories, INACTIVITY)
 
         if team_data.remove_users:
-            github.remove_list_of_users_from_team(team_data.github_team, inactive_users)
+            github.remove_list_of_users_from_team(
+                team_data.github_team, inactive_users)
 
         if inactive_users and team_data.slack_channel:
             slack.send_message_to_plaintext_channel_name(
