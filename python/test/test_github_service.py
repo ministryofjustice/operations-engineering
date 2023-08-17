@@ -1486,10 +1486,5 @@ class TestReportOnInactiveUsers(unittest.TestCase):
                 f"ERROR:root:An exception occurred while removing user user1 from team {self.team.name}", cm.output[0])
 
 
-
-
-
-
-
 if __name__ == "__main__":
     unittest.main()
