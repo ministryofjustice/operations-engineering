@@ -1,6 +1,6 @@
 import os
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import python.scripts.report_on_inactive_users as report_test
 
