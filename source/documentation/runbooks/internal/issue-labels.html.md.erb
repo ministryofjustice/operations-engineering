@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Issue Labelling
-last_reviewed_on: 2023-08-15
+last_reviewed_on: 2023-08-17
 review_in: 3 months
 ---
 
@@ -23,6 +23,8 @@ A story type Issue will typically have 4 labels assigned to it:
 
 **Type of Story** - This indicates the principle type of work that the story might involve e.g. `Documentation` (e.g. the story is for creating a runbook)
 
+**Language** - Idetifies coding language required to complete this story. Only applies to `Development` "Type" stories
+
 ## Exceptions
 
 There are two exceptions for labelling Issues:
@@ -33,24 +35,24 @@ There are two exceptions for labelling Issues:
 
 ## Available Labels for Story type Issues
 
-| Product/Service | Workflow Status | MoSCoW Priority | Type of Story |
-|-----------------|-----------------|-----------------|---------------|
-| 1Password | Needs Refining | Must Have | Community |
-| Auth0 | Refined | Should Have | Documentation |
-| CircleCI | Agreed for Sprint | Could Have | EPIC |
-| DNS-IAC | Purged | Wont Have | Feature Request |
-| Docker | Blocked |  | Policy |
-| Domain Management |  |  | Spike |
-| Github | | | Support |
-| Github actions | | | User Research |
-| Maintenance Pages | | |
-| OS Data Hub APIs | | |
-| Other Support Request | | |
-| PagerDuty | | |
-| Pingdom | | |
-| Sentry | | |
-| SonarCloud.io | | |
-| SSL Certificate Management | | |
-| Standards | | |
-| Tech Docs | | |
-| AWS Root Account | | |
+| Product/Service | Workflow Status | MoSCoW Priority | Type of Story | Language |
+|-----------------|-----------------|-----------------|---------------|----------|
+| 1Password | Needs Refining | Must Have | Community | Ruby |
+| Auth0 | Refined | Should Have | Documentation | Python |
+| CircleCI | Agreed for Sprint | Could Have | EPIC | Terraform |
+| DNS-IAC | Purged | Wont Have | Feature Request | |
+| Docker | Blocked |  | Policy | |
+| Domain Management | Unplanned |  | Spike | |
+| Github | | | Support | |
+| Github actions | | | User Research | |
+| Maintenance Pages | | Development | |
+| OS Data Hub APIs | | | |
+| Other Support Request | | | |
+| PagerDuty | | | |
+| Pingdom | | | |
+| Sentry | | | |
+| SonarCloud.io | | | |
+| SSL Certificate Management | | | |
+| Standards | | | |
+| Tech Docs | | | |
+| AWS Root Account | | | |
