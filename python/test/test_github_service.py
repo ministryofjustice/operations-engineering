@@ -1354,7 +1354,6 @@ class TestReportOnInactiveUsers(unittest.TestCase):
             self.user1, self.user2
         ]
 
-        github_service = GithubService("", ORGANISATION_NAME)
         github_service = GithubService(
             org_token="test_token", organisation_name="test_org")
 
@@ -1422,6 +1421,30 @@ class TestReportOnInactiveUsers(unittest.TestCase):
                 call().get_team(team_id),
             ]
         )
+
+    def test_get_all_repositories_managed_by_team(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_team().get_repos.return_value = [
+            self.repository1, self.repository2
+        ]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        result = github_service._get_repositories_managed_by_team(
+            self.team.id, self.ignored_repositories)
+
+        self.assertEqual(1, len(result))
+
+    def test_get_all_repositories_managed_by_team_are_ignored(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_team().get_repos.return_value = [
+            self.repository2
+        ]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        result = github_service._get_repositories_managed_by_team(
+            self.team.id, self.ignored_repositories)
+
+        self.assertEqual(0, len(result))
 
 
 if __name__ == "__main__":
