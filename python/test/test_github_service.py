@@ -1391,6 +1391,33 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(False, result)
 
+    def test_user_is_inactive_no_commits(self, mock_github_client_core_api):
+
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
+            self.user1, self.user2
+        ]
+        mock_team = mock_github_client_core_api.return_value.get_organization().get_team()
+        mock_team.get_members.return_value = [
+            self.user1, self.user2
+        ]
+        mock_github_client_core_api.return_value.get_user.side_effect = [
+            self.user1, self.user2
+        ]
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            self.repository1, self.repository2
+        ]
+        mock_github_client_core_api.return_value.get_organization().Repository.get_commits.side_effect = [
+            GithubException(status=500, data="test", headers={})
+        ]
+
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        with self.assertLogs(level='ERROR') as cm:
+            github_service._is_user_inactive(
+                self.user1, self.repositories, self.inactivity_months)
+            self.assertEqual(
+                f"ERROR:root:An exception occurred while getting commit date for user user1 in repo repo1", cm.output[0])
+
     def test_remove_list_of_users_from_team(self, mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1445,6 +1472,23 @@ class TestReportOnInactiveUsers(unittest.TestCase):
             self.team.id, self.ignored_repositories)
 
         self.assertEqual(0, len(result))
+
+    def test_remove_list_of_users_exception(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_team().remove_membership.side_effect = [
+            GithubException(status=500, data="test", headers={})
+        ]
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        with self.assertLogs(level='ERROR') as cm:
+            github_service.remove_list_of_users_from_team(
+                self.team.name, self.users)
+            self.assertEqual(
+                f"ERROR:root:An exception occurred while removing user user1 from team {self.team.name}", cm.output[0])
+
+
+
+
+
 
 
 if __name__ == "__main__":

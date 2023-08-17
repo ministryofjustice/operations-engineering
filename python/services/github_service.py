@@ -772,4 +772,4 @@ class GithubService:
                 logging.info(f"Removed user {user.login} from team {team_id}")
             except Exception:
                 logging.error(
-                    f"An exception occurred while removing user {user.login} from team {team_id}")
+                    f"An exception occurred while removing user {user.login} from team {team_name}")
