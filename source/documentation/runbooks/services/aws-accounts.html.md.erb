@@ -7,26 +7,26 @@ review_in: 3 months
 
 # Requests for AWS Account Access
 
-Occasionally we are asked by user for access to an existing AWS account.
+Occasionally, we are asked by users for access to an existing AWS account.
 
-**Note - We do not create new AWS Accounts. Service Teams should be using either Cloud Platform or Modernisation Platform.**
+**Note:** We do not create new AWS accounts. Service teams should be using either the Cloud Platform or Modernisation Platform.
 
-## Requests for Modernisation Platform access
+## Requests for Modernisation Platform Access
 
-Direct requester to #ask-modernisation-platform slack channel.
+Direct the requester to the `#ask-modernisation-platform` Slack channel.
 
-## AWS SSO
+## AWS Single Sign On (SSO)
 
-The MoJ preferred way to access AWS acount is via [AWS SSO](https://moj.awsapps.com/start/#/). SSO uses GitHub Teams to set permissions to AWS Accounts.
+The preferred method to access an AWS account is using [AWS SSO](https://moj.awsapps.com/start/#/). SSO utilizes GitHub Teams to set permissions for AWS accounts.
 
-1. Confirm with the user which the AWS account.
+1. Confirm with the user which AWS account they need access to.
 
 2. Confirm with the AWS Account Owner [see AWS Account List](https://docs.google.com/spreadsheets/d/1lZ2ffiN_yQEYqTYnBzTbl16iElfrp3rZ8JnznDQWc-g/edit?usp=sharing) that the requester can have access to that account.
 
 3. If approved, add the user to the appropriate GitHub Team [see team associations](https://github.com/ministryofjustice/aws-root-account/blob/main/management-account/terraform/sso-admin-account-assignments.tf).
 
-4. Confirm to requester when completed and send [AWS SSO link](https://moj.awsapps.com/start/#/).
+4. Confirm to the requester when completed and send the [AWS SSO link](https://moj.awsapps.com/start/#/).
 
-## AWS SSO not applicable
+## AWS SSO Not Applicable
 
-Some older AWS accounts are not enrolled in SSO. In those instances direct the requester to the owner of that AWS account.
+Some older AWS accounts are not enrolled in SSO. In those instances, direct the requester to the owner of that AWS account.
