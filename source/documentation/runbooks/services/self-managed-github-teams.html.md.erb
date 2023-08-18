@@ -1,0 +1,63 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Self-Managed GitHub Teams
+last_reviewed_on: 2023-08-18
+review_in: 3 months
+---
+
+# GitHub Self-Managed Teams (Beta)
+
+GitHub Self-Managed Teams is an opt-in, automated solution currently in beta testing. It helps manage team members' activity by allowing you to set rules to monitor user activity, send notifications, and remove users as needed. The system runs on the first of every month and can be tailored to your team's specific needs through a simple configuration.
+
+**Definition:** User activity is current defined as "commits made to any repository a team has access to". This will expand over time and we welcome suggestions for additional activity types.
+
+## Features
+
+1. **Monitor Activity**: Checks users' activity in the specified repositories.
+
+2. **Automated Removal**: Option to automatically remove inactive users from the team.
+
+3. **Slack Notifications**: Sends a notification to a specified Slack channel regarding the removals.
+
+4. **Ignore Specific Users and Repositories**: Exclude certain users or repositories from the checks.
+
+## How to Opt In
+
+Being an opt-in feature in beta testing, you can enable GitHub Self-Managed Teams by creating a configuration block in this [TOML file](https://github.com/ministryofjustice/operations-engineering/blob/main/python/config/inactive-users.toml). Here's an example:
+
+```toml
+[team.operations_engineering]
+github_team = "operations-engineering"
+slack_channel = "#operations-engineering-alerts"
+remove_from_team = true
+users_to_ignore = [ "cloud-platform-moj", "ScottSeaward" ]
+repositories_to_ignore = [ "operations-engineering-reports" ]
+```
+
+The only required field are `github_team` and `remove_from_team`. The other fields are optional and can be omitted if you don't want to use them.
+
+### Configuration Options
+
+- `github_team`: The name of the GitHub team you want to manage.
+- `slack_channel`: The Slack channel where notifications will be sent.
+- `remove_from_team`: Set to `true` if you want to remove inactive users from the team; `false` if not.
+- `users_to_ignore`: A list of GitHub usernames to be ignored during the check.
+- `repositories_to_ignore`: A list of repositories you don't want to be checked.
+
+## What Happens During the Check?
+
+On the first of every month, a GitHub Action runs and performs the following actions:
+
+1. Identifies users who haven't committed to any repositories that the specified GitHub team manages.
+
+2. If `remove_from_team` is set to `true`, the job removes users who haven't made a commit.
+
+3. Sends an informative message to a specified Slack channel (if one is specified in your team configuration block).
+
+## Support and Assistance
+
+Since this feature is in beta testing, your feedback and insights are invaluable to us. If you need any assistance, have questions, or encounter any issues, please feel free to contact us in the **#ask-operations-engineering** Slack channel.
+
+## Opting Out
+
+If you wish to opt out of this feature, simply remove your teams corresponding configuration block from the TOML file.
