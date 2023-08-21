@@ -14,65 +14,78 @@ This document aims to outline the guidelines and best practices for developers t
 These practices will help you maintain the integrity and security of public repositories.
 
 #### ✅ Publish Code and Data Early
-Start sharing your code and data from the beginning of your project to encourage collaboration, clearer documentation, and a more maintainable codebase.
+Start sharing your code and data from the beginning of your project to encourage collaboration, clearer documentation, and a more maintainable codebase. [be and use open by default]
 
 #### ✅ Use Multiple Countermeasures (Defence in Depth)
-Rely on multiple security measures instead of depending solely on keeping code closed.
+Rely on multiple security measures instead of depending solely on keeping code closed. [security considerations for open source software]
 
 #### ✅ Implement Security Measures for Sensitive Data
-Ensure clarity around data that needs to remain protected and implement measures to achieve security.
+Ensure clarity around data that needs to remain protected and implement measures to achieve security. [be and use open by default]
 
 #### ✅ Separate Secrets from Source Code
-Always keep secrets, keys, and sensitive information out of the source code.
+Always keep secrets, keys, and sensitive information out of the source code. [secrets in code]
 
 #### ✅ Monitor for Sensitive Information
-Implement systems to alert developers if sensitive information is detected in public repositories.
+Implement systems to alert developers if sensitive information is detected in public repositories. [dealing with sensitive leaks]
 
 #### ✅ Provide Clear Documentation
-Ensure that there's enough documentation for someone new to get started with the project.
+Ensure that there's enough documentation for someone new to get started with the project. [documenting your code]
 
 #### ✅ Follow Good Development Practices
-Use clear commit messages, comprehensive documentation, code reviews, automated tests, and style enforcement.
+Use clear commit messages, comprehensive documentation, code reviews, automated tests, and style enforcement. [development principles]
 
 #### ✅ Keep Dependencies Up to Date
-Whether your configuration code is open or closed, make sure to update your dependencies to prevent vulnerabilities.
+Whether your configuration code is open or closed, make sure to update your dependencies to prevent vulnerabilities. [be and use open by default]
 
 #### ✅ Use Third-Party Libraries for Authentication
-Consider leveraging third-party libraries for authentication as they will likely be more secure and robust.
+Consider leveraging third-party libraries for authentication as they will likely be more secure and robust. [be and use open by default]
 
 #### ✅ Utilise Security Scanning Tools
-Make use of tools like Brakeman, Sonarcloud, and Talisman to supplement manual code reviews.
+Make use of tools like Brakeman, Sonarcloud, and Talisman to supplement manual code reviews. [security considerations for open source software]
 
 #### ✅ Have Mechanisms to Change and Rotate Keys
-Be prepared to change and rotate keys and credentials easily if accidental disclosure occurs.
+Be prepared to change and rotate keys and credentials easily if accidental disclosure occurs. [security considerations for open source software]
 
 #### ✅ Address Security Vulnerabilities Swiftly
-Follow specific and general practices to deal with vulnerabilities quickly, including emergency fixes if necessary.
+Follow specific and general practices to deal with vulnerabilities quickly, including emergency fixes if necessary. [security considerations for open source software]
 
 #### ✅ Never Close an Open Repository
-Once the code is public, keep it open to avoid drawing attention to unresolved issues.
+Once the code is public, keep it open to avoid drawing attention to unresolved issues. [be and use open by default]
 
 ### Don'ts
 
 #### ❌ Don't Assume Open Source is Always the Cheapest Option
-Take into account all costs, including those for training, management, and possible migration, before deciding on an open source solution.
+Take into account all costs, including those for training, management, and possible migration, before deciding on an open source solution. [when code should be open]
 
 #### ❌ Do Not Store Secrets in the Code
-Never include passwords, API keys, or other sensitive information within the code itself.
+Never include passwords, API keys, or other sensitive information within the code itself. [secrets in code]
 
 #### ❌ Don't Include Keys or Credentials in Open Configuration Code
-Keep any keys or credentials closed and separate from your open configuration code.
+Keep any keys or credentials closed and separate from your open configuration code. [secrets in code]
 
 #### ❌ Do Not Make Private Repositories Public Without Review
-Before converting a private or internal repository to public, ensure there's no sensitive data in the commit history.
+Before converting a private or internal repository to public, ensure there's no sensitive data in the commit history. [secrets in code]
 
 #### ❌ Avoid Closed Source When Possible
-If possible, consider using open source solutions instead of closed source, as open source often provides more flexibility and collaboration opportunities.
+If possible, consider using open source solutions instead of closed source, as open source often provides more flexibility and collaboration opportunities. [private repositories]
 
 #### ❌ Do Not Ignore Security Practices
-Always consult with the security team and follow best practices for handling sensitive data.
+Always consult with the security team and follow best practices for handling sensitive data. [security considerations for open source software]
 
-### Additional Resources
-- [How to Make Source Code Open and Reusable](#)
-- [Technology Code of Practice (TCoP)](#)
-- [GitHub Guidelines for ministryofjustice](#)
+### References
+- [Be open and use open source](https://www.gov.uk/guidance/be-open-and-use-open-source)
+- [How to Make Source Code Open and Reusable](https://www.gov.uk/government/publications/open-source-guidance/when-code-should-be-open-or-closed)
+- [Technology Code of Practice (TCoP)](https://www.gov.uk/guidance/the-technology-code-of-practice#be-open-and-use-open-source)
+- [GitHub Guidelines for ministryofjustice](https://operations-engineering.service.justice.gov.uk/documentation/services/moj-github.html#ministry-of-justice-uk-github-enterprise-management)
+- [Managing software dependiencies](https://www.gov.uk/service-manual/technology/managing-software-dependencies)
+- [Storing source code](https://technical-guidance.service.justice.gov.uk/documentation/standards/storing-source-code.html)
+- [Documenting how your service is supported](https://technical-guidance.service.justice.gov.uk/documentation/standards/documenting-how-your-service-is-supported.html)
+
+[be and use open by default]: https://www.gov.uk/guidance/government-design-principles#be-open-by-default
+[security considerations for open source software]: https://www.gov.uk/government/publications/open-source-guidance/security-considerations-when-coding-in-the-open
+[when code should be open]: https://www.gov.uk/government/publications/open-source-guidance/when-code-should-be-open-or-closed
+[secrets in code]: https://technical-guidance.service.justice.gov.uk/documentation/standards/storing-source-code.html#storing-source-code
+[dealing with sensitive leaks]: https://technical-guidance.service.justice.gov.uk/documentation/standards/storing-source-code.html#converting-private-or-internal-repositories-to-public
+[documenting your code]: https://technical-guidance.service.justice.gov.uk/documentation/standards/documenting-how-your-service-is-supported.html
+[development principles]: https://technical-guidance.service.justice.gov.uk/documentation/principles/development-principles.html
+[private repositories]: https://technical-guidance.service.justice.gov.uk/documentation/standards/storing-source-code.html#private-repositories
