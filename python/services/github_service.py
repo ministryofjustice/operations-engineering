@@ -17,7 +17,7 @@ from requests import Session
 
 from python.config.logging_config import logging
 
-logging.getLogger("gql").setLevel(logging.WARNING)
+logging.getLogger("gql").setLevel(logging.DEBUG)
 
 
 def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Callable:
@@ -588,6 +588,76 @@ class GithubService:
                                 isDisabled
                                 isLocked
                                 hasIssuesEnabled
+                                collaborators(affiliation: DIRECT) {
+                                    totalCount
+                                }
+                            }
+                        }
+                    }
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
+                }
+            }
+        """)
+        variable_values = {"the_query": the_query, "page_size": page_size,
+                           "after_cursor": after_cursor}
+        return self.github_client_gql_api.execute(query, variable_values)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_repositories_per_topic(self, topic: str, after_cursor: str | None,
+                                                     page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+        """
+        Fetches a paginated list of repositories associated with a given GitHub topic/
+
+        Parameters:
+        - topic (str): The GitHub topic for which to fetch associated repositories.
+        - after_cursor (str | None): The pagination cursor to fetch results after a certain point. If None, fetches from the beginning.
+        - page_size (int, optional): The number of repository results to return per page. Defaults to GITHUB_GQL_DEFAULT_PAGE_SIZE.
+            Note that there's an upper limit, GITHUB_GQL_MAX_PAGE_SIZE, beyond which an exception will be raised.
+
+        Returns:
+        - dict[str, Any]: A dictionary containing the repository data and pagination information.
+
+        Raises:
+        - ValueError: If the specified page size exceeds GitHub's maximum allowable page size.
+
+        Usage:
+        >>> get_paginated_list_of_repositories_per_topic('standards-compliant', None, 50)
+        { ...repository data... }
+
+        """
+        logging.info(
+            f"Getting paginated list of repositories per topic {topic}. Page size {page_size}, after cursor {bool(after_cursor)}")
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        the_query = f"org:{self.organisation_name}, archived:false, topic:{topic}"
+        query = gql("""
+            query($page_size: Int!, $after_cursor: String, $the_query: String!) {
+                search(
+                    type: REPOSITORY
+                    query: $the_query
+                    first: $page_size
+                    after: $after_cursor
+                ) {
+                repos: edges {
+                    repo: node {
+                        ... on Repository {
+                                name
+                                isDisabled
+                                isLocked
+                                hasIssuesEnabled
+                                repositoryTopics(first: 10) {
+                                    edges {
+                                        node {
+                                            topic {
+                                                name
+                                            }
+                                        }
+                                    }
+                                }
                                 collaborators(affiliation: DIRECT) {
                                     totalCount
                                 }
