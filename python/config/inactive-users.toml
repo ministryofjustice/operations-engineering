@@ -11,5 +11,12 @@ remove_from_team = true
 users_to_ignore = [ "cloud-platform-moj", "ScottSeaward" ]
 repositories_to_ignore = [ "operations-engineering-reports" ]
 
+[team.laa_eligibility_platform]
+github_team = "laa-eligibility-platform"
+slack_channel = "#laa-eligibility-platform-alerts-staging"
+remove_from_team = true
+users_to_ignore = []
+repositories_to_ignore = []
+
 # Add more teams here
 
