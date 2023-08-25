@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Redirecting Domains
-last_reviewed_on: 2023-05-24
+last_reviewed_on: 2023-08-25
 review_in: 3 months
 ---
 
@@ -35,7 +35,7 @@ Few things to note when creating a redirect:
 
 ## Redirection with AWS S3 (HTTPS traffic)
 
-A more complex form of redirect involving AWS S3. This type of redirect needs to be used where a service needs to process traffic over HTTPS. This type of redirect needs to include a TLS certificate, but that in tern needs the use of AWS CloudFront. This type is more complex as it needs creation of more AWS resources.
+A more complex form of redirect involving AWS S3. This type of redirect needs to be used where a service needs to process traffic over HTTPS. This type of redirect needs to include a TLS certificate, but that in turn needs the use of AWS CloudFront. This type is more complex as it needs creation of more AWS resources.
 
 Follow the [AWS documentation](https://repost.aws/knowledge-center/redirect-domain-route-53) to set this up.
 
