@@ -22,7 +22,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "yjaf-mule-mis-processor",
     "satis-s3",
     "wasm",
-    "wp-rewrite-media-to-s3"
+    "wp-rewrite-media-to-s3",
+    "oracle-policy-automation-docker"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
