@@ -1,7 +1,7 @@
 ---
 owner_slack: "#operations-engineering-alerts"
 title: Create Manual SSL Certificate Processes
-last_reviewed_on: 2023-08-31
+last_reviewed_on: 2023-09-01
 review_in: 3 months
 ---
 
@@ -32,13 +32,7 @@ This process specifically relates to certificates issued through [Gandi.net]
 
 **In the email 'Re: SSL Cert query' within the Certificates Google Group is a list of the domains that the HMCTS are responsible for.**
 
-**BT will sporadically send us emails, as BT domain management looks after a group of gov.uk domains. BT should auto renew those domains. BT will batch renew their certificates at the start of the month! So there will be a delay in processing.**
-
-**JISC Emails: JISC is a group that checks for any DNS changes that attempt to modify gov.uk DNS settings without approval from MoJ security.**
-
 **In Gandi the SSL certs that are "No longer valid - To reissue" require a Gandi support request to remove them.**
-
-**A team may at somepoint throughout the year that a SSL certificate is valid may move to their own AWS ACM account, in which case the SSL Certificate in Gandi can be allowed to lapse.**
 
 **There is an operations-engineering script that runs on the first day of the month that will delete the Gandi related CNAME records from the AWS account. Be wary of this if doing a CNAME validation around that time of the month.**
 
