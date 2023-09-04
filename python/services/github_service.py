@@ -565,6 +565,23 @@ class GithubService:
         return [member.login.lower() for member in members]
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def set_standards(self, repository_name: str):
+
+        repo = self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}")
+
+        branch_name = 'main'
+        rule_settings = {
+            'enforce_admins': True,
+            'required_approving_review_count': 1,
+            'dismiss_stale_reviews': True
+        }
+
+        branch = repo.get_branch(branch_name)
+        branch.edit_protection(**rule_settings)
+        repo.edit(has_issues=True)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
                                                     page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
