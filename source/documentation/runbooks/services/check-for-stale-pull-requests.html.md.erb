@@ -1,0 +1,59 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: Checking for Stale Pull Requests
+last_reviewed_on: 2023-09-05
+review_in: 3 months
+---
+
+# Checking for Stale Pull Requests #
+
+This runbook details the process of adding a GitHub Action to your repository that can check for any stale pull requests and report them to a specified Slack channel. There are two steps to this process:
+
+1. Firstly you will need to set up the appropriate Slack integrations to enable the usage of the SLACK_WEBHOOK_URL in your repository's environment variables.
+2. You will then need to copy over the provided GitHub Action to your repository that will periodically check for stale pull requests.
+
+## Creating a Slack WebHook Url ##
+
+1. If you haven't already, you'll need to create a new [Slack App](https://api.slack.com/apps) in order to enable incoming messages to your desired channel. You'll need to pick a name for you new app and a workspace to associate it with.
+
+2. After creating the new app, you'll need to click the *Activate Incoming Webhooks* toggle to switch it on.
+
+3. The settings page should then refresh, enabling to you view and click the *Add New Webhook to Workspace* button. You can then pick the channel that you'd like the messages to be posted to. OInce you've done this, you should see a new entry under *Webhook URLs for Your Workspace*.
+
+4. Copy the new Webhook's value, and add it as an environment variable to the repository you'd like to be checked for stale pull requests. It is recommended to call the environment variable `SLACK_WEBHOOK_URL` as this matches what's in the existing GitHub action - you are free to edit this, but you must also edit the GitHub action code to match.
+
+## Adding the Stale Pull Request Action ##
+
+1. Navigate to [this file](https://github.com/ministryofjustice/operations-engineering/blob/main/.github/workflows/check-for-stale-pull-requests.yml) within this repository, and copy its contents.
+
+2. Create a new GitHub Action workflow in the `.github/workflows` folder of your repository. You can name this what you'd like, but it's recommended to something along the lines of `check-for-stale-pull-requests.yml` to ensure it's clear what the action is doing.
+
+3. Paste the content of the file you copied earlier, and push your changes to your repostory. Once completed, your new GitHub Action will run at regular intervals and report any stale pull requests via the Slack Webhook you created earlier.
+
+> **Note:** The current GitHub Action is set to run at 08:00 every day, and will report on stale pull requests older than 4 hours. You can change these perameters by editing the following lines of code:
+
+### To change the frequency that the GitHub Actions runs ###
+
+Simply change the cron scheduling defined at the top of the file:
+
+```
+on:
+  schedule:
+    - cron: '0 8 * * *'
+```
+
+### To Change the Time Needed for a Pull Request to be Considered Stale:
+
+Change the text value of the time specified in the `DATE_CREATED` variable:
+
+```
+DATE_CREATED=$(date -d '4 hours ago' --utc +%Y-%m-%dT%H:%M:%SZ)
+```
+
+Here a some example values:
+
+- '1 day ago'
+- '50 minutes ago'
+- '12 hours ago'
+
+etc.
