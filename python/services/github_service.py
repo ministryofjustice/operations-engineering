@@ -566,20 +566,176 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def set_standards(self, repository_name: str):
+        """
+        Set various standards for a GitHub repository.
 
+        Args:
+            repository_name (str): The name of the repository for which standards are to be set.
+
+        Returns:
+            None
+
+        """
+
+        # Get the GitHub repository object
         repo = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}")
 
-        branch_name = 'main'
-        rule_settings = {
-            'enforce_admins': True,
-            'required_approving_review_count': 1,
-            'dismiss_stale_reviews': True
-        }
+        # Set default branch protection
+        self._set_default_branch_protection(repository=repo)
 
-        branch = repo.get_branch(branch_name)
-        branch.edit_protection(**rule_settings)
-        repo.edit(has_issues=True)
+        # Set 'enforce_admins' protection
+        self._set_enforce_admins(repository=repo)
+
+        # Set the required review count
+        self._set_required_review_count(repository=repo)
+
+        # Set the 'dismiss stale reviews' option
+        self._set_dismiss_stale_reviews(repository=repo)
+
+        # Set whether issues are enabled
+        self._set_has_issues(repository=repo)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def _set_has_issues(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
+        """
+        Sets the has issues for a repository
+
+        Args:
+            repository_name (str): The name of the repository.
+            branch_name (str): The name of the branch. Defaults to "main".
+            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
+
+        Returns:
+            The result of calling the edit_protection method on the branch object.
+
+        """
+
+        # Check if repository_name is provided
+        if repository_name is not None:
+            # Fetch the repository using the provided repository_name
+            repository = self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            )
+
+        # Check if repository object is provided
+        if repository is not None:
+            # Get the branch object for the specified branch_name from the repository
+            repository.edit(has_issues=True)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def _set_default_branch_protection(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
+        """
+        Sets the default branch protection for a repository.
+
+        Args:
+            repository_name (str): The name of the repository.
+            branch_name (str): The name of the branch. Defaults to "main".
+            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
+
+        Returns:
+            The result of calling the edit_protection method on the branch object.
+
+        """
+
+        # Check if repository_name is provided
+        if repository_name is not None:
+            # Fetch the repository using the provided repository_name
+            repository = self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            )
+
+        # Check if repository object is provided
+        if repository is not None:
+            # Get the branch object for the specified branch_name from the repository
+            branch = repository.get_branch(branch_name)
+            # Call the edit_protection method on the branch object and return the result
+            return branch.edit_protection()
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def _set_enforce_admins(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
+        """
+        Sets enforce admins for a repository
+
+        Args:
+            repository_name (str): The name of the repository.
+            branch_name (str): The name of the branch. Defaults to "main".
+            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
+
+        Returns:
+            The result of calling the edit_protection method on the branch object.
+
+        """
+        # Check if repository_name is provided
+        if repository_name is not None:
+            # Fetch the repository using the provided repository_name
+            repository = self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            )
+
+        # Check if repository object is provided
+        if repository is not None:
+            # Get the branch object for the specified branch_name from the repository
+            branch = repository.get_branch(branch_name)
+            # Call the edit_protection method on the branch object and return the result
+            return branch.edit_protection(enforce_admins=True)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def _set_dismiss_stale_reviews(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
+        """
+        Sets dismiss stale reviews for a repository
+
+        Args:
+            repository_name (str): The name of the repository.
+            branch_name (str): The name of the branch. Defaults to "main".
+            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
+
+        Returns:
+            The result of calling the edit_protection method on the branch object.
+
+        """
+        # Check if repository_name is provided
+        if repository_name is not None:
+            # Fetch the repository using the provided repository_name
+            repository = self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            )
+
+        # Check if repository object is provided
+        if repository is not None:
+            # Get the branch object for the specified branch_name from the repository
+            branch = repository.get_branch(branch_name)
+            # Call the edit_protection method on the branch object and return the result
+            return branch.edit_protection(dismiss_stale_reviews=True)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def _set_required_review_count(self, repository_name: str = None, required_review_count: int = 1, branch_name: str = "main", repository: Repository = None):
+        """
+        Sets the required review count for a repository
+
+        Args:
+            repository_name (str): The name of the repository.
+            branch_name (str): The name of the branch. Defaults to "main".
+            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
+            required_review_count (int): The number of reviewers needed
+
+        Returns:
+            The result of calling the edit_protection method on the branch object.
+
+        """
+        # Check if repository_name is provided
+        if repository_name is not None:
+            # Fetch the repository using the provided repository_name
+            repository = self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/{repository_name}"
+            )
+
+        # Check if repository object is provided
+        if repository is not None:
+            # Get the branch object for the specified branch_name from the repository
+            branch = repository.get_branch(branch_name)
+            # Call the edit_protection method on the branch object and return the result
+            return branch.edit_protection(required_approving_review_count=required_review_count)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
