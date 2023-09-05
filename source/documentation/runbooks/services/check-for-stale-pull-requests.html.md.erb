@@ -9,8 +9,8 @@ review_in: 3 months
 
 This runbook details the process of adding a GitHub Action to your repository that can check for any stale pull requests and report them to a specified Slack channel. There are two steps to this process:
 
-1. Firstly you will need to set up the appropriate Slack integrations to enable the usage of the SLACK_WEBHOOK_URL in your repository's environment variables.
-2. You will then need to copy over the provided GitHub Action to your repository that will periodically check for stale pull requests.
+* Firstly you will need to set up the appropriate Slack integrations to enable the usage of the SLACK_WEBHOOK_URL in your repository's environment variables.
+* You will then need to copy over the provided GitHub Action to your repository that will periodically check for stale pull requests.
 
 ## Creating a Slack WebHook Url ##
 
@@ -21,6 +21,8 @@ This runbook details the process of adding a GitHub Action to your repository th
 3. The settings page should then refresh, enabling you to view and click the *Add New Webhook to Workspace* button. You can then pick the channel that you'd like the messages to be posted to. Once you've done this, you should see a new entry under *Webhook URLs for Your Workspace*.
 
 4. Copy the new Webhook's value, and add it as an environment variable to the repository you'd like to be checked for stale pull requests. It is recommended to call the environment variable `SLACK_WEBHOOK_URL` as this matches what's in the existing GitHub action - you are free to edit this, but you must also edit the GitHub action code to match.
+
+You can find a more detailed explanation of this process in [this guide](https://api.slack.com/messaging/webhooks).
 
 ## Adding the Stale Pull Request Action ##
 
