@@ -1,4 +1,4 @@
-name: Metadat Generation
+name: Metadata Generation
 
 on:
   workflow_dispatch:
