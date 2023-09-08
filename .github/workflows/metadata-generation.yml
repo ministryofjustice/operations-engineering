@@ -1,0 +1,20 @@
+name: Metadat Generation
+
+on:
+    workflow_dispatch:
+
+jobs:
+  fetch-metadata:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get repository metadata using MetaMaker
+      id: metadata
+      uses: ministryofjustice/metamaker@main
+      with:
+        repo-name: 'ministryofjustice/${{ github.repository }}'
+
+    - name: Display metadata
+      run: echo "${{ steps.metadata.outputs.metadata }}"
