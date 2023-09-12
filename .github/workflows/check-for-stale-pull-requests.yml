@@ -1,8 +1,9 @@
 name: Stale Pull Request Check
 
 on:
-  schedule:
-    - cron: '0 8 * * *'
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 8 * * *'
 
 jobs:
   check_stale_prs:
@@ -22,7 +23,7 @@ jobs:
 
         echo "TOTAL_PR_COUNT=$PR_COUNT" >> $GITHUB_ENV
 
-        if [ "$PR_COUNT" -gt 0 ]; then
+        if [[ -n "$PR_JSON" ]]; then
           PR_ATTACHMENTS=""
           while read -r pr; do
             PR_ATTACHMENTS="$PR_ATTACHMENTS,{\"title\": \"Pull Request\",\"value\": \"$pr\",\"short\": false}"
