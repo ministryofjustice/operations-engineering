@@ -1069,6 +1069,141 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
+class TestGitHubServiceSetDefaulBranchProtection(unittest.TestCase):
+    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository')
+        ])
+
+    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo().get_branch('main'),
+            call.get_repo().get_branch().edit_protection()
+        ])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGitHubServiceSetEnforceAdmin(unittest.TestCase):
+    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository')
+        ])
+
+    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo().get_branch('main'),
+            call.get_repo().get_branch().edit_protection()
+        ])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGitHubServiceSetDimissStaleReviews(unittest.TestCase):
+    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository')
+        ])
+
+    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo().get_branch('main'),
+            call.get_repo().get_branch().edit_protection()
+        ])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGitHubServiceHasIssues(unittest.TestCase):
+    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository')
+        ])
+
+    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo().get_branch('main'),
+            call.get_repo().get_branch().edit_protection()
+        ])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGitHubServiceSetRequiredReviews(unittest.TestCase):
+    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository')
+        ])
+
+    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service._set_default_branch_protection(
+            repository_name="test-repository")
+
+        github_service.github_client_core_api.assert_has_calls([
+            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo().get_branch('main'),
+            call.get_repo().get_branch().edit_protection()
+        ])
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
     def test_calls_downstream_services_when_no_issues_to_close(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
