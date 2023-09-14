@@ -1,0 +1,31 @@
+# This GitHub Action utilises the script to review and remove GitHub users from teams defined in TOML file: ../../python/config/inactive-users.toml
+# Please see here for more infomation: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/github/self-managed-github-teams.html
+name: Review GitHub users older than n months from select teams
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # The first of every month
+  workflow_dispatch: # So we can trigger manually
+
+jobs:
+  report-on-inactive-github-users:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r python/requirements.txt
+      - run: python3 -m python.scripts.report_on_inactive_users
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed to report on inactive GitHub users"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
