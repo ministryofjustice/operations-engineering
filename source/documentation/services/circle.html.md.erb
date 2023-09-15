@@ -1,0 +1,97 @@
+---
+owner_slack: "#operations-engineering-alerts"
+title: CircleCI
+last_reviewed_on: 2023-09-15
+review_in: 3 months
+---
+
+# CircleCI
+
+The Operations Engineering team have Admin permissions in [CircleCI](https://circleci.com/) and may be called upon to help create and publish Orbs and setup Contexts.
+
+## Credentials
+
+We can log into CircleCI using our Github SSO credentials.
+
+For GitHub Organisation Members to log into CircleCI they must have their MoJ email address as their primary email address in GitHub.
+
+CircleCI uses a users Github MoJ Organisation membership to determine their CircleCI membership.
+
+A CircleCI Organization Administrator is a permission level inherited from GitHub ie GitHub Organisation Owners.
+
+A CircleCI Project Administrator is the user who adds a GitHub repository to CircleCI as a Project.
+
+A CircleCI User is an individual user within an organization, inherited from GitHub ie GitHub Organisation Members.
+
+## Login
+
+To login to CircleCI:
+
+1. Navigate to [CircleCI](https://circleci.com/)
+2. Click Application at the top right of the page
+3. Click 'Log in with GitHub'
+4. Select 'ministryofjustice'
+
+## Owner API Token
+
+As Owners we can generate CircleCI API tokens that can be shared with other users for use in Contexts and Orbs.
+
+In your personal CircleCI settings page look for the section called 'Personal API Tokens' or the link [here](https://app.circleci.com/settings/user/tokens).
+
+Create an API token and it will display the public key value.
+
+That API Token can be used in contexts, orbs or as an argument to the CircleCI CLI [tool](https://circleci-public.github.io/circleci-cli/circleci_orb.html).
+
+## Orbs
+
+An intro about CircleCI orbs can be found [here](https://circleci.com/docs/2.0/concepts/#orbs).
+
+The Orbs page is found within the CircleCI Organisation settings page. This will list the Orbs in use.
+
+An MoJ Orb example [repository](https://github.com/ministryofjustice/hmpps-circleci-orb).
+
+Creation and publishing of Orbs is restricted to Github Organisation Owners.
+
+The users who can create an Orb are listed on this Github Organisation [page](https://github.com/organizations/ministryofjustice/settings/apps).
+
+CircleCI has a [CLI](https://circleci.com/docs/2.0/orb-author-intro/#orb-cli) that the above Organisation Owners can use to create and publish an Orb.
+
+Non Organisation Owner users can only publish a Development Orb.
+
+To get around this, ie the Owners being involved, we can place an Owner generated API Token value into a Environment Variable within a Context. See the next section.
+
+Or
+
+A non Organisation Owner user can use the CircleCI CLI [tool](https://circleci-public.github.io/circleci-cli/circleci_orb.html) with an Owner generated token to create and publish an Orb. This means directly sharing the Owners Token with the other user/s.
+
+## Contexts
+
+An intro about CircleCI Contexts can be found [here](https://circleci.com/docs/2.0/concepts/#contexts).
+
+The Context page is found within the CircleCI Organisation settings page.
+
+When creating a Context the format is team_name - repo or project_name - preproduction or staging or dev or production or live or uat.
+
+A Context has Security Groups and Environment Variables.
+
+A Security Group resticts the Context to a specific GH [team](https://github.com/orgs/ministryofjustice/teams).
+
+An Environment Variable is a key/value pair to store secrets and environment data that can be used in CI runs.
+
+An Environment Variable example would be AWS_ACCESS_KEY_ID.
+
+We can store an Owner generated API Token value into a Environment Variable within the Context. This will enable that project Owner permissions to create and publish an Orb individually of an Owner involvement.
+
+## Example
+
+Create a personal API token for other teams to publish their own Orbs.
+
+Have created a Context called laa-cla-orbs-token with a Security Group containing LAA Get Access (GH team) and an Environment Variable called CIRCLE_TOKEN which takes the personal token generated above.
+
+This is enough permissions for the team to then publish the Orb from a GH repo.
+
+## Support
+
+User Slack channel: #circleci-users
+Access help channel: #ask-operations-engineering
+Troubleshooting guide: [CircleCI Troubleshooting](circleCI-troubleshoot.html)
