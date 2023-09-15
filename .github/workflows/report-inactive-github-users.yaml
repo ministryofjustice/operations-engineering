@@ -19,6 +19,7 @@ jobs:
       - run: python3 -m python.scripts.report_on_inactive_users
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
