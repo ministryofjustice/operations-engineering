@@ -83,29 +83,29 @@ def check_the_repositories(github_service: GithubService):
     # Print the repositories that have permission problems
 
     if len(repositories_without_maintainers) > 0:
-        logger.warning("Repositories without any maintainers (team or individual):")
+        logging.warning("Repositories without any maintainers (team or individual):")
         for repository_name in repositories_without_maintainers:
-            logger.warning(repository_name)
+            logging.warning(repository_name)
 
     if len(repositories_with_no_associations) > 0:
-        logger.warning("Repositories with no teams or users attached:")
+        logging.warning("Repositories with no teams or users attached:")
         for repository_name in repositories_with_no_associations:
-            logger.warning(repository_name)
+            logging.warning(repository_name)
 
     if len(repositories_without_admin_team) > 0:
-        logger.warning("Repositories without an admin team:")
+        logging.warning("Repositories without an admin team:")
         for repository_name in repositories_without_admin_team:
-            logger.warning(repository_name)
+            logging.warning(repository_name)
 
     if len(repositories_without_any_admin) > 0:
-        logger.warning("Repositories without any admin team or admin collaborator:")
+        logging.warning("Repositories without any admin team or admin collaborator:")
         for repository_name in repositories_without_any_admin:
-            logger.warning(repository_name)
+            logging.warning(repository_name)
 
     if len(repositories_without_any_teams) > 0:
-        logger.warning("Repositories without any teams (except the organisation-security-auditor and all-org-members teams):")
+        logging.warning("Repositories without any teams (except the organisation-security-auditor and all-org-members teams):")
         for repository_name in repositories_without_any_teams:
-            logger.warning(repository_name)
+            logging.warning(repository_name)
 
 
 def main():
