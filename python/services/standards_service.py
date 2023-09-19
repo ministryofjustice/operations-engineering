@@ -59,6 +59,7 @@ class RepositoryReport:
         """Return the report as a json object."""
         return self.__output.to_json()
 
+
     def __repo_name(self) -> str:
         return self.__github_data["node"]["name"]
 
@@ -143,6 +144,24 @@ class RepositoryReport:
     def __has_license(self) -> bool:
         if self.__github_data["node"]["licenseInfo"] is not None:
             return True
+        return False
+
+    def __has_maintainers(self) -> bool:
+        """A maintainer is a user in the organisation
+        or a collaborator on the repository.
+        """
+        return False
+
+    def __has_admins(self) -> bool:
+        """An admin is a user in the organisation
+        that has write access to the repository.
+        """
+        return False
+
+    def __has_team_associated(self) -> bool:
+        """A team is a team in the organisation
+        that has write access to the repository.
+        """
         return False
 
     def __has_description(self) -> bool:
