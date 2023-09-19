@@ -24,7 +24,7 @@ jobs:
         with:
           status: ${{ job.status }}
           notify_when: "failure"
-          notification_title: "Failed to report on inactive GitHub users"
+          notification_title: "Failed to report on unowned_repositories"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
