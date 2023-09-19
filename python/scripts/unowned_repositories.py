@@ -29,10 +29,13 @@ def check_the_repositories(github_service: GithubService):
         has_maintainer_team = False
         has_admin_team = False
         repository_team_names = []
+        repository_collaborators_count = 0
+        repository_teams_count = 0
 
         # Check for teams with maintain or admin permissions
         repository_teams = github_service.get_repository_teams(repository_name)
         for team in repository_teams:
+            repository_teams_count += 1
             repository_team_names.append(team.name)
 
             if team.permission == 'admin':
@@ -46,6 +49,8 @@ def check_the_repositories(github_service: GithubService):
         # Check for outside collaborators with maintain or admin permissions
         repository_collaborators = github_service.get_repository_collaborators(repository_name)
         for collaborator in repository_collaborators:
+            repository_collaborators_count += 1
+
             if collaborator.permissions.admin == True:
                 has_maintainer_collaborator = True
                 has_admin_collaborator = True
@@ -55,14 +60,15 @@ def check_the_repositories(github_service: GithubService):
                 has_maintainer_collaborator = True
 
         for allowed_team in allowed_teams:
-            repository_team_names.remove(allowed_team)
+            if repository_team_names.count(allowed_team) > 0:
+                repository_team_names.remove(allowed_team)
 
         # Determine if repository has any permission problems via team and collaborators
 
         if has_maintainer_team == False and has_maintainer_collaborator == False:
             repositories_without_maintainers.append(repository_name)
 
-        if len(repository_collaborators) == 0 and len(repository_teams) == 0:
+        if repository_collaborators_count == 0 and repository_teams_count == 0:
             repositories_with_no_associations.append(repository_name)
 
         if has_admin_team == False:
@@ -97,7 +103,7 @@ def check_the_repositories(github_service: GithubService):
             logger.warning(repository_name)
 
     if len(repositories_without_any_teams) > 0:
-        logger.warning("Repositories without any teams:")
+        logger.warning("Repositories without any teams (except the organisation-security-auditor and all-org-members teams):")
         for repository_name in repositories_without_any_teams:
             logger.warning(repository_name)
 
