@@ -14,6 +14,7 @@ def get_cli_arguments() -> tuple[str, str, str] | ValueError:
     slack_token = sys.argv[3]
     return organisation_name, admin_github_token, slack_token
 
+
 def check_the_repositories(github_service: GithubService):
     repositories_without_maintainers = []
     repositories_with_no_associations = []
@@ -47,7 +48,8 @@ def check_the_repositories(github_service: GithubService):
                 has_maintainer_team = True
 
         # Check for outside collaborators with maintain or admin permissions
-        repository_collaborators = github_service.get_repository_collaborators(repository_name)
+        repository_collaborators = github_service.get_repository_collaborators(
+            repository_name)
         for collaborator in repository_collaborators:
             repository_collaborators_count += 1
 
@@ -83,7 +85,8 @@ def check_the_repositories(github_service: GithubService):
     # Print the repositories that have permission problems
 
     if len(repositories_without_maintainers) > 0:
-        logging.warning("Repositories without any maintainers (team or individual):")
+        logging.warning(
+            "Repositories without any maintainers (team or individual):")
         for repository_name in repositories_without_maintainers:
             logging.warning(repository_name)
 
@@ -98,12 +101,14 @@ def check_the_repositories(github_service: GithubService):
             logging.warning(repository_name)
 
     if len(repositories_without_any_admin) > 0:
-        logging.warning("Repositories without any admin team or admin collaborator:")
+        logging.warning(
+            "Repositories without any admin team or admin collaborator:")
         for repository_name in repositories_without_any_admin:
             logging.warning(repository_name)
 
     if len(repositories_without_any_teams) > 0:
-        logging.warning("Repositories without any teams (except the organisation-security-auditor and all-org-members teams):")
+        logging.warning(
+            "Repositories without any teams (except the organisation-security-auditor and all-org-members teams):")
         for repository_name in repositories_without_any_teams:
             logging.warning(repository_name)
 
@@ -117,6 +122,7 @@ def main():
     check_the_repositories(github_service)
 
     logging.info("Finished")
+
 
 if __name__ == "__main__":
     main()
