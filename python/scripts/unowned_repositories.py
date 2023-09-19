@@ -31,12 +31,10 @@ def check_the_repositories(github_service: GithubService):
         has_admin_team = False
         repository_team_names = []
         repository_collaborators_count = 0
-        repository_teams_count = 0
 
         # Check for teams with maintain or admin permissions
         repository_teams = github_service.get_repository_teams(repository_name)
         for team in repository_teams:
-            repository_teams_count += 1
             repository_team_names.append(team.name)
 
             if team.permission == 'admin':
@@ -70,7 +68,7 @@ def check_the_repositories(github_service: GithubService):
         if has_maintainer_team == False and has_maintainer_collaborator == False:
             repositories_without_maintainers.append(repository_name)
 
-        if repository_collaborators_count == 0 and repository_teams_count == 0:
+        if repository_collaborators_count == 0 and len(repository_team_names) == 0:
             repositories_with_no_associations.append(repository_name)
 
         if has_admin_team == False:
