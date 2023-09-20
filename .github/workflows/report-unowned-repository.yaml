@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r python/requirements.txt
-      - run: python3 -m python.scripts.unowned_repositories.py ministryofjustice ${ADMIN_GITHUB_TOKEN} ${ADMIN_SLACK_TOKEN}
+      - run: python3 -m python.scripts.unowned_repositories ministryofjustice ${ADMIN_GITHUB_TOKEN} ${ADMIN_SLACK_TOKEN}
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
