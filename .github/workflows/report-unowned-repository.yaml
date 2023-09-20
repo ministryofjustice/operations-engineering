@@ -17,7 +17,7 @@ jobs:
       - run: python3 -m python.scripts.unowned_repositories ministryofjustice ${ADMIN_GITHUB_TOKEN} ${ADMIN_SLACK_TOKEN}
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
-          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
