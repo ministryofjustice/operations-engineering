@@ -44,9 +44,11 @@ def check_the_repositories(github_service: GithubService):
     # Print the repositories that have owner problems
 
     if len(repositories_with_no_associations) > 0:
-        logging.warning("Repositories with no teams, teams with zero users or no users attached:")
+        logging.warning(
+            "Repositories with no teams, teams with zero users or no users attached:")
         for repository_name in repositories_with_no_associations:
             logging.warning(repository_name)
+
 
 def main():
     logging.info("Start")
@@ -57,6 +59,7 @@ def main():
     check_the_repositories(github_service)
 
     logging.info("Finished")
+
 
 if __name__ == "__main__":
     main()
