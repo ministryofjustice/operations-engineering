@@ -245,6 +245,7 @@ class GithubService:
         self.github_client_core_api.get_organization(
             self.organisation_name).get_team(team_id).add_membership(user)
 
+    @retries_github_rate_limit_exception_at_next_reset_once
     def add_all_users_to_team(self, team_name: str) -> None:
         logging.info(f"Adding all users to {team_name}")
         team_id = self.get_team_id_from_team_name(team_name)
@@ -557,6 +558,12 @@ class GithubService:
         users = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
         return [member.login.lower() for member in users]
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repository_collaborators(self, repository_name: str) -> list:
+        users = self.github_client_core_api.get_repo(
+            f"{self.organisation_name}/{repository_name}").get_collaborators("outside") or []
+        return users
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_a_team_usernames(self, team_name: str) -> list[str]:
