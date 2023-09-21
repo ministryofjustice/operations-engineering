@@ -60,6 +60,7 @@ def check_the_repositories(github_service: GithubService):
     if len(repositories_with_no_associations) > 0:
         logging.warning(
             "Repositories with no owners:")
+        repositories_with_no_associations.sort()
         for repository_name in repositories_with_no_associations:
             logging.warning(repository_name)
 
