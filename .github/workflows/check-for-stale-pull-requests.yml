@@ -1,9 +1,9 @@
 name: Stale Pull Request Check
 
 on:
+  schedule:
+    - cron: '0 8 * * *'
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 8 * * *'
 
 jobs:
   check_stale_prs:
@@ -17,7 +17,7 @@ jobs:
       id: check_prs
       run: |
         DATE_CREATED=$(date -d '4 hours ago' --utc +%Y-%m-%dT%H:%M:%SZ)
-        PR_JSON=$(gh pr list --repo ${{ github.repository }} --state open --json createdAt,url,title,isDraft -q ".[] | select(.createdAt < \"$DATE_CREATED\" and .isDraft == false) | .url")
+        PR_JSON=$(gh pr list --repo ${{ github.repository }} --state open --json createdAt,url,title,isDraft,author -q ".[] | select(.createdAt < \"$DATE_CREATED\" and .isDraft == false and .author.is_bot == false) | .url")
 
         PR_COUNT=$(echo "$PR_JSON" | wc -l)
 
