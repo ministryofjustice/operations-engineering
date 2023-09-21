@@ -15,37 +15,49 @@ def get_cli_arguments() -> tuple[str, str, str] | ValueError:
     return organisation_name, admin_github_token, slack_token
 
 
+def get_org_teams(github_service: GithubService):
+    org_teams = []
+    ignore_teams = ["organisation-security-auditor", "all-org-members"]
+    for team_name in github_service.get_team_names():
+        if team_name in ignore_teams:
+            continue
+        team_repository_names = github_service.get_team_repository_names(team_name)
+        team_user_names = github_service.get_team_user_names(team_name)
+        org_teams.append(
+            {
+                "name": team_name,
+                "repositories": team_repository_names,
+                "number_of_users": len(team_user_names)
+            }
+        )
+    return org_teams
+
 def check_the_repositories(github_service: GithubService):
     repositories_with_no_associations = []
-    allowed_teams = ["organisation-security-auditor", "all-org-members"]
+    org_teams = get_org_teams(github_service)
 
-    for repository in github_service.fetch_all_repositories_in_org():
-        repository_name = repository['node']['name']
-        repository_has_collaborator = False
+    for repository_name in github_service.get_org_repo_names():
         repository_has_team = False
 
-        # Check for teams and teams have users
-        repository_teams = github_service.get_repository_teams(repository_name)
-        for team in repository_teams:
-            if team.members_count > 0 and team.name not in allowed_teams:
-                repository_has_team = True
+        for team in org_teams:
+            for team_repository_name in team["repositories"]:
+                # Check repository has any team that has users in it
+                if team_repository_name == repository_name and team["number_of_users"] > 0:
+                    repository_has_team = True
+                    break
+            if repository_has_team == True:
+                break
 
-        # Check for outside collaborators
-        repository_collaborators = github_service.get_repository_collaborators(
-            repository_name)
+        if repository_has_team == False:
+            # Check repository has any outside collaborators
+            if len(github_service.get_repository_collaborators(repository_name)) == 0:
+                # Repository has no owners
+                repositories_with_no_associations.append(repository_name)
 
-        for collaborator in repository_collaborators:
-            repository_has_collaborator = True
-
-        # Determine if repository has no owners
-        if repository_has_team == False and repository_has_collaborator == False:
-            repositories_with_no_associations.append(repository_name)
-
-    # Print the repositories that have owner problems
-
+    # Print the repositories that have no owner
     if len(repositories_with_no_associations) > 0:
         logging.warning(
-            "Repositories with no teams, teams with zero users or no users attached:")
+            "Repositories with no owners:")
         for repository_name in repositories_with_no_associations:
             logging.warning(repository_name)
 
