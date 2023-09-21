@@ -329,6 +329,36 @@ class GithubService:
         return data["organization"]["team"]["databaseId"]
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_org_repository_names(self, after_cursor: str | None,
+                                                   page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated list of org repository names. Page size {page_size}, after cursor {bool(after_cursor)}")
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        return self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $organisation_name) {
+                    repositories(first: $page_size, after: $after_cursor) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                        edges {
+                            node {
+                                isArchived
+                                isDisabled
+                                isLocked
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
+                               "after_cursor": after_cursor})
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories(self, after_cursor: str | None,
                                            page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
@@ -476,6 +506,102 @@ class GithubService:
             "after_cursor": after_cursor
         })
 
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_team_names(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get the team names in the organisation
+
+        Returns:
+            list: A list of the team names
+        """
+        has_next_page = True
+        after_cursor = None
+        team_names = []
+
+        while has_next_page:
+            data = self.get_paginated_list_of_team_names(after_cursor, 100)
+
+            if data["organization"]["teams"]["edges"] is not None:
+                for team in data["organization"]["teams"]["edges"]:
+                    team_names.append(team["node"]["slug"])
+
+            has_next_page = data["organization"]["teams"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["teams"]["pageInfo"]["endCursor"]
+        return team_names
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_team_repository_names(self, team_name: str) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a team repository names
+
+        Returns:
+            list: A list of the team repository names
+        """
+        has_next_page = True
+        after_cursor = None
+        team_repository_names = []
+
+        while has_next_page:
+            data = self.get_paginated_list_of_team_repositories(
+                team_name, after_cursor, 100)
+
+            if data["organization"]["team"]["repositories"]["edges"] is not None:
+                for team in data["organization"]["team"]["repositories"]["edges"]:
+                    team_repository_names.append(team["node"]["name"])
+
+            has_next_page = data["organization"]["team"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["team"]["repositories"]["pageInfo"]["endCursor"]
+        return team_repository_names
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_team_user_names(self, team_name: str) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a team user names
+
+        Returns:
+            list: A list of the team user names
+        """
+        has_next_page = True
+        after_cursor = None
+        team_user_names = []
+
+        while has_next_page:
+            data = self.get_paginated_list_of_team_user_names(
+                team_name, after_cursor, 100)
+
+            if data["organization"]["team"]["members"]["edges"] is not None:
+                for team in data["organization"]["team"]["members"]["edges"]:
+                    team_user_names.append(team["node"]["login"])
+
+            has_next_page = data["organization"]["team"]["members"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["team"]["members"]["pageInfo"]["endCursor"]
+        return team_user_names
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_org_repo_names(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a list of the organisation repository names
+
+        Returns:
+            list: A list of the organisation repository names
+        """
+        has_next_page = True
+        after_cursor = None
+        repository_names = []
+        while has_next_page:
+            data = self.get_paginated_list_of_org_repository_names(
+                after_cursor, 100)
+
+            if data["organization"]["repositories"]["edges"] is not None:
+                for repo in data["organization"]["repositories"]["edges"]:
+                    if not (
+                        repo["node"]["isDisabled"]
+                        or repo["node"]["isArchived"]
+                        or repo["node"]["isLocked"]
+                    ):
+                        repository_names.append(repo["node"]["name"])
+
+            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+        return repository_names
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
         """A wrapper function to run a GraphQL query to get the list of repositories in the organisation
 
@@ -511,7 +637,7 @@ class GithubService:
                                               page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
 
         logging.info(
-            f"Getting paginated list of team repos. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of team user names. Page size {page_size}, after cursor {bool(after_cursor)}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
@@ -563,7 +689,7 @@ class GithubService:
     def get_repository_collaborators(self, repository_name: str) -> list:
         users = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}").get_collaborators("outside") or []
-        return users
+        return [member.login.lower() for member in users]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_a_team_usernames(self, team_name: str) -> list[str]:

@@ -15,101 +15,53 @@ def get_cli_arguments() -> tuple[str, str, str] | ValueError:
     return organisation_name, admin_github_token, slack_token
 
 
+def get_org_teams(github_service: GithubService):
+    org_teams = []
+    ignore_teams = ["organisation-security-auditor", "all-org-members"]
+    for team_name in github_service.get_team_names():
+        if team_name in ignore_teams:
+            continue
+        team_repository_names = github_service.get_team_repository_names(
+            team_name)
+        team_user_names = github_service.get_team_user_names(team_name)
+        org_teams.append(
+            {
+                "name": team_name,
+                "repositories": team_repository_names,
+                "number_of_users": len(team_user_names)
+            }
+        )
+    return org_teams
+
+
 def check_the_repositories(github_service: GithubService):
-    repositories_without_maintainers = []
     repositories_with_no_associations = []
-    repositories_without_admin_team = []
-    repositories_without_any_admin = []
-    repositories_without_any_teams = []
-    allowed_teams = ["organisation-security-auditor", "all-org-members"]
+    org_teams = get_org_teams(github_service)
 
-    for repository in github_service.fetch_all_repositories_in_org():
-        repository_name = repository['node']['name']
-        has_maintainer_collaborator = False
-        has_admin_collaborator = False
-        has_maintainer_team = False
-        has_admin_team = False
-        repository_team_names = []
-        repository_collaborators_count = 0
-        repository_teams_count = 0
+    for repository_name in github_service.get_org_repo_names():
+        repository_has_team = False
 
-        # Check for teams with maintain or admin permissions
-        repository_teams = github_service.get_repository_teams(repository_name)
-        for team in repository_teams:
-            repository_teams_count += 1
-            repository_team_names.append(team.name)
-
-            if team.permission == 'admin':
-                has_maintainer_team = True
-                has_admin_team = True
+        for team in org_teams:
+            for team_repository_name in team["repositories"]:
+                # Check repository has any team that has users in it
+                if team_repository_name == repository_name and team["number_of_users"] > 0:
+                    repository_has_team = True
+                    break
+            if repository_has_team == True:
                 break
 
-            if team.permission == 'maintain':
-                has_maintainer_team = True
+        if repository_has_team == False:
+            # Check repository has any outside collaborators
+            if len(github_service.get_repository_collaborators(repository_name)) == 0:
+                # Repository has no owners
+                repositories_with_no_associations.append(repository_name)
 
-        # Check for outside collaborators with maintain or admin permissions
-        repository_collaborators = github_service.get_repository_collaborators(
-            repository_name)
-        for collaborator in repository_collaborators:
-            repository_collaborators_count += 1
-
-            if collaborator.permissions.admin == True:
-                has_maintainer_collaborator = True
-                has_admin_collaborator = True
-                break
-
-            if collaborator.permissions.maintain == True:
-                has_maintainer_collaborator = True
-
-        for allowed_team in allowed_teams:
-            if repository_team_names.count(allowed_team) > 0:
-                repository_team_names.remove(allowed_team)
-
-        # Determine if repository has any permission problems via team and collaborators
-
-        if has_maintainer_team == False and has_maintainer_collaborator == False:
-            repositories_without_maintainers.append(repository_name)
-
-        if repository_collaborators_count == 0 and repository_teams_count == 0:
-            repositories_with_no_associations.append(repository_name)
-
-        if has_admin_team == False:
-            repositories_without_admin_team.append(repository_name)
-
-        if has_admin_team == False and has_admin_collaborator == False:
-            repositories_without_any_admin.append(repository_name)
-
-        if len(repository_team_names) == 0:
-            repositories_without_any_teams.append(repository_name)
-
-    # Print the repositories that have permission problems
-
-    if len(repositories_without_maintainers) > 0:
-        logging.warning(
-            "Repositories without any maintainers (team or individual):")
-        for repository_name in repositories_without_maintainers:
-            logging.warning(repository_name)
-
+    # Print the repositories that have no owner
     if len(repositories_with_no_associations) > 0:
-        logging.warning("Repositories with no teams or users attached:")
+        logging.warning(
+            "Repositories with no owners:")
+        repositories_with_no_associations.sort()
         for repository_name in repositories_with_no_associations:
-            logging.warning(repository_name)
-
-    if len(repositories_without_admin_team) > 0:
-        logging.warning("Repositories without an admin team:")
-        for repository_name in repositories_without_admin_team:
-            logging.warning(repository_name)
-
-    if len(repositories_without_any_admin) > 0:
-        logging.warning(
-            "Repositories without any admin team or admin collaborator:")
-        for repository_name in repositories_without_any_admin:
-            logging.warning(repository_name)
-
-    if len(repositories_without_any_teams) > 0:
-        logging.warning(
-            "Repositories without any teams (except the organisation-security-auditor and all-org-members teams):")
-        for repository_name in repositories_without_any_teams:
             logging.warning(repository_name)
 
 
