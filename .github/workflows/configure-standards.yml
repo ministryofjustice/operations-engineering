@@ -6,7 +6,7 @@ on:
   workflow_dispatch: # So we can trigger manually
 
 jobs:
-  report-on-unowned-github-repositories:
+  configure-standards:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
