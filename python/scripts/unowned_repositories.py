@@ -21,7 +21,8 @@ def get_org_teams(github_service: GithubService):
     for team_name in github_service.get_team_names():
         if team_name in ignore_teams:
             continue
-        team_repository_names = github_service.get_team_repository_names(team_name)
+        team_repository_names = github_service.get_team_repository_names(
+            team_name)
         team_user_names = github_service.get_team_user_names(team_name)
         org_teams.append(
             {
@@ -31,6 +32,7 @@ def get_org_teams(github_service: GithubService):
             }
         )
     return org_teams
+
 
 def check_the_repositories(github_service: GithubService):
     repositories_with_no_associations = []

@@ -330,7 +330,7 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_org_repository_names(self, after_cursor: str | None,
-                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+                                                   page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
             f"Getting paginated list of org repository names. Page size {page_size}, after cursor {bool(after_cursor)}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
@@ -540,7 +540,8 @@ class GithubService:
         team_repository_names = []
 
         while has_next_page:
-            data = self.get_paginated_list_of_team_repositories(team_name, after_cursor, 100)
+            data = self.get_paginated_list_of_team_repositories(
+                team_name, after_cursor, 100)
 
             if data["organization"]["team"]["repositories"]["edges"] is not None:
                 for team in data["organization"]["team"]["repositories"]["edges"]:
@@ -562,7 +563,8 @@ class GithubService:
         team_user_names = []
 
         while has_next_page:
-            data = self.get_paginated_list_of_team_user_names(team_name, after_cursor, 100)
+            data = self.get_paginated_list_of_team_user_names(
+                team_name, after_cursor, 100)
 
             if data["organization"]["team"]["members"]["edges"] is not None:
                 for team in data["organization"]["team"]["members"]["edges"]:
@@ -583,7 +585,8 @@ class GithubService:
         after_cursor = None
         repository_names = []
         while has_next_page:
-            data = self.get_paginated_list_of_org_repository_names(after_cursor, 100)
+            data = self.get_paginated_list_of_org_repository_names(
+                after_cursor, 100)
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
