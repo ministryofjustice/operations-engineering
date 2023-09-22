@@ -682,7 +682,8 @@ class TestGithubServiceGetPaginatedListOfRepositories(unittest.TestCase):
 class TestGithubServiceGetPaginatedListOfOrgRepositoryNames(unittest.TestCase):
     def test_calls_downstream_services(self):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_paginated_list_of_org_repository_names("test_after_cursor")
+        github_service.get_paginated_list_of_org_repository_names(
+            "test_after_cursor")
         github_service.github_client_gql_api.execute.assert_called_once()
 
     def test_throws_value_error_when_page_size_greater_than_limit(self):
@@ -1042,7 +1043,7 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerTopic(unittest.TestCase)
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetTeamRepositoryNames(unittest.TestCase):
     def setUp(self):
-        self.return_data={
+        self.return_data = {
             "organization": {
                 "team": {
                     "repositories": {
@@ -1086,7 +1087,7 @@ class TestGithubServiceGetTeamRepositoryNames(unittest.TestCase):
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetTeamNames(unittest.TestCase):
     def setUp(self):
-        self.return_data={
+        self.return_data = {
             "organization": {
                 "teams": {
                     "edges": [
@@ -1128,7 +1129,7 @@ class TestGithubServiceGetTeamNames(unittest.TestCase):
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetTeamUserNames(unittest.TestCase):
     def setUp(self):
-        self.return_data={
+        self.return_data = {
             "organization": {
                 "team": {
                     "members": {
@@ -1172,7 +1173,7 @@ class TestGithubServiceGetTeamUserNames(unittest.TestCase):
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetOrgRepoNames(unittest.TestCase):
     def setUp(self):
-        self.return_data={
+        self.return_data = {
             "organization": {
                 "repositories": {
                     "edges": [
@@ -1873,6 +1874,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
             self.assertEqual(
                 f"ERROR:root:An exception occurred while removing user user1 from team {self.team.name}", cm.output[0])
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
@@ -1904,6 +1906,7 @@ class TestSetStandards(unittest.TestCase):
 #         github_service = GithubService("", ORGANISATION_NAME)
 #         github_service._set_has_issues()
 #         github_service.github_client_core_api.get_repo.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()
