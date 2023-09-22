@@ -1891,22 +1891,6 @@ class TestSetStandards(unittest.TestCase):
             [call('moj-analytical-services/test_repository')]
         )
 
-# @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-# @patch("gql.Client.__new__", new=MagicMock)
-# @patch("github.Github.__new__", new=MagicMock)
-# class TestSetHasIssues(unittest.TestCase):
-#     def test_set_has_issues(self):
-#         github_service = GithubService("", ORGANISATION_NAME)
-#         github_service._set_has_issues("test_repository")
-#         github_service.github_client_core_api.get_repo.assert_has_calls(
-#             [call('moj-analytical-services/test_repository')]
-#         )
-
-#     def test_doesnt_call_has_issues(self):
-#         github_service = GithubService("", ORGANISATION_NAME)
-#         github_service._set_has_issues()
-#         github_service.github_client_core_api.get_repo.assert_not_called()
-
 
 if __name__ == "__main__":
     unittest.main()
