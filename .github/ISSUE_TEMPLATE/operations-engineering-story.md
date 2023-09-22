@@ -7,9 +7,15 @@ assignees: ''
 
 ---
 
+**User Need**
+
 **As a** (type of user)
 **I want** (some action)
 **so that** (some result)
+
+**Value**
+
+
 
 **Functional Requirements:**
 
@@ -38,6 +44,8 @@ As a (type of user): This is the role that the stakeholder or user plays. It cou
 I want (some action): This describes what the user wants to do. It should be a specific action or feature.
 
 so that (some result): This is the reason or benefit that the user expects from performing the action.
+
+Value: This is a description of the value that this specific story delivers i.e. what benefits will be realised for users, Ops Eng, MoJ etc. The value may relate to more than one catagory e.g. saves money, removes an manual process. If there is a metric that can show the value you should include this here.
 
 Functional Requirements: Here, you list the functional requirements associated with the user story. These could be based on what you learned from the stakeholder interviews.
 
