@@ -52,7 +52,7 @@ def main():
         logging.warning("No issues found, skipping")
     for issue in issues:
         logging.info(
-            f"Assigned issue {issue.number} to {issue.assignee.login}")
+            f"Assigned issue {issue.number} to {issue.assignees}")
 
 
 if __name__ == "__main__":

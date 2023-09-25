@@ -54,7 +54,12 @@ class TestSentryUsageAlertMain(unittest.TestCase):
 
 @patch("requests.get", new=MagicMock)
 class TestGetEnvironmentVariables(unittest.TestCase):
-    def test_raises_error_when_no_environment_variables_provided(self):
+    def test_raises_error_when_no_sentry_environment_variable_provided(self):
+        self.assertRaises(
+            ValueError, sentry_usage_alert.get_environment_variables)
+
+    @patch.dict(os.environ, {"SENTRY_TOKEN": "sentry_token"})
+    def test_raises_error_when_no_slack_environment_variable_provided(self):
         self.assertRaises(
             ValueError, sentry_usage_alert.get_environment_variables)
 

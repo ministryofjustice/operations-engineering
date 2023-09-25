@@ -29,27 +29,30 @@ class SlackService:
         channel_id = self._lookup_channel_id(channel_name)
         if channel_id is None:
             logging.error(f"Could not find channel {channel_name}")
-            return
-
-        response = self.slack_client.chat_postMessage(
-            channel=channel_id, text=message)
-        if not response['ok']:
-            logging.error(
-                f"Error sending message to channel {channel_name}: {response['error']}")
         else:
-            logging.info(f"Message sent to channel {channel_name}")
+            response = self.slack_client.chat_postMessage(
+                channel=channel_id, text=message)
+            if not response['ok']:
+                logging.error(
+                    f"Error sending message to channel {channel_name}: {response['error']}")
+            else:
+                logging.info(f"Message sent to channel {channel_name}")
 
     def _lookup_channel_id(self, channel_name, cursor=''):
+        channel_id = None
         response = self.slack_client.conversations_list(
             limit=200, cursor=cursor)
-        for channel in response['channels']:
-            if channel['name'] == channel_name:
-                return channel['id']
 
-        if response['response_metadata']['next_cursor'] != '':
-            return self._lookup_channel_id(channel_name, cursor=response['response_metadata']['next_cursor'])
+        if response['channels'] is not None:
+            for channel in response['channels']:
+                if channel['name'] == channel_name:
+                    channel_id = channel['id']
+                    break
 
-        return None
+        if channel_id == None and response['response_metadata']['next_cursor'] != '':
+            channel_id = self._lookup_channel_id(channel_name, cursor=response['response_metadata']['next_cursor'])
+
+        return channel_id
 
     def send_error_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
                                                          usage_threshold: float):

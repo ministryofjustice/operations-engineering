@@ -20,63 +20,69 @@ class TestSlackServiceInit(unittest.TestCase):
                          slack_service.slack_client)
 
 
-@patch("slack_sdk.WebClient.__new__")
 class TestSendMessageToPlainTextChannelName(unittest.TestCase):
 
-    def test_send_message_to_plaintext_channel_name(self, mock_web_client):
-        channel_name = 'test_channel'
-        message = 'test message'
-        channel_id = 'test_channel_id'
-        response_metadata = {'next_cursor': ''}
-        channel = {'name': channel_name, 'id': channel_id}
-        response = {'ok': True}
-        slack_client = MagicMock()
-        mock_web_client.return_value = slack_client
-        slack_client.conversations_list.return_value = {
-            'channels': [channel], 'response_metadata': response_metadata}
-        slack_client.chat_postMessage.return_value = response
+    @patch("slack_sdk.WebClient.__new__")
+    def setUp(self, mock_web_client):
+        self.channel_name = 'test_channel'
+        self.message = 'test message'
+        self.channel_id = 'test_channel_id'
+        self.response_metadata = {'next_cursor': ''}
+        self.channel = {'name': self.channel_name, 'id': self.channel_id}
+        self.response = {'ok': True}
+        self.slack_client = MagicMock()
+        self.mock_web_client = mock_web_client
+        self.mock_web_client.return_value = self.slack_client
+        self.slack_service = SlackService("")
+        self.slack_client.conversations_list.return_value = {
+            'channels': [self.channel], 'response_metadata': self.response_metadata}
+        self.slack_service.slack_client = self.slack_client
 
-        service = SlackService("")
-        service.slack_client = slack_client
-        service.send_message_to_plaintext_channel_name(message, channel_name)
+    def test_send_message_to_plaintext_channel_name(self):
+        self.slack_client.chat_postMessage.return_value = self.response
+        self.slack_service.send_message_to_plaintext_channel_name(self.message, self.channel_name)
+        self.slack_client.chat_postMessage.assert_called_once_with(channel=self.channel_id, text=self.message)
 
-        slack_client.conversations_list.assert_called_once_with(
+    def test_send_message_to_plaintext_channel_name_when_no_channel_name_exists(self):
+        response = {'channels': [], 'response_metadata': self.response_metadata}
+        self.slack_client.conversations_list.return_value = response
+        self.slack_service.send_message_to_plaintext_channel_name(self.message, self.channel_name)
+        self.slack_client.chat_postMessage.assert_not_called()
+
+    def test_send_message_to_plaintext_channel_name_when_response_not_okay(self):
+        response = {'ok': False, "error": "some-error"}
+        self.slack_client.chat_postMessage.return_value = response
+        # self.slack_client.conversations_list.return_value = response
+        self.slack_service.send_message_to_plaintext_channel_name(self.message, self.channel_name)
+        self.slack_client.chat_postMessage.assert_called_once_with(channel=self.channel_id, text=self.message)
+
+    def test_lookup_channel_id(self):
+        result = self.slack_service._lookup_channel_id(self.channel_name)
+        self.slack_client.conversations_list.assert_called_once_with(
             limit=200, cursor='')
-        slack_client.chat_postMessage.assert_called_once_with(
-            channel=channel_id, text=message)
+        self.assertEqual(result, self.channel_id)
 
-    def test_lookup_channel_id(self, mock_web_client):
-        channel_name = 'test_channel'
-        channel_id = 'test_channel_id'
-        response_metadata = {'next_cursor': ''}
-        channel = {'name': channel_name, 'id': channel_id}
-        response = {'channels': [channel],
-                    'response_metadata': response_metadata}
-        slack_client = MagicMock()
-        mock_web_client.return_value = slack_client
-        slack_client.conversations_list.return_value = response
-
-        service = SlackService("")
-        service.slack_client = slack_client
-        result = service._lookup_channel_id(channel_name)
-
-        slack_client.conversations_list.assert_called_once_with(
+    def test_lookup_channel_id_when_no_matching_channels(self):
+        response = {'channels': [{'name': "other-channel", 'id': self.channel_id}], 'response_metadata': self.response_metadata}
+        self.slack_client.conversations_list.return_value = response
+        result = self.slack_service._lookup_channel_id(self.channel_name)
+        self.slack_client.conversations_list.assert_called_once_with(
             limit=200, cursor='')
-        self.assertEqual(result, channel_id)
+        self.assertIsNone(result)
 
-    def test_lookup_channel_id_not_found(self, mock_web_client):
-        channel_name = 'test_channel'
-        response_metadata = {'next_cursor': ''}
-        response = {'channels': [], 'response_metadata': response_metadata}
-        slack_client = MagicMock()
-        mock_web_client.return_value = slack_client
-        slack_client.conversations_list.return_value = response
+    def test_lookup_channel_id_when_channels_empty(self):
+        response = {'channels': [], 'response_metadata': self.response_metadata}
+        self.slack_client.conversations_list.return_value = response
+        result = self.slack_service._lookup_channel_id(self.channel_name)
+        self.slack_client.conversations_list.assert_called_once_with(
+            limit=200, cursor='')
+        self.assertIsNone(result)
 
-        service = SlackService("")
-        service.slack_client = slack_client
-        result = service._lookup_channel_id(channel_name)
-
-        slack_client.conversations_list.assert_called_once_with(
+    def test_lookup_channel_id_when_no_channels(self):
+        response = {'channels': None, 'response_metadata': self.response_metadata}
+        self.slack_client.conversations_list.return_value = response
+        result = self.slack_service._lookup_channel_id(self.channel_name)
+        self.slack_client.conversations_list.assert_called_once_with(
             limit=200, cursor='')
         self.assertIsNone(result)
 
