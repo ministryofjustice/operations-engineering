@@ -16,7 +16,7 @@ labels: 'Firebreak'
 
 ## What hypothesis do we want to test?/What do we want to learn?
 
-<!-- Additional information to explain approach what we wan to learn from this firebreak ? -->
+<!-- Additional information to explain approach what we want to learn from this firebreak? -->
 
 ## Definition of done
 
