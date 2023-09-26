@@ -35,7 +35,7 @@ class TestAssignSupportTicket(unittest.TestCase):
     def test_call_main_catches_exception(self, github_service_mock):
         github_service_mock.return_value.assign_support_issues_to_self = MagicMock(
             side_effect=ValueError)
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(ValueError):
             assign_support_tickets.main()
 
     @patch("sys.argv", [
