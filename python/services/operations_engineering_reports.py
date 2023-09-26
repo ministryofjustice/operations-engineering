@@ -44,7 +44,7 @@ class OperationsEngineeringReportsService:
         """
         #  The database can't handle more than 100 at a time
         # so we need to chunk the list into 100s.
-        self.logger.info("fSending {len(reports)} repository standards reports to API.")
+        self.logger.info(f"Sending {len(reports)} repository standards reports to API.")
         for i in range(0, len(reports), 100):
             chunk = reports[i:i+100]
             status = self.__http_post(chunk)
