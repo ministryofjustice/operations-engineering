@@ -9,6 +9,7 @@ from python.scripts.unowned_repositories import (
     check_the_repositories
 )
 
+
 @patch("python.scripts.unowned_repositories.GithubService", new=MagicMock)
 @patch("python.scripts.unowned_repositories.SlackService", new=MagicMock)
 @patch("python.scripts.unowned_repositories.get_cli_arguments")
@@ -19,6 +20,7 @@ class TestUnownedRepositoriesMain(unittest.TestCase):
         main()
         mock_check_the_repositories.assert_called_once()
         mock_get_cli_arguments.assert_called_once()
+
 
 class TestUnownedRepositories(unittest.TestCase):
     @patch("sys.argv", ["", "", "", ""])
@@ -43,14 +45,16 @@ class TestUnownedRepositories(unittest.TestCase):
         teams = get_org_teams(mock_github_service)
         self.assertEqual(len(teams), 0)
 
-        mock_github_service.get_team_names.return_value = ["organisation-security-auditor"]
+        mock_github_service.get_team_names.return_value = [
+            "organisation-security-auditor"]
         teams = get_org_teams(mock_github_service)
         self.assertEqual(len(teams), 0)
 
     @patch("python.services.github_service.GithubService")
     def test_get_org_teams(self, mock_github_service):
         mock_github_service.get_team_names.return_value = ["some-team"]
-        mock_github_service.get_team_repository_names.return_value = ["some-repo"]
+        mock_github_service.get_team_repository_names.return_value = [
+            "some-repo"]
         mock_github_service.get_team_user_names.return_value = ["some-user"]
         expected_result = {
             "name": "some-team",
@@ -73,7 +77,8 @@ class TestUnownedRepositories(unittest.TestCase):
     @patch("python.scripts.unowned_repositories.get_org_teams")
     def test_check_the_repositories_when_repo_has_a_collaborator(self, mock_get_org_teams, mock_github_service):
         mock_get_org_teams.return_value = []
-        mock_github_service.get_repository_collaborators.return_value = ["some-collaborator"]
+        mock_github_service.get_repository_collaborators.return_value = [
+            "some-collaborator"]
         mock_github_service.get_org_repo_names.return_value = ["org-repo"]
         check_the_repositories(mock_github_service)
         mock_github_service.get_repository_collaborators.assert_called()
