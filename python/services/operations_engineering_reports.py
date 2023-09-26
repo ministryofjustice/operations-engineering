@@ -1,5 +1,6 @@
 import requests
 import logging
+
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -65,7 +66,7 @@ class OperationsEngineeringReportsService:
         self.logger.debug(f"Sending POST request to {url} with data: {len(data)} items")
 
         session = requests.Session()
-        retry_strategy = Retry(
+        retry_strategy = LoggingRetry(
             total=3,
             backoff_factor=1,
             status_forcelist=[500, 502, 503, 504],
@@ -82,3 +83,9 @@ class OperationsEngineeringReportsService:
         else:
             self.logger.debug(f"Successful POST request to {url}")
         return resp
+
+
+class LoggingRetry(Retry):
+    def increment(self, *args, **kwargs):
+        self._logger.warning(f"Retrying request due to failure. Retry number: {self.total}")
+        super(LoggingRetry, self).increment(*args, **kwargs)
