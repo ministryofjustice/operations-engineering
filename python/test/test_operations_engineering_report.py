@@ -18,7 +18,8 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
         service = OperationsEngineeringReportsService(
             url='https://example.com',
             endpoint='reports',
-            api_key='test_api_key'
+            api_key='test_api_key',
+            log_level='DEBUG'
         )
 
         # Prepare the data for the test
@@ -54,7 +55,8 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
         service = OperationsEngineeringReportsService(
             url='https://example.com',
             endpoint='reports',
-            api_key='test_api_key'
+            api_key='test_api_key',
+            log_level='DEBUG'
         )
 
         # Prepare the data for the test
