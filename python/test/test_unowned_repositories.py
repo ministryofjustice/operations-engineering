@@ -15,7 +15,7 @@ from python.scripts.unowned_repositories import (
 @patch("python.scripts.unowned_repositories.get_cli_arguments")
 @patch("python.scripts.unowned_repositories.check_the_repositories")
 class TestUnownedRepositoriesMain(unittest.TestCase):
-    def test_main_runs_step_one(self, mock_check_the_repositories, mock_get_cli_arguments):
+    def test_main(self, mock_check_the_repositories, mock_get_cli_arguments):
         mock_get_cli_arguments.return_value = "", "", ""
         main()
         mock_check_the_repositories.assert_called_once()
