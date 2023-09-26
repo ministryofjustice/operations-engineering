@@ -295,6 +295,7 @@ class TestSlackService(unittest.TestCase):
             ]
         )
 
+
 @patch("slack_sdk.WebClient.__new__")
 class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
 
@@ -315,6 +316,7 @@ class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
                 }
             ]
         )
+
 
 if __name__ == "__main__":
     unittest.main()

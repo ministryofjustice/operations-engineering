@@ -66,8 +66,10 @@ def get_unowned_repositories(github_service: GithubService) -> list:
 
     return repositories_with_no_associations
 
+
 def send_slack_message(slack_service: SlackService, unowned_repositories: list):
     slack_service.send_unowned_repos_slack_message(unowned_repositories)
+
 
 def main():
     logging.info("Start")

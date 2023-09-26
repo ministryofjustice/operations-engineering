@@ -34,6 +34,7 @@ class TestUnownedRepositoriesMain(unittest.TestCase):
         mock_get_cli_arguments.assert_called_once()
         mock_send_slack_message.assert_called()
 
+
 class TestUnownedRepositories(unittest.TestCase):
     @patch("sys.argv", ["", "", "", ""])
     def test_get_cli_arguments_correct_length(self):
@@ -116,7 +117,8 @@ class TestUnownedRepositories(unittest.TestCase):
             "number_of_users": 1
         }
         mock_get_org_teams.return_value = [team]
-        mock_github_service.get_repository_collaborators.return_value = ["some-user"]
+        mock_github_service.get_repository_collaborators.return_value = [
+            "some-user"]
         mock_github_service.get_org_repo_names.return_value = ["org-repo"]
         repos = get_unowned_repositories(mock_github_service)
         self.assertEqual(len(repos), 0)
@@ -140,7 +142,9 @@ class TestUnownedRepositories(unittest.TestCase):
     @patch("python.services.slack_service.SlackService")
     def test_send_slack_message(self, mock_slack_service):
         send_slack_message(mock_slack_service, ["repo"])
-        mock_slack_service.send_unowned_repos_slack_message.assert_called_with(["repo"])
+        mock_slack_service.send_unowned_repos_slack_message.assert_called_with([
+                                                                               "repo"])
+
 
 if __name__ == "__main__":
     unittest.main()
