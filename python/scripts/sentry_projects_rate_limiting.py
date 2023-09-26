@@ -46,16 +46,7 @@ def print_project_key_info(project_key):
     else:
         print("  Active: False")
 
-
-def main():
-    sentry_token = get_sentry_token()
-    print("Start \n")
-
-    headers = {"Authorization": "Bearer " + sentry_token}
-    base_url = "https://sentry.io/api/0"
-
-    teams = get_org_teams(headers, base_url)
-
+def check_sentry_projects(headers, base_url, teams):
     if teams is not None:
         rate_limited_keys = 0
         total_keys = 0
@@ -90,6 +81,14 @@ def main():
         print(f"Rate Limited Keys: {(total_keys - rate_limited_keys)}")
         print(f"Non Rate Limited Keys: {rate_limited_keys}")
 
+
+def main():
+    print("Start \n")
+    sentry_token = get_sentry_token()
+    headers = {"Authorization": "Bearer " + sentry_token}
+    base_url = "https://sentry.io/api/0"
+    teams = get_org_teams(headers, base_url)
+    check_sentry_projects(headers, base_url, teams)
     print("\n Finished")
 
 

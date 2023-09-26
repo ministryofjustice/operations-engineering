@@ -9,12 +9,6 @@ from github.NamedUser import NamedUser
 from python.services.github_service import GithubService
 from python.services.slack_service import SlackService
 
-config_path = './python/config/inactive-users.toml'
-config = toml.load(config_path)
-
-ORGANISATION = config['github']['organisation_name']
-INACTIVITY = config['activity_check']['inactivity_months']
-
 
 @dataclass
 class SelfManagedGitHubTeam:
@@ -58,9 +52,9 @@ def get_environment_variables() -> tuple:
 
 def _message_to_users(users: list[NamedUser], remove: bool, team_name: str, inactivity_months: int) -> str:
     removed_names = "\n".join(
-        [f"- {user.login}" for user in users]) if remove and users else None
+        [f"- {user.login}" for user in users]) if remove and users else False
     to_remove_names = "\n".join(
-        [f"- {user.login}" for user in users]) if not remove and users else None
+        [f"- {user.login}" for user in users]) if not remove and users else False
 
     message = ""
     if removed_names or to_remove_names:
@@ -101,27 +95,35 @@ def _load_team_config(team_config: dict) -> SelfManagedGitHubTeam:
         slack_channel=slack_channel_name
     )
 
-
-def main():
-    github_token, slack_token = get_environment_variables()
-    github = GithubService(github_token, ORGANISATION)
-    slack = SlackService(slack_token)
-
-    for team, settings in config['team'].items():
+def create_report(github_service: GithubService, slack_service: SlackService, inactivity: int, teams: dict):
+    for team, settings in teams:
         logging.info(f"Checking for inactive users in team {team}")
         team_data = _load_team_config(settings)
 
-        inactive_users = github.get_inactive_users(
-            team_data.github_team, team_data.ignore_users, team_data.ignore_repositories, INACTIVITY)
+        inactive_users = github_service.get_inactive_users(
+            team_data.github_team, team_data.ignore_users, team_data.ignore_repositories, inactivity)
 
         if team_data.remove_users:
-            github.remove_list_of_users_from_team(
+            github_service.remove_list_of_users_from_team(
                 team_data.github_team, inactive_users)
 
-        if inactive_users and team_data.slack_channel:
-            slack.send_message_to_plaintext_channel_name(
-                _message_to_users(inactive_users, team_data.remove_users, team, INACTIVITY), team_data.slack_channel)
+        if len(inactive_users) > 0 and team_data.slack_channel:
+            slack_service.send_message_to_plaintext_channel_name(
+                _message_to_users(inactive_users, team_data.remove_users, team, inactivity), team_data.slack_channel)
 
+def get_config(config_path: str) -> tuple[str, str, dict] :
+    config = toml.load(config_path)
+    org_name = config['github']['organisation_name']
+    inactivity = config['activity_check']['inactivity_months']
+    teams = config['team'].items()
+    return org_name, inactivity, teams
+
+def main():
+    org_name, inactivity, teams = get_config('./python/config/inactive-users.toml')
+    github_token, slack_token = get_environment_variables()
+    github_service = GithubService(github_token, org_name)
+    slack_service = SlackService(slack_token)
+    create_report(github_service, slack_service, inactivity, teams)
 
 if __name__ == "__main__":
     main()

@@ -19,6 +19,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             self.config, self.api_key, "some-org")
         self.notify_service.client = mock_notify_client
         self.template_id = "test_template_id"
+        self.email_address = "test@example.com"
 
     @patch.object(NotifyService, "_get_notifications_by_type_and_status")
     def test_undelivered_emails_not_found_returns_none(self, mock_get_notifications_by_type_and_status):
@@ -37,7 +38,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             "notifications": [
                 {
                     "template": {"id": self.template_id},
-                    "email_address": "test@example.com",
+                    "email_address": self.email_address,
                     "created_at": today.isoformat(),
                     "status": "failed"
                 }
@@ -48,7 +49,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             self.template_id)
 
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["email_address"], "test@example.com")
+        self.assertEqual(result[0]["email_address"], self.email_address)
         self.assertEqual(result[0]["created_at"], today)
         self.assertEqual(result[0]["status"], "failed")
 
@@ -125,31 +126,32 @@ class TestNotifyServiceFunctionsForAsOrg(unittest.TestCase):
         self.notify_service = NotifyService(
             self.config, self.api_key, MOJ_ANALYTICAL_SERVICES)
         self.notify_service.client = mock_notifications_api_client
+        self.email_address = "test@example.com"
 
     @patch.object(NotifyService, "_send_email_reply_to_ops_eng")
     def test_send_first_email_as_org(self, mock_send_email_reply_to_ops_eng):
-        self.notify_service.send_first_email("test@example.com", "today")
+        self.notify_service.send_first_email(self.email_address, "today")
         mock_send_email_reply_to_ops_eng.assert_called_once_with(
             "ac0e8752-f550-4550-bff7-ba739a3f2977",
-            "test@example.com",
+            self.email_address,
             {"login_date": "today"}
         )
 
     @patch.object(NotifyService, "_send_email_reply_to_ops_eng")
     def test_send_reminder_email_as_org(self, mock_send_email_reply_to_ops_eng):
-        self.notify_service.send_reminder_email("test@example.com", "today")
+        self.notify_service.send_reminder_email(self.email_address, "today")
         mock_send_email_reply_to_ops_eng.assert_called_once_with(
             "13863d96-7986-4c3b-967e-3123a6773896",
-            "test@example.com",
+            self.email_address,
             {"login_date": "today"}
         )
 
     @patch.object(NotifyService, "_send_email_reply_to_ops_eng")
     def test_send_removed_email_as_org(self, mock_send_email_reply_to_ops_eng):
-        self.notify_service.send_removed_email("test@example.com")
+        self.notify_service.send_removed_email(self.email_address)
         mock_send_email_reply_to_ops_eng.assert_called_once_with(
             "762646ac-0f88-4371-8550-3b6acf66334a",
-            "test@example.com",
+            self.email_address,
             {}
         )
 
@@ -166,31 +168,32 @@ class TestNotifyServiceFunctionsForMojOrg(unittest.TestCase):
         self.notify_service = NotifyService(
             self.config, self.api_key, MINISTRY_OF_JUSTICE)
         self.notify_service.client = mock_notifications_api_client
+        self.email_address = "test@example.com"
 
     @patch.object(NotifyService, "_send_email_reply_to_ops_eng")
     def test_send_first_email_moj_org(self, mock_send_email_reply_to_ops_eng):
-        self.notify_service.send_first_email("test@example.com", "today")
+        self.notify_service.send_first_email(self.email_address, "today")
         mock_send_email_reply_to_ops_eng.assert_called_once_with(
             "30351e8f-320b-4ebe-b0bf-d6aa0a7c607d",
-            "test@example.com",
+            self.email_address,
             {"login_date": "today"}
         )
 
     @patch.object(NotifyService, "_send_email_reply_to_ops_eng")
     def test_send_reminder_email_moj_org(self, mock_send_email_reply_to_ops_eng):
-        self.notify_service.send_reminder_email("test@example.com", "today")
+        self.notify_service.send_reminder_email(self.email_address, "today")
         mock_send_email_reply_to_ops_eng.assert_called_once_with(
             "7405b6f8-9355-4572-8b8c-c73bc8cdee3c",
-            "test@example.com",
+            self.email_address,
             {"login_date": "today"}
         )
 
     @patch.object(NotifyService, "_send_email_reply_to_ops_eng")
     def test_send_removed_email_moj_org(self, mock_send_email_reply_to_ops_eng):
-        self.notify_service.send_removed_email("test@example.com")
+        self.notify_service.send_removed_email(self.email_address)
         mock_send_email_reply_to_ops_eng.assert_called_once_with(
             "d1698bc9-7176-4d54-bece-e68d03d5896a",
-            "test@example.com",
+            self.email_address,
             {}
         )
 

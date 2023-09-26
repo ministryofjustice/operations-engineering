@@ -486,7 +486,7 @@ class TestRunStepThree(unittest.TestCase):
             user1,
             user2
         ]
-        
+
         run_step_three(
             MINISTRY_OF_JUSTICE,
             mock_s3_service,

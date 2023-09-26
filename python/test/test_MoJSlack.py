@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 from datetime import datetime, timedelta
+from slack_sdk.errors import SlackApiError
 
 from python.lib.moj_slack import MojSlack
 
@@ -35,6 +36,17 @@ class MojSlackTestCase(unittest.TestCase):
         messages = self.slack.get_conversation_history(channel_id, days)
 
         self.assertEqual(len(messages), 2)
+
+    def test_print_breakdown(self):
+        list_of_messages = []
+        days = 4
+        self.slack.print_breakdown(list_of_messages, days)
+        list_of_messages = [{"ts": MagicMock()}]
+        self.slack.print_breakdown(list_of_messages, days)
+
+    def test_print_slack_error(self):
+        slack_api_error = MagicMock(response={"ok": False, "error": "some-error"})
+        self.slack.print_slack_error(slack_api_error, "test")
 
     def test_generate_datetime(self):
         number_of_days = 7

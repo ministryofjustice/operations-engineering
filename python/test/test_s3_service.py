@@ -23,6 +23,7 @@ class TestS3Service(unittest.TestCase):
         self.the_json_file = "the_file.json"
         self.builtins = "builtins.open"
         self.fake_datetime = "2023-01-20T14:51:47.000+01:00"
+        self.s3_json_file = "s3_object_file.json"
 
     def test_download_file_correctly(self):
         # Create a temporary directory
@@ -40,20 +41,20 @@ class TestS3Service(unittest.TestCase):
 
     def test_download_file_raise_error(self):
         self.assertRaises(
-            ValueError, self.s3_service._download_file, self.the_json_file, "s3_object_file.json")
+            ValueError, self.s3_service._download_file, self.the_json_file, self.s3_json_file)
 
     def test_upload_file(self):
-        self.s3_service._upload_file(self.the_json_file, "s3_object_file.json")
+        self.s3_service._upload_file(self.the_json_file, self.s3_json_file)
         self.mock_boto3.assert_has_calls(
             [call.client("s3"), call.client().upload_file(
-                "s3_object_file.json", "test-bucket", self.the_json_file)]
+                self.s3_json_file, "test-bucket", self.the_json_file)]
         )
 
     def test_delete_file(self):
-        self.s3_service._delete_file("s3_object_file.json")
+        self.s3_service._delete_file(self.s3_json_file)
         self.mock_boto3.assert_has_calls(
             [call.client("s3"), call.client().delete_object(
-                Bucket="test-bucket", Key="s3_object_file.json")]
+                Bucket="test-bucket", Key=self.s3_json_file)]
         )
 
     @patch.object(S3Service, "_delete_file")
