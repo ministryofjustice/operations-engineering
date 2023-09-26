@@ -4,6 +4,7 @@ from python.scripts import assign_support_tickets
 from python.services.github_service import GithubService
 from python.test.test_github_service import MockGithubIssue
 
+
 @patch("github.Github.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -62,7 +63,8 @@ class TestAssignSupportTicket(unittest.TestCase):
     ])
     @patch.object(GithubService, "assign_support_issues_to_self")
     def test_call_main_with_issues(self, mock_assign_support_issues_to_self):
-        the_object = MockGithubIssue(123, 456, "test complete", [], ["test_support_label"])
+        the_object = MockGithubIssue(
+            123, 456, "test complete", [], ["test_support_label"])
         mock_assign_support_issues_to_self.return_value = [the_object]
         assign_support_tickets.main()
 
@@ -79,6 +81,7 @@ class TestAssignSupportTicket(unittest.TestCase):
         self.assertEqual(parser.org, "ministryofjustice")
         self.assertEqual(parser.repo, "operations-engineering")
         self.assertEqual(parser.tag, "Support")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -418,5 +418,6 @@ class TestRepository5(unittest.TestCase):
         self.repo.remove_users_already_in_existing_teams.assert_called_once()
         self.repo.move_remaining_users_to_new_teams.assert_called_once()
 
+
 if __name__ == "__main__":
     unittest.main()

@@ -1804,7 +1804,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         with self.assertLogs(level='ERROR') as cm:
             github_service._is_user_inactive(
                 self.user1, self.repositories, self.inactivity_months)
-            self.assertEqual("ERROR:root:An exception occurred while getting commit date for user user1 in repo repo1", cm.output[0])
+            self.assertEqual(
+                "ERROR:root:An exception occurred while getting commit date for user user1 in repo repo1", cm.output[0])
 
     def test_remove_list_of_users_from_team(self, mock_github_client_core_api):
 

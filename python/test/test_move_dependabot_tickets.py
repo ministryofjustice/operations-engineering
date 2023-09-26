@@ -100,6 +100,7 @@ class TestMoveDependabotTickets(unittest.TestCase):
         self.assertRaises(
             ValueError, move_dependabot_tickets.move_issues, svc, issues, "test_pipeline_id")
 
+
 @patch("sys.argv", ["", "--api_token", "test"])
 @patch("python.scripts.move_dependabot_tickets.ZenhubService")
 class TestMoveDependabotTicketsMainFunction(unittest.TestCase):
@@ -118,16 +119,20 @@ class TestMoveDependabotTicketsMainFunction(unittest.TestCase):
 
     def test_main_when_issues(self, mock_zen_service):
         mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock()
-        move_dependabot_tickets.get_issues = MagicMock(return_value=["some-issue"])
+        move_dependabot_tickets.get_issues = MagicMock(
+            return_value=["some-issue"])
         move_dependabot_tickets.move_issues = MagicMock()
         move_dependabot_tickets.main()
         move_dependabot_tickets.move_issues.assert_called_once()
 
     def test_main_catches_move_issues_exception(self, mock_zen_service):
         mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock()
-        move_dependabot_tickets.get_issues = MagicMock(return_value=["some-issue"])
-        mock_zen_service.return_value.move_issues = MagicMock(side_effect=Exception)
+        move_dependabot_tickets.get_issues = MagicMock(
+            return_value=["some-issue"])
+        mock_zen_service.return_value.move_issues = MagicMock(
+            side_effect=Exception)
         self.assertRaises(Exception, move_dependabot_tickets.main())
+
 
 if __name__ == '__main__':
     unittest.main()

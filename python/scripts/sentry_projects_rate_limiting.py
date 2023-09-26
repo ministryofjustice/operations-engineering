@@ -46,6 +46,7 @@ def print_project_key_info(project_key):
     else:
         print("  Active: False")
 
+
 def check_sentry_projects(headers, base_url, teams):
     if teams is not None:
         rate_limited_keys = 0

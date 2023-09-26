@@ -6,6 +6,7 @@ import python.scripts.report_on_inactive_users as report_test
 from python.services.github_service import GithubService
 from python.services.slack_service import SlackService
 
+
 class TestReportOnInactiveUsers(unittest.TestCase):
 
     @patch("python.services.slack_service.SlackService")
@@ -27,7 +28,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.teams = [('some_team', self.config)]
         self.mock_github_service = mock_github_service
         self.mock_slack_service = mock_slack_service
-        self.mock_github_service.get_inactive_users.return_value = ["some-value"]
+        self.mock_github_service.get_inactive_users.return_value = [
+            "some-value"]
         self.user1 = Mock()
         self.user1.login = "user1"
         self.user2 = Mock()
@@ -84,7 +86,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.assertEqual('slack_channel', team.slack_channel)
 
     def test_get_config(self):
-        org_name, inactivity, teams = report_test.get_config('./python/test/files/test-inactive-users.toml')
+        org_name, inactivity, teams = report_test.get_config(
+            './python/test/files/test-inactive-users.toml')
         self.assertEqual(org_name, "some-org")
         self.assertEqual(inactivity, 18)
         self.assertEqual(len(teams), 1)
@@ -92,14 +95,16 @@ class TestReportOnInactiveUsers(unittest.TestCase):
     def test_create_report_dont_remove_users(self):
         report_test._message_to_users = MagicMock()
         self.config["remove_from_team"] = False
-        report_test.create_report(self.mock_github_service, self.mock_slack_service, 18, self.teams)
+        report_test.create_report(
+            self.mock_github_service, self.mock_slack_service, 18, self.teams)
         self.mock_github_service.get_inactive_users.assert_called()
         self.mock_github_service.remove_list_of_users_from_team.assert_not_called()
         self.mock_slack_service.send_message_to_plaintext_channel_name.assert_called()
 
     def test_create_report_happy_path(self):
         report_test._message_to_users = MagicMock()
-        report_test.create_report(self.mock_github_service, self.mock_slack_service, 18, self.teams)
+        report_test.create_report(
+            self.mock_github_service, self.mock_slack_service, 18, self.teams)
         self.mock_github_service.get_inactive_users.assert_called()
         self.mock_github_service.remove_list_of_users_from_team.assert_called()
         self.mock_slack_service.send_message_to_plaintext_channel_name.assert_called()
@@ -107,7 +112,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
     def test_create_report_dont_send_slack_message(self):
         self.mock_github_service.get_inactive_users.return_value = []
         report_test._message_to_users = MagicMock()
-        report_test.create_report(self.mock_github_service, self.mock_slack_service, 18, self.teams)
+        report_test.create_report(
+            self.mock_github_service, self.mock_slack_service, 18, self.teams)
         self.mock_github_service.get_inactive_users.assert_called()
         self.mock_github_service.remove_list_of_users_from_team.assert_called()
         self.mock_slack_service.send_message_to_plaintext_channel_name.assert_not_called()
@@ -118,12 +124,13 @@ class TestReportOnInactiveUsers(unittest.TestCase):
     @patch("python.scripts.report_on_inactive_users.create_report")
     @patch("python.scripts.report_on_inactive_users.get_environment_variables")
     def test_call_main(self, mock_get_environment_variables, mock_create_report, mock_get_config):
-        mock_get_config.return_value=["", "", ""]
+        mock_get_config.return_value = ["", "", ""]
         mock_get_environment_variables.return_value = ["", ""]
         report_test.main()
         mock_get_config.assert_called()
         mock_get_environment_variables.assert_called()
         mock_create_report.assert_called()
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -140,7 +140,8 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         self.repository_data['node']['branchProtectionRules']['edges'][0]['node']['isAdminEnforced'] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
-        self.assertEqual(self.to_json['report']['has_default_branch_protection'], False)
+        self.assertEqual(self.to_json['report']
+                         ['has_default_branch_protection'], False)
 
     def test_empty_description(self):
         self.repository_data['node']['description'] = None
@@ -152,7 +153,8 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         self.repository_data['node']['branchProtectionRules']["edges"] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
-        self.assertEqual(self.to_json['report']['has_default_branch_protection'], False)
+        self.assertEqual(self.to_json['report']
+                         ['has_default_branch_protection'], False)
 
     def test_empty_branch_condition(self):
         empty_data_set = {

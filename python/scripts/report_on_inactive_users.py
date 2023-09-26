@@ -95,6 +95,7 @@ def _load_team_config(team_config: dict) -> SelfManagedGitHubTeam:
         slack_channel=slack_channel_name
     )
 
+
 def create_report(github_service: GithubService, slack_service: SlackService, inactivity: int, teams: dict):
     for team, settings in teams:
         logging.info(f"Checking for inactive users in team {team}")
@@ -111,19 +112,23 @@ def create_report(github_service: GithubService, slack_service: SlackService, in
             slack_service.send_message_to_plaintext_channel_name(
                 _message_to_users(inactive_users, team_data.remove_users, team, inactivity), team_data.slack_channel)
 
-def get_config(config_path: str) -> tuple[str, str, dict] :
+
+def get_config(config_path: str) -> tuple[str, str, dict]:
     config = toml.load(config_path)
     org_name = config['github']['organisation_name']
     inactivity = config['activity_check']['inactivity_months']
     teams = config['team'].items()
     return org_name, inactivity, teams
 
+
 def main():
-    org_name, inactivity, teams = get_config('./python/config/inactive-users.toml')
+    org_name, inactivity, teams = get_config(
+        './python/config/inactive-users.toml')
     github_token, slack_token = get_environment_variables()
     github_service = GithubService(github_token, org_name)
     slack_service = SlackService(slack_token)
     create_report(github_service, slack_service, inactivity, teams)
+
 
 if __name__ == "__main__":
     main()

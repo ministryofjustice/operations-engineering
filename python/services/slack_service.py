@@ -50,7 +50,8 @@ class SlackService:
                     break
 
         if channel_id == None and response['response_metadata']['next_cursor'] != '':
-            channel_id = self._lookup_channel_id(channel_name, cursor=response['response_metadata']['next_cursor'])
+            channel_id = self._lookup_channel_id(
+                channel_name, cursor=response['response_metadata']['next_cursor'])
 
         return channel_id
 

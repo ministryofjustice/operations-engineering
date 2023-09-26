@@ -119,7 +119,6 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
             "test_pipeline_name_false")
         self.assertEqual(None, false_pipeline_id)
 
-
     def test_get_pipeline_id_when_none_exist(self):
         mock_zenhub_service = ZenhubService("123")
         mock_zenhub_service.zenhub_client_gql_api.execute.return_value = {

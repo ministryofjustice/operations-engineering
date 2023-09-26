@@ -25,7 +25,8 @@ class TestSentry(unittest.TestCase):
     @patch("python.scripts.sentry_projects_rate_limiting.get_project_keys")
     @patch("python.scripts.sentry_projects_rate_limiting.print_project_key_info")
     def test_check_sentry_projects_with_teams_and_has_no_project_key(self, mock_print_project_key_info, mock_get_project_keys):
-        teams = [{"name": "some-team", "projects":[{"slug":"some-slug", "name":"some-name", "status":"some-status"}]}]
+        teams = [{"name": "some-team", "projects": [{"slug": "some-slug",
+                                                     "name": "some-name", "status": "some-status"}]}]
         mock_get_project_keys.return_value = None
         sentry_projects_rate_limiting.check_sentry_projects("", "", teams)
         mock_get_project_keys.assert_called()
@@ -34,7 +35,8 @@ class TestSentry(unittest.TestCase):
     @patch("python.scripts.sentry_projects_rate_limiting.get_project_keys")
     @patch("python.scripts.sentry_projects_rate_limiting.print_project_key_info")
     def test_check_sentry_projects_with_teams_and_has_project_key(self, mock_print_project_key_info, mock_get_project_keys):
-        teams = [{"name": "some-team", "projects":[{"slug":"some-slug", "name":"some-name", "status":"some-status"}]}]
+        teams = [{"name": "some-team", "projects": [{"slug": "some-slug",
+                                                     "name": "some-name", "status": "some-status"}]}]
         project_key = {"rateLimit": None}
         mock_get_project_keys.return_value = [project_key]
         sentry_projects_rate_limiting.check_sentry_projects("", "", teams)
@@ -42,11 +44,14 @@ class TestSentry(unittest.TestCase):
         mock_print_project_key_info.assert_called()
 
     def test_print_project_key_info(self):
-        project_key = {"name":"some-name", "rateLimit":"some-rateLimit", "isActive": "some-vale"}
+        project_key = {"name": "some-name",
+                       "rateLimit": "some-rateLimit", "isActive": "some-vale"}
         sentry_projects_rate_limiting.print_project_key_info(project_key)
-        project_key = {"name":"some-name", "rateLimit":"some-rateLimit", "isActive": "some-vale"}
+        project_key = {"name": "some-name",
+                       "rateLimit": "some-rateLimit", "isActive": "some-vale"}
         sentry_projects_rate_limiting.print_project_key_info(project_key)
-        project_key = {"name":"some-name", "rateLimit": None, "isActive": None}
+        project_key = {"name": "some-name",
+                       "rateLimit": None, "isActive": None}
         sentry_projects_rate_limiting.print_project_key_info(project_key)
 
     @patch.dict('os.environ', {'SENTRY_TOKEN': 'test_token'})
@@ -55,7 +60,8 @@ class TestSentry(unittest.TestCase):
         self.assertEqual(token, 'test_token')
 
     def test_get_sentry_token_raises_exception(self):
-        self.assertRaises(ValueError, sentry_projects_rate_limiting.get_sentry_token)
+        self.assertRaises(
+            ValueError, sentry_projects_rate_limiting.get_sentry_token)
 
     @patch('requests.get')
     def test_get_org_teams(self, mock_get):

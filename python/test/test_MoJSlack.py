@@ -45,7 +45,8 @@ class MojSlackTestCase(unittest.TestCase):
         self.slack.print_breakdown(list_of_messages, days)
 
     def test_print_slack_error(self):
-        slack_api_error = MagicMock(response={"ok": False, "error": "some-error"})
+        slack_api_error = MagicMock(
+            response={"ok": False, "error": "some-error"})
         self.slack.print_slack_error(slack_api_error, "test")
 
     def test_generate_datetime(self):
