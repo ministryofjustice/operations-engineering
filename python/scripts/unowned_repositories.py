@@ -34,7 +34,7 @@ def get_org_teams(github_service: GithubService):
     return org_teams
 
 
-def check_the_repositories(github_service: GithubService):
+def get_unowned_repositories(github_service: GithubService) -> list:
     repositories_with_no_associations = []
     org_teams = get_org_teams(github_service)
 
@@ -64,6 +64,10 @@ def check_the_repositories(github_service: GithubService):
         for repository_name in repositories_with_no_associations:
             logging.warning(repository_name)
 
+    return repositories_with_no_associations
+
+def send_slack_message(slack_service: SlackService, unowned_repositories: list):
+    slack_service.send_unowned_repos_slack_message(unowned_repositories)
 
 def main():
     logging.info("Start")
@@ -71,8 +75,9 @@ def main():
     organisation_name, admin_github_token, slack_token = get_cli_arguments()
     slack_service = SlackService(slack_token)
     github_service = GithubService(admin_github_token, organisation_name)
-    check_the_repositories(github_service)
-
+    unowned_repositories = get_unowned_repositories(github_service)
+    if len(unowned_repositories) > 0:
+        send_slack_message(slack_service, unowned_repositories)
     logging.info("Finished")
 
 
