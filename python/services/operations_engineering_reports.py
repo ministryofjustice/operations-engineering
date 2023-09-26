@@ -62,6 +62,7 @@ class OperationsEngineeringReportsService:
         }
 
         url = f"{self.__reports_url}/{self.__endpoint}"
+        self.logger.debug(f"Sending POST request to {url} with data: {len(data)} items")
 
         session = requests.Session()
         retry_strategy = Retry(
@@ -76,5 +77,8 @@ class OperationsEngineeringReportsService:
 
         resp = session.post(url, headers=headers, json=data,
                             timeout=180, stream=True).status_code
-
+        if resp != 200:
+            self.logger.error(f"Failed POST request to {url}. Received status: {resp}")
+        else:
+            self.logger.debug(f"Successful POST request to {url}")
         return resp
