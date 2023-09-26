@@ -18,8 +18,7 @@ class TestMoveDependabotTickets(unittest.TestCase):
     def test_invalid_args(self):
         with self.assertRaises(SystemExit) as cm:
             move_dependabot_tickets.main()
-
-        self.assertEqual(cm.exception.code, 2)
+            self.assertEqual(cm.exception.code, 2)
 
     def test_get_issues(self):
         svc = ZenhubService("123")

@@ -50,7 +50,7 @@ class TestFixingDocumentDates(unittest.TestCase):
 
 class TestMainFunction(unittest.TestCase):
     def test_call_main_without_arguments(self):
-        with self.assertRaises(SystemExit) as cm:
+        with self.assertRaises(SystemExit):
             check.main()
 
     @patch("sys.argv", ["", "--fix", "", "--file-path", ""])

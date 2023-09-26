@@ -56,11 +56,8 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
     def test_send_message_to_plaintext_channel_name_when_response_not_okay(self):
         response = {'ok': False, "error": "some-error"}
         self.slack_client.chat_postMessage.return_value = response
-        # self.slack_client.conversations_list.return_value = response
-        self.slack_service.send_message_to_plaintext_channel_name(
-            self.message, self.channel_name)
-        self.slack_client.chat_postMessage.assert_called_once_with(
-            channel=self.channel_id, text=self.message)
+        self.slack_service.send_message_to_plaintext_channel_name(self.message, self.channel_name)
+        self.slack_client.chat_postMessage.assert_called_once_with(channel=self.channel_id, text=self.message)
 
     def test_lookup_channel_id(self):
         result = self.slack_service._lookup_channel_id(self.channel_name)
