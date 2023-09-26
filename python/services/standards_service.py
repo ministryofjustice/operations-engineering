@@ -103,42 +103,54 @@ class RepositoryReport:
         return self.__github_data["node"]["defaultBranchRef"]["name"] == "main"
 
     def __has_default_branch_protection_enabled(self) -> bool:
-        if self.__github_data["node"]["defaultBranchRef"] is None:
-            return False
-
+        default_branch_protection_enabled = False
+        if self.__github_data["node"]["defaultBranchRef"] is None or self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+            return default_branch_protection_enabled
         default_branch = self.__github_data["node"]["defaultBranchRef"]["name"]
         branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             branch_rule = branch_protection_rule["node"]["pattern"]
             if branch_rule == default_branch:
-                return True
-            return False
+                default_branch_protection_enabled = True
+                break
+        return default_branch_protection_enabled
 
     def __has_requires_approving_reviews_enabled(self) -> bool:
+        approving_reviews_enabled = False
+        if self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+            return approving_reviews_enabled
         branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             if branch_protection_rule["node"]["requiresApprovingReviews"] is None:
-                return False
-            return branch_protection_rule["node"]["requiresApprovingReviews"]
+                break
+            approving_reviews_enabled = branch_protection_rule["node"]["requiresApprovingReviews"]
+        return approving_reviews_enabled
 
     def __has_admin_requires_reviews_enabled(self) -> bool:
+        admin_requires_reviews_enabled = False
+        if self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+            return admin_requires_reviews_enabled
         branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             if branch_protection_rule["node"]["isAdminEnforced"] is None:
-                return False
-            return branch_protection_rule["node"]["isAdminEnforced"]
+                break
+            admin_requires_reviews_enabled = branch_protection_rule["node"]["isAdminEnforced"]
+        return admin_requires_reviews_enabled
 
     def __has_issues_enabled(self) -> bool:
         return self.__github_data["node"]["hasIssuesEnabled"]
 
     def __has_required_approval_review_count_enabled(self) -> bool:
+        approval_review_count_enabled = False
+        if self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+            return approval_review_count_enabled
         branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
             if branch_protection_rule["node"]["requiredApprovingReviewCount"] is None:
-                return False
+                break
             if branch_protection_rule["node"]["requiredApprovingReviewCount"] > 0:
-                return True
-            return False
+                approval_review_count_enabled = True
+        return approval_review_count_enabled
 
     def __has_license(self) -> bool:
         if self.__github_data["node"]["licenseInfo"] is not None:

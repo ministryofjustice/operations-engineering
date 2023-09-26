@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from datetime import datetime
 from freezegun import freeze_time
-
+from python.config.constants import MISSING_EMAIL_ADDRESS
 
 from python.scripts.dormant_users import (
     main,
@@ -310,6 +310,31 @@ class TestRunStepOne(unittest.TestCase):
             [{"email_address": "some-email", "username": "full-org-user", "login_date": "13/08/2023", "is_outside_collaborator": False}])
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
 
+    @freeze_time("2023-07-13")
+    def test_run_step_one_when_user_missing_email_address(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
+        mock_github_service.get_org_members_login_names.return_value = [
+            "full-org-user"]
+        user = create_saved_json_file_user("full-org-user")
+        mock_get_dormant_users.return_value = [user]
+        mock_notify_service.check_for_undelivered_first_emails.return_value = [
+            create_undelivered_email_user("some-email")]
+        mock_github_service.get_user_org_email_address.return_value = MISSING_EMAIL_ADDRESS
+
+        run_step_one(
+            MINISTRY_OF_JUSTICE,
+            mock_s3_service,
+            mock_slack_service,
+            mock_notify_service,
+            mock_github_service,
+            mock_auth0_service,
+            True
+        )
+        mock_slack_service.send_unknown_users_slack_message.assert_not_called()
+        mock_notify_service.send_first_email.assert_not_called()
+        mock_s3_service.save_emailed_users_file.assert_called_once_with(
+            [{"email_address": MISSING_EMAIL_ADDRESS, "username": "full-org-user", "login_date": "13/08/2023", "is_outside_collaborator": False}])
+        mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
+
     @freeze_time("2023-08-13")
     @patch("python.scripts.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
@@ -380,6 +405,23 @@ class TestRunStepTwo(unittest.TestCase):
         )
         mock_notify_service.send_reminder_email.assert_not_called()
 
+    def test_run_step_two_when_user_has_no_email_address(self, mock_notify_service, mock_s3_service):
+        user1 = create_saved_json_file_user("full-org-user")
+        user2 = create_saved_json_file_user("moj-operations-engineering-bot")
+        user1['email_address'] = MISSING_EMAIL_ADDRESS
+        user2['email_address'] = MISSING_EMAIL_ADDRESS
+        mock_s3_service.get_users_have_emailed.return_value = [
+            user1,
+            user2
+        ]
+        run_step_two(
+            MINISTRY_OF_JUSTICE,
+            mock_s3_service,
+            mock_notify_service,
+            True
+        )
+        mock_notify_service.send_reminder_email.assert_not_called()
+
     def test_run_step_two_when_no_users(self, mock_notify_service, mock_s3_service):
         mock_s3_service.get_users_have_emailed.return_value = []
         run_step_two(
@@ -433,6 +475,34 @@ class TestRunStepThree(unittest.TestCase):
         mock_s3_service.delete_emailed_users_file.assert_called_once()
 
     def test_run_step_three_when_in_debug_mode(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
+        mock_github_service.get_org_members_login_names.return_value = [
+            "full-org-user"]
+        user1 = create_saved_json_file_user("full-org-user")
+        user2 = create_saved_json_file_user("moj-operations-engineering-bot")
+        user1['email_address'] = MISSING_EMAIL_ADDRESS
+        user2['email_address'] = MISSING_EMAIL_ADDRESS
+        mock_get_dormant_users.return_value = [user1]
+        mock_s3_service.get_users_have_emailed.return_value = [
+            user1,
+            user2
+        ]
+
+        run_step_three(
+            MINISTRY_OF_JUSTICE,
+            mock_s3_service,
+            mock_slack_service,
+            mock_notify_service,
+            mock_github_service,
+            mock_auth0_service,
+            True
+        )
+
+        mock_github_service.remove_user_from_gitub.assert_not_called()
+        mock_notify_service.send_removed_email.assert_not_called()
+        mock_slack_service.send_remove_users_slack_message.assert_not_called()
+        mock_s3_service.delete_emailed_users_file.assert_called_once()
+
+    def test_run_step_three_when_user_has_no_email_address(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = [
             "full-org-user"]
         mock_get_dormant_users.return_value = [

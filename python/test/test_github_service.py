@@ -290,7 +290,7 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.close_expired_issues("test")
         github_service.github_client_core_api.get_repo.assert_has_calls(
-            [call(), call('moj-analytical-services/test'), call().get_issues()])
+            [call(), call(f"{ORGANISATION_NAME}/test"), call().get_issues()])
         github_service.github_client_core_api.get_repo().get_issues.assert_has_calls(
             [call()])
 
@@ -427,7 +427,7 @@ class TestGithubServiceRemoveUserFromTeam(unittest.TestCase):
         github_service.github_client_core_api.get_user.assert_has_calls([
             call('test_user')])
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team('test_repository'),
             call().get_team().remove_membership('mock_user')
         ])
@@ -451,7 +451,7 @@ class TestGithubServiceAddUserToTeam(unittest.TestCase):
         github_service.github_client_core_api.get_user.assert_has_calls([
             call('test_user')])
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team(1),
             call().get_team().add_membership('mock_user')
         ])
@@ -534,7 +534,7 @@ class TestGithubServiceCreateNewTeamWithRepository(unittest.TestCase):
             call(TEST_REPOSITORY)
         ])
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().create_team('test_team', ['mock_repo'], '', 'closed',
                                'Automated generated team to grant users access to this repository')
         ])
@@ -565,7 +565,7 @@ class TestGithubServiceTeamExists(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.team_exists("test_team")
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call(), call('moj-analytical-services'), call().get_teams()
+            call(), call(ORGANISATION_NAME), call().get_teams()
         ])
 
     def test_returns_true_when_team_name_exists(self, mock_github_client_core_api):
@@ -610,7 +610,7 @@ class TestGithubServiceAmendTeamPermissionsForRepository(unittest.TestCase):
             call(TEST_REPOSITORY)
         ])
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team(1),
             call().get_team().update_team_repository(
                 'mock_test_repository', 'test_permission')
@@ -622,7 +622,7 @@ class TestGithubServiceAmendTeamPermissionsForRepository(unittest.TestCase):
         github_service.amend_team_permissions_for_repository(
             1, "read", "test_repository")
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team(1),
             call().get_team().update_team_repository('mock_test_repository', 'pull')
         ])
@@ -633,7 +633,7 @@ class TestGithubServiceAmendTeamPermissionsForRepository(unittest.TestCase):
         github_service.amend_team_permissions_for_repository(
             1, "write", "test_repository")
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team(1),
             call().get_team().update_team_repository('mock_test_repository', 'push')
         ])
@@ -845,7 +845,7 @@ class TestGithubServiceMakeUserTeamMaintainer(unittest.TestCase):
         github_service.github_client_core_api.get_user.assert_has_calls([
             call('test_user')])
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team(1),
             call().get_team().add_membership('mock_user', 'maintainer')
         ])
@@ -985,7 +985,7 @@ class TestGithubServiceGetATeamUsernames(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_a_team_usernames("some-team")
         github_service.github_client_core_api.get_organization.assert_has_calls([
-            call('moj-analytical-services'),
+            call(ORGANISATION_NAME),
             call().get_team_by_slug('some-team'),
             call().get_team_by_slug().get_members(),
             call().get_team_by_slug().get_members().__bool__(),
@@ -1329,10 +1329,10 @@ class TestGitHubServiceSetDefaulBranchProtection(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._set_default_branch_protection(
-            repository_name="test-repository")
+            repository_name="test_repository")
 
         github_service.github_client_core_api.assert_has_calls([
-            call.get_repo('moj-analytical-services/test-repository')
+            call.get_repo(TEST_REPOSITORY)
         ])
 
     def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
@@ -1352,10 +1352,10 @@ class TestGitHubServiceSetEnforceAdmin(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._set_enforce_admins(
-            repository_name="test-repository")
+            repository_name="test_repository")
 
         github_service.github_client_core_api.assert_has_calls([
-            call.get_repo('moj-analytical-services/test-repository')
+            call.get_repo(TEST_REPOSITORY)
         ])
 
     def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
@@ -1375,10 +1375,10 @@ class TestGitHubServiceSetDimissStaleReviews(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._set_dismiss_stale_reviews(
-            repository_name="test-repository")
+            repository_name="test_repository")
 
         github_service.github_client_core_api.assert_has_calls([
-            call.get_repo('moj-analytical-services/test-repository')
+            call.get_repo(TEST_REPOSITORY)
         ])
 
     def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
@@ -1398,10 +1398,10 @@ class TestGitHubServiceHasIssues(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._set_has_issues(
-            repository_name="test-repository")
+            repository_name="test_repository")
 
         github_service.github_client_core_api.assert_has_calls([
-            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo(TEST_REPOSITORY),
             call.get_repo().edit(has_issues=True)
         ])
 
@@ -1422,10 +1422,10 @@ class TestGitHubServiceSetRequiredReviews(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._set_required_review_count(
-            repository_name="test-repository")
+            repository_name="test_repository")
 
         github_service.github_client_core_api.assert_has_calls([
-            call.get_repo('moj-analytical-services/test-repository'),
+            call.get_repo(TEST_REPOSITORY),
             call.get_repo().get_branch('main'),
             call.get_repo().get_branch().edit_protection(required_approving_review_count=1)
         ])
@@ -1446,9 +1446,9 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
     def test_calls_downstream_services_when_no_issues_to_close(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.close_repository_open_issues_with_tag(
-            "test-repository", "test-tag")
+            "test_repository", "test-tag")
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test-repository'),
+            call(TEST_REPOSITORY),
             call().get_issues(state='open'),
             call().get_issues().__iter__()
         ])
@@ -1461,10 +1461,10 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.close_repository_open_issues_with_tag(
-            "test-repository", "test-tag")
+            "test_repository", "test-tag")
 
         github_service.github_client_core_api.get_repo.assert_has_calls([
-            call('moj-analytical-services/test-repository'),
+            call(TEST_REPOSITORY),
             call().get_issues(state='open')
         ])
         mock_open_issue_with_tag.edit.assert_has_calls([call(state='closed')])
@@ -1477,7 +1477,7 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.close_repository_open_issues_with_tag(
-            "test-repository", "test-tag")
+            "test_repository", "test-tag")
 
         self.assertFalse(mock_open_issue_without_tag.edit.called)
 
@@ -1639,7 +1639,7 @@ class TestGithubServiceRemoveUserFromGitHub(unittest.TestCase):
         )
         github_service.github_client_core_api.get_organization.assert_has_calls(
             [
-                call('moj-analytical-services'),
+                call(ORGANISATION_NAME),
                 call().remove_from_membership("mock-user"),
             ]
         )
@@ -1805,7 +1805,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
             github_service._is_user_inactive(
                 self.user1, self.repositories, self.inactivity_months)
             self.assertEqual(
-                f"ERROR:root:An exception occurred while getting commit date for user user1 in repo repo1", cm.output[0])
+                "ERROR:root:An exception occurred while getting commit date for user user1 in repo repo1", cm.output[0])
 
     def test_remove_list_of_users_from_team(self, mock_github_client_core_api):
 
@@ -1888,7 +1888,7 @@ class TestSetStandards(unittest.TestCase):
         github_service._set_has_issues = Mock()
         github_service.set_standards("test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls(
-            [call('moj-analytical-services/test_repository')]
+            [call(TEST_REPOSITORY)]
         )
 
 

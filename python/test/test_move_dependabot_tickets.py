@@ -18,8 +18,7 @@ class TestMoveDependabotTickets(unittest.TestCase):
     def test_invalid_args(self):
         with self.assertRaises(SystemExit) as cm:
             move_dependabot_tickets.main()
-
-        self.assertEqual(cm.exception.code, 2)
+            self.assertEqual(cm.exception.code, 2)
 
     def test_get_issues(self):
         svc = ZenhubService("123")
@@ -91,6 +90,47 @@ class TestMoveDependabotTickets(unittest.TestCase):
 
         self.assertEqual(None, move_dependabot_tickets.move_issues(
             svc, issues, "test_pipeline_id"))
+
+    def test_move_issues_raises_exception(self):
+        svc = ZenhubService("123")
+        svc.get_pipeline_id = MagicMock(return_value="test_pipeline_id")
+        issues = [{"id": "test_issue_id"}]
+        svc.move_issue_to_pipeline = MagicMock(return_value=False)
+        self.assertRaises(
+            ValueError, move_dependabot_tickets.move_issues, svc, issues, "test_pipeline_id")
+
+
+@patch("sys.argv", ["", "--api_token", "test"])
+@patch("python.scripts.move_dependabot_tickets.ZenhubService")
+class TestMoveDependabotTicketsMainFunction(unittest.TestCase):
+    def test_main_raises_exception_from_service(self, mock_zen_service):
+        mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock(
+            side_effect=Exception)
+        self.assertRaises(
+            Exception, move_dependabot_tickets.main())
+
+    def test_main_when_no_issues(self, mock_zen_service):
+        mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock()
+        move_dependabot_tickets.get_issues = MagicMock(return_value=[])
+        move_dependabot_tickets.move_issues = MagicMock()
+        move_dependabot_tickets.main()
+        move_dependabot_tickets.move_issues.assert_not_called()
+
+    def test_main_when_issues(self, mock_zen_service):
+        mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock()
+        move_dependabot_tickets.get_issues = MagicMock(
+            return_value=["some-issue"])
+        move_dependabot_tickets.move_issues = MagicMock()
+        move_dependabot_tickets.main()
+        move_dependabot_tickets.move_issues.assert_called_once()
+
+    def test_main_catches_move_issues_exception(self, mock_zen_service):
+        mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock()
+        move_dependabot_tickets.get_issues = MagicMock(
+            return_value=["some-issue"])
+        mock_zen_service.return_value.move_issues = MagicMock(
+            side_effect=Exception)
+        self.assertRaises(Exception, move_dependabot_tickets.main())
 
 
 if __name__ == '__main__':

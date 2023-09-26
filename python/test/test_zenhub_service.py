@@ -40,7 +40,22 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
         workspace_id = mock.get_workspace_id_from_repo(12)
         self.assertEqual(12, workspace_id)
 
-    def test_returns_none_when_no_workspace_found(self):
+    def test_returns_exception_when_no_workspaces_exist(self):
+        svc = ZenhubService("123")
+        svc.zenhub_client_gql_api.execute.return_value = {
+            "repositoriesByGhId":
+            [
+                {
+                    "workspacesConnection": {
+                        "nodes": None
+                    }
+                }
+            ]
+        }
+        workspace_id = svc.get_workspace_id_from_repo(12)
+        self.assertRaises(Exception, workspace_id)
+
+    def test_returns_exception_index_error_when_zero_workspace_found(self):
         svc = ZenhubService("123")
         svc.zenhub_client_gql_api.execute.return_value = {
             "repositoriesByGhId":
@@ -103,6 +118,19 @@ class TestZenhubIssueRetrieval(unittest.TestCase):
         false_pipeline_id = mock_zenhub_service.get_pipeline_id(
             "test_pipeline_name_false")
         self.assertEqual(None, false_pipeline_id)
+
+    def test_get_pipeline_id_when_none_exist(self):
+        mock_zenhub_service = ZenhubService("123")
+        mock_zenhub_service.zenhub_client_gql_api.execute.return_value = {
+            "workspace": {
+                "pipelinesConnection": {
+                    "nodes": None
+                }
+            }
+        }
+
+        pipeline_id = mock_zenhub_service.get_pipeline_id("test_pipeline_name")
+        self.assertEqual(None, pipeline_id)
 
 
 @patch("gql.Client.__new__", new=MagicMock)
