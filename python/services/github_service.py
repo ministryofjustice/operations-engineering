@@ -529,6 +529,34 @@ class GithubService:
         return team_names
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repositories_info(self) -> list[tuple]:
+        repositories = []
+
+        for repo_type in ["public", "private", "internal"]:
+            after_cursor = None
+            has_next_page = True
+            while has_next_page:
+                data = self.get_paginated_list_of_repositories_per_type(
+                    repo_type, after_cursor)
+
+                if data["search"]["repos"] is not None:
+                    for repository in data["search"]["repos"]:
+                        if repository["repo"]["isDisabled"] == True or repository["repo"]["isLocked"] == True:
+                            continue
+                        repositories.append(
+                            (
+                                repository["repo"]["name"].lower(),
+                                repository["repo"]["hasIssuesEnabled"],
+                                repository["repo"]["collaborators"]["totalCount"],
+                            )
+                        )
+
+                has_next_page = data["search"]["pageInfo"]["hasNextPage"]
+                after_cursor = data["search"]["pageInfo"]["endCursor"]
+
+        return repositories
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_team_repository_names(self, team_name: str) -> list[str]:
         """A wrapper function to run a GraphQL query to get a team repository names
 
@@ -590,12 +618,9 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if not (
-                        repo["node"]["isDisabled"]
-                        or repo["node"]["isArchived"]
-                        or repo["node"]["isLocked"]
-                    ):
-                        repository_names.append(repo["node"]["name"])
+                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"]["isLocked"] == True:
+                        continue
+                    repository_names.append(repo["node"]["name"])
 
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
@@ -621,12 +646,9 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if not (
-                        repo["node"]["isDisabled"]
-                        or repo["node"]["isArchived"]
-                        or repo["node"]["isLocked"]
-                    ):
-                        repos.append(repo)
+                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"]["isLocked"] == True:
+                        continue
+                    repos.append(repo)
 
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
