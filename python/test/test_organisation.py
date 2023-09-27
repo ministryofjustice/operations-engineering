@@ -61,6 +61,8 @@ class TestOrganisation2(unittest.TestCase):
         self.assertEqual(org.ops_eng_team_user_usernames, [])
         self.assertEqual(org.org_name, "some-org")
 
+    # Refactor Status: Done
+    # Changed to TestGithubServiceGetRepositoryInfo.test_returns_correct_data() in test_github_service.py
     def test_filter_out_ignored_repos(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -99,6 +101,8 @@ class TestOrganisation2(unittest.TestCase):
         self.assertEqual(org.repositories, [
                          ('repo1', False, 1), ('repo1', False, 1), ('repo1', False, 1)])
 
+    # Refactor Status: Done
+    # Changed to TestGithubServiceGetRepositoryInfo.test_repo_is_disabled() in test_github_service.py
     def test_ignore_disabled_repo(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -124,6 +128,8 @@ class TestOrganisation2(unittest.TestCase):
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(len(org.repositories), 0)
 
+    # Refactor Status: Done
+    # Changed to TestGithubServiceGetRepositoryInfo.test_repo_is_locked() in test_github_service.py
     def test_ignore_locked_repo(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
