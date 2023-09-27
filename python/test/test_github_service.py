@@ -1124,7 +1124,6 @@ class TestGithubServiceGetTeamNames(unittest.TestCase):
         self.assertEqual(len(repos), 0)
 
 
-
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
@@ -1155,7 +1154,8 @@ class TestGithubServiceGetRepositoryInfo(unittest.TestCase):
         self.public_repo_info = self.expected_repo_data
         self.private_repo_info = self.expected_repo_data
         self.internal_repo_info = self.expected_repo_data
-        self.all_expected_repos_data = [self.public_repo_info, self.private_repo_info, self.internal_repo_info]
+        self.all_expected_repos_data = [
+            self.public_repo_info, self.private_repo_info, self.internal_repo_info]
 
     def test_returns_correct_data(self):
         github_service = GithubService("", ORGANISATION_NAME)
