@@ -11,6 +11,8 @@ class Organisation:
     def __new__(cls, *_, **__):
         return super(Organisation, cls).__new__(cls)
 
+    # Refactor Status: Done
+    # Moved to get_repositories_with_direct_users() and main() in move_users_to_teams_refactor.py
     def __init__(self, github_service: GithubService, org_name: str):
         self.repository_name = 0
 
@@ -34,6 +36,9 @@ class Organisation:
         self.repositories_with_direct_users = []
         self.__create_repositories_with_direct_users()
 
+    # Refactor Status: Not needed
+    # Using lists in move_users_to_teams_refactor.py instead of config file
+    # TODO: Remove the config file/a and related config file test/s
     def __load_config(self):
         config_file = os.getenv("CONFIG_FILE")
         if not config_file:
@@ -61,6 +66,8 @@ class Organisation:
                 for team_name in configs["ignore_teams"]
             ]
 
+    # Refactor Status: Done
+    # Moved to get_repositories_with_direct_users() in move_users_to_teams_refactor.py
     def __fetch_repositories(self):
         self.repositories = [
             repository
@@ -69,6 +76,8 @@ class Organisation:
             if repository[self.repository_name].lower() not in self.badly_named_repositories
         ]
 
+    # Refactor Status: Done
+    # Moved to get_repositories_with_direct_users() in move_users_to_teams_refactor.py
     def __create_repositories_with_direct_users(self):
         issue_section_enabled = 1
         for repository in self.repositories:
@@ -86,6 +95,8 @@ class Organisation:
                     )
                 )
 
+    # Refactor Status: Done
+    # Moved to get_repositories_with_direct_users() in move_users_to_teams_refactor.py
     def __fetch_users_with_direct_access(self, repository: tuple):
         users_with_direct_access = []
         number_of_direct_users = 2
