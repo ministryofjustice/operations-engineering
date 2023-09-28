@@ -7,11 +7,11 @@ from python.services.standards_service import RepositoryReport
 class TestCompliantRepositoryReport(unittest.TestCase):
     def setUp(self):
         self.repository_data = {
-            "node": {
+            "repo": {
                 "branchProtectionRules": {
                     "edges": [
                         {
-                            "node": {
+                            "repo": {
                                 "pattern": "main",
                                 "requiresApprovingReviews": True,
                                 "isAdminEnforced": True,
@@ -43,7 +43,7 @@ class TestCompliantRepositoryReport(unittest.TestCase):
 
     def test_bad_data_init(self):
         bad_data = {
-            "node": {
+            "repo": {
                 "hasIssuesEnabled": True,
                 "licenseInfo": None,
             }
@@ -72,11 +72,11 @@ class TestCompliantRepositoryReport(unittest.TestCase):
 class TestNonCompliantRepositoryReport(unittest.TestCase):
     def setUp(self):
         self.repository_data = {
-            "node": {
+            "repo": {
                 "branchProtectionRules": {
                     "edges": [
                         {
-                            "node": {
+                            "repo": {
                                 "pattern": "not_main",
                                 "requiresApprovingReviews": False,
                                 "isAdminEnforced": False,
@@ -123,34 +123,34 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
                          ['requires_approving_reviews'], False)
 
     def test_empty_admin_approvals(self):
-        self.repository_data['node']['branchProtectionRules']['edges'][0]['node']['requiredApprovingReviewCount'] = None
+        self.repository_data['repo']['branchProtectionRules']['edges'][0]['repo']['requiredApprovingReviewCount'] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
         self.assertEqual(self.to_json['report']
                          ['has_require_approvals_enabled'], False)
 
     def test_empty_require_approvers(self):
-        self.repository_data['node']['branchProtectionRules']['edges'][0]['node']['requiresApprovingReviews'] = None
+        self.repository_data['repo']['branchProtectionRules']['edges'][0]['repo']['requiresApprovingReviews'] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
         self.assertEqual(self.to_json['report']
                          ['has_require_approvals_enabled'], False)
 
     def test_empty_admin_requires_reviews_enabled(self):
-        self.repository_data['node']['branchProtectionRules']['edges'][0]['node']['isAdminEnforced'] = None
+        self.repository_data['repo']['branchProtectionRules']['edges'][0]['repo']['isAdminEnforced'] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
         self.assertEqual(self.to_json['report']
                          ['has_default_branch_protection'], False)
 
     def test_empty_description(self):
-        self.repository_data['node']['description'] = None
+        self.repository_data['repo']['description'] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
         self.assertEqual(self.to_json['report']['has_description'], False)
 
     def test_empty_branch_protection_settings(self):
-        self.repository_data['node']['branchProtectionRules']["edges"] = None
+        self.repository_data['repo']['branchProtectionRules']["edges"] = None
         self.repository_report = RepositoryReport(self.repository_data)
         self.to_json = json.loads(self.repository_report.output)
         self.assertEqual(self.to_json['report']
@@ -158,11 +158,11 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
 
     def test_empty_branch_condition(self):
         empty_data_set = {
-            "node": {
+            "repo": {
                 "branchProtectionRules": {
                     "edges": [
                         {
-                            "node": {
+                            "repo": {
                                 "pattern": "not_main",
                                 "requiresApprovingReviews": False,
                                 "isAdminEnforced": False,

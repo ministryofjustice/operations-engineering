@@ -60,15 +60,15 @@ class RepositoryReport:
         return self.__output.to_json()
 
     def __repo_name(self) -> str:
-        return self.__github_data["node"]["name"]
+        return self.__github_data["repo"]["name"]
 
     def __default_branch(self) -> str:
-        if self.__github_data["node"]["defaultBranchRef"] is None:
+        if self.__github_data["repo"]["defaultBranchRef"] is None:
             return "unknown"
-        return self.__github_data["node"]["defaultBranchRef"]["name"]
+        return self.__github_data["repo"]["defaultBranchRef"]["name"]
 
     def __url(self) -> str:
-        return self.__github_data["node"]["url"]
+        return self.__github_data["repo"]["url"]
 
     def __check_compliant(self) -> bool:
         for key, value in self.__compliance_report().items():
@@ -80,10 +80,10 @@ class RepositoryReport:
         return True
 
     def __last_push(self) -> str:
-        return self.__github_data["node"]["pushedAt"]
+        return self.__github_data["repo"]["pushedAt"]
 
     def __is_private(self) -> bool:
-        return self.__github_data["node"]["isPrivate"]
+        return self.__github_data["repo"]["isPrivate"]
 
     def __compliance_report(self) -> dict:
         return {
@@ -98,18 +98,18 @@ class RepositoryReport:
         }
 
     def __default_branch_main(self) -> bool:
-        if self.__github_data["node"]["defaultBranchRef"] is None:
+        if self.__github_data["repo"]["defaultBranchRef"] is None:
             return False
-        return self.__github_data["node"]["defaultBranchRef"]["name"] == "main"
+        return self.__github_data["repo"]["defaultBranchRef"]["name"] == "main"
 
     def __has_default_branch_protection_enabled(self) -> bool:
         default_branch_protection_enabled = False
-        if self.__github_data["node"]["defaultBranchRef"] is None or self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+        if self.__github_data["repo"]["defaultBranchRef"] is None or self.__github_data["repo"]["branchProtectionRules"]["edges"] is None:
             return default_branch_protection_enabled
-        default_branch = self.__github_data["node"]["defaultBranchRef"]["name"]
-        branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
+        default_branch = self.__github_data["repo"]["defaultBranchRef"]["name"]
+        branch_protection_rules = self.__github_data["repo"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
-            branch_rule = branch_protection_rule["node"]["pattern"]
+            branch_rule = branch_protection_rule["repo"]["pattern"]
             if branch_rule == default_branch:
                 default_branch_protection_enabled = True
                 break
@@ -117,47 +117,47 @@ class RepositoryReport:
 
     def __has_requires_approving_reviews_enabled(self) -> bool:
         approving_reviews_enabled = False
-        if self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+        if self.__github_data["repo"]["branchProtectionRules"]["edges"] is None:
             return approving_reviews_enabled
-        branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
+        branch_protection_rules = self.__github_data["repo"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
-            if branch_protection_rule["node"]["requiresApprovingReviews"] is None:
+            if branch_protection_rule["repo"]["requiresApprovingReviews"] is None:
                 break
-            approving_reviews_enabled = branch_protection_rule["node"]["requiresApprovingReviews"]
+            approving_reviews_enabled = branch_protection_rule["repo"]["requiresApprovingReviews"]
         return approving_reviews_enabled
 
     def __has_admin_requires_reviews_enabled(self) -> bool:
         admin_requires_reviews_enabled = False
-        if self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+        if self.__github_data["repo"]["branchProtectionRules"]["edges"] is None:
             return admin_requires_reviews_enabled
-        branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
+        branch_protection_rules = self.__github_data["repo"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
-            if branch_protection_rule["node"]["isAdminEnforced"] is None:
+            if branch_protection_rule["repo"]["isAdminEnforced"] is None:
                 break
-            admin_requires_reviews_enabled = branch_protection_rule["node"]["isAdminEnforced"]
+            admin_requires_reviews_enabled = branch_protection_rule["repo"]["isAdminEnforced"]
         return admin_requires_reviews_enabled
 
     def __has_issues_enabled(self) -> bool:
-        return self.__github_data["node"]["hasIssuesEnabled"]
+        return self.__github_data["repo"]["hasIssuesEnabled"]
 
     def __has_required_approval_review_count_enabled(self) -> bool:
         approval_review_count_enabled = False
-        if self.__github_data["node"]["branchProtectionRules"]["edges"] is None:
+        if self.__github_data["repo"]["branchProtectionRules"]["edges"] is None:
             return approval_review_count_enabled
-        branch_protection_rules = self.__github_data["node"]["branchProtectionRules"]["edges"]
+        branch_protection_rules = self.__github_data["repo"]["branchProtectionRules"]["edges"]
         for branch_protection_rule in branch_protection_rules:
-            if branch_protection_rule["node"]["requiredApprovingReviewCount"] is None:
+            if branch_protection_rule["repo"]["requiredApprovingReviewCount"] is None:
                 break
-            if branch_protection_rule["node"]["requiredApprovingReviewCount"] > 0:
+            if branch_protection_rule["repo"]["requiredApprovingReviewCount"] > 0:
                 approval_review_count_enabled = True
         return approval_review_count_enabled
 
     def __has_license(self) -> bool:
-        if self.__github_data["node"]["licenseInfo"] is not None:
+        if self.__github_data["repo"]["licenseInfo"] is not None:
             return True
         return False
 
     def __has_description(self) -> bool:
-        if self.__github_data["node"]["description"] is not None:
+        if self.__github_data["repo"]["description"] is not None:
             return True
         return False
