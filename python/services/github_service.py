@@ -408,6 +408,10 @@ class GithubService:
                             }
                         }
                     }
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
                 }
             }
         """), variable_values = {"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})

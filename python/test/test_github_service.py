@@ -1245,8 +1245,8 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
                     "hasNextPage": False,
                     "endCursor": "test_end_cursor",
                 },
-                }
             }
+        }
 
     def test_returning_correct_data(self):
         github_service = GithubService("", ORGANISATION_NAME)
