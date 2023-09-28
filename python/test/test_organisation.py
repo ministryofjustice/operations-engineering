@@ -37,22 +37,19 @@ class TestOrganisation2(unittest.TestCase):
 
     def setUp(self):
         self.mock_github_service = MagicMock(GithubService)
-
+        self.expected_data = {
+            "name": "repo1",
+            "hasIssuesEnabled": False,
+            "collaborators": {
+                "totalCount": 1
+            }
+        }
         self.mock_github_service.get_outside_collaborators_login_names.return_value = []
         self.mock_github_service.get_a_team_usernames.return_value = []
         self.mock_github_service.get_repository_direct_users.return_value = []
 
     def test_smoke_test(self):
-        self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
-            }
-        }
-
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = []
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(org.ignore_teams, ["ignoreteam1"])
         self.assertEqual(org.badly_named_repositories, ["repo1234"])
@@ -62,115 +59,20 @@ class TestOrganisation2(unittest.TestCase):
         self.assertEqual(org.org_name, "some-org")
 
     def test_filter_out_ignored_repos(self):
-        self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [
-                    {
-                        "repo": {
-                            "isDisabled": False,
-                            "isLocked": False,
-                            "name": "repo1",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 1
-                            }
-                        }
-                    },
-                    {
-                        "repo": {
-                            "isDisabled": False,
-                            "isLocked": False,
-                            "name": "repo1234",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 1
-                            }
-                        }
-                    }
-                ],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
+        extra_data = {
+            "name": "repo1234",
+            "hasIssuesEnabled": False,
+            "collaborators": {
+                "totalCount": 1
             }
         }
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data, extra_data]
         org = Organisation(self.mock_github_service, "some-org")
-        # Creates three repo's: x1 public, x1 private and x1 internal
-        self.assertEqual(org.repositories, [
-                         ('repo1', False, 1), ('repo1', False, 1), ('repo1', False, 1)])
-
-    def test_ignore_disabled_repo(self):
-        self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [
-                    {
-                        "repo": {
-                            "isDisabled": True,
-                            "isLocked": False,
-                            "name": "repo1",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 1
-                            }
-                        }
-                    },
-                ],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
-            }
-        }
-        org = Organisation(self.mock_github_service, "some-org")
-        self.assertEqual(len(org.repositories), 0)
-
-    def test_ignore_locked_repo(self):
-        self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [
-                    {
-                        "repo": {
-                            "isDisabled": False,
-                            "isLocked": True,
-                            "name": "repo1",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 1
-                            }
-                        }
-                    },
-                ],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
-            }
-        }
-        org = Organisation(self.mock_github_service, "some-org")
-        self.assertEqual(len(org.repositories), 0)
+        self.assertEqual(org.repositories, [('repo1', False, 1)])
 
     def test_dont_create_repo_object_when_no_direct_users(self):
-        self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [
-                    {
-                        "repo": {
-                            "isDisabled": False,
-                            "isLocked": False,
-                            "name": "repo1",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 0
-                            }
-                        }
-                    },
-                ],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
-            }
-        }
+        self.expected_data["collaborators"]["totalCount"] = 0
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data]
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(len(org.repositories_with_direct_users), 0)
 
@@ -180,31 +82,17 @@ class TestOrganisation3(unittest.TestCase):
 
     def test_filter_out_outside_collaborators(self):
         mock_github_service = MagicMock(GithubService)
-
+        self.expected_data = {
+            "name": "repo1",
+            "hasIssuesEnabled": False,
+            "collaborators": {
+                "totalCount": 1
+            }
+        }
         mock_github_service.get_outside_collaborators_login_names.return_value = [
             "user1234"]
         mock_github_service.get_a_team_usernames.return_value = []
-        mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [
-                    {
-                        "repo": {
-                            "isDisabled": False,
-                            "isLocked": False,
-                            "name": "repo1",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 1
-                            }
-                        }
-                    },
-                ],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
-            }
-        }
+        mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data]
         mock_github_service.get_repository_direct_users.return_value = [
             "user1", "user1234"]
         org = Organisation(mock_github_service, "some-org")
@@ -217,45 +105,28 @@ class TestOrganisation4(unittest.TestCase):
 
     def setUp(self):
         self.mock_github_service = MagicMock(GithubService)
-
-        self.mock_github_service.get_outside_collaborators_login_names.return_value = []
-        self.mock_github_service.get_a_team_usernames.return_value = []
-        self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
-            "search": {
-                "repos": [
-                    {
-                        "repo": {
-                            "isDisabled": False,
-                            "isLocked": False,
-                            "name": "repo1",
-                            "hasIssuesEnabled": False,
-                            "collaborators": {
-                                "totalCount": 1
-                            }
-                        }
-                    },
-                ],
-                "pageInfo": {
-                    "hasNextPage": False,
-                    "endCursor": ""
-                }
+        self.expected_data = {
+            "name": "repo1",
+            "hasIssuesEnabled": False,
+            "collaborators": {
+                "totalCount": 1
             }
         }
+        self.mock_github_service.get_outside_collaborators_login_names.return_value = []
+        self.mock_github_service.get_a_team_usernames.return_value = []
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data]
         self.mock_github_service.get_repository_direct_users.return_value = [
             "user1"]
 
     def test_create_repo_object(self):
         org = Organisation(self.mock_github_service, "some-org")
-        # Creates three repo's x1 public, x1 private and x1 internal
-        self.assertEqual(len(org.repositories_with_direct_users), 3)
+        self.assertEqual(len(org.repositories_with_direct_users), 1)
 
     def test_call_close_expired_issues(self):
         org = Organisation(self.mock_github_service, "some-org")
         org.close_expired_issues()
         self.mock_github_service.close_expired_issues.assert_has_calls(
             [
-                call("repo1"),
-                call("repo1"),
                 call("repo1")
             ]
         )

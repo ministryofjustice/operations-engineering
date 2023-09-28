@@ -628,7 +628,7 @@ class GithubService:
                     for repo in data["search"]["repos"]:
                         if repo["repo"]["isDisabled"] == True or repo["repo"]["isLocked"] == True:
                             continue
-                        repos.append(repo)
+                        repos.append(repo["repo"])
 
                 has_next_page = data["search"]["pageInfo"]["hasNextPage"]
                 after_cursor = data["search"]["pageInfo"]["endCursor"]

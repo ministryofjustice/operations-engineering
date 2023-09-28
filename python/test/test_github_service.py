@@ -1255,7 +1255,7 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
         )
         repos = github_service.fetch_all_repositories_in_org()
         self.assertEqual(len(repos), 3)
-        self.assertEqual(repos[0]["repo"]["name"], "test_repository")
+        self.assertEqual(repos[0]["name"], "test_repository")
         self.assertFalse("unexpected_data" in repos[0])
 
     def test_nothing_to_return(self):

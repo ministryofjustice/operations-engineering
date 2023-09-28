@@ -100,32 +100,17 @@ class Organisation:
         return users_with_direct_access
 
     def __fetch_repository_info(self) -> list[tuple]:
-        repositories = []
-
-        for repo_type in ["public", "private", "internal"]:
-            after_cursor = None
-            has_next_page = True
-            while has_next_page:
-                data = self.github_service.get_paginated_list_of_repositories_per_type(
-                    repo_type, after_cursor)
-
-                for repository in data["search"]["repos"]:
-                    if not (
-                        repository["repo"]["isDisabled"]
-                        or repository["repo"]["isLocked"]
-                    ):
-                        repositories.append(
-                            (
-                                repository["repo"]["name"].lower(),
-                                repository["repo"]["hasIssuesEnabled"],
-                                repository["repo"]["collaborators"]["totalCount"],
-                            )
-                        )
-
-                has_next_page = data["search"]["pageInfo"]["hasNextPage"]
-                after_cursor = data["search"]["pageInfo"]["endCursor"]
-
-        return repositories
+        repositories = self.github_service.fetch_all_repositories_in_org()
+        repos = []
+        for repository in repositories:
+            repos.append(
+            (
+                repository["name"].lower(),
+                repository["hasIssuesEnabled"],
+                repository["collaborators"]["totalCount"],
+            )
+        )
+        return repos
 
     def close_expired_issues(self):
         for repository in self.repositories:
