@@ -608,8 +608,6 @@ class GithubService:
         Returns:
             list: A list of the organisation repos names
         """
-        has_next_page = True
-        after_cursor = None
         repos = []
 
         #  Disable logging. The output is too verbose and not required.
@@ -624,12 +622,12 @@ class GithubService:
 
                 if data["search"]["repos"] is not None:
                     for repo in data["search"]["repos"]:
-                        if repo["repo"]["isDisabled"] == True or repository["repo"]["isLocked"] == True:
+                        if repo["repo"]["isDisabled"] == True or repo["repo"]["isLocked"] == True:
                             continue
                         repos.append(repo)
 
-            has_next_page = data["search"]["pageInfo"]["hasNextPage"]
-            after_cursor = data["search"]["pageInfo"]["endCursor"]
+                has_next_page = data["search"]["pageInfo"]["hasNextPage"]
+                after_cursor = data["search"]["pageInfo"]["endCursor"]
         return repos
 
     @retries_github_rate_limit_exception_at_next_reset_once
