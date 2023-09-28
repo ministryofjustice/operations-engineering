@@ -359,24 +359,25 @@ class GithubService:
                                "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_repositories(self, after_cursor: str | None,
-                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
+    def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
+                                                    page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
-            f"Getting paginated list of repositories. Page size {page_size}, after cursor {bool(after_cursor)}")
+            f"Getting paginated list of repositories per type {repo_type}. Page size {page_size}, after cursor {bool(after_cursor)}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        the_query = f"org:{self.organisation_name}, archived:false, is:{repo_type}"
         return self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
-                organization(login: $organisation_name) {
-                    repositories(first: $page_size, after: $after_cursor) {
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                        edges {
-                            node {
-                                isArchived
+            query($page_size: Int!, $after_cursor: String, $the_query: String!) {
+                search(
+                    type: REPOSITORY
+                    query: $the_query
+                    first: $page_size
+                    after: $after_cursor
+                ) {
+                repos: edges {
+                    repo: node {
+                        ... on Repository {
                                 isDisabled
                                 isPrivate
                                 isLocked
@@ -390,6 +391,9 @@ class GithubService:
                                 }
                                 licenseInfo {
                                     name
+                                }
+                                collaborators(affiliation: DIRECT) {
+                                    totalCount
                                 }
                                 branchProtectionRules(first: 10) {
                                     edges {
@@ -406,8 +410,7 @@ class GithubService:
                     }
                 }
             }
-        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
-                               "after_cursor": after_cursor})
+        """), variable_values = {"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
@@ -529,34 +532,6 @@ class GithubService:
         return team_names
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_repositories_info(self) -> list[tuple]:
-        repositories = []
-
-        for repo_type in ["public", "private", "internal"]:
-            after_cursor = None
-            has_next_page = True
-            while has_next_page:
-                data = self.get_paginated_list_of_repositories_per_type(
-                    repo_type, after_cursor)
-
-                if data["search"]["repos"] is not None:
-                    for repository in data["search"]["repos"]:
-                        if repository["repo"]["isDisabled"] == True or repository["repo"]["isLocked"] == True:
-                            continue
-                        repositories.append(
-                            (
-                                repository["repo"]["name"].lower(),
-                                repository["repo"]["hasIssuesEnabled"],
-                                repository["repo"]["collaborators"]["totalCount"],
-                            )
-                        )
-
-                has_next_page = data["search"]["pageInfo"]["hasNextPage"]
-                after_cursor = data["search"]["pageInfo"]["endCursor"]
-
-        return repositories
-
-    @retries_github_rate_limit_exception_at_next_reset_once
     def get_team_repository_names(self, team_name: str) -> list[str]:
         """A wrapper function to run a GraphQL query to get a team repository names
 
@@ -641,17 +616,20 @@ class GithubService:
         logging.getLogger("gql").setLevel(logging.CRITICAL)
         logging.disable(logging.INFO)
 
-        while has_next_page:
-            data = self.get_paginated_list_of_repositories(after_cursor, 50)
+        for repo_type in ["public", "private", "internal"]:
+            after_cursor = None
+            has_next_page = True
+            while has_next_page:
+                data = self.get_paginated_list_of_repositories_per_type(repo_type, after_cursor)
 
-            if data["organization"]["repositories"]["edges"] is not None:
-                for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"]["isLocked"] == True:
-                        continue
-                    repos.append(repo)
+                if data["search"]["repos"] is not None:
+                    for repo in data["search"]["repos"]:
+                        if repo["repo"]["isDisabled"] == True or repository["repo"]["isLocked"] == True:
+                            continue
+                        repos.append(repo)
 
-            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
-            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+            has_next_page = data["search"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["search"]["pageInfo"]["endCursor"]
         return repos
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -891,47 +869,6 @@ class GithubService:
             branch = repository.get_branch(branch_name)
             # Call the edit_protection method on the branch object and return the result
             return branch.edit_protection(required_approving_review_count=required_review_count)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
-                                                    page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
-        logging.info(
-            f"Getting paginated list of repositories per type {repo_type}. Page size {page_size}, after cursor {bool(after_cursor)}")
-        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
-            raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        the_query = f"org:{self.organisation_name}, archived:false, is:{repo_type}"
-        query = gql("""
-            query($page_size: Int!, $after_cursor: String, $the_query: String!) {
-                search(
-                    type: REPOSITORY
-                    query: $the_query
-                    first: $page_size
-                    after: $after_cursor
-                ) {
-                repos: edges {
-                    repo: node {
-                        ... on Repository {
-                                name
-                                isDisabled
-                                isLocked
-                                hasIssuesEnabled
-                                collaborators(affiliation: DIRECT) {
-                                    totalCount
-                                }
-                            }
-                        }
-                    }
-                    pageInfo {
-                        hasNextPage
-                        endCursor
-                    }
-                }
-            }
-        """)
-        variable_values = {"the_query": the_query, "page_size": page_size,
-                           "after_cursor": after_cursor}
-        return self.github_client_gql_api.execute(query, variable_values)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_topic(self, topic: str, after_cursor: str | None,
