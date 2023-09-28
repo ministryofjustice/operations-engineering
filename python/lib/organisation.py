@@ -99,8 +99,6 @@ class Organisation:
 
         return users_with_direct_access
 
-    # Refactor Status: Done
-    # Changed to get_repositories_info() in github_service.py
     def __fetch_repository_info(self) -> list[tuple]:
         repositories = []
 
