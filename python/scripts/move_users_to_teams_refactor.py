@@ -30,21 +30,31 @@ class Repository:
     teams: list = field(default_factory=list)
 
 
-def get_ignore_lists(organisation_name: str) -> tuple | ValueError:
-    ignore_repositories = []
+def get_ignore_teams_list(organisation_name: str) -> tuple | ValueError:
     ignore_teams = []
 
     if organisation_name == MINISTRY_OF_JUSTICE:
-        ignore_repositories = [repo.lower() for repo in IGNORE_REPOSITORIES_MOJ_ORG]
         ignore_teams = [team.lower() for team in IGNORE_TEAMS_MOJ_ORG]
     elif organisation_name == MOJ_ANALYTICAL_SERVICES:
-        ignore_repositories = [repo.lower() for repo in IGNORE_REPOSITORIES_AS_ORG]
         ignore_teams = [team.lower() for team in IGNORE_TEAMS_AS_ORG]
     else:
         raise ValueError(
             f"Unsupported Github Organisation Name [{organisation_name}]")
 
-    return ignore_repositories, ignore_teams
+    return ignore_teams
+
+def get_ignore_repositories_list(organisation_name: str) -> tuple | ValueError:
+    ignore_repositories = []
+
+    if organisation_name == MINISTRY_OF_JUSTICE:
+        ignore_repositories = [repo.lower() for repo in IGNORE_REPOSITORIES_MOJ_ORG]
+    elif organisation_name == MOJ_ANALYTICAL_SERVICES:
+        ignore_repositories = [repo.lower() for repo in IGNORE_REPOSITORIES_AS_ORG]
+    else:
+        raise ValueError(
+            f"Unsupported Github Organisation Name [{organisation_name}]")
+
+    return ignore_repositories
 
 
 def get_environment_variables() -> tuple:
@@ -63,24 +73,30 @@ def get_environment_variables() -> tuple:
 def get_repo_direct_access_users(github_service: GithubService, repository: dict, org_outside_collaborators: list) -> list:
     users_with_direct_access = []
     # Get repository users but exclude the outside collaborators
-    if repository["number_of_direct_users"] > 0:
+    if repository["collaborators"]["totalCount"] > 0:
         users_with_direct_access = [
             user
-            for user in github_service.get_repository_direct_users(repository["repository_name"])
+            for user in github_service.get_repository_direct_users(repository["name"])
             if user not in org_outside_collaborators
         ]
     return users_with_direct_access
 
 
-def get_org_repositories(github_service: GithubService, ignore_repositories: list) -> list:
+def get_org_repositories(github_service: GithubService, org_name: str) -> list:
+    ignore_repositories = get_ignore_repositories_list(org_name)
+    all_repos = [
+        repository["node"]
+        for repository in github_service.fetch_all_repositories_in_org()
+    ]
     return [
         repository
-        for repository in github_service.get_repositories_info()
-        if repository["repository_name"] not in ignore_repositories
+        for repository in all_repos
+        if repository["name"] not in ignore_repositories
     ]
 
 
-def get_repository_teams(github_service: GithubService, repository_name: str, ignore_teams: list) -> list:
+def get_repository_teams(github_service: GithubService, repository_name: str, org_name: str) -> list:
+    ignore_teams = get_ignore_teams_list(org_name)
     return [
         RepositoryTeam(team)
         for team in github_service.get_repository_teams(repository_name)
@@ -88,19 +104,18 @@ def get_repository_teams(github_service: GithubService, repository_name: str, ig
     ]
 
 
-def get_repositories_with_direct_users(github_service: GithubService) -> list[Repository]:
+def get_repositories_with_direct_users(github_service: GithubService, org_name: str) -> list[Repository]:
     repositories_with_direct_users = []
-    ignore_repositories, ignore_teams = get_ignore_lists(org_name)
     org_outside_collaborators = github_service.get_outside_collaborators_login_names()
-    for repository in get_org_repositories(github_service, ignore_repositories):
+    for repository in get_org_repositories(github_service, org_name):
         users_with_direct_access = get_repo_direct_access_users(github_service, repository, org_outside_collaborators)
-        repository_name = repository["repository_name"]
+        repository_name = repository["name"]
         if len(users_with_direct_access) > 0:
-            repository_teams = get_repository_teams(github_service, repository_name, ignore_teams)
+            repository_teams = get_repository_teams(github_service, repository_name, org_name)
             repositories_with_direct_users.append(
                 Repository(
                     repository_name,
-                    repository["issue_section_enabled"],
+                    repository["hasIssuesEnabled"],
                     users_with_direct_access,
                     repository_teams
                 )
@@ -117,7 +132,7 @@ def main():
     github_token, org_name = get_environment_variables()
     github_service = GithubService(github_token, org_name)
     ops_eng_team_usernames = get_ops_eng_team_usernames(github_service)
-    repositories_with_direct_users = get_repositories_with_direct_users(github_service)
+    repositories_with_direct_users = get_repositories_with_direct_users(github_service, org_name)
     print("Finished")
 
 

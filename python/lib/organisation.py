@@ -38,6 +38,7 @@ class Organisation:
 
     # Refactor Status: Not needed
     # Using lists in move_users_to_teams_refactor.py instead of config file
+    # See get_ignore_teams_list() and get_ignore_repositories_list()
     # TODO: Remove the config file/a and related config file test/s
     def __load_config(self):
         config_file = os.getenv("CONFIG_FILE")
@@ -67,7 +68,7 @@ class Organisation:
             ]
 
     # Refactor Status: Done
-    # Moved to get_repositories_with_direct_users() in move_users_to_teams_refactor.py
+    # Moved to get_org_repositories() in move_users_to_teams_refactor.py
     def __fetch_repositories(self):
         self.repositories = [
             repository
@@ -96,7 +97,7 @@ class Organisation:
                 )
 
     # Refactor Status: Done
-    # Moved to get_repositories_with_direct_users() in move_users_to_teams_refactor.py
+    # Moved to get_repo_direct_access_users() in move_users_to_teams_refactor.py
     def __fetch_users_with_direct_access(self, repository: tuple):
         users_with_direct_access = []
         number_of_direct_users = 2

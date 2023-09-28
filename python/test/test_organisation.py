@@ -8,23 +8,31 @@ from python.lib.organisation import Organisation
 
 class TestOrganisation1(unittest.TestCase):
 
+    # Refactor Status: Done
+    # Test not needed. Config file replaced with a list.
     def test_detect_config_file_env_var_missing(self):
         mock_github_service = MagicMock(GithubService)
         with self.assertRaises(ValueError):
             Organisation(mock_github_service, "some-org")
 
+    # Refactor Status: Done
+    # Test not needed. Config file replaced with a list.
     @patch.dict(os.environ, {"CONFIG_FILE": "test/files/some-config.yml"})
     def test_provide_wrong_config_file(self):
         mock_github_service = MagicMock(GithubService)
         with self.assertRaises(ValueError):
             Organisation(mock_github_service, "some-org")
 
+    # Refactor Status: Done
+    # Test not needed. Config file replaced with a list.
     @patch.dict(os.environ, {"CONFIG_FILE": "test/files/incorrect-config1.yml"})
     def test_provide_incorrect_config_file_1(self):
         mock_github_service = MagicMock(GithubService)
         with self.assertRaises(KeyError):
             Organisation(mock_github_service, "some-org")
 
+    # Refactor Status: Done
+    # Test not needed. Config file replaced with a list.
     @patch.dict(os.environ, {"CONFIG_FILE": "test/files/incorrect-config2.yml"})
     def test_provide_incorrect_config_file_2(self):
         mock_github_service = MagicMock(GithubService)
@@ -42,6 +50,8 @@ class TestOrganisation2(unittest.TestCase):
         self.mock_github_service.get_a_team_usernames.return_value = []
         self.mock_github_service.get_repository_direct_users.return_value = []
 
+    # Refactor Status: Done
+    # Test not needed. Class will be deleted.
     def test_smoke_test(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -61,6 +71,8 @@ class TestOrganisation2(unittest.TestCase):
         self.assertEqual(org.ops_eng_team_user_usernames, [])
         self.assertEqual(org.org_name, "some-org")
 
+    # Refactor Status: Done
+    # Test moved to test_github_service.py.
     def test_filter_out_ignored_repos(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -99,6 +111,8 @@ class TestOrganisation2(unittest.TestCase):
         self.assertEqual(org.repositories, [
                          ('repo1', False, 1), ('repo1', False, 1), ('repo1', False, 1)])
 
+    # Refactor Status: Done
+    # Test moved to TestGithubServiceFetchAllRepositories
     def test_ignore_disabled_repo(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -124,6 +138,8 @@ class TestOrganisation2(unittest.TestCase):
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(len(org.repositories), 0)
 
+    # Refactor Status: Done
+    # Test moved to TestGithubServiceFetchAllRepositories
     def test_ignore_locked_repo(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -149,6 +165,8 @@ class TestOrganisation2(unittest.TestCase):
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(len(org.repositories), 0)
 
+    # Refactor Status: Done
+    # Test moved to TestGithubServiceFetchAllRepositories
     def test_dont_create_repo_object_when_no_direct_users(self):
         self.mock_github_service.get_paginated_list_of_repositories_per_type.return_value = {
             "search": {
@@ -178,6 +196,8 @@ class TestOrganisation2(unittest.TestCase):
 @patch.dict(os.environ, {"CONFIG_FILE": "test/files/test-config.yml"})
 class TestOrganisation3(unittest.TestCase):
 
+    # Refactor Status: Done
+    # Test moved to test_get_repo_direct_access_users_excludes_collaborator
     def test_filter_out_outside_collaborators(self):
         mock_github_service = MagicMock(GithubService)
 
@@ -244,6 +264,8 @@ class TestOrganisation4(unittest.TestCase):
         self.mock_github_service.get_repository_direct_users.return_value = [
             "user1"]
 
+    # Refactor Status: Done
+    # Test moved to test_get_repositories_with_direct_users_when_repo_has_direct_users
     def test_create_repo_object(self):
         org = Organisation(self.mock_github_service, "some-org")
         # Creates three repo's x1 public, x1 private and x1 internal
