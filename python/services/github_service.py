@@ -414,7 +414,7 @@ class GithubService:
                     }
                 }
             }
-        """), variable_values = {"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})
+        """), variable_values={"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
@@ -622,7 +622,8 @@ class GithubService:
             after_cursor = None
             has_next_page = True
             while has_next_page:
-                data = self.get_paginated_list_of_repositories_per_type(repo_type, after_cursor)
+                data = self.get_paginated_list_of_repositories_per_type(
+                    repo_type, after_cursor)
 
                 if data["search"]["repos"] is not None:
                     for repo in data["search"]["repos"]:
