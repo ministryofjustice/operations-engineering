@@ -66,13 +66,15 @@ class TestOrganisation2(unittest.TestCase):
                 "totalCount": 1
             }
         }
-        self.mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data, extra_data]
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = [
+            self.expected_data, extra_data]
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(org.repositories, [('repo1', False, 1)])
 
     def test_dont_create_repo_object_when_no_direct_users(self):
         self.expected_data["collaborators"]["totalCount"] = 0
-        self.mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data]
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = [
+            self.expected_data]
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(len(org.repositories_with_direct_users), 0)
 
@@ -92,7 +94,8 @@ class TestOrganisation3(unittest.TestCase):
         mock_github_service.get_outside_collaborators_login_names.return_value = [
             "user1234"]
         mock_github_service.get_a_team_usernames.return_value = []
-        mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data]
+        mock_github_service.fetch_all_repositories_in_org.return_value = [
+            self.expected_data]
         mock_github_service.get_repository_direct_users.return_value = [
             "user1", "user1234"]
         org = Organisation(mock_github_service, "some-org")
@@ -114,7 +117,8 @@ class TestOrganisation4(unittest.TestCase):
         }
         self.mock_github_service.get_outside_collaborators_login_names.return_value = []
         self.mock_github_service.get_a_team_usernames.return_value = []
-        self.mock_github_service.fetch_all_repositories_in_org.return_value = [self.expected_data]
+        self.mock_github_service.fetch_all_repositories_in_org.return_value = [
+            self.expected_data]
         self.mock_github_service.get_repository_direct_users.return_value = [
             "user1"]
 

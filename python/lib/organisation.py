@@ -104,12 +104,12 @@ class Organisation:
         repos = []
         for repository in repositories:
             repos.append(
-            (
-                repository["name"].lower(),
-                repository["hasIssuesEnabled"],
-                repository["collaborators"]["totalCount"],
+                (
+                    repository["name"].lower(),
+                    repository["hasIssuesEnabled"],
+                    repository["collaborators"]["totalCount"],
+                )
             )
-        )
         return repos
 
     def close_expired_issues(self):
