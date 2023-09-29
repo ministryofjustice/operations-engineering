@@ -664,21 +664,6 @@ class TestGithubServiceGetTeamIdFromTeamName(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
-class TestGithubServiceGetPaginatedListOfRepositories(unittest.TestCase):
-    def test_calls_downstream_services(self):
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_paginated_list_of_repositories("test_after_cursor")
-        github_service.github_client_gql_api.execute.assert_called_once()
-
-    def test_throws_value_error_when_page_size_greater_than_limit(self):
-        github_service = GithubService("", ORGANISATION_NAME)
-        self.assertRaises(
-            ValueError, github_service.get_paginated_list_of_repositories, "test_after_cursor", 101)
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetPaginatedListOfOrgRepositoryNames(unittest.TestCase):
     def test_calls_downstream_services(self):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1243,79 +1228,59 @@ class TestGithubServiceGetOrgRepoNames(unittest.TestCase):
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceFetchAllRepositories(unittest.TestCase):
+    def setUp(self):
+        self.return_data = {
+            "search": {
+                "repos": [
+                    {
+                        "repo": {
+                            "name": "test_repository",
+                            "url": "test.com",
+                            "isLocked": False,
+                            "isDisabled": False,
+                        },
+                    },
+                ],
+                "pageInfo": {
+                    "hasNextPage": False,
+                    "endCursor": "test_end_cursor",
+                },
+            }
+        }
+
     def test_returning_correct_data(self):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_paginated_list_of_repositories = MagicMock(
-            return_value={
-                "organization": {
-                    "repositories": {
-                        "edges": [
-                            {
-                                "node": {
-                                    "name": "test_repository",
-                                    "url": "test.com",
-                                    "isArchived": False,
-                                    "isLocked": False,
-                                    "isDisabled": False,
-                                },
-                            },
-                        ],
-                        "pageInfo": {
-                            "hasNextPage": False,
-                            "endCursor": "test_end_cursor",
-                        },
-                    }
-                }
-            }
+        github_service.get_paginated_list_of_repositories_per_type = MagicMock(
+            return_value=self.return_data
         )
         repos = github_service.fetch_all_repositories_in_org()
-        self.assertEqual(len(repos), 1)
-        self.assertEqual(repos[0]["node"]["name"], "test_repository")
+        self.assertEqual(len(repos), 3)
+        self.assertEqual(repos[0]["name"], "test_repository")
         self.assertFalse("unexpected_data" in repos[0])
 
     def test_nothing_to_return(self):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_paginated_list_of_repositories = MagicMock(
-            return_value={
-                "organization": {
-                    "repositories": {
-                        "edges": None,
-                        "pageInfo": {
-                            "hasNextPage": False,
-                            "endCursor": "test_end_cursor",
-                        },
-                    }
-                }
-            }
+        self.return_data["search"]["repos"] = None
+        github_service.get_paginated_list_of_repositories_per_type = MagicMock(
+            return_value=self.return_data
         )
-
         repos = github_service.fetch_all_repositories_in_org()
         self.assertEqual(len(repos), 0)
 
-    def test_ignore_invalid_data(self):
+    def test_ignore_locked_repo(self):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_paginated_list_of_repositories = MagicMock(
-            return_value={
-                "organization": {
-                    "repositories": {
-                        "edges": [
-                            {
-                                "node": {
-                                    "name": "test_repository2",
-                                    "url": "test.couk",
-                                    "isArchived": True,
-                                    "isLocked": False,
-                                    "isDisabled": False,
-                                },
-                            },
-                        ],
-                        "pageInfo": {
-                            "hasNextPage": False,
-                            "endCursor": "test_end_cursor",
-                        },
-                    }
-                }
-            }
+        self.return_data["search"]["repos"][0]["repo"]["isLocked"] = True
+        github_service.get_paginated_list_of_repositories_per_type = MagicMock(
+            return_value=self.return_data
+        )
+        repos = github_service.fetch_all_repositories_in_org()
+        self.assertEqual(len(repos), 0)
+
+    def test_ignore_disabled_repo(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.return_data["search"]["repos"][0]["repo"]["isDisabled"] = True
+        github_service.get_paginated_list_of_repositories_per_type = MagicMock(
+            return_value=self.return_data
         )
         repos = github_service.fetch_all_repositories_in_org()
         self.assertEqual(len(repos), 0)
