@@ -1,5 +1,6 @@
 import argparse
 
+import logging
 from python.services.github_service import GithubService
 from python.services.operations_engineering_reports import \
     OperationsEngineeringReportsService as reports_service
@@ -62,7 +63,7 @@ def main():
         args.oauth_token, args.org).fetch_all_repositories_in_org()
     repo_reports = [RepositoryReport(repo).output for repo in repos]
 
-    reports_service(args.url, args.endpoint, args.api_key). \
+    reports_service(args.url, args.endpoint, args.api_key, "INFO"). \
         override_repository_standards_reports(repo_reports)
 
 
