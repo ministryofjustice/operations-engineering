@@ -389,6 +389,9 @@ class GithubService:
                                 defaultBranchRef {
                                     name
                                 }
+                                collaborators(affiliation: DIRECT) {
+                                    totalCount
+                                }
                                 licenseInfo {
                                     name
                                 }
