@@ -23,7 +23,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "satis-s3",
     "wasm",
     "wp-rewrite-media-to-s3",
-    "oracle-policy-automation-docker"
+    "oracle-policy-automation-docker",
+    "criminal-forecasting-rap"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
