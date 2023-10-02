@@ -17,5 +17,6 @@ def main():
     close_expired_issues(github_service, org_name)
     print("Finished")
 
+
 if __name__ == "__main__":
     main()
