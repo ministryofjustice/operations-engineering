@@ -70,7 +70,7 @@ class TestAssignSupportTicket(unittest.TestCase):
 
     @patch("sys.argv", ["", "--oauth-token"])
     def test_call_main_without_arguments(self):
-        with self.assertRaises(SystemExit) as cm:
+        with self.assertRaises(SystemExit):
             assign_support_tickets.main()
 
     @patch("sys.argv", ["", "--oauth-token", ""])

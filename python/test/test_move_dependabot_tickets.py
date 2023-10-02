@@ -16,7 +16,7 @@ class TestMoveDependabotTickets(unittest.TestCase):
         move_dependabot_tickets.main()
 
     def test_invalid_args(self):
-        with self.assertRaises(SystemExit) as cm:
+        with self.assertRaises(SystemExit):
             move_dependabot_tickets.main()
 
     def test_get_issues(self):
