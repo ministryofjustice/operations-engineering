@@ -43,13 +43,16 @@ def get_ignore_teams_list(organisation_name: str) -> tuple | ValueError:
 
     return ignore_teams
 
+
 def get_ignore_repositories_list(organisation_name: str) -> tuple | ValueError:
     ignore_repositories = []
 
     if organisation_name == MINISTRY_OF_JUSTICE:
-        ignore_repositories = [repo.lower() for repo in IGNORE_REPOSITORIES_MOJ_ORG]
+        ignore_repositories = [repo.lower()
+                               for repo in IGNORE_REPOSITORIES_MOJ_ORG]
     elif organisation_name == MOJ_ANALYTICAL_SERVICES:
-        ignore_repositories = [repo.lower() for repo in IGNORE_REPOSITORIES_AS_ORG]
+        ignore_repositories = [repo.lower()
+                               for repo in IGNORE_REPOSITORIES_AS_ORG]
     else:
         raise ValueError(
             f"Unsupported Github Organisation Name [{organisation_name}]")
@@ -108,10 +111,12 @@ def get_repositories_with_direct_users(github_service: GithubService, org_name: 
     repositories_with_direct_users = []
     org_outside_collaborators = github_service.get_outside_collaborators_login_names()
     for repository in get_org_repositories(github_service, org_name):
-        users_with_direct_access = get_repo_direct_access_users(github_service, repository, org_outside_collaborators)
+        users_with_direct_access = get_repo_direct_access_users(
+            github_service, repository, org_outside_collaborators)
         repository_name = repository["name"]
         if len(users_with_direct_access) > 0:
-            repository_teams = get_repository_teams(github_service, repository_name, org_name)
+            repository_teams = get_repository_teams(
+                github_service, repository_name, org_name)
             repositories_with_direct_users.append(
                 Repository(
                     repository_name,
@@ -132,7 +137,8 @@ def main():
     github_token, org_name = get_environment_variables()
     github_service = GithubService(github_token, org_name)
     ops_eng_team_usernames = get_ops_eng_team_usernames(github_service)
-    repositories_with_direct_users = get_repositories_with_direct_users(github_service, org_name)
+    repositories_with_direct_users = get_repositories_with_direct_users(
+        github_service, org_name)
     print("Finished")
 
 

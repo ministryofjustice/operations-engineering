@@ -45,7 +45,8 @@ class TestMoveUsersToTeamsMain(unittest.TestCase):
 
 class TestMoveUsersToTeams(unittest.TestCase):
     def setUp(self):
-        self.repository_data = {"name": "some-repo", "collaborators": {"totalCount": 1}, "hasIssuesEnabled": True}
+        self.repository_data = {
+            "name": "some-repo", "collaborators": {"totalCount": 1}, "hasIssuesEnabled": True}
         self.org_outside_collaborators = []
         self.test_user = "some-user"
 
@@ -58,7 +59,8 @@ class TestMoveUsersToTeams(unittest.TestCase):
         self.assertEqual(ignore_teams, IGNORE_TEAMS_AS_ORG)
 
     def test_get_ignore_repositories_list_as_org(self):
-        ignore_repositories = get_ignore_repositories_list(MOJ_ANALYTICAL_SERVICES)
+        ignore_repositories = get_ignore_repositories_list(
+            MOJ_ANALYTICAL_SERVICES)
         self.assertEqual(ignore_repositories, IGNORE_REPOSITORIES_AS_ORG)
 
     def test_get_ignore_repositories_list_moj_org(self):
@@ -89,35 +91,42 @@ class TestMoveUsersToTeams(unittest.TestCase):
 
     @patch("python.services.github_service.GithubService")
     def test_get_repo_direct_access_users_when_users_exist(self, mock_github_service):
-        mock_github_service.get_repository_direct_users.return_value = [self.test_user]
-        users = get_repo_direct_access_users(mock_github_service, self.repository_data, self.org_outside_collaborators)
+        mock_github_service.get_repository_direct_users.return_value = [
+            self.test_user]
+        users = get_repo_direct_access_users(
+            mock_github_service, self.repository_data, self.org_outside_collaborators)
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0], self.test_user)
 
     @patch("python.services.github_service.GithubService")
     def test_get_repo_direct_access_users_when_no_exist(self, mock_github_service):
         mock_github_service.get_repository_direct_users.return_value = []
-        users = get_repo_direct_access_users(mock_github_service, self.repository_data, self.org_outside_collaborators)
+        users = get_repo_direct_access_users(
+            mock_github_service, self.repository_data, self.org_outside_collaborators)
         self.assertEqual(len(users), 0)
 
     @patch("python.services.github_service.GithubService")
     def test_get_repo_direct_access_users_when_repo_has_no_direct_users(self, mock_github_service):
         self.repository_data["collaborators"]["totalCount"] = 0
-        users = get_repo_direct_access_users(mock_github_service, self.repository_data, self.org_outside_collaborators)
+        users = get_repo_direct_access_users(
+            mock_github_service, self.repository_data, self.org_outside_collaborators)
         self.assertEqual(len(users), 0)
 
     @patch("python.services.github_service.GithubService")
     def test_get_repo_direct_access_users_excludes_collaborator(self, mock_github_service):
         self.repository_data["collaborators"]["totalCount"] = 2
         self.org_outside_collaborators.append("collaborator")
-        mock_github_service.get_repository_direct_users.return_value = ["collaborator", self.test_user]
-        users = get_repo_direct_access_users(mock_github_service, self.repository_data, self.org_outside_collaborators)
+        mock_github_service.get_repository_direct_users.return_value = [
+            "collaborator", self.test_user]
+        users = get_repo_direct_access_users(
+            mock_github_service, self.repository_data, self.org_outside_collaborators)
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0], self.test_user)
 
     @patch("python.services.github_service.GithubService")
     def test_get_ops_eng_team_usernames(self, mock_github_service):
-        mock_github_service.get_a_team_usernames.return_value = [self.test_user, self.test_user]
+        mock_github_service.get_a_team_usernames.return_value = [
+            self.test_user, self.test_user]
         users = get_ops_eng_team_usernames(mock_github_service)
         self.assertEqual(len(users), 2)
         self.assertEqual(users, [self.test_user, self.test_user])
@@ -161,15 +170,18 @@ class TestMoveUsersToTeams(unittest.TestCase):
     @patch("python.scripts.move_users_to_teams_refactor.get_ignore_repositories_list")
     def test_get_org_repositories_when_repos_exist(self, mock_get_ignore_repositories_list, mock_github_service):
         mock_get_ignore_repositories_list.return_value = []
-        mock_github_service.fetch_all_repositories_in_org.return_value = [{"node": self.repository_data}]
+        mock_github_service.fetch_all_repositories_in_org.return_value = [
+            {"node": self.repository_data}]
         repos = get_org_repositories(mock_github_service, "")
         self.assertEqual(len(repos), 1)
 
     @patch("python.services.github_service.GithubService")
     @patch("python.scripts.move_users_to_teams_refactor.get_ignore_repositories_list")
     def test_get_org_repositories_when_repo_is_in_ignore_list(self, mock_get_ignore_repositories_list, mock_github_service):
-        mock_get_ignore_repositories_list.return_value = [self.repository_data["name"]]
-        mock_github_service.fetch_all_repositories_in_org.return_value = [{"node": self.repository_data}]
+        mock_get_ignore_repositories_list.return_value = [
+            self.repository_data["name"]]
+        mock_github_service.fetch_all_repositories_in_org.return_value = [
+            {"node": self.repository_data}]
         repos = get_org_repositories(mock_github_service, "")
         self.assertEqual(len(repos), 0)
 
@@ -199,6 +211,7 @@ class TestMoveUsersToTeams(unittest.TestCase):
         mock_github_service.get_repository_teams.return_value = [mock_team]
         teams = get_repository_teams(mock_github_service, "", "")
         self.assertEqual(len(teams), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
