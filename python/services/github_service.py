@@ -612,10 +612,8 @@ class GithubService:
         after_cursor = None
         repos = []
 
-        #  Disable logging. The output is too verbose and not required.
-        logging.getLogger("gql").setLevel(logging.CRITICAL)
-        logging.disable(logging.INFO)
-
+        # Specifically switch off logging for this query as it is very large and doesn't need to be logged
+        logging.disabled = True
         while has_next_page:
             data = self.get_paginated_list_of_repositories(after_cursor, 50)
 
@@ -630,6 +628,9 @@ class GithubService:
 
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+
+        # Re-enable logging
+        logging.disabled = False
         return repos
 
     @retries_github_rate_limit_exception_at_next_reset_once
