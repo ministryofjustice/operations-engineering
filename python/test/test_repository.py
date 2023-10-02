@@ -4,7 +4,8 @@ from unittest.mock import MagicMock, patch, call
 from python.services.github_service import GithubService
 from python.lib.repository import Repository
 
-
+# Refactor Status: Done
+# Test not needed
 class TestRepository1(unittest.TestCase):
 
     def test_smoke_test(self):

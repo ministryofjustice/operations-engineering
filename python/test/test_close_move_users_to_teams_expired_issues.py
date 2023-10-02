@@ -6,7 +6,8 @@ from python.scripts import close_move_users_to_teams_expired_issues
 from python.services.github_service import GithubService
 from python.lib.organisation import Organisation
 
-
+# Refactor Status: Done
+# Test not needed
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 @patch.object(Organisation, "__new__")
 @patch.object(GithubService, "__new__")
@@ -16,6 +17,8 @@ class TestCloseMoveUsersToTeamsExpiredIssues1(unittest.TestCase):
         close_move_users_to_teams_expired_issues.main()
 
 
+# Refactor Status: Done
+# Test not needed
 @patch.dict(os.environ, {"WRONG_TOKEN": "token"})
 @patch.object(Organisation, "__new__")
 @patch.object(GithubService, "__new__")

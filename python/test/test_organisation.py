@@ -144,6 +144,8 @@ class TestOrganisation4(unittest.TestCase):
         org = Organisation(self.mock_github_service, "some-org")
         self.assertEqual(len(org.repositories_with_direct_users), 1)
 
+    # Refactor Status: Done
+    # Test moved to test_close_move_users_to_teams_expired_issues_refactor
     def test_call_close_expired_issues(self):
         org = Organisation(self.mock_github_service, "some-org")
         org.close_expired_issues()
@@ -153,6 +155,8 @@ class TestOrganisation4(unittest.TestCase):
             ]
         )
 
+    # Refactor Status: Done
+    # Test moved to test_move_users_to_teams
     @patch("python.lib.repository.Repository.__new__")
     def test_call_move_users_to_teams(self, mock_repository):
         org = Organisation(self.mock_github_service, "some-org")
