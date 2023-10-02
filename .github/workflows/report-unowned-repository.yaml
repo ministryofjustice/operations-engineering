@@ -1,8 +1,8 @@
 name: Report any repository identified as "unowned"
 
 on:
-  # schedule:
-    # - cron: "0 6 * * *" # Every day at 0600
+  schedule:
+    - cron: "0 10 * * 1" # once a week Monday at 10am
   workflow_dispatch: # So we can trigger manually
 
 jobs:
