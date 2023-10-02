@@ -5,7 +5,8 @@ from pyaml_env import parse_config
 from python.lib.repository import Repository
 from python.services.github_service import GithubService
 
-
+# Refactor Status: Done
+# Class no longer need
 class Organisation:
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
@@ -111,6 +112,8 @@ class Organisation:
 
         return users_with_direct_access
 
+    # Refactor Status: Done
+    # Moved to get_org_repositories() in move_users_to_teams_refactor.py
     def __fetch_repository_info(self) -> list[tuple]:
         repositories = self.github_service.fetch_all_repositories_in_org()
         repos = []
@@ -124,11 +127,15 @@ class Organisation:
             )
         return repos
 
+    # Refactor Status: Done
+    # Moved to close_expired_issues() in close_move_users_to_teams_expired_issues_refactor.py
     def close_expired_issues(self):
         for repository in self.repositories:
             self.github_service.close_expired_issues(
                 repository[self.repository_name].lower())
 
+    # Refactor Status: Done
+    # Moved to move_users_to_teams() in move_users_to_teams_refactor.py
     def move_users_to_teams(self):
         for repository in self.repositories_with_direct_users:
             repository.move_direct_users_to_teams()

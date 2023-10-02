@@ -2,7 +2,8 @@ from github import Team
 
 from python.services.github_service import GithubService
 
-
+# Refactor Status: Done
+# Moved to move_users_to_teams_refactor.py
 class RepositoryTeam:
     def __init__(self, team: Team):
         self.name = team.name.lower()
@@ -13,12 +14,15 @@ class RepositoryTeam:
         self.repository_permission = team.permission
         self.id = team.id
 
-
+# Refactor Status: Done
+# Class moved to move_users_to_teams_refactor.py
 class Repository:
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
         return super(Repository, cls).__new__(cls)
 
+    # Refactor Status: Done
+    # Moved to move_users_to_teams_refactor.py
     def __init__(self, github_service: GithubService, name: str,
                  issue_section_status: bool, users_with_direct_access: list[str], ops_eng_team_user_names: list[str],
                  ignore_teams: list):

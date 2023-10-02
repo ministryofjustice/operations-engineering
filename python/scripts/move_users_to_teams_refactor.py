@@ -88,7 +88,7 @@ def get_repo_direct_access_users(github_service: GithubService, repository: dict
 def get_org_repositories(github_service: GithubService, org_name: str) -> list:
     ignore_repositories = get_ignore_repositories_list(org_name)
     all_repos = [
-        repository["node"]
+        repository
         for repository in github_service.fetch_all_repositories_in_org()
     ]
     return [
@@ -112,14 +112,19 @@ def get_repositories_with_direct_users(github_service: GithubService, org_name: 
     org_outside_collaborators = github_service.get_outside_collaborators_login_names()
     for repository in get_org_repositories(github_service, org_name):
         users_with_direct_access = get_repo_direct_access_users(
-            github_service, repository, org_outside_collaborators)
-        repository_name = repository["name"]
+            github_service,
+            repository,
+            org_outside_collaborators
+        )
         if len(users_with_direct_access) > 0:
             repository_teams = get_repository_teams(
-                github_service, repository_name, org_name)
+                github_service,
+                repository["name"],
+                org_name
+            )
             repositories_with_direct_users.append(
                 Repository(
-                    repository_name,
+                    repository["name"],
                     repository["hasIssuesEnabled"],
                     users_with_direct_access,
                     repository_teams
@@ -130,6 +135,11 @@ def get_repositories_with_direct_users(github_service: GithubService, org_name: 
 
 def get_ops_eng_team_usernames(github_service: GithubService):
     return github_service.get_a_team_usernames("operations-engineering")
+
+
+def move_users_to_teams(repositories_with_direct_users: list[Repository]):
+    for repository in repositories_with_direct_users:
+        pass
 
 
 def main():

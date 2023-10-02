@@ -4,6 +4,9 @@ from python.lib.organisation import Organisation
 from python.services.github_service import GithubService
 
 
+# Refactor Status: Done
+# Moved to functionalit to close_move_users_to_teams_expired_issues_refactor.py
+# TODO: Delete this file and remove the config file from the GH Action
 def main():
     print("Start")
 
