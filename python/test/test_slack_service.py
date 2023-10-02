@@ -297,7 +297,7 @@ class TestSlackService(unittest.TestCase):
 
 
 @patch("slack_sdk.WebClient.__new__")
-class SendUnknownedReposAlertToOperationsEngineering(unittest.TestCase):
+class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
 
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
         repos = ["some-repo1", "some-repo2", "some-repo3"]
