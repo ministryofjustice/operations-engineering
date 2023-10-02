@@ -24,9 +24,7 @@ class OperationsEngineeringReportsService:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.logger.setLevel(log_level)
         self.logger.info(
-            f"Initialised {self.__class__.__name__}  \
-            with url:  {self.__reports_url},  \
-            endpoint: {self.__endpoint}"
+            f"Initialised {self.__class__.__name__} with url:  {self.__reports_url}, endpoint: {self.__endpoint}"
         )
 
     def override_repository_standards_reports(self, reports: list[dict]) -> None:
@@ -87,5 +85,5 @@ class OperationsEngineeringReportsService:
 
 class LoggingRetry(Retry):
     def increment(self, *args, **kwargs):
-        self._logger.warning(f"Retrying request due to failure. Retry number: {self.total}")
+        self.logger.warning(f"Retrying request due to failure. Retry number: {self.total}")
         super(LoggingRetry, self).increment(*args, **kwargs)
