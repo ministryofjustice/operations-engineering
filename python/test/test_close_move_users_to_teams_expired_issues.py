@@ -8,6 +8,8 @@ from python.lib.organisation import Organisation
 
 # Refactor Status: Done
 # Test not needed
+
+
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 @patch.object(Organisation, "__new__")
 @patch.object(GithubService, "__new__")

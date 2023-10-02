@@ -8,6 +8,8 @@ from python.lib.organisation import Organisation
 
 # Refactor Status: Done
 # Test not needed
+
+
 @patch.dict(os.environ, {"ORG_NAME": "orgname"})
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 @patch.object(Organisation, "__new__")
@@ -19,6 +21,8 @@ class TestMoveUsersToTeams1(unittest.TestCase):
 
 # Refactor Status: Done
 # Test not needed
+
+
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 @patch.object(Organisation, "__new__")
 @patch.object(GithubService, "__new__")
@@ -30,6 +34,8 @@ class TestMoveUsersToTeams2(unittest.TestCase):
 
 # Refactor Status: Done
 # Test not needed
+
+
 @patch.dict(os.environ, {"ORG_NAME": "orgname"})
 @patch.object(Organisation, "__new__")
 @patch.object(GithubService, "__new__")
