@@ -170,8 +170,7 @@ class TestMoveUsersToTeams(unittest.TestCase):
     @patch("python.scripts.move_users_to_teams_refactor.get_ignore_repositories_list")
     def test_get_org_repositories_when_repos_exist(self, mock_get_ignore_repositories_list, mock_github_service):
         mock_get_ignore_repositories_list.return_value = []
-        mock_github_service.fetch_all_repositories_in_org.return_value = [
-            {"node": self.repository_data}]
+        mock_github_service.fetch_all_repositories_in_org.return_value = [self.repository_data]
         repos = get_org_repositories(mock_github_service, "")
         self.assertEqual(len(repos), 1)
 
@@ -180,8 +179,7 @@ class TestMoveUsersToTeams(unittest.TestCase):
     def test_get_org_repositories_when_repo_is_in_ignore_list(self, mock_get_ignore_repositories_list, mock_github_service):
         mock_get_ignore_repositories_list.return_value = [
             self.repository_data["name"]]
-        mock_github_service.fetch_all_repositories_in_org.return_value = [
-            {"node": self.repository_data}]
+        mock_github_service.fetch_all_repositories_in_org.return_value = [self.repository_data]
         repos = get_org_repositories(mock_github_service, "")
         self.assertEqual(len(repos), 0)
 
