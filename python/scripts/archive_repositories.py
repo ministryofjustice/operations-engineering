@@ -24,6 +24,13 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "wasm",
     "wp-rewrite-media-to-s3",
     "oracle-policy-automation-docker",
+    "Transport", # keep repo in list until collaborator Arcturus-Tom is removed
+    "HMLandsRegistry", # keep repo in list until collaborator Arcturus-Tom is removed
+    "FinanceAndTaxTribunalDecision", # keep repo in list until collaborator Arcturus-Tom is removed
+    "HMEat", # keep repo in list until collaborator Arcturus-Tom is removed
+    "Cicap", # keep repo in list until collaborator Arcturus-Tom is removed
+    "CareStandards", # keep repo in list until collaborator Arcturus-Tom is removed
+    "AdministrativeAppeals", # keep repo in list until collaborator Arcturus-Tom is removed
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
