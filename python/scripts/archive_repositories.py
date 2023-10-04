@@ -24,7 +24,6 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "wasm",
     "wp-rewrite-media-to-s3",
     "oracle-policy-automation-docker",
-    "criminal-forecasting-rap"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
@@ -33,7 +32,8 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "GPC-anomalies",
     "pq-tool",
     "opg-data-processing",
-    "df_criminal_court_research"
+    "df_criminal_court_research",
+    "criminal-forecasting-rap"
 ]
 
 
