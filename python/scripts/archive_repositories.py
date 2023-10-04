@@ -26,8 +26,9 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "oracle-policy-automation-docker",
     "Transport",  # keep repo in list until collaborator Arcturus-Tom is removed
     "HMLandsRegistry",  # keep repo in list until collaborator Arcturus-Tom is removed
-    # keep repo in list until collaborator Arcturus-Tom is removed
-    "FinanceAndTaxTribunalDecision",
+    "landschambertribunal", # keep repo in list until collaborator Arcturus-Tom is removed
+    "FinanceAndTaxTribunalDecision", # keep repo in list until collaborator Arcturus-Tom is removed 
+    "informationtribunal", # keep repo in list until collaborator Arcturus-Tom is removed
     "HMEat",  # keep repo in list until collaborator Arcturus-Tom is removed
     "Cicap",  # keep repo in list until collaborator Arcturus-Tom is removed
     "CareStandards",  # keep repo in list until collaborator Arcturus-Tom is removed
