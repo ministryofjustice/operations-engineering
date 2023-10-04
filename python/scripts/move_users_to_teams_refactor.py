@@ -11,7 +11,9 @@ IGNORE_REPOSITORIES_AS_ORG = []
 IGNORE_TEAMS_AS_ORG = []
 
 IGNORE_REPOSITORIES_MOJ_ORG = []
-IGNORE_TEAMS_MOJ_ORG = []
+IGNORE_TEAMS_MOJ_ORG = [
+    "organisation-security-auditor"
+]
 
 
 @dataclass
@@ -108,7 +110,7 @@ def get_repository_teams(github_service: GithubService, repository_name: str) ->
     gh_repository_teams = [
         team
         for team in github_service.get_repository_teams(repository_name)
-        if team.name.lower() not in ignore_teams
+        if team.slug.lower() not in ignore_teams
     ]
     for gh_repository_team in gh_repository_teams:
         team_users = [
@@ -117,7 +119,7 @@ def get_repository_teams(github_service: GithubService, repository_name: str) ->
         ]
         repository_teams.append(
             RepositoryTeam(
-                gh_repository_team.name.lower(),
+                gh_repository_team.slug.lower(),
                 team_users,
                 gh_repository_team.permission,
                 gh_repository_team.id
@@ -161,14 +163,14 @@ def remove_repository_users_with_team_access(github_service: GithubService, repo
                 github_service.remove_user_from_repository(user, repository.name)
 
 
-def put_users_into_repository_teams(github_service: GithubService, teams: list, repository_name: str):
+def put_users_into_repository_teams(github_service: GithubService, users: list, repository_name: str):
     repository_teams = get_repository_teams(github_service, repository_name)
     for user in users:
+        user_repository_permission = github_service.get_user_permission_for_repository(user, repository_name)
+        team_name = form_team_name(user_repository_permission, repository_name)
         for repository_team in repository_teams:
-            permission = github_service.get_user_permission_for_repository(user, repository_name)
-            expected_team_name = form_team_name(permission)
-            if repository_team.name == expected_team_name:
-                if len(repository_team.users) == 0 or permission == "admin":
+            if repository_team.name == team_name:
+                if len(repository_team.users) == 0 or user_repository_permission == "admin":
                     github_service.add_user_to_team_as_maintainer(user, repository_team.id)
                 else:
                     github_service.add_user_to_team(user, repository_team.id)
@@ -193,9 +195,8 @@ def form_team_name(users_permission: str, repository_name: str) -> str:
     return temp_name.lower()
 
 
-def is_new_team_needed(permission: str, teams: list) -> bool:
+def is_new_team_needed(expected_team_name: str, teams: list) -> bool:
     new_team_required = True
-    expected_team_name = form_team_name(permission.lower())
     for team in teams:
         if team.name.lower() == expected_team_name.lower():
             new_team_required = False
@@ -224,12 +225,12 @@ def ensure_repository_teams_exists(github_service: GithubService, users: list, r
         exists. If not create a new repository team with required permission.
     """
     for user in users:
-        permission = github_service.get_user_permission_for_repository(user, repository_name)
-        if is_new_team_needed(permission, teams):
-            team_name = form_team_name(permission)
-            team_id = create_a_team_on_github(team_name)
+        user_repository_permission = github_service.get_user_permission_for_repository(user, repository_name)
+        expected_team_name = form_team_name(user_repository_permission, repository_name)
+        if is_new_team_needed(expected_team_name, teams):
+            team_id = create_a_team_on_github(github_service, expected_team_name, repository_name)
             if team_id > 0:
-                github_service.amend_team_permissions_for_repository(team_id, permission, repository_name)
+                github_service.amend_team_permissions_for_repository(team_id, user_repository_permission, repository_name)
                 remove_operations_engineering_team_users_from_team(github_service, team_id)
 
 
@@ -241,9 +242,9 @@ def raise_issue_on_repository(github_service: GithubService, repository_name: st
 def move_remaining_repository_users_into_teams(github_service: GithubService, repositories: list, org_outside_collaborators: list):
     for repository in repositories:
         users = get_repository_users(github_service, repository.name, org_outside_collaborators)
-        if users > 0:
-            ensure_repository_teams_exists(github_service, users, repository.name)
-            put_users_into_repository_teams(github_service, repository.name)
+        if len(users) > 0:
+            ensure_repository_teams_exists(github_service, users, repository.name, repository.teams)
+            put_users_into_repository_teams(github_service, users, repository.name)
             for user in users:
                 raise_issue_on_repository(github_service, repository.name, repository.issue_section_enabled, user)
                 github_service.remove_user_from_repository(user, repository.name)
