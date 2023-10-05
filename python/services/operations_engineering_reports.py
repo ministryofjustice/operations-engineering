@@ -42,16 +42,19 @@ class OperationsEngineeringReportsService:
         """
         #  The database can't handle more than 100 at a time
         # so we need to chunk the list into 100s.
-        self.logger.info(f"Sending {len(reports)} repository standards reports to API.")
+        self.logger.info(
+            f"Sending {len(reports)} repository standards reports to API.")
         for i in range(0, len(reports), 100):
             chunk = reports[i:i+100]
             status = self.__http_post(chunk)
             if status != 200:
-                self.logger.error(f"Failed to send chunk starting from index {i}. Received status: {status}")
+                self.logger.error(
+                    f"Failed to send chunk starting from index {i}. Received status: {status}")
                 raise ValueError(
                     f"Failed to send repository standards reports to API. Received: {status}")
             else:
-                self.logger.debug(f"Successfully sent chunk starting from index {i}")
+                self.logger.debug(
+                    f"Successfully sent chunk starting from index {i}")
 
     def __http_post(self, data: list[dict]) -> int:
         headers = {
@@ -61,7 +64,8 @@ class OperationsEngineeringReportsService:
         }
 
         url = f"{self.__reports_url}/{self.__endpoint}"
-        self.logger.debug(f"Sending POST request to {url} with data: {len(data)} items")
+        self.logger.debug(
+            f"Sending POST request to {url} with data: {len(data)} items")
 
         session = requests.Session()
         retry_strategy = LoggingRetry(
@@ -77,7 +81,8 @@ class OperationsEngineeringReportsService:
         resp = session.post(url, headers=headers, json=data,
                             timeout=180, stream=True).status_code
         if resp != 200:
-            self.logger.error(f"Failed POST request to {url}. Received status: {resp}")
+            self.logger.error(
+                f"Failed POST request to {url}. Received status: {resp}")
         else:
             self.logger.debug(f"Successful POST request to {url}")
         return resp
@@ -85,5 +90,6 @@ class OperationsEngineeringReportsService:
 
 class LoggingRetry(Retry):
     def increment(self, *args, **kwargs):
-        self.logger.warning(f"Retrying request due to failure. Retry number: {self.total}")
+        self.logger.warning(
+            f"Retrying request due to failure. Retry number: {self.total}")
         super(LoggingRetry, self).increment(*args, **kwargs)

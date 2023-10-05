@@ -616,7 +616,7 @@ class GithubService:
             list: A list of the organisation repos names
         """
         repos = []
-                  
+
         # Specifically switch off logging for this query as it is very large and doesn't need to be logged
         logging.disabled = True
 
@@ -635,7 +635,7 @@ class GithubService:
 
                 has_next_page = data["search"]["pageInfo"]["hasNextPage"]
                 after_cursor = data["search"]["pageInfo"]["endCursor"]
-                
+
         # Re-enable logging
         logging.disabled = False
         return repos
