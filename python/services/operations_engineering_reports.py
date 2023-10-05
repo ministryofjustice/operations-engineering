@@ -16,7 +16,7 @@ class OperationsEngineeringReportsService:
 
     """
 
-    def __init__(self, url: str, endpoint: str, api_key: str, log_level: str) -> None:
+    def __init__(self, url: str, endpoint: str, api_key: str, log_level="INFO") -> None:
         self.__reports_url = url
         self.__endpoint = endpoint
         self.__api_key = api_key
