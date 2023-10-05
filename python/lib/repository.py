@@ -35,6 +35,8 @@ class Repository:
         self.teams = []
         self.get_existing_teams()
 
+    # Refactor Status: Done
+    # Moved to is_new_team_needed() in move_users_to_teams_refactor.py
     def is_new_team_needed(self, permission: str) -> bool:
         new_team_required = True
         expected_team_name = self.form_team_name(permission.lower())
@@ -44,6 +46,8 @@ class Repository:
                 break
         return new_team_required
 
+    # Refactor Status: Done
+    # Moved to ensure_repository_teams_exists() in move_users_to_teams_refactor.py
     def ensure_repository_teams_exists(self):
         """ Check if a automated team with the required permission already
             exists and if not creates a new team for the repository
@@ -65,9 +69,13 @@ class Repository:
                         if team.name == team_name:
                             self.add_team(team)
 
+    # Refactor Status: Done
+    # Not needed
     def add_team(self, team):
         self.teams.append(RepositoryTeam(team))
 
+    # Refactor Status: Done
+    # Moved to put_users_into_repository_teams() in move_users_to_teams_refactor.py
     def put_direct_users_into_teams(self):
         for direct_user_username in self.direct_users:
             for team in self.teams:
@@ -83,17 +91,23 @@ class Repository:
                             direct_user_username, team.id)
                     break
 
+    # Refactor Status: Done
+    # Moved to raise_issue_on_repository() in move_users_to_teams_refactor.py
     def create_repo_issues_for_direct_users(self):
         for direct_user_username in self.direct_users:
             if self.issue_section_enabled:
                 self.github_service.create_an_access_removed_issue_for_user_in_repository(
                     direct_user_username, self.name)
 
+    # Refactor Status: Done
+    # Not used
     def remove_direct_users_access(self):
         for direct_user_username in self.direct_users:
             self.github_service.remove_user_from_repository(
                 direct_user_username, self.name)
 
+    # Refactor Status: Done
+    # Moved to remove_operations_engineering_team_users_from_team() in move_users_to_teams_refactor.py
     def remove_operations_engineering_team_users_from_team(self, team_id: int):
         """When team is created GH adds the user who ran the GH action to the team
            this function removes the user from that team
@@ -101,6 +115,8 @@ class Repository:
         for user_username in self.ops_eng_team_user_names:
             self.github_service.remove_user_from_team(user_username, team_id)
 
+    # Refactor Status: Done
+    # Moved to create_a_team_on_github() in move_users_to_teams_refactor.py
     def create_a_team_on_github(self, team_name: str) -> int:
         team_id = 0
         if not self.github_service.team_exists(team_name):
@@ -109,6 +125,8 @@ class Repository:
             team_id = self.github_service.get_team_id_from_team_name(team_name)
         return team_id
 
+    # Refactor Status: Done
+    # Moved to form_team_name() in move_users_to_teams_refactor.py
     def form_team_name(self, users_permission: str) -> str:
         """ GH team names use a slug name. This swaps ., _, , with
             a - and then lower cases the team name
@@ -126,6 +144,8 @@ class Repository:
 
         return temp_name.lower()
 
+    # Refactor Status: Done
+    # Moved to get_repository_teams() in move_users_to_teams_refactor.py
     def get_existing_teams(self):
         self.teams = [
             RepositoryTeam(team)
@@ -135,7 +155,7 @@ class Repository:
         ]
 
     # Refactor Status: Done
-    # Moved to move_users_to_teams() in move_users_to_teams_refactor.py
+    # Moved to remove_repository_users_with_team_access() in move_users_to_teams_refactor.py
     def remove_users_already_in_existing_teams(self):
         removed_users = []
         for team in self.teams:
@@ -158,7 +178,7 @@ class Repository:
         ]
 
     # Refactor Status: Done
-    # Moved to move_users_to_teams_refactor.py
+    # Not needed
     def move_remaining_users_to_new_teams(self):
         self.ensure_repository_teams_exists()
         self.put_direct_users_into_teams()
@@ -166,7 +186,7 @@ class Repository:
         self.remove_direct_users_access()
 
     # Refactor Status: Done
-    # Moved to move_users_to_teams() in move_users_to_teams_refactor.py
+    # Not needed
     def move_direct_users_to_teams(self):
         self.remove_users_already_in_existing_teams()
         self.move_remaining_users_to_new_teams()
