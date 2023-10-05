@@ -4,6 +4,9 @@ from unittest.mock import MagicMock, patch, call
 from python.services.github_service import GithubService
 from python.lib.repository import Repository
 
+# Refactor Status: Done
+# Test not needed
+
 
 class TestRepository1(unittest.TestCase):
 
@@ -349,6 +352,20 @@ class TestRepository4(unittest.TestCase):
         self.assertEqual(len(self.repo.direct_users), 1)
 
     @patch("python.lib.repository.RepositoryTeam")
+    def test_remove_user_when_teams_exist_and_user_permission_matches_the_team_do_not_create_issue_on_repo(self, mock_repository_team):
+        mock_repository_team.name = "other-team"
+        mock_repository_team.users_usernames = ["user1"]
+        mock_repository_team.repository_permission = "read"
+        self.repo.teams.append(mock_repository_team)
+        self.repo.issue_section_enabled = False
+        self.assertEqual(len(self.repo.direct_users), 1)
+        self.repo.remove_users_already_in_existing_teams()
+        self.assertEqual(len(self.repo.direct_users), 0)
+        self.mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_not_called()
+        self.mock_github_service.remove_user_from_repository.assert_called_once_with(
+            "user1", "some-repo")
+
+    @patch("python.lib.repository.RepositoryTeam")
     def test_remove_user_when_teams_exist_and_user_permission_matches_the_team(self, mock_repository_team):
         mock_repository_team.name = "other-team"
         mock_repository_team.users_usernames = ["user1"]
@@ -385,6 +402,24 @@ class TestRepository5(unittest.TestCase):
         self.repo.remove_operations_engineering_team_users_from_team(12345)
         self.mock_github_service.remove_user_from_team.assert_called_once_with(
             "ops-eng-user1", 12345)
+
+    def test_move_remaining_users_to_new_teams(self):
+        self.repo.ensure_repository_teams_exists = MagicMock()
+        self.repo.put_direct_users_into_teams = MagicMock()
+        self.repo.create_repo_issues_for_direct_users = MagicMock()
+        self.repo.remove_direct_users_access = MagicMock()
+        self.repo.move_remaining_users_to_new_teams()
+        self.repo.ensure_repository_teams_exists.assert_called_once()
+        self.repo.put_direct_users_into_teams.assert_called_once()
+        self.repo.create_repo_issues_for_direct_users.assert_called_once()
+        self.repo.remove_direct_users_access.assert_called_once()
+
+    def test_move_direct_users_to_teams(self):
+        self.repo.remove_users_already_in_existing_teams = MagicMock()
+        self.repo.move_remaining_users_to_new_teams = MagicMock()
+        self.repo.move_direct_users_to_teams()
+        self.repo.remove_users_already_in_existing_teams.assert_called_once()
+        self.repo.move_remaining_users_to_new_teams.assert_called_once()
 
 
 if __name__ == "__main__":
