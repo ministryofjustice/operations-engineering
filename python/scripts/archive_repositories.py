@@ -27,7 +27,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "Transport",  # keep repo in list until collaborator Arcturus-Tom is removed
     "HMLandsRegistry",  # keep repo in list until collaborator Arcturus-Tom is removed
     "LandsChamberTribunal",  # keep repo in list until collaborator Arcturus-Tom is removed
-    "FinanceAndTaxTribunalDecision", # keep repo in list until collaborator Arcturus-Tom is removed
+    # keep repo in list until collaborator Arcturus-Tom is removed
+    "FinanceAndTaxTribunalDecision",
     "InformationTribunal",  # keep repo in list until collaborator Arcturus-Tom is removed
     "HMEat",  # keep repo in list until collaborator Arcturus-Tom is removed
     "Cicap",  # keep repo in list until collaborator Arcturus-Tom is removed
