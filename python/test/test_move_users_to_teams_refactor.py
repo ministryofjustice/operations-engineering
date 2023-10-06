@@ -3,8 +3,6 @@ import unittest
 import github.Team
 from unittest.mock import patch, MagicMock
 
-from python.services.github_service import GithubService
-
 from python.config.constants import (
     MINISTRY_OF_JUSTICE,
     MOJ_ANALYTICAL_SERVICES
@@ -15,16 +13,22 @@ from python.scripts.move_users_to_teams_refactor import (
     main,
     get_ignore_repositories_list,
     get_ignore_teams_list,
+    move_remaining_repository_users_into_teams,
     get_environment_variables,
     get_repositories_with_direct_users,
     get_repository_teams,
+    raise_issue_on_repository,
     form_team_name,
     get_org_repositories,
+    is_new_team_needed,
+    create_a_team_on_github,
     get_repository_org_users,
     get_repository_users,
     does_user_have_team_access,
     remove_repository_users_with_team_access,
+    ensure_repository_teams_exists,
     put_users_into_repository_teams,
+    remove_operations_engineering_team_users_from_team,
     IGNORE_REPOSITORIES_AS_ORG,
     IGNORE_TEAMS_AS_ORG,
     IGNORE_REPOSITORIES_MOJ_ORG,
@@ -85,6 +89,7 @@ class TestGeRepositoriesWithDirectUsers(unittest.TestCase):
         mock_get_repository_teams.return_value = []
         repos = get_repositories_with_direct_users(mock_github_service, [])
         self.assertEqual(len(repos), 1)
+
 
 class TestMoveUsersToTeamsFunctions(unittest.TestCase):
     def setUp(self):
@@ -152,27 +157,27 @@ class TestMoveUsersToTeamsFunctions(unittest.TestCase):
     def test_does_user_have_team_access_is_false_because_different_repo_permission(self, mock_github_service):
         mock_github_service.get_user_permission_for_repository.return_value = "pull"
         has_access = does_user_have_team_access(mock_github_service, self.repository, self.user)
-        self.assertEqual(has_access, False)
+        self.assertFalse(has_access)
 
     @patch("python.services.github_service.GithubService")
     def test_does_user_have_team_access_is_true(self, mock_github_service):
         mock_github_service.get_user_permission_for_repository.return_value = self.admin_access
         has_access = does_user_have_team_access(mock_github_service, self.repository, self.user)
-        self.assertEqual(has_access, True)
+        self.assertTrue(has_access)
 
     @patch("python.services.github_service.GithubService")
     def test_does_user_have_team_access_is_false_because_no_repo_teams(self, mock_github_service):
         mock_github_service.get_user_permission_for_repository.return_value = self.admin_access
         self.repository.teams = []
         has_access = does_user_have_team_access(mock_github_service, self.repository, self.user)
-        self.assertEqual(has_access, False)
+        self.assertFalse(has_access)
 
     @patch("python.services.github_service.GithubService")
     def test_does_user_have_team_access_is_false_because_user_not_in_repo_team(self, mock_github_service):
         mock_github_service.get_user_permission_for_repository.return_value = self.admin_access
         self.repository.teams = []
         has_access = does_user_have_team_access(mock_github_service, self.repository, "random-user")
-        self.assertEqual(has_access, False)
+        self.assertFalse(has_access)
 
     @patch("python.services.github_service.GithubService")
     def test_get_repository_users(self, mock_github_service):
@@ -413,6 +418,127 @@ class TestMoveUsersToTeamsFunctions(unittest.TestCase):
 
         repo_name = "..some-repo.."
         self.assertEqual(form_team_name(self.admin_access, repo_name), self.admin_team_name)
+
+    def test_is_new_team_needed_not_needed(self):
+        self.assertFalse(is_new_team_needed(self.team_name, [self.team]))
+
+    def test_is_new_team_needed_is_needed(self):
+        self.assertTrue(is_new_team_needed("random-team", [self.team]))
+
+    def test_is_new_team_needed_when_no_team_in_list(self):
+        self.assertTrue(is_new_team_needed(self.team_name, []))
+
+    @patch("python.services.github_service.GithubService")
+    def test_create_a_team_on_github(self, mock_github_service):
+        mock_github_service.team_exists.return_value = False
+        mock_github_service.get_team_id_from_team_name.return_value = 123
+        team_id = create_a_team_on_github(mock_github_service, self.team_name, self.repo_name)
+        mock_github_service.create_new_team_with_repository.assert_called()
+        mock_github_service.get_team_id_from_team_name.assert_called()
+        self.assertEqual(team_id, 123)
+
+    @patch("python.services.github_service.GithubService")
+    def test_create_a_team_on_github_doesnt(self, mock_github_service):
+        mock_github_service.team_exists.return_value = True
+        team_id = create_a_team_on_github(mock_github_service, self.team_name, self.repo_name)
+        mock_github_service.create_new_team_with_repository.assert_not_called()
+        mock_github_service.get_team_id_from_team_name.assert_not_called()
+        self.assertEqual(team_id, 0)
+
+    @patch("python.services.github_service.GithubService")
+    def test_remove_operations_engineering_team_users_from_team(self, mock_github_service):
+        mock_github_service.get_a_team_usernames.return_value = [self.user]
+        remove_operations_engineering_team_users_from_team(mock_github_service, 123)
+        mock_github_service.remove_user_from_team.assert_called()
+
+    @patch("python.services.github_service.GithubService")
+    def test_remove_operations_engineering_team_users_from_team_isnt_called(self, mock_github_service):
+        mock_github_service.get_a_team_usernames.return_value = []
+        remove_operations_engineering_team_users_from_team(mock_github_service, 123)
+        mock_github_service.remove_user_from_team.assert_not_called()
+
+    @patch("python.scripts.move_users_to_teams_refactor.remove_operations_engineering_team_users_from_team")
+    @patch("python.scripts.move_users_to_teams_refactor.create_a_team_on_github")
+    @patch("python.scripts.move_users_to_teams_refactor.is_new_team_needed")
+    @patch("python.scripts.move_users_to_teams_refactor.form_team_name")
+    @patch("python.services.github_service.GithubService")
+    def test_ensure_repository_teams_exists(self, mock_github_service, mock_form_team_name, mock_is_new_team_needed, mock_create_a_team_on_github, mock_remove_operations_engineering_team_users_from_team):
+        mock_github_service.get_user_permission_for_repository.return_value = self.admin_access
+        mock_form_team_name.return_value = "team"
+        mock_create_a_team_on_github.return_value = 123
+        mock_is_new_team_needed.return_value = True
+        ensure_repository_teams_exists(mock_github_service, [self.user], self.repo_name, [self.team])
+        mock_github_service.amend_team_permissions_for_repository.assert_called()
+        mock_remove_operations_engineering_team_users_from_team.assert_called()
+
+    @patch("python.scripts.move_users_to_teams_refactor.remove_operations_engineering_team_users_from_team")
+    @patch("python.scripts.move_users_to_teams_refactor.create_a_team_on_github")
+    @patch("python.scripts.move_users_to_teams_refactor.is_new_team_needed")
+    @patch("python.scripts.move_users_to_teams_refactor.form_team_name")
+    @patch("python.services.github_service.GithubService")
+    def test_ensure_repository_teams_exists_when_no_team_created_on_gh(self, mock_github_service, mock_form_team_name, mock_is_new_team_needed, mock_create_a_team_on_github, mock_remove_operations_engineering_team_users_from_team):
+        mock_github_service.get_user_permission_for_repository.return_value = self.admin_access
+        mock_form_team_name.return_value = "team"
+        mock_create_a_team_on_github.return_value = 0
+        mock_is_new_team_needed.return_value = True
+        ensure_repository_teams_exists(mock_github_service, [self.user], self.repo_name, [self.team])
+        mock_github_service.amend_team_permissions_for_repository.assert_not_called()
+        mock_remove_operations_engineering_team_users_from_team.assert_not_called()
+
+    @patch("python.scripts.move_users_to_teams_refactor.create_a_team_on_github")
+    @patch("python.scripts.move_users_to_teams_refactor.is_new_team_needed")
+    @patch("python.scripts.move_users_to_teams_refactor.form_team_name")
+    @patch("python.services.github_service.GithubService")
+    def test_ensure_repository_teams_exists_when_no_new_team_is_needed(self, mock_github_service, mock_form_team_name, mock_is_new_team_needed, mock_create_a_team_on_github):
+        mock_github_service.get_user_permission_for_repository.return_value = self.admin_access
+        mock_form_team_name.return_value = "team"
+        mock_is_new_team_needed.return_value = False
+        ensure_repository_teams_exists(mock_github_service, [self.user], self.repo_name, [self.team])
+        mock_create_a_team_on_github.assert_not_called()
+
+    @patch("python.scripts.move_users_to_teams_refactor.form_team_name")
+    @patch("python.services.github_service.GithubService")
+    def test_ensure_repository_teams_exists_when_no_users(self, mock_github_service, mock_form_team_name):
+        ensure_repository_teams_exists(mock_github_service, [], self.repo_name, [self.team])
+        mock_github_service.get_user_permission_for_repository.assert_not_called()
+        mock_form_team_name.assert_not_called()
+
+    @patch("python.services.github_service.GithubService")
+    def test_raise_issue_on_repository(self, mock_github_service):
+        raise_issue_on_repository(mock_github_service, self.repo_name, True, self.user)
+        mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_called()
+
+    @patch("python.services.github_service.GithubService")
+    def test_raise_issue_on_repository_doesnt(self, mock_github_service):
+        raise_issue_on_repository(mock_github_service, self.repo_name, False, self.user)
+        mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_not_called()
+
+    @patch("python.scripts.move_users_to_teams_refactor.raise_issue_on_repository")
+    @patch("python.scripts.move_users_to_teams_refactor.put_users_into_repository_teams")
+    @patch("python.scripts.move_users_to_teams_refactor.ensure_repository_teams_exists")
+    @patch("python.scripts.move_users_to_teams_refactor.get_repository_users")
+    @patch("python.services.github_service.GithubService")
+    def test_move_remaining_repository_users_into_teams(self, mock_github_service, mock_get_repository_users, mock_ensure_repository_teams_exists, mock_put_users_into_repository_teams, mock_raise_issue_on_repository):
+        mock_get_repository_users.return_value = [self.user]
+        move_remaining_repository_users_into_teams(mock_github_service, [self.repository], self.org_outside_collaborators)
+        mock_ensure_repository_teams_exists.assert_called()
+        mock_github_service.remove_user_from_repository.assert_called()
+        mock_put_users_into_repository_teams.assert_called()
+        mock_raise_issue_on_repository.assert_called()
+
+    @patch("python.scripts.move_users_to_teams_refactor.raise_issue_on_repository")
+    @patch("python.scripts.move_users_to_teams_refactor.put_users_into_repository_teams")
+    @patch("python.scripts.move_users_to_teams_refactor.ensure_repository_teams_exists")
+    @patch("python.scripts.move_users_to_teams_refactor.get_repository_users")
+    @patch("python.services.github_service.GithubService")
+    def test_move_remaining_repository_users_into_teams_when_no_users(self, mock_github_service, mock_get_repository_users, mock_ensure_repository_teams_exists, mock_put_users_into_repository_teams, mock_raise_issue_on_repository):
+        mock_get_repository_users.return_value = []
+        move_remaining_repository_users_into_teams(mock_github_service, [self.repository], self.org_outside_collaborators)
+        mock_ensure_repository_teams_exists.assert_not_called()
+        mock_github_service.remove_user_from_repository.assert_not_called()
+        mock_put_users_into_repository_teams.assert_not_called()
+        mock_raise_issue_on_repository.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

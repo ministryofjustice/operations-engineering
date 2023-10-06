@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch, call
 from python.services.github_service import GithubService
 from python.lib.repository import Repository
 
+
 # Refactor Status: Done
 # Test not needed
 class TestRepository1(unittest.TestCase):
@@ -41,6 +42,8 @@ class TestRepository2(unittest.TestCase):
         self.repo.remove_operations_engineering_team_users_from_team(12345)
         self.mock_github_service.remove_user_from_team.assert_not_called()
 
+    # Refactor Status: Done
+    # Test not needed
     def test_do_not_create_repo_issues_for_direct_users_when_no_direct_users(self):
         self.repo.create_repo_issues_for_direct_users()
         self.mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_not_called()
@@ -52,10 +55,14 @@ class TestRepository2(unittest.TestCase):
         self.mock_github_service.add_user_to_team_as_maintainer.assert_not_called()
         self.mock_github_service.add_user_to_team.assert_not_called()
 
+    # Refactor Status: Done
+    # Test moved to test_is_new_team_needed_when_no_team_in_list()
     def test_is_new_team_needed_when_no_teams_exist(self):
         self.assertEqual(self.repo.is_new_team_needed(
             "admin"), True)
 
+    # Refactor Status: Done
+    # Test moved to test_is_new_team_needed_not_needed()
     @patch("github.Team")
     def test_is_new_team_needed_when_no_matching_teams_exist(self, mock_github_team):
         mock_github_team.name = "some-repo-pull-team"
@@ -63,6 +70,8 @@ class TestRepository2(unittest.TestCase):
         self.assertEqual(self.repo.is_new_team_needed(
             "admin"), True)
 
+    # Refactor Status: Done
+    # Test moved to test_is_new_team_needed_is_needed()
     @patch("github.Team")
     def test_is_new_team_needed_when_a_matching_teams_exist(self, mock_github_team):
         mock_github_team.name = "some-repo-admin-team"
@@ -70,6 +79,8 @@ class TestRepository2(unittest.TestCase):
         self.assertEqual(self.repo.is_new_team_needed(
             "admin"), False)
 
+    # Refactor Status: Done
+    # Test moved to test_ensure_repository_teams_exists_when_no_users()
     def test_dont_make_team_when_no_direct_users(self):
         self.repo.ensure_repository_teams_exists()
         self.assertEqual(len(self.repo.teams), 0)
@@ -214,6 +225,8 @@ class TestRepository3(unittest.TestCase):
         self.mock_github_service.add_user_to_team_as_maintainer.assert_called_once()
         self.mock_github_service.add_user_to_team.assert_not_called()
 
+    # Refactor Status: Done
+    # Test moved to test_ensure_repository_teams_exists_when_no_new_team_is_needed()
     @patch("github.Team")
     def test_dont_make_team_when_team_already_exists(self, mock_github_team):
         mock_github_team.name = "some-repo-admin-team"
@@ -222,6 +235,8 @@ class TestRepository3(unittest.TestCase):
         self.repo.ensure_repository_teams_exists()
         self.assertEqual(len(self.repo.teams), 1)
 
+    # Refactor Status: Done
+    # Test moved to test_ensure_repository_teams_exists_when_no_team_created_on_gh()
     @patch("github.Team")
     def test_make_a_team_fails_on_github(self, mock_github_team):
         mock_github_team.name = "some-repo-write-team"
@@ -230,6 +245,8 @@ class TestRepository3(unittest.TestCase):
         self.repo.ensure_repository_teams_exists()
         self.assertEqual(len(self.repo.teams), 1)
 
+    # Refactor Status: Done
+    # Test moved to test_ensure_repository_teams_exists_when_no_team_created_on_gh()
     @patch("github.Team")
     def test_fail_to_make_a_team_on_github_because_team_already_exists(self, mock_github_team):
         mock_github_team.name = "some-repo-write-team"
@@ -239,6 +256,8 @@ class TestRepository3(unittest.TestCase):
         self.repo.ensure_repository_teams_exists()
         self.assertEqual(len(self.repo.teams), 1)
 
+    # Refactor Status: Done
+    # Test not needed
     @patch("github.Team")
     def test_fail_to_make_a_team_on_github_because_cannot_find_the_team(self, mock_github_team):
         mock_github_team.name = "some-repo-write-team"
@@ -257,6 +276,8 @@ class TestRepository3(unittest.TestCase):
         )
         self.assertEqual(len(self.repo.teams), 1)
 
+    # Refactor Status: Done
+    # Test not needed
     @patch("github.Team")
     def test_make_admin_team_on_github(self, mock_github_team):
         mock_github_team.name = "some-repo-write-team"
@@ -317,6 +338,8 @@ class TestRepository4(unittest.TestCase):
         self.mock_github_service.add_user_to_team_as_maintainer.assert_not_called()
         self.mock_github_service.add_user_to_team.assert_called_once()
 
+    # Refactor Status: Done
+    # Test moved to test_raise_issue_on_repository()
     def test_create_repo_issue(self):
         self.repo.create_repo_issues_for_direct_users()
         self.mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_called_once_with(
@@ -436,11 +459,14 @@ class TestRepository5(unittest.TestCase):
         )
         self.repo.direct_users = ["user1"]
 
+    # Refactor Status: Done
+    # Test moved to test_raise_issue_on_repository_doesnt()
     def test_do_not_create_repo_issues_when_repo_issue_section_disabled(self):
         self.repo.create_repo_issues_for_direct_users()
         self.mock_github_service.create_an_access_removed_issue_for_user_in_repository.assert_not_called()
 
-    # remove_operations_engineering_team_users_from_team
+    # Refactor Status: Done
+    # Test moved to test_remove_operations_engineering_team_users_from_team()
     def test_remove_operations_engineering_team_users_from_team(self):
         self.repo.remove_operations_engineering_team_users_from_team(12345)
         self.mock_github_service.remove_user_from_team.assert_called_once_with(
