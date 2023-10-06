@@ -617,9 +617,8 @@ class GithubService:
         """
         repos = []
 
-        #  Disable logging. The output is too verbose and not required.
-        logging.getLogger("gql").setLevel(logging.CRITICAL)
-        logging.disable(logging.INFO)
+        # Specifically switch off logging for this query as it is very large and doesn't need to be logged
+        logging.disabled = True
 
         for repo_type in ["public", "private", "internal"]:
             after_cursor = None
@@ -636,6 +635,9 @@ class GithubService:
 
                 has_next_page = data["search"]["pageInfo"]["hasNextPage"]
                 after_cursor = data["search"]["pageInfo"]["endCursor"]
+
+        # Re-enable logging
+        logging.disabled = False
         return repos
 
     @retries_github_rate_limit_exception_at_next_reset_once

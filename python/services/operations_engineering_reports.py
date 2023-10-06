@@ -1,4 +1,6 @@
 import requests
+import logging
+
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
@@ -14,10 +16,16 @@ class OperationsEngineeringReportsService:
 
     """
 
-    def __init__(self, url: str, endpoint: str, api_key: str) -> None:
+    def __init__(self, url: str, endpoint: str, api_key: str, log_level="INFO") -> None:
         self.__reports_url = url
         self.__endpoint = endpoint
         self.__api_key = api_key
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.setLevel(log_level)
+        self.logger.info(
+            f"Initialised {self.__class__.__name__} with url:  {self.__reports_url}, endpoint: {self.__endpoint}"
+        )
 
     def override_repository_standards_reports(self, reports: list[dict]) -> None:
         """Send a list of GitHubRepositoryStandardsReport objects represented as json objects
@@ -34,12 +42,19 @@ class OperationsEngineeringReportsService:
         """
         #  The database can't handle more than 100 at a time
         # so we need to chunk the list into 100s.
+        self.logger.info(
+            f"Sending {len(reports)} repository standards reports to API.")
         for i in range(0, len(reports), 100):
             chunk = reports[i:i+100]
             status = self.__http_post(chunk)
             if status != 200:
+                self.logger.error(
+                    f"Failed to send chunk starting from index {i}. Received status: {status}")
                 raise ValueError(
                     f"Failed to send repository standards reports to API. Received: {status}")
+            else:
+                self.logger.debug(
+                    f"Successfully sent chunk starting from index {i}")
 
     def __http_post(self, data: list[dict]) -> int:
         headers = {
@@ -49,9 +64,11 @@ class OperationsEngineeringReportsService:
         }
 
         url = f"{self.__reports_url}/{self.__endpoint}"
+        self.logger.debug(
+            f"Sending POST request to {url} with data: {len(data)} items")
 
         session = requests.Session()
-        retry_strategy = Retry(
+        retry_strategy = LoggingRetry(
             total=3,
             backoff_factor=1,
             status_forcelist=[500, 502, 503, 504],
@@ -63,5 +80,16 @@ class OperationsEngineeringReportsService:
 
         resp = session.post(url, headers=headers, json=data,
                             timeout=180, stream=True).status_code
-
+        if resp != 200:
+            self.logger.error(
+                f"Failed POST request to {url}. Received status: {resp}")
+        else:
+            self.logger.debug(f"Successful POST request to {url}")
         return resp
+
+
+class LoggingRetry(Retry):
+    def increment(self, *args, **kwargs):
+        self.logger.warning(
+            f"Retrying request due to failure. Retry number: {self.total}")
+        super(LoggingRetry, self).increment(*args, **kwargs)
