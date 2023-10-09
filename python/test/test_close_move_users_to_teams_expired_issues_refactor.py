@@ -1,16 +1,10 @@
 from dataclasses import dataclass
 import unittest
 from unittest.mock import patch, MagicMock
-from python.services.github_service import GithubService
 
 from python.scripts.close_move_users_to_teams_expired_issues_refactor import (
     close_expired_move_users_to_teams_issues,
     main
-)
-
-from python.scripts.move_users_to_teams_refactor import (
-    get_environment_variables,
-    get_org_repositories
 )
 
 
