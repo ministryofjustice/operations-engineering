@@ -4,6 +4,8 @@ from python.services.github_service import GithubService
 
 # Refactor Status: Done
 # Moved to move_users_to_teams_refactor.py
+
+
 class RepositoryTeam:
     def __init__(self, team: Team):
         self.name = team.name.lower()
@@ -16,6 +18,8 @@ class RepositoryTeam:
 
 # Refactor Status: Done
 # Class moved to move_users_to_teams_refactor.py
+
+
 class Repository:
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
