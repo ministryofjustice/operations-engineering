@@ -24,7 +24,16 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "wasm",
     "wp-rewrite-media-to-s3",
     "oracle-policy-automation-docker",
-    "criminal-forecasting-rap"
+    "Transport",  # keep repo in list until collaborator Arcturus-Tom is removed
+    "HMLandsRegistry",  # keep repo in list until collaborator Arcturus-Tom is removed
+    "LandsChamberTribunal",  # keep repo in list until collaborator Arcturus-Tom is removed
+    # keep repo in list until collaborator Arcturus-Tom is removed
+    "FinanceAndTaxTribunalDecision",
+    "InformationTribunal",  # keep repo in list until collaborator Arcturus-Tom is removed
+    "HMEat",  # keep repo in list until collaborator Arcturus-Tom is removed
+    "Cicap",  # keep repo in list until collaborator Arcturus-Tom is removed
+    "CareStandards",  # keep repo in list until collaborator Arcturus-Tom is removed
+    "AdministrativeAppeals",  # keep repo in list until collaborator Arcturus-Tom is removed
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
@@ -33,7 +42,8 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "GPC-anomalies",
     "pq-tool",
     "opg-data-processing",
-    "df_criminal_court_research"
+    "df_criminal_court_research",
+    "criminal-forecasting-rap"
 ]
 
 
