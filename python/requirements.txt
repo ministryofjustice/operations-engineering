@@ -12,3 +12,4 @@ cryptography
 coverage
 requests-mock
 notifications-python-client
+requests
