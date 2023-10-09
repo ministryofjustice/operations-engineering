@@ -95,13 +95,9 @@ def get_repository_org_users(github_service: GithubService, repository: dict, or
 def get_org_repositories(github_service: GithubService) -> list:
     ignore_repositories = get_ignore_repositories_list(
         github_service.organisation_name)
-    all_repos = [
-        repository
-        for repository in github_service.fetch_all_repositories_in_org()
-    ]
     return [
         repository
-        for repository in all_repos
+        for repository in github_service.fetch_all_repositories_in_org()
         if repository["name"] not in ignore_repositories
     ]
 

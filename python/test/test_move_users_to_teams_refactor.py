@@ -1,7 +1,7 @@
 import os
 import unittest
-import github.Team
 from unittest.mock import patch, MagicMock
+import github.Team
 
 from python.config.constants import (
     MINISTRY_OF_JUSTICE,
@@ -57,7 +57,6 @@ class TestMoveUsersToTeamsMain(unittest.TestCase):
 @patch("python.scripts.move_users_to_teams_refactor.get_repository_teams")
 @patch("python.scripts.move_users_to_teams_refactor.get_repository_org_users")
 @patch("python.scripts.move_users_to_teams_refactor.get_org_repositories")
-@patch("python.scripts.move_users_to_teams_refactor.get_ignore_repositories_list")
 @patch("python.services.github_service.GithubService")
 class TestGeRepositoriesWithDirectUsers(unittest.TestCase):
     def setUp(self):
@@ -66,25 +65,25 @@ class TestGeRepositoriesWithDirectUsers(unittest.TestCase):
         self.repo = {"name": self.repo_name, "hasIssuesEnabled": True}
         self.team = "some-team"
 
-    def test_get_repositories_with_direct_users_when_users_exist(self, mock_github_service, mock_get_ignore_repositories_list, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
+    def test_get_repositories_with_direct_users_when_users_exist(self, mock_github_service, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
         mock_get_org_repositories.return_value = [self.repo]
         mock_get_repository_org_users.return_value = [self.user]
         mock_get_repository_teams.return_value = [self.team]
         repos = get_repositories_with_direct_users(mock_github_service, [])
         self.assertEqual(len(repos), 1)
 
-    def test_get_repositories_with_direct_users_when_no_org_repos(self, mock_github_service, mock_get_ignore_repositories_list, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
+    def test_get_repositories_with_direct_users_when_no_org_repos(self, mock_github_service, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
         mock_get_org_repositories.return_value = []
         repos = get_repositories_with_direct_users(mock_github_service, [])
         self.assertEqual(len(repos), 0)
 
-    def test_get_repositories_with_direct_users_when_repo_has_no_users(self, mock_github_service, mock_get_ignore_repositories_list, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
+    def test_get_repositories_with_direct_users_when_repo_has_no_users(self, mock_github_service, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
         mock_get_org_repositories.return_value = [self.repo]
         mock_get_repository_org_users.return_value = []
         repos = get_repositories_with_direct_users(mock_github_service, [])
         self.assertEqual(len(repos), 0)
 
-    def test_get_repositories_with_direct_users_when_repo_has_no_teams(self, mock_github_service, mock_get_ignore_repositories_list, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
+    def test_get_repositories_with_direct_users_when_repo_has_no_teams(self, mock_github_service, mock_get_org_repositories, mock_get_repository_org_users, mock_get_repository_teams):
         mock_get_org_repositories.return_value = [self.repo]
         mock_get_repository_org_users.return_value = [self.user]
         mock_get_repository_teams.return_value = []
@@ -153,9 +152,8 @@ class TestMoveUsersToTeamsFunctions(unittest.TestCase):
             mock_github_service, self.repository_dict_data, self.org_outside_collaborators)
         self.assertEqual(len(users), 1)
 
-    @patch("python.scripts.move_users_to_teams_refactor.get_repository_users")
     @patch("python.services.github_service.GithubService")
-    def test_get_repository_org_users_when_repo_has_no_users(self, mock_github_service, mock_get_repository_users):
+    def test_get_repository_org_users_when_repo_has_no_users(self, mock_github_service):
         self.repository_dict_data["collaborators"]["totalCount"] = 0
         users = get_repository_org_users(
             mock_github_service, self.repository_dict_data, self.org_outside_collaborators)
