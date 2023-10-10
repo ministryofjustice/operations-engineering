@@ -362,8 +362,9 @@ class GetAllSlackUsernamesTest(unittest.TestCase):
             "An unexpected error")
 
     def test_handle_exception_gracefully(self):
-        self.mock_slack_client.return_value.users.list.side_effect = Exception("An unexpected error")
-        
+        self.mock_slack_client.return_value.users.list.side_effect = Exception(
+            "An unexpected error")
+
         result = self.slack_service.get_all_slack_usernames()
         self.assertEqual(result, [])
 
@@ -381,7 +382,6 @@ class FilterUsernamesTest(unittest.TestCase):
             {'username': 'user3'}
         ]
         self.slack_service = SlackService("")
-
 
     def test_filter_usernames(self):
         filtered_usernames = self.slack_service.filter_usernames(
