@@ -316,16 +316,17 @@ class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
                 }
             ]
         )
-        
+
+
 @patch("slack_sdk.WebClient.__new__")
 class GetAllSlackUsernamesTest(unittest.TestCase):
-    
+
     def setUp(self):
         self.slack_service = SlackService("some_token")
         self.user_data_mock = [{
             'name': 'user1',
             'profile': {'email': 'user1@example.com'}
-        },{
+        }, {
             'name': 'user2',
             'profile': {'email': 'user2@example.com'}
         }]
@@ -336,7 +337,7 @@ class GetAllSlackUsernamesTest(unittest.TestCase):
             'members': self.user_data_mock,
             'response_metadata': {'next_cursor': ''}
         }
-        
+
         result = self.slack_service.get_all_slack_usernames()
         self.assertEqual(result, [
             {'username': 'user1', 'email': 'user1@example.com'},
@@ -348,18 +349,20 @@ class GetAllSlackUsernamesTest(unittest.TestCase):
             'ok': False,
             'error': 'some_error'
         }
-        
+
         result = self.slack_service.get_all_slack_usernames()
         self.assertEqual(result, [])
 
     def test_handle_exception_gracefully(self, mock_slack_client):
-        mock_slack_client.return_value.users.list.side_effect = Exception("An unexpected error")
-        
+        mock_slack_client.return_value.users.list.side_effect = Exception(
+            "An unexpected error")
+
         result = self.slack_service.get_all_slack_usernames()
         self.assertEqual(result, [])
 
+
 class FilterUsernamesTest(unittest.TestCase):
-    
+
     def setUp(self):
         self.slack_service = SlackService("some_token")
         self.all_usernames = [
@@ -373,8 +376,9 @@ class FilterUsernamesTest(unittest.TestCase):
         ]
 
     def test_filter_usernames(self):
-        filtered_usernames = self.slack_service.filter_usernames(self.all_usernames, self.accepted_usernames)
-        
+        filtered_usernames = self.slack_service.filter_usernames(
+            self.all_usernames, self.accepted_usernames)
+
         self.assertEqual(filtered_usernames, [
             {'username': 'user1', 'email': 'user1@example.com'},
             {'username': 'user3', 'email': 'user3@example.com'}

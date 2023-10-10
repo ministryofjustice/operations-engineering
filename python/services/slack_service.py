@@ -272,23 +272,24 @@ class SlackService:
                                                }
                                            ]
                                            )
-        
+
     def get_all_slack_usernames(self):
         """Fetch usernames from Slack, handling pagination, and return them as a list.
 
         Returns:
             usernames: A list of usernames from Slack
         """
-        
+
         user_data = []
         cursor = None
         limit = 200
         delay_seconds = 1
-        
+
         try:
             while True:
-                response = self.slack_client.users.list(cursor=cursor, limit=limit)
-                
+                response = self.slack_client.users.list(
+                    cursor=cursor, limit=limit)
+
                 if response['ok']:
                     # usernames.extend([user['name'] for user in response['members']])
                     for user in response['members']:
@@ -297,36 +298,38 @@ class SlackService:
                             "email": user['profile']['email']
                         }
                     user_data.append(user_info)
-                    
-                    cursor = response.get('response_metadata', {}).get('next_cursor')
-                    if not cursor: 
+
+                    cursor = response.get(
+                        'response_metadata', {}).get('next_cursor')
+                    if not cursor:
                         break
                 else:
-                    logging.error("Error fetching user data: %s", response['error'])
+                    logging.error("Error fetching user data: %s",
+                                  response['error'])
                     break
                 time.sleep(delay_seconds)
         except Exception as e:
             logging.error("An error has occurred connecting to Slack", str(e))
             return []
-        
+
         return user_data
-        
+
     def filter_usernames(self, username_list: list[dict], accepted_username_list: list[dict]):
         """Filter out all usernames deemed not acceptable.
-        
+
         Parameters:
             username_list: All fecthed usernames from the source
             accepted_username_list: A list of acceptable usernames to include in the final list
-        
+
         Returns:
             filtered_usernames: A list of filtered usernames
         """
-        
-        accepted_usernames_set = {user["username"] for user in accepted_username_list}
-        
+
+        accepted_usernames_set = {user["username"]
+                                  for user in accepted_username_list}
+
         filtered_usernames = [
             user for user in username_list if user["username"] in accepted_usernames_set
         ]
-        
+
         return filtered_usernames
-        
