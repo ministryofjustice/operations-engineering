@@ -320,14 +320,16 @@ class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
 
 @patch("slack_sdk.WebClient.__new__")
 class GetAllSlackUsernamesTest(unittest.TestCase):
-<<<<<<< HEAD
+
+
+<< << << < HEAD
 
     def setUp(self):
         self.slack_service = SlackService("some_token")
-=======
-    
+== == == =
+
     def setUp(self, mock_slack_client):
->>>>>>> ed4da38 (Tests updated)
+>>>>>> > ed4da38(Tests updated)
         self.user_data_mock = [{
             'name': 'user1',
             'profile': {'email': 'user1@example.com'}
