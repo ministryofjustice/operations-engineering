@@ -289,7 +289,7 @@ class SlackService:
             while True:
                 response = self.slack_client.users_list(
                     cursor=cursor, limit=limit)
-                
+
                 if response['ok']:
                     for user in response['members']:
                         user_info = {
@@ -297,13 +297,14 @@ class SlackService:
                             "email": user['profile']['email']
                         }
                         user_data.append(user_info)
-                    
+
                     cursor = response.get(
                         'response_metadata', {}).get('next_cursor')
                     if not cursor:
                         break
                 else:
-                    logging.error(f"Error fetching user data: {response['error']}")
+                    logging.error(
+                        f"Error fetching user data: {response['error']}")
                     break
                 time.sleep(delay_seconds)
         except Exception as e:
