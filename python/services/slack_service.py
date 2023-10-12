@@ -330,5 +330,5 @@ class SlackService:
         filtered_usernames = [
             user for user in username_list if user["username"] in accepted_usernames_set
         ]
-        
+
         return filtered_usernames
