@@ -31,12 +31,14 @@ def main():
     # Grabs a list of all slack usernames from the Slack API
     slack_usernames = slack_service.get_all_slack_usernames()
 
-    # Grabs the existing Slack usernames from the metadata API (a default list is provided for now)
-    existing_slack_users = metadata_service.get_existing_slack_users()
+    # # Grabs the existing Slack usernames from the metadata API
+    # existing_slack_users = metadata_service.get_existing_slack_users()
+    
+    acceptable_slack_users = metadata_service.get_acceptable_slack_users()
 
     # Filter the full list of Slack users to only include some defaults
     filtered_usernames = slack_service.filter_usernames(
-        slack_usernames, existing_slack_users)
+        slack_usernames, acceptable_slack_users)
 
     # Send the new Slack usernames to the metadata API to be added into the database
     metadata_service.add_new_slack_usernames(filtered_usernames)
