@@ -274,10 +274,10 @@ class SlackService:
                                            )
 
     def get_all_slack_usernames(self):
-        """Fetch usernames from Slack, handling pagination, and return them as a list.
+        """Fetches all usernames and user email addresses from the Slack API.
 
         Returns:
-            usernames: A list of usernames from Slack
+            user_data: A list of of JSON objects
         """
 
         user_data = []
@@ -317,7 +317,7 @@ class SlackService:
         """Filter out all usernames deemed not acceptable.
 
         Parameters:
-            username_list: All fecthed usernames from the source
+            username_list: Initial list containing all usernames
             accepted_username_list: A list of acceptable usernames to include in the final list
 
         Returns:
@@ -330,5 +330,5 @@ class SlackService:
         filtered_usernames = [
             user for user in username_list if user["username"] in accepted_usernames_set
         ]
-
+        
         return filtered_usernames
