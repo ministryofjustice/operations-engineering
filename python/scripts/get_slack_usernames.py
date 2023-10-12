@@ -31,9 +31,6 @@ def main():
     # Grabs a list of all slack usernames from the Slack API
     slack_usernames = slack_service.get_all_slack_usernames()
 
-    # # Grabs the existing Slack usernames from the metadata API
-    # existing_slack_users = metadata_service.get_existing_slack_users()
-
     acceptable_slack_users = metadata_service.get_acceptable_slack_users()
 
     # Filter the full list of Slack users to only include some defaults
