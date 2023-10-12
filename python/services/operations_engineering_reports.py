@@ -68,11 +68,11 @@ class OperationsEngineeringReportsService:
             f"Sending POST request to {url} with data: {len(data)} items")
 
         session = requests.Session()
-        retry_strategy = LoggingRetry(
+        retry_strategy = Retry(
             total=3,
             backoff_factor=1,
             status_forcelist=[500, 502, 503, 504],
-            method_whitelist=["POST"],
+            allowed_methods=["POST"],
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
         session.mount("http://", adapter)
@@ -86,10 +86,3 @@ class OperationsEngineeringReportsService:
         else:
             self.logger.debug(f"Successful POST request to {url}")
         return resp
-
-
-class LoggingRetry(Retry):
-    def increment(self, *args, **kwargs):
-        self.logger.warning(
-            f"Retrying request due to failure. Retry number: {self.total}")
-        super(LoggingRetry, self).increment(*args, **kwargs)
