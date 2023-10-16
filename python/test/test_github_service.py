@@ -1446,6 +1446,30 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
 
         self.assertFalse(mock_open_issue_without_tag.edit.called)
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__")
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetAllUsernames(unittest.TestCase):
+    def test_get_all_github_usernames_returns_succesfully(self, mock_github_client_core_api):
+        
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
+            {'login': 'user1'},
+            {'login': 'user2'},
+            {'login': 'user3'},
+        ]
+        
+        github_service = GithubService("", ORGANISATION_NAME)
+        
+        result = github_service.get_all_github_usernames()
+        
+        expected_result = [
+            {'username': 'user1', 'email': 'user1@example.com'},
+            {'username': 'user2', 'email': 'user2@example.com'},
+            {'username': 'user3', 'email': 'user3@example.com'},
+        ]
+        
+        self.assertEqual(result, expected_result)
+
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
