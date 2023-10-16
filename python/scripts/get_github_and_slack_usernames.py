@@ -34,17 +34,23 @@ def main():
     metadata_service = MetadataService(api_url, api_token)
     github_service = GithubService(github_token, "ministryofjustice")
 
-    # Grabs a list of all slack usernames from the Slack API
-    slack_usernames = slack_service.get_all_slack_usernames()
+    # Grabs a list of all slack usernames from the Slack API (using stub for testing purposes)
+    slack_usernames = slack_service.get_all_slack_usernames_stub()
     
-    # Grabs a list of all GitHub usernames from the GitHub API
-    github_usernames = github_service.get_all_github_usernames()
+    # Grabs a list of all GitHub usernames from the GitHub API (using stub for testing purposes)
+    github_usernames = github_service.get_all_github_usernames_stub()
+    
+    print(f"<PEPPER> - Slack usernames: {slack_usernames}")
+    print(f"<PEPPER> - GitHub usernames: {github_usernames}")
 
     # Grabs a list of acceptable slack usernames (this is for testing purposes)
     acceptable_slack_users = metadata_service.get_acceptable_slack_users()
     
     # Grabs a list of acceptable github usernames (this is for testing purposes)
     acceptable_github_users = metadata_service.get_acceptable_github_usernames()
+    
+    print(f"<PEPPER> - Acceptable slack usernames: {acceptable_slack_users}")
+    print(f"<PEPPER> - Acceptable gitHub usernames: {acceptable_github_users}")
 
     # Filter the full list of Slack users to only include some defaults
     filtered_slack_usernames = slack_service.filter_usernames(
@@ -54,11 +60,16 @@ def main():
     filtered_github_usernames = slack_service.filter_usernames(
         github_usernames, acceptable_github_users)
     
+    print(f"<PEPPER> - Filtered slack usernames: {filtered_slack_usernames}")
+    print(f"<PEPPER> - Filtered gitHub usernames: {filtered_github_usernames}")
+    
     # Combine both slack and GitHub user lists
-    combined_user_information = metadata_service.combine_github_slack_usernames(filtered_github_usernames, filtered_slack_usernames)
+    combined_user_information = metadata_service.combine_user_data(filtered_github_usernames, filtered_slack_usernames)
+    
+    print(f"<PEPPER> - Combined user information: {filtered_github_usernames}")
 
     # Send the new Slack usernames to the metadata API to be added into the database
-    metadata_service.add_new_slack_usernames(combined_user_information)
+    # metadata_service.add_new_usernames(combined_user_information)
 
 
 if __name__ == "__main__":
