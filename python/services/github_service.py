@@ -1116,3 +1116,28 @@ class GithubService:
             except Exception:
                 logging.error(
                     f"An exception occurred while removing user {user.login} from team {team_name}")
+                
+    def get_all_github_usernames(self) -> list[dict]:
+        """
+        Gets all GitHub users and created a list of dictionaries detailing their username and email
+
+        Returns:
+            list[dict]: A list of dictionaries with usernames and emails
+        """
+        logging.info(f"Fetching all GitHub usernames")
+        
+        user_data = []
+
+        try:
+            all_users = self.__get_all_users()
+        except Exception:
+            logging.error(f"An exception occurred when fetching all GitHub usernames")
+        
+        for user in all_users:
+            user_info = {
+                "username": user['login'],
+                "email": user['login'] + "@example.com"
+            }
+            user_data.append(user_info)
+            
+        return user_data
