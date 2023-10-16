@@ -53,11 +53,11 @@ def main():
     print(f"<PEPPER> - Acceptable gitHub usernames: {acceptable_github_users}")
 
     # Filter the full list of Slack users to only include some defaults
-    filtered_slack_usernames = slack_service.filter_usernames(
+    filtered_slack_usernames = metadata_service.filter_usernames(
         slack_usernames, acceptable_slack_users)
     
     # Filter the full list of GitHub users to only include the defaults
-    filtered_github_usernames = slack_service.filter_usernames(
+    filtered_github_usernames = metadata_service.filter_usernames(
         github_usernames, acceptable_github_users)
     
     print(f"<PEPPER> - Filtered slack usernames: {filtered_slack_usernames}")
