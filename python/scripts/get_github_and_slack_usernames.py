@@ -64,9 +64,9 @@ def main():
     print(f"<PEPPER> - Filtered gitHub usernames: {filtered_github_usernames}")
     
     # Combine both slack and GitHub user lists
-    combined_user_information = metadata_service.combine_user_data(filtered_github_usernames, filtered_slack_usernames)
+    combined_user_information = metadata_service.combine_user_data(filtered_slack_usernames, filtered_github_usernames)
     
-    print(f"<PEPPER> - Combined user information: {filtered_github_usernames}")
+    print(f"<PEPPER> - Combined user information: {combined_user_information}")
 
     # Send the new Slack usernames to the metadata API to be added into the database
     # metadata_service.add_new_usernames(combined_user_information)
