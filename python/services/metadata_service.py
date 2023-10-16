@@ -59,7 +59,7 @@ class MetadataService:
             },
             {
                 "username": "PepperMoJ",
-                "email": "PepperMoJ@example.com"
+                "email": "sam.pepper@example.com"
             }
         ]
 
