@@ -116,9 +116,12 @@ class MetadataService:
         combined_user_data = []
 
         github_email_to_username = {user['email']: user['username'] for user in github_user_data}
+        
+        print(f"Github email to username: {github_email_to_username}")
 
         for slack_user in slack_user_data:
             email = slack_user['email']
+            print(f"Slack email: {email}")
             if email in github_email_to_username:
                 combined_user = {
                     "slack_username": slack_user['username'],
