@@ -1136,7 +1136,7 @@ class GithubService:
         for user in all_users:
             user_info = {
                 "username": user.login,
-                "email": user.login + "@example.com"
+                "email": user.email
             }
             user_data.append(user_info)
             

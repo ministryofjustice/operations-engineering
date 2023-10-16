@@ -294,7 +294,7 @@ class SlackService:
                     for user in response['members']:
                         user_info = {
                             "username": user['name'],
-                            "email": user['name'] + "@example.com"
+                            "email": user['profile']['email']
                         }
                         user_data.append(user_info)
 
