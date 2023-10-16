@@ -312,23 +312,3 @@ class SlackService:
             return []
 
         return user_data
-
-    def filter_usernames(self, username_list: list[dict], accepted_username_list: list[dict]):
-        """Filter out all usernames deemed not acceptable.
-
-        Parameters:
-            username_list: Initial list containing all usernames
-            accepted_username_list: A list of acceptable usernames to include in the final list
-
-        Returns:
-            filtered_usernames: A list of filtered usernames
-        """
-
-        accepted_usernames_set = {user["username"]
-                                  for user in accepted_username_list}
-
-        filtered_usernames = [
-            user for user in username_list if user["username"] in accepted_usernames_set
-        ]
-
-        return filtered_usernames
