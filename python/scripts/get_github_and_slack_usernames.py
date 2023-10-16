@@ -71,7 +71,7 @@ def main():
     print(f"<PEPPER> - Combined user information: {combined_user_information}")
 
     # Send the new Slack usernames to the metadata API to be added into the database
-    # metadata_service.add_new_usernames(combined_user_information)
+    metadata_service.add_new_usernames(combined_user_information)
 
 
 if __name__ == "__main__":
