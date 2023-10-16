@@ -100,7 +100,7 @@ class MetadataService:
 
         return filtered_usernames
     
-    def combine_user_data(slack_user_data, github_user_data):
+    def combine_user_data(self, slack_user_data, github_user_data):
         """Combine user data from Slack and GitHub based on the email address
 
         Parameters:
