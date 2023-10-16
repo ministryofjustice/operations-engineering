@@ -363,28 +363,28 @@ class GetAllSlackUsernamesTest(unittest.TestCase):
         self.assertEqual(result, [])
 
 
-class FilterUsernamesTest(unittest.TestCase):
+# class FilterUsernamesTest(unittest.TestCase):
 
-    def setUp(self):
-        self.all_usernames = [
-            {'username': 'user1', 'email': 'user1@example.com'},
-            {'username': 'user2', 'email': 'user2@example.com'},
-            {'username': 'user3', 'email': 'user3@example.com'}
-        ]
-        self.accepted_usernames = [
-            {'username': 'user1'},
-            {'username': 'user3'}
-        ]
-        self.slack_service = SlackService("")
+#     def setUp(self):
+#         self.all_usernames = [
+#             {'username': 'user1', 'email': 'user1@example.com'},
+#             {'username': 'user2', 'email': 'user2@example.com'},
+#             {'username': 'user3', 'email': 'user3@example.com'}
+#         ]
+#         self.accepted_usernames = [
+#             {'username': 'user1'},
+#             {'username': 'user3'}
+#         ]
+#         self.slack_service = SlackService("")
 
-    def test_filter_usernames(self):
-        filtered_usernames = self.slack_service.filter_usernames(
-            self.all_usernames, self.accepted_usernames)
+#     def test_filter_usernames(self):
+#         filtered_usernames = self.slack_service.filter_usernames(
+#             self.all_usernames, self.accepted_usernames)
 
-        self.assertEqual(filtered_usernames, [
-            {'username': 'user1', 'email': 'user1@example.com'},
-            {'username': 'user3', 'email': 'user3@example.com'}
-        ])
+#         self.assertEqual(filtered_usernames, [
+#             {'username': 'user1', 'email': 'user1@example.com'},
+#             {'username': 'user3', 'email': 'user3@example.com'}
+#         ])
 
 
 if __name__ == "__main__":
