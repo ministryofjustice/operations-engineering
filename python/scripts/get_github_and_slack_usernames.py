@@ -35,15 +35,12 @@ def main():
     github_service = GithubService(github_token, "ministryofjustice")
 
     # Grabs a list of all slack usernames from the Slack API (using stub for testing purposes)
-    slack_usernames = metadata_service.get_all_slack_usernames_stub()
-    # slack_usernames = slack_service.get_all_slack_usernames()
+    # slack_usernames = metadata_service.get_all_slack_usernames_stub()
+    slack_usernames = slack_service.get_all_slack_usernames()
     
     # Grabs a list of all GitHub usernames from the GitHub API (using stub for testing purposes)
-    github_usernames = metadata_service.get_all_github_usernames_stub()
-    # github_usernames = github_service.get_all_github_usernames()
-    
-    print(f"<PEPPER> - Slack usernames: {slack_usernames}")
-    print(f"<PEPPER> - GitHub usernames: {github_usernames}")
+    # github_usernames = metadata_service.get_all_github_usernames_stub()
+    github_usernames = github_service.get_all_github_usernames()
 
     # Grabs a list of acceptable slack usernames (this is for testing purposes)
     acceptable_slack_users = metadata_service.get_acceptable_slack_users()
