@@ -15,7 +15,7 @@ class MetadataService:
         
     def get_acceptable_github_usernames(self):
         return [
-            {"username": "PepperMoJ"}
+            {"username": "PepperMoJ"},
             {"username": "connormaglynn"}
         ]
         
