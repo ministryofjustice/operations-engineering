@@ -9,12 +9,14 @@ class MetadataService:
 
     def get_acceptable_slack_users(self):
         return [
-            {"username": "sam.pepper"}
+            {"username": "sam.pepper"},
+            {"username": "connor.glynn"}
         ]
         
     def get_acceptable_github_usernames(self):
         return [
             {"username": "PepperMoJ"}
+            {"username": "connormaglynn"}
         ]
         
     def get_all_slack_usernames_stub(self):
@@ -30,12 +32,12 @@ class MetadataService:
                 "email": "user1@example.com"
             },
             {
-                "username": "user2",
+                "username": "connor.glynn",
                 "email": "user2@example.com"
             },
             {
                 "username": "sam.pepper",
-                "email": "sam.pepper@example.com"
+                "email": "user3@example.com"
             }
         ]
 
@@ -54,12 +56,12 @@ class MetadataService:
                 "email": "user1@example.com"
             },
             {
-                "username": "user2",
+                "username": "connormaglynn",
                 "email": "user2@example.com"
             },
             {
                 "username": "PepperMoJ",
-                "email": "sam.pepper@example.com"
+                "email": "user3@example.com"
             }
         ]
 
@@ -136,20 +138,19 @@ class MetadataService:
         Returns:
             list: None
         """
-        payload = {"usernames_to_add": usernames_to_add}
+        payload = {"users": usernames_to_add}
 
         try:
             response = requests.post(
-                f"{self.api_url}/add_users",
+                f"{self.api_url}/user/add",
                 json=payload,
-                headers={"Authorization": f"Bearer {self.api_token}"}
             )
 
             if response.status_code == 200 or response.status_code == 201:
-                logging.info("New Slack usernames added successfully!")
+                logging.info("New usernames added successfully!")
             else:
                 logging.error(
-                    "Error adding new Slack usernames: %s", response.content)
+                    "Error adding new usernames: %s", response.content)
         except Exception as e:
             logging.error(
-                "An error occurred while adding new Slack usernames: %s", str(e))
+                "An error occurred while adding new usernames: %s", str(e))
