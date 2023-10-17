@@ -1191,7 +1191,7 @@ class GithubService:
         for member in all_members:
             email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
             members.append({
-                "username": node["login"],
+                "username": member["login"],
                 "email": email
             })
             
