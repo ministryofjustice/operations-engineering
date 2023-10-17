@@ -1180,7 +1180,7 @@ class GithubService:
     
     def get_github_member_list(self):
         members = []
-        response = self.github_service.get_paginated_organization_members_with_emails(after_cursor=None)
+        response = self._get_paginated_organization_members_with_emails(after_cursor=None)
         
         if 'data' in response and \
         'organization' in response['data'] and \
