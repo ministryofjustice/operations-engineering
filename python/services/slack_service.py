@@ -292,9 +292,15 @@ class SlackService:
 
                 if response['ok']:
                     for user in response['members']:
+                        
+                        email = user['profile'].get('email') 
+                        
+                        if email is None:
+                            continue
+                        
                         user_info = {
                             "username": user['name'],
-                            "email": user['profile']['email']
+                            "email": email
                         }
                         user_data.append(user_info)
 
