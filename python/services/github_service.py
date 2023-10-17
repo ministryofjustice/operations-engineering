@@ -1183,17 +1183,16 @@ class GithubService:
         all_members = []
         response = self._get_paginated_organization_members_with_emails(after_cursor=None)
         
-        if 'data' in response and \
-        'organization' in response['data'] and \
-        'membersWithRole' in response['data']['organization']:
+        if 'data' in response and 'organization' in response['data'] and 'membersWithRole' in response['data']['organization']:
+            print("<PEPPER> - Members found!")
             all_members = response['data']['organization']['membersWithRole']['nodes']
 
-        for member in all_members:
-            email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
-            members.append({
-                "username": member["login"],
-                "email": "email"
-            })
+            for member in all_members:
+                email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
+                members.append({
+                    "username": member["login"],
+                    "email": "email"
+                })
             
         return members
 
