@@ -1142,6 +1142,48 @@ class GithubService:
             
         return user_data
     
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
+        logging.info(f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
+        
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        
+        query = gql("""
+            query($org: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $org) {
+                    membersWithRole(first: $page_size, after: $after_cursor) {
+                        nodes {
+                            login
+                            name
+                            organizationVerifiedDomainEmails(login: $org)
+                        }
+                        pageInfo {
+                            hasNextPage
+                            endCursor
+                        }
+                    }
+                }
+            }
+        """)
+
+        variable_values = {
+            "org": self.organisation_name,
+            "page_size": page_size,
+            "after_cursor": after_cursor
+        }
+
+        return self.github_client_gql_api.execute(query, variable_values)
+    
+        # after_cursor = None
+        # while True:
+        #     response = client.get_paginated_organization_members_with_emails(after_cursor)
+        #     if not response['data']['organization']['membersWithRole']['pageInfo']['hasNextPage']:
+        #         break 
+        #     after_cursor = response['data']['organization']['membersWithRole']['pageInfo']['endCursor']
+
+    
     def get_all_organization_members_with_emails(self, org: str) -> list:
         logging.info(f"Getting all members for organization {org} with their verified domain emails.")
 
