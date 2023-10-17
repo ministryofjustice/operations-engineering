@@ -1183,6 +1183,9 @@ class GithubService:
         all_members = []
         response = self._get_paginated_organization_members_with_emails(after_cursor=None)
         
+        if 'errors' in response:
+            print(response['errors'])
+
         if 'data' in response and 'organization' in response['data'] and 'membersWithRole' in response['data']['organization']:
             print("<PEPPER> - Members found!")
             all_members = response['data']['organization']['membersWithRole']['nodes']
@@ -1194,57 +1197,4 @@ class GithubService:
                     "email": "email"
                 })
             
-        return members
-
-    
-    def get_all_organization_members_with_emails(self, org: str) -> list:
-        logging.info(f"Getting all members for organization {org} with their verified domain emails.")
-
-        query = gql("""
-            query($org: String!, $cursor: String) {
-                organization(login: $org) {
-                    membersWithRole(first: 100, after: $cursor) {
-                        nodes {
-                            login
-                            organizationVerifiedDomainEmails(login: $org)
-                        }
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                    }
-                }
-            }
-        """)
-
-        members = []
-        next_page = True
-        cursor = None
-
-        while next_page:
-            variables = {
-                "org": org,
-                "cursor": cursor
-            }
-            
-            try:
-                data = self.github_client_gql_api.execute(query, variable_values=variables)
-            except Exception as e:
-                logging.error(f"An error occurred: {str(e)}")
-
-            if "errors" in data:
-                logging.error(f"Error retrieving organization members: {data['errors']}")
-                break
-
-            members_nodes = data["data"]["organization"]["membersWithRole"]["nodes"]
-            for node in members_nodes:
-                members.append({
-                    "username": node["login"],
-                    "email": node["organizationVerifiedDomainEmails"]
-                })
-
-            page_info = data["data"]["organization"]["membersWithRole"]["pageInfo"]
-            next_page = page_info["hasNextPage"]
-            cursor = page_info["endCursor"] 
-
         return members
