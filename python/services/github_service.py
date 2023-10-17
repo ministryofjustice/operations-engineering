@@ -1145,7 +1145,7 @@ class GithubService:
     def get_all_organization_members_with_emails(self, org: str) -> list:
         logging.info(f"Getting all members for organization {org} with their verified domain emails.")
 
-        query = """
+        query = gql("""
             query($org: String!, $cursor: String) {
                 organization(login: $org) {
                     membersWithRole(first: 100, after: $cursor) {
@@ -1160,7 +1160,7 @@ class GithubService:
                     }
                 }
             }
-        """
+        """)
 
         members = []
         next_page = True
@@ -1171,8 +1171,11 @@ class GithubService:
                 "org": org,
                 "cursor": cursor
             }
-
-            data = self.github_client_gql_api.execute(query, variable_values=variables)
+            
+            try:
+                data = self.github_client_gql_api.execute(query, variable_values=variables)
+            except Exception as e:
+                logging.error(f"An error occurred: {str(e)}")
 
             if "errors" in data:
                 logging.error(f"Error retrieving organization members: {data['errors']}")
