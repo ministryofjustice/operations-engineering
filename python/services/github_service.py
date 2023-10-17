@@ -1176,7 +1176,6 @@ class GithubService:
             "after_cursor": after_cursor
         }      
 
-
         return self.github_client_gql_api.execute(query, variable_values)
     
     def get_github_member_list(self):
