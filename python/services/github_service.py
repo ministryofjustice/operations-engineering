@@ -1115,33 +1115,7 @@ class GithubService:
                 logging.info(f"Removed user {user.login} from team {team_id}")
             except Exception:
                 logging.error(
-                    f"An exception occurred while removing user {user.login} from team {team_name}")
-                
-    def get_all_github_usernames(self) -> list[dict]:
-        """
-        Gets all GitHub users and created a list of dictionaries detailing their username and email
-
-        Returns:
-            list[dict]: A list of dictionaries with usernames and emails
-        """
-        logging.info(f"Fetching all GitHub usernames")
-        
-        user_data = []
-
-        try:
-            all_users = self.__get_all_users()
-        except Exception:
-            logging.error(f"An exception occurred when fetching all GitHub usernames")
-        
-        for user in all_users:
-            user_info = {
-                "username": user.login,
-                "email": user.email
-            }
-            user_data.append(user_info)
-            
-        return user_data
-    
+                    f"An exception occurred while removing user {user.login} from team {team_name}")    
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
@@ -1158,7 +1132,6 @@ class GithubService:
                     membersWithRole(first: $page_size, after: $after_cursor) {
                         nodes {
                             login
-                            name
                             organizationVerifiedDomainEmails(login: $org)
                         }
                         pageInfo {
