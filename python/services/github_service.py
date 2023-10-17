@@ -1182,9 +1182,7 @@ class GithubService:
         github_usernames = []
         all_members = []
         response = self._get_paginated_organization_members_with_emails(after_cursor=None)
-        
-        print(f"<PEPPER> - Response from GitHub: {response}")
-        
+                
         if 'errors' in response:
             print(response['errors'])
 
