@@ -1188,9 +1188,9 @@ class GithubService:
         if 'errors' in response:
             print(response['errors'])
 
-        if 'data' in response and 'organization' in response['data'] and 'membersWithRole' in response['data']['organization']:
+        if 'organization' in response and 'membersWithRole' in response['organization']:
             print("<PEPPER> - Members found!")
-            all_members = response['data']['organization']['membersWithRole']['nodes']
+            all_members = response['organization']['membersWithRole']['nodes']
 
             for member in all_members:
                 email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
