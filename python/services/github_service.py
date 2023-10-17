@@ -1120,9 +1120,7 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
         logging.info(f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
-        
-        members = []
-        
+                
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         

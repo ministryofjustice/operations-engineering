@@ -42,8 +42,6 @@ def main():
     # github_usernames = metadata_service.get_all_github_usernames_stub()
     github_usernames = github_service.get_github_member_list()
     
-    print(f"GitHub Usernames: {github_usernames}")
-
     # Grabs a list of acceptable slack usernames (this is for testing purposes)
     acceptable_slack_users = metadata_service.get_acceptable_slack_users()
     
