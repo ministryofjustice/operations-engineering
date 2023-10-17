@@ -1179,9 +1179,11 @@ class GithubService:
         return self.github_client_gql_api.execute(query, variable_values)
     
     def get_github_member_list(self):
-        members = []
+        github_usernames = []
         all_members = []
         response = self._get_paginated_organization_members_with_emails(after_cursor=None)
+        
+        print(f"<PEPPER> - Response from GitHub: {response}")
         
         if 'errors' in response:
             print(response['errors'])
@@ -1192,9 +1194,9 @@ class GithubService:
 
             for member in all_members:
                 email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
-                members.append({
+                github_usernames.append({
                     "username": member["login"],
                     "email": "email"
                 })
             
-        return members
+        return github_usernames
