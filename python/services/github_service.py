@@ -1180,21 +1180,31 @@ class GithubService:
     
     def get_github_member_list(self):
         github_usernames = []
+        next_page = True
+        after_cursor = None
         all_members = []
-        response = self._get_paginated_organization_members_with_emails(after_cursor=None)
-                
-        if 'errors' in response:
-            print(response['errors'])
+        
+        while next_page:
+            response = self._get_paginated_organization_members_with_emails(after_cursor=after_cursor)
+                    
+            if 'errors' in response:
+                print(response['errors'])
+                break
 
-        if 'organization' in response and 'membersWithRole' in response['organization']:
-            print("<PEPPER> - Members found!")
-            all_members = response['organization']['membersWithRole']['nodes']
+            if 'organization' in response and 'membersWithRole' in response['organization']:
+                all_members = response['organization']['membersWithRole']['nodes']
+                member_data = response['organization']['membersWithRole']
 
-            for member in all_members:
-                email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
-                github_usernames.append({
-                    "username": member["login"],
-                    "email": "email"
-                })
+                for member in all_members:
+                    email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
+                    github_usernames.append({
+                        "username": member["login"],
+                        "email": "email"
+                    })
+                next_page = member_data['pageInfo']['hasNextPage']
+                if next_page:
+                    after_cursor = member_data['pageInfo']['endCursor']
+            else:
+                next_page = False
             
         return github_usernames
