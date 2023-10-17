@@ -40,7 +40,7 @@ def main():
     
     # Grabs a list of all GitHub usernames from the GitHub API (using stub for testing purposes)
     # github_usernames = metadata_service.get_all_github_usernames_stub()
-    github_usernames = github_service.get_all_organization_members_with_emails("ministryofjustice")
+    github_usernames = github_service.get_paginated_organization_members_with_emails()
 
     # Grabs a list of acceptable slack usernames (this is for testing purposes)
     acceptable_slack_users = metadata_service.get_acceptable_slack_users()
