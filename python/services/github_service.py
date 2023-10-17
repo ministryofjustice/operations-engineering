@@ -1170,7 +1170,7 @@ class GithubService:
                     email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
                     github_usernames.append({
                         "username": member["login"],
-                        "email": "email"
+                        "email": email
                     })
                 next_page = member_data['pageInfo']['hasNextPage']
                 if next_page:
