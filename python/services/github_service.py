@@ -1144,7 +1144,7 @@ class GithubService:
     
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
+    def _get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
         logging.info(f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
         
         members = []
@@ -1174,9 +1174,14 @@ class GithubService:
             "org": self.organisation_name,
             "page_size": page_size,
             "after_cursor": after_cursor
-        }
-        
-        response = self.github_client_gql_api.execute(query, variable_values)
+        }      
+
+
+        return self.github_client_gql_api.execute(query, variable_values)
+    
+    def get_github_member_list(self):
+        members = []
+        response = self.github_service.get_paginated_organization_members_with_emails(after_cursor=None)
         
         if 'data' in response and \
         'organization' in response['data'] and \
@@ -1189,7 +1194,7 @@ class GithubService:
                 "username": node["login"],
                 "email": email
             })
-
+            
         return members
 
     
