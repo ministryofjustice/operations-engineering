@@ -1147,6 +1147,8 @@ class GithubService:
     def get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
         logging.info(f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
         
+        members = []
+        
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         
@@ -1173,15 +1175,22 @@ class GithubService:
             "page_size": page_size,
             "after_cursor": after_cursor
         }
+        
+        response = self.github_client_gql_api.execute(query, variable_values)
+        
+        if 'data' in response and \
+        'organization' in response['data'] and \
+        'membersWithRole' in response['data']['organization']:
+            nodes = response['data']['organization']['membersWithRole']['nodes']
 
-        return self.github_client_gql_api.execute(query, variable_values)
-    
-        # after_cursor = None
-        # while True:
-        #     response = client.get_paginated_organization_members_with_emails(after_cursor)
-        #     if not response['data']['organization']['membersWithRole']['pageInfo']['hasNextPage']:
-        #         break 
-        #     after_cursor = response['data']['organization']['membersWithRole']['pageInfo']['endCursor']
+        for node in nodes:
+            email = node['organizationVerifiedDomainEmails'][0] if node['organizationVerifiedDomainEmails'] else None
+            members.append({
+                "username": node["login"],
+                "email": email
+            })
+
+        return members
 
     
     def get_all_organization_members_with_emails(self, org: str) -> list:
