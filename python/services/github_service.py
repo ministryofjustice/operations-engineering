@@ -1192,7 +1192,7 @@ class GithubService:
             email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
             members.append({
                 "username": member["login"],
-                "email": email
+                "email": "email"
             })
             
         return members
