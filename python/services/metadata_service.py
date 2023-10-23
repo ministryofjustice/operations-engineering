@@ -18,54 +18,6 @@ class MetadataService:
             {"username": "PepperMoJ"},
             {"username": "connormaglynn"}
         ]
-        
-    def get_all_slack_usernames_stub(self):
-        """Stubbed method to simulate fetching usernames and user email addresses from the Slack API (for testing purposes)
-
-        Returns:
-            user_data: A list of JSON objects with example data.
-        """
-
-        user_data = [
-            {
-                "username": "user1",
-                "email": "user1@example.com"
-            },
-            {
-                "username": "connor.glynn",
-                "email": "user2@example.com"
-            },
-            {
-                "username": "sam.pepper",
-                "email": "user3@example.com"
-            }
-        ]
-
-        return user_data
-    
-    def get_all_github_usernames_stub(self):
-        """Stubbed method to simulate fetching usernames and user email addresses from the Slack API (for testing purposes)
-
-        Returns:
-            user_data: A list of JSON objects with example data.
-        """
-
-        user_data = [
-            {
-                "username": "user1",
-                "email": "user1@example.com"
-            },
-            {
-                "username": "connormaglynn",
-                "email": "user2@example.com"
-            },
-            {
-                "username": "PepperMoJ",
-                "email": "user3@example.com"
-            }
-        ]
-
-        return user_data
 
     def get_existing_slack_users(self):
         try:
