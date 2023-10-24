@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from scripts import sentry_usage_alert
+from bin import sentry_usage_alert
 from services.sentry_service import UsageStats
 
 START_TIME = "2023-06-08T00:00:00Z"

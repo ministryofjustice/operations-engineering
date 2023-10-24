@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from scripts import close_move_users_to_teams_expired_issues
+from bin import close_move_users_to_teams_expired_issues
 from services.github_service import GithubService
 from lib.organisation import Organisation
 

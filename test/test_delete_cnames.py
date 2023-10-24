@@ -4,7 +4,7 @@ from unittest.mock import patch
 import boto3
 import botocore.session
 from botocore.stub import Stubber
-from scripts import delete_cnames
+from bin import delete_cnames
 
 
 class TestDeleteCNames(unittest.TestCase):

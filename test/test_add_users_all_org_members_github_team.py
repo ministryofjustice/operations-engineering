@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from scripts import add_users_all_org_members_github_team
+from bin import add_users_all_org_members_github_team
 
 
 @patch("github.Github.__new__", new=MagicMock)

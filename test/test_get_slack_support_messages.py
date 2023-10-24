@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from scripts import get_slack_support_messages
+from bin import get_slack_support_messages
 from lib.moj_slack import MojSlack
 
 

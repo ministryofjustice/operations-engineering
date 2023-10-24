@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import MagicMock, patch
 
-from scripts import close_support_tickets
+from bin import close_support_tickets
 
 
 @patch("github.Github.__new__", new=MagicMock)

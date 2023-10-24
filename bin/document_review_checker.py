@@ -11,7 +11,7 @@ to their editor of choice, and then update the document the date
 as they see fit.
 
 Execution:
-python python.scripts.document_review_checker.py --help
+python bin.document_review_checker.py --help
 """
 import argparse
 import os

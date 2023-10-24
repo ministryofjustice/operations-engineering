@@ -1,4 +1,4 @@
-from scripts.move_users_to_teams_refactor import (
+from bin.move_users_to_teams_refactor import (
     get_environment_variables,
     get_org_repositories
 )
