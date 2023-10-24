@@ -90,29 +90,6 @@ class TestMetadataService(unittest.TestCase):
         self.assertEqual(mock_error.output, [
                          f"ERROR:root:Error adding new usernames: {mock_response.content}"])
 
-    def test_add_new_usernames_exception(self, mock_post):
-        mock_post.side_effect = Exception("API is down")
-
-        usernames_to_add = [
-            {
-                "slack_username": "slack_user1",
-                "github_username": "github_user1",
-                "email": "user1@example.com"
-            },
-            {
-                "slack_username": "slack_user2",
-                "github_username": "github_user2",
-                "email": "user2@example.com"
-            }
-        ]
-
-        with self.assertLogs(level='ERROR') as mock_exception:
-            self.metadata_service.add_new_usernames(usernames_to_add)
-
-        self.assertEqual(mock_exception.output, [
-                         "ERROR:root:An error occurred while adding new usernames: API is down"])
-
-
 class FilterUsernamesTest(unittest.TestCase):
 
     def setUp(self):

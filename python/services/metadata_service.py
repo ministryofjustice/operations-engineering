@@ -20,19 +20,15 @@ class MetadataService:
         ]
 
     def get_existing_slack_users(self):
-        try:
-            response = requests.get(
-                f"{self.api_url}/slack_users", headers={"Authorization": f"Bearer {self.api_token}"})
-            if response.status_code == 200:
-                return response.json()
-            else:
-                logging.error(
-                    "Error fetching existing Slack usernames: %s", response.content)
-                return []
-        except Exception as e:
+        response = requests.get(
+            f"{self.api_url}/slack_users", headers={"Authorization": f"Bearer {self.api_token}"})
+        if response.status_code == 200:
+            return response.json()
+        else:
             logging.error(
-                "An error occurred while fetching existing Slack usernames: %s", str(e))
+                "Error fetching existing Slack usernames: %s", response.content)
             return []
+
 
     def filter_usernames(self, username_list: list[dict], accepted_username_list: list[dict]):
         """Filter out all usernames deemed not acceptable.
@@ -54,7 +50,7 @@ class MetadataService:
 
         return filtered_usernames
 
-    def combine_user_data(self, slack_user_data, github_user_data):
+    def combine_user_data(self, slack_user_data: list[dict], github_user_data: list[dict]):
         """Combine user data from Slack and GitHub based on the email address
 
         Parameters:
@@ -93,17 +89,13 @@ class MetadataService:
         """
         payload = {"users": usernames_to_add}
 
-        try:
-            response = requests.post(
-                f"{self.api_url}/user/add",
-                json=payload,
-            )
+        response = requests.post(
+            f"{self.api_url}/user/add",
+            json=payload,
+        )
 
-            if response.status_code == 200 or response.status_code == 201:
-                logging.info("New usernames added successfully!")
-            else:
-                logging.error(
-                    "Error adding new usernames: %s", response.content)
-        except Exception as e:
+        if response.status_code == 200 or response.status_code == 201:
+            logging.info("New usernames added successfully!")
+        else:
             logging.error(
-                "An error occurred while adding new usernames: %s", str(e))
+                "Error adding new usernames: %s", response.content)
