@@ -12,8 +12,8 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - run: pip install -r python/requirements.txt
-      - run: python -m python.scripts.sentry_projects_rate_limiting
+      - run: pip install -r requirements.txt
+      - run: python -m bin.sentry_projects_rate_limiting
         env:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}

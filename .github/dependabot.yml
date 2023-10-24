@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/scripts/python/"
+    directory: "/bin/python/"
     schedule:
       interval: "daily"
       time: "09:00" # UTC

@@ -15,8 +15,8 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - run: pip install -r python/requirements.txt
-      - run: python -m python.scripts.assign_support_tickets --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }}
+      - run: pip install -r requirements.txt
+      - run: python -m bin.assign_support_tickets --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }}
         env:
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
   close-support-ticket:
@@ -29,8 +29,8 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - run: pip install -r python/requirements.txt
-      - run: python -m python.scripts.close_support_tickets
+      - run: pip install -r requirements.txt
+      - run: python -m bin.close_support_tickets
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
