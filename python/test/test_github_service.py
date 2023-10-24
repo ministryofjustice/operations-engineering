@@ -1447,28 +1447,95 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
         self.assertFalse(mock_open_issue_without_tag.edit.called)
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__")
+@patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
-class TestGithubServiceGetAllUsernames(unittest.TestCase):
-    def test_get_all_github_usernames_returns_succesfully(self, mock_github_client_core_api):
+class TestGithubServiceGetMemberList(unittest.TestCase):
+    def setUp(self):
+        self.return_data_with_members = {
+            "organization": {
+                "membersWithRole": {
+                    "nodes": [
+                        {
+                            "login": "test_user",
+                            "organizationVerifiedDomainEmails": ["test_user@test.com"]
+                        }
+                    ],
+                    "pageInfo": {
+                        "hasNextPage": False,
+                        "endCursor": "test_end_cursor",
+                    },
+                }
+            }
+        }
         
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
-            {'login': 'user1'},
-            {'login': 'user2'},
-            {'login': 'user3'},
-        ]
-        
+        self.return_data_no_members = {
+            "organization": {
+                "membersWithRole": {
+                    "nodes": [],
+                    "pageInfo": {
+                        "hasNextPage": False,
+                        "endCursor": "test_end_cursor",
+                    },
+                }
+            }
+        }
+
+    def test_returns_correct_data(self):
         github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_paginated_organization_members_with_emails = MagicMock(
+            return_value=self.return_data_with_members
+        )
+        members = github_service.get_github_member_list()
+        self.assertEqual(len(members), 1)
+        self.assertEqual(members[0]["username"], "test_user")
+        self.assertEqual(members[0]["email"], "test_user@test.com")
+
+    def test_handles_no_members(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_paginated_organization_members_with_emails = MagicMock(
+            return_value=self.return_data_no_members
+        )
+        members = github_service.get_github_member_list()
+        self.assertEqual(len(members), 0)
+
+    def test_handles_rate_limiting(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_paginated_organization_members_with_emails = MagicMock(
+            side_effect=Exception("API rate limit exceeded")
+        )
+        with self.assertRaises(Exception) as context:
+            github_service.get_github_member_list()
+        self.assertIn('API rate limit exceeded', str(context.exception))
         
-        result = github_service.get_all_github_usernames()
-        
-        expected_result = [
-            {'username': 'user1', 'email': 'user1@example.com'},
-            {'username': 'user2', 'email': 'user2@example.com'},
-            {'username': 'user3', 'email': 'user3@example.com'},
-        ]
-        
-        self.assertEqual(result, expected_result)
+    def test_handles_pagination_as_expected(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        page_one = {
+            "organization": {
+                "membersWithRole": {
+                    "nodes": [{"login": "test_user1", "organizationVerifiedDomainEmails": ["test_user1@test.com"]}],
+                    "pageInfo": {"hasNextPage": True, "endCursor": "page2"},
+                }
+            }
+        }
+
+        page_two = {
+            "organization": {
+                "membersWithRole": {
+                    "nodes": [{"login": "test_user2", "organizationVerifiedDomainEmails": ["test_user2@test.com"]}],
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                }
+            }
+        }
+
+        github_service._get_paginated_organization_members_with_emails = MagicMock(
+            side_effect=[page_one, page_two]
+        )
+
+        members = github_service.get_github_member_list()
+        self.assertEqual(len(members), 2)
+        self.assertEqual(members[0]["username"], "test_user1")
+        self.assertEqual(members[1]["username"], "test_user2")
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
