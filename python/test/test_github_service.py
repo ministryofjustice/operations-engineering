@@ -1468,7 +1468,7 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
                 }
             }
         }
-        
+
         self.return_data_no_members = {
             "organization": {
                 "membersWithRole": {
@@ -1507,7 +1507,7 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             github_service.get_github_member_list()
         self.assertIn('API rate limit exceeded', str(context.exception))
-        
+
     def test_handles_pagination_as_expected(self):
         github_service = GithubService("", ORGANISATION_NAME)
 
@@ -1537,6 +1537,7 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
         self.assertEqual(len(members), 2)
         self.assertEqual(members[0]["username"], "test_user1")
         self.assertEqual(members[1]["username"], "test_user2")
+
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
