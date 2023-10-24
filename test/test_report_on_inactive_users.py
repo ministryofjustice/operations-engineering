@@ -87,7 +87,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
     def test_get_config(self):
         org_name, inactivity, teams = report_test.get_config(
-            './python/test/files/test-inactive-users.toml')
+            './test/files/test-inactive-users.toml')
         self.assertEqual(org_name, "some-org")
         self.assertEqual(inactivity, 18)
         self.assertEqual(len(teams), 1)
