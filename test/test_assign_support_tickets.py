@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from scripts import assign_support_tickets
+from bin import assign_support_tickets
 from services.github_service import GithubService
 from test.test_github_service import MockGithubIssue
 

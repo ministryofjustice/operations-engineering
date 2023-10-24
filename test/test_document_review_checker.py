@@ -4,7 +4,7 @@ import tempfile
 import os
 from datetime import datetime
 
-from scripts import document_review_checker as check
+from bin import document_review_checker as check
 
 
 class TestDocumentReviewChecker(unittest.TestCase):

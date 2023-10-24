@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 
-import scripts.report_on_inactive_users as report_test
+import bin.report_on_inactive_users as report_test
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
@@ -118,11 +118,11 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.mock_github_service.remove_list_of_users_from_team.assert_called()
         self.mock_slack_service.send_message_to_plaintext_channel_name.assert_not_called()
 
-    @patch("python.scripts.report_on_inactive_users.GithubService", new=MagicMock)
-    @patch("python.scripts.report_on_inactive_users.SlackService", new=MagicMock)
-    @patch("python.scripts.report_on_inactive_users.get_config")
-    @patch("python.scripts.report_on_inactive_users.create_report")
-    @patch("python.scripts.report_on_inactive_users.get_environment_variables")
+    @patch("python.bin.report_on_inactive_users.GithubService", new=MagicMock)
+    @patch("python.bin.report_on_inactive_users.SlackService", new=MagicMock)
+    @patch("python.bin.report_on_inactive_users.get_config")
+    @patch("python.bin.report_on_inactive_users.create_report")
+    @patch("python.bin.report_on_inactive_users.get_environment_variables")
     def test_call_main(self, mock_get_environment_variables, mock_create_report, mock_get_config):
         mock_get_config.return_value = ["", "", ""]
         mock_get_environment_variables.return_value = ["", ""]

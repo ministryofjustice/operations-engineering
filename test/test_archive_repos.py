@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 from dateutil.relativedelta import relativedelta
 from freezegun import freeze_time
 
-from scripts import archive_repositories
+from bin import archive_repositories
 
 
 @patch("github.Github.__new__", new=MagicMock)

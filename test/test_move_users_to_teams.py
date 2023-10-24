@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from scripts import move_users_to_teams
+from bin import move_users_to_teams
 from services.github_service import GithubService
 from lib.organisation import Organisation
 

@@ -2,28 +2,28 @@ import unittest
 from unittest.mock import patch
 import json
 import requests
-from scripts import sentry_projects_rate_limiting
+from bin import sentry_projects_rate_limiting
 
 SENTRY_URL = "https://sentry.io/api/0"
 
 
 class TestSentry(unittest.TestCase):
-    @patch("python.scripts.sentry_projects_rate_limiting.get_sentry_token")
-    @patch("python.scripts.sentry_projects_rate_limiting.get_org_teams")
-    @patch("python.scripts.sentry_projects_rate_limiting.check_sentry_projects")
+    @patch("python.bin.sentry_projects_rate_limiting.get_sentry_token")
+    @patch("python.bin.sentry_projects_rate_limiting.get_org_teams")
+    @patch("python.bin.sentry_projects_rate_limiting.check_sentry_projects")
     def test_call_main(self, mock_check_sentry_projects, mock_get_org_teams, mock_get_sentry_token):
         sentry_projects_rate_limiting.main()
         mock_get_sentry_token.assert_called()
         mock_get_org_teams.assert_called()
         mock_check_sentry_projects.assert_called()
 
-    @patch("python.scripts.sentry_projects_rate_limiting.get_project_keys")
+    @patch("python.bin.sentry_projects_rate_limiting.get_project_keys")
     def test_check_sentry_projects_with_no_teams(self, mock_get_project_keys):
         sentry_projects_rate_limiting.check_sentry_projects("", "", None)
         mock_get_project_keys.assert_not_called()
 
-    @patch("python.scripts.sentry_projects_rate_limiting.get_project_keys")
-    @patch("python.scripts.sentry_projects_rate_limiting.print_project_key_info")
+    @patch("python.bin.sentry_projects_rate_limiting.get_project_keys")
+    @patch("python.bin.sentry_projects_rate_limiting.print_project_key_info")
     def test_check_sentry_projects_with_teams_and_has_no_project_key(self, mock_print_project_key_info, mock_get_project_keys):
         teams = [{"name": "some-team", "projects": [{"slug": "some-slug",
                                                      "name": "some-name", "status": "some-status"}]}]
@@ -32,8 +32,8 @@ class TestSentry(unittest.TestCase):
         mock_get_project_keys.assert_called()
         mock_print_project_key_info.assert_not_called()
 
-    @patch("python.scripts.sentry_projects_rate_limiting.get_project_keys")
-    @patch("python.scripts.sentry_projects_rate_limiting.print_project_key_info")
+    @patch("python.bin.sentry_projects_rate_limiting.get_project_keys")
+    @patch("python.bin.sentry_projects_rate_limiting.print_project_key_info")
     def test_check_sentry_projects_with_teams_and_has_project_key(self, mock_print_project_key_info, mock_get_project_keys):
         teams = [{"name": "some-team", "projects": [{"slug": "some-slug",
                                                      "name": "some-name", "status": "some-status"}]}]

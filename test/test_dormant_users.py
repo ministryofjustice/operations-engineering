@@ -4,7 +4,7 @@ from datetime import datetime
 from freezegun import freeze_time
 from config.constants import MISSING_EMAIL_ADDRESS
 
-from scripts.dormant_users import (
+from bin.dormant_users import (
     main,
     convert_str_to_bool,
     get_username,
@@ -51,15 +51,15 @@ def create_dormant_file_user(username):
     }
 
 
-@patch("python.scripts.dormant_users.GithubService", new=MagicMock)
-@patch("python.scripts.dormant_users.S3Service", new=MagicMock)
-@patch("python.scripts.dormant_users.SlackService", new=MagicMock)
-@patch("python.scripts.dormant_users.NotifyService", new=MagicMock)
-@patch("python.scripts.dormant_users.Auth0Service", new=MagicMock)
-@patch("python.scripts.dormant_users.run_step_one")
-@patch("python.scripts.dormant_users.run_step_two")
-@patch("python.scripts.dormant_users.run_step_three")
-@patch("python.scripts.dormant_users.print_dormant_outside_collaborators")
+@patch("python.bin.dormant_users.GithubService", new=MagicMock)
+@patch("python.bin.dormant_users.S3Service", new=MagicMock)
+@patch("python.bin.dormant_users.SlackService", new=MagicMock)
+@patch("python.bin.dormant_users.NotifyService", new=MagicMock)
+@patch("python.bin.dormant_users.Auth0Service", new=MagicMock)
+@patch("python.bin.dormant_users.run_step_one")
+@patch("python.bin.dormant_users.run_step_two")
+@patch("python.bin.dormant_users.run_step_three")
+@patch("python.bin.dormant_users.print_dormant_outside_collaborators")
 class TestDormantUsersMain(unittest.TestCase):
 
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "true", "", ""])
@@ -247,7 +247,7 @@ class TestGetDormantUsers(unittest.TestCase):
 @patch("python.services.github_service.GithubService")
 @patch("python.services.notify_service.NotifyService")
 @patch("python.services.slack_service.SlackService")
-@patch("python.scripts.dormant_users.get_dormant_users")
+@patch("python.bin.dormant_users.get_dormant_users")
 class TestRunStepOne(unittest.TestCase):
     def test_run_step_one_in_production_mode_when_no_dormant_users_find_unknown_user(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = []
@@ -336,7 +336,7 @@ class TestRunStepOne(unittest.TestCase):
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
 
     @freeze_time("2023-08-13")
-    @patch("python.scripts.dormant_users.sleep", return_value=None)
+    @patch("python.bin.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         new_list = MINISTRY_OF_JUSTICE_ALLOW_LIST.copy()
         mock_github_service.get_org_members_login_names.return_value = new_list
@@ -364,7 +364,7 @@ class TestRunStepOne(unittest.TestCase):
             ["some-email"], MINISTRY_OF_JUSTICE)
 
     @freeze_time("2023-08-13")
-    @patch("python.scripts.dormant_users.sleep", return_value=None)
+    @patch("python.bin.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode_with_no_undelivered_email(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = MINISTRY_OF_JUSTICE_ALLOW_LIST
         user = create_saved_json_file_user("full-org-user")
@@ -453,7 +453,7 @@ class TestRunStepTwo(unittest.TestCase):
 @patch("python.services.github_service.GithubService")
 @patch("python.services.notify_service.NotifyService")
 @patch("python.services.slack_service.SlackService")
-@patch("python.scripts.dormant_users.get_dormant_users")
+@patch("python.bin.dormant_users.get_dormant_users")
 class TestRunStepThree(unittest.TestCase):
     def test_run_step_three_when_no_dormant_users(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = [

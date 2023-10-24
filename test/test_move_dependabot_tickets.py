@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from scripts import move_dependabot_tickets
+from bin import move_dependabot_tickets
 from services.zenhub_service import ZenhubService
 
 
@@ -100,7 +100,7 @@ class TestMoveDependabotTickets(unittest.TestCase):
 
 
 @patch("sys.argv", ["", "--api_token", "test"])
-@patch("python.scripts.move_dependabot_tickets.ZenhubService")
+@patch("python.bin.move_dependabot_tickets.ZenhubService")
 class TestMoveDependabotTicketsMainFunction(unittest.TestCase):
     def test_main_raises_exception_from_service(self, mock_zen_service):
         mock_zen_service.return_value.get_workspace_id_from_repo = MagicMock(
