@@ -27,20 +27,6 @@ These are just a few examples of the useful tools and features available in this
 3. **Install Dependencies:** `pip install -r python/requirements.txt`
 4. **Run a script:** `python -m python.scripts.dormant_users # for example`
 
-## Documentation Hosting and Updates
-
-Our repository documentation is built using the [Technical Documentation Template](https://github.com/ministryofjustice/template-documentation-site) to provide a user-friendly and consistent experience. The Technical Documentation Template ensures a clear, standardised layout for all our project documentation, enhancing readability and navigation.
-
-This documentation is then published via GitHub Pages, enabling easy accessibility for everyone. You can view the published documentation [here](https://operations-engineering.service.justice.gov.uk/#moj-operations-engineering). GitHub Pages offers a streamlined way to host project documentation directly from the repository.
-
-If you wish to update the documentation, start by editing the relevant files in the `source` directory. While making edits, you can preview your changes locally. To do so, run `make preview` in your terminal and open `http://127.0.0.1:4567` in your browser. This allows you to view the impact of your changes in real-time before committing.
-
-After you've made your changes, use `make check` to compile the site to HTML and validate the URLs. This ensures that all links are working correctly and that the site structure is maintained.
-
-We also provide a `tech-docs.yml` file located in the `config` directory. This file includes layout configuration options to customise the appearance of the documentation. For more details about the configuration options available, check out the official guide [here](https://tdt-documentation.london.cloudapps.digital/configure_project/global_configuration/).
-
-Through the use of the Technical Documentation Template and GitHub Pages, we aim to provide well-organised, easily accessible, and up-to-date documentation for all users.
-
 ## Support
 
 If you have any questions or need help with this repository, please contact us on the #ask-operations-engineering slack channel.
