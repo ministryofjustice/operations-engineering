@@ -90,6 +90,7 @@ class TestMetadataService(unittest.TestCase):
         self.assertEqual(mock_error.output, [
                          f"ERROR:root:Error adding new usernames: {mock_response.content}"])
 
+
 class FilterUsernamesTest(unittest.TestCase):
 
     def setUp(self):

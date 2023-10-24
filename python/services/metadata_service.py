@@ -29,7 +29,6 @@ class MetadataService:
                 "Error fetching existing Slack usernames: %s", response.content)
             return []
 
-
     def filter_usernames(self, username_list: list[dict], accepted_username_list: list[dict]):
         """Filter out all usernames deemed not acceptable.
 

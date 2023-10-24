@@ -1162,7 +1162,8 @@ class GithubService:
                 after_cursor=after_cursor)
 
             if 'errors' in response:
-                logging.error(f"Error retrieving organization members: {response['errors']}")
+                logging.error(
+                    f"Error retrieving organization members: {response['errors']}")
                 break
 
             if 'organization' in response and 'membersWithRole' in response['organization']:
