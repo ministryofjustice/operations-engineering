@@ -1,4 +1,4 @@
-# This GitHub Action utilises the script to review and remove GitHub users from teams defined in TOML file: ../../python/config/inactive-users.toml
+# This GitHub Action utilises the script to review and remove GitHub users from teams defined in TOML file: ../../config/inactive-users.toml
 # Please see here for more infomation: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/github/self-managed-github-teams.html
 name: Review GitHub users older than n months from select teams
 
@@ -15,8 +15,8 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - run: python3 -m pip install -r python/requirements.txt
-      - run: python3 -m python.scripts.report_on_inactive_users
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m bin.report_on_inactive_users
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}

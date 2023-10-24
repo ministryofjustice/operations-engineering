@@ -23,8 +23,8 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - run: pip install -r python/requirements.txt
-      - run: python -m python.scripts.delete_cnames
+      - run: pip install -r requirements.txt
+      - run: python -m bin.delete_cnames
         env:
           HOSTED_ZONE_1: ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }}
           HOSTED_ZONE_2: ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
