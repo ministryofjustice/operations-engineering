@@ -7,7 +7,7 @@ from services.operations_engineering_reports import \
 
 class TestOperationsEngineeringReportsService(unittest.TestCase):
 
-    @mock.patch('python.services.operations_engineering_reports.requests.Session')
+    @mock.patch('services.operations_engineering_reports.requests.Session')
     def test_override_repository_standards_reports_success(self, mock_session):
         # Mock the response object and its status_code attribute
         mock_response = mock.Mock()
@@ -44,7 +44,7 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
             stream=True
         )
 
-    @mock.patch('python.services.operations_engineering_reports.requests.Session')
+    @mock.patch('services.operations_engineering_reports.requests.Session')
     def test_override_repository_standards_reports_failure(self, mock_session):
         # Mock the response object and its status_code attribute
         mock_response = mock.Mock()

@@ -11,7 +11,7 @@ from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
 
-    @patch("python.services.notify_service.NotificationsAPIClient")
+    @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notify_client):
         self.config = test_config
         self.api_key = "test_api_key"
@@ -56,7 +56,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
 
 class TestSendEmailReplyToOpsEng(unittest.TestCase):
 
-    @patch("python.services.notify_service.NotificationsAPIClient")
+    @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
         self.config = test_config
         self.api_key = "test_api_key"
@@ -88,7 +88,7 @@ class TestSendEmailReplyToOpsEng(unittest.TestCase):
 
 class TestGetNotificationsByTypeAndStatus(unittest.TestCase):
 
-    @patch("python.services.notify_service.NotificationsAPIClient")
+    @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
         self.config = test_config
         self.api_key = "test_api_key"
@@ -105,7 +105,7 @@ class TestGetNotificationsByTypeAndStatus(unittest.TestCase):
 
 
 class TestMissingOrgName(unittest.TestCase):
-    @patch("python.services.notify_service.NotificationsAPIClient")
+    @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
         self.config = test_config
         self.api_key = "test_api_key"
@@ -119,7 +119,7 @@ class TestMissingOrgName(unittest.TestCase):
 
 
 class TestNotifyServiceFunctionsForAsOrg(unittest.TestCase):
-    @patch("python.services.notify_service.NotificationsAPIClient")
+    @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
         self.config = test_config
         self.api_key = "test_api_key"
@@ -161,7 +161,7 @@ class TestNotifyServiceFunctionsForAsOrg(unittest.TestCase):
 
 
 class TestNotifyServiceFunctionsForMojOrg(unittest.TestCase):
-    @patch("python.services.notify_service.NotificationsAPIClient")
+    @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notifications_api_client):
         self.config = test_config
         self.api_key = "test_api_key"

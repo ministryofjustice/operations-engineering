@@ -12,7 +12,7 @@ from config.constants import NO_ACTIVITY
 
 
 class TestS3Service(unittest.TestCase):
-    @patch("python.services.s3_service.boto3")
+    @patch("services.s3_service.boto3")
     def setUp(self, mock_boto3):
         self.mock_boto3 = mock_boto3
         self.s3_service = S3Service(

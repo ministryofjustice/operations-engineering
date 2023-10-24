@@ -157,7 +157,7 @@ class TestOrganisation4(unittest.TestCase):
 
     # Refactor Status: Done
     # Test moved to test_move_users_to_teams
-    @patch("python.lib.repository.Repository.__new__")
+    @patch("lib.repository.Repository.__new__")
     def test_call_move_users_to_teams(self, mock_repository):
         org = Organisation(self.mock_github_service, "some-org")
         org.move_users_to_teams()

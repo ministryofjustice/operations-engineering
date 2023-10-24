@@ -9,8 +9,8 @@ from services.slack_service import SlackService
 
 class TestReportOnInactiveUsers(unittest.TestCase):
 
-    @patch("python.services.slack_service.SlackService")
-    @patch("python.services.github_service.GithubService")
+    @patch("services.slack_service.SlackService")
+    @patch("services.github_service.GithubService")
     def setUp(self, mock_github_service, mock_slack_service) -> None:
         if "ADMIN_GITHUB_TOKEN" in os.environ:
             os.environ.pop("ADMIN_GITHUB_TOKEN")
@@ -118,11 +118,11 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.mock_github_service.remove_list_of_users_from_team.assert_called()
         self.mock_slack_service.send_message_to_plaintext_channel_name.assert_not_called()
 
-    @patch("python.bin.report_on_inactive_users.GithubService", new=MagicMock)
-    @patch("python.bin.report_on_inactive_users.SlackService", new=MagicMock)
-    @patch("python.bin.report_on_inactive_users.get_config")
-    @patch("python.bin.report_on_inactive_users.create_report")
-    @patch("python.bin.report_on_inactive_users.get_environment_variables")
+    @patch("bin.report_on_inactive_users.GithubService", new=MagicMock)
+    @patch("bin.report_on_inactive_users.SlackService", new=MagicMock)
+    @patch("bin.report_on_inactive_users.get_config")
+    @patch("bin.report_on_inactive_users.create_report")
+    @patch("bin.report_on_inactive_users.get_environment_variables")
     def test_call_main(self, mock_get_environment_variables, mock_create_report, mock_get_config):
         mock_get_config.return_value = ["", "", ""]
         mock_get_environment_variables.return_value = ["", ""]

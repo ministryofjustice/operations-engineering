@@ -51,15 +51,15 @@ def create_dormant_file_user(username):
     }
 
 
-@patch("python.bin.dormant_users.GithubService", new=MagicMock)
-@patch("python.bin.dormant_users.S3Service", new=MagicMock)
-@patch("python.bin.dormant_users.SlackService", new=MagicMock)
-@patch("python.bin.dormant_users.NotifyService", new=MagicMock)
-@patch("python.bin.dormant_users.Auth0Service", new=MagicMock)
-@patch("python.bin.dormant_users.run_step_one")
-@patch("python.bin.dormant_users.run_step_two")
-@patch("python.bin.dormant_users.run_step_three")
-@patch("python.bin.dormant_users.print_dormant_outside_collaborators")
+@patch("bin.dormant_users.GithubService", new=MagicMock)
+@patch("bin.dormant_users.S3Service", new=MagicMock)
+@patch("bin.dormant_users.SlackService", new=MagicMock)
+@patch("bin.dormant_users.NotifyService", new=MagicMock)
+@patch("bin.dormant_users.Auth0Service", new=MagicMock)
+@patch("bin.dormant_users.run_step_one")
+@patch("bin.dormant_users.run_step_two")
+@patch("bin.dormant_users.run_step_three")
+@patch("bin.dormant_users.print_dormant_outside_collaborators")
 class TestDormantUsersMain(unittest.TestCase):
 
     @patch("sys.argv", ["", "", "", "", "", "", "", "", "", "", "true", "", ""])
@@ -123,8 +123,8 @@ class TestDormantUsers(unittest.TestCase):
         self.assertRaises(
             ValueError, get_cli_arguments)
 
-    @patch("python.services.s3_service.S3Service")
-    @patch("python.services.github_service.GithubService")
+    @patch("services.s3_service.S3Service")
+    @patch("services.github_service.GithubService")
     def test_print_dormant_outside_collaborators_path(self, mock_github_service, mock_s3_service):
         mock_s3_service.get_users_from_dormant_user_file.return_value = [
             self.user]
@@ -133,8 +133,8 @@ class TestDormantUsers(unittest.TestCase):
         print_dormant_outside_collaborators(
             mock_github_service, mock_s3_service)
 
-    @patch("python.services.s3_service.S3Service")
-    @patch("python.services.github_service.GithubService")
+    @patch("services.s3_service.S3Service")
+    @patch("services.github_service.GithubService")
     def test_print_dormant_outside_collaborators_no_users(self, mock_github_service, mock_s3_service):
         mock_s3_service.get_users_from_dormant_user_file.return_value = []
         mock_github_service.get_outside_collaborators_login_names.return_value = []
@@ -142,9 +142,9 @@ class TestDormantUsers(unittest.TestCase):
             mock_github_service, mock_s3_service)
 
 
-@patch("python.services.auth0_service.Auth0Service")
-@patch("python.services.s3_service.S3Service")
-@patch("python.services.github_service.GithubService")
+@patch("services.auth0_service.Auth0Service")
+@patch("services.s3_service.S3Service")
+@patch("services.github_service.GithubService")
 class TestGetDormantUsers(unittest.TestCase):
     def test_get_dormant_users_when_no_users_in_file(self, mock_github_service, mock_s3_service, mock_auth0_service):
         org_users = []
@@ -242,12 +242,12 @@ class TestGetDormantUsers(unittest.TestCase):
         self.assertEqual(len(dormant_users), 1)
 
 
-@patch("python.services.auth0_service.Auth0Service")
-@patch("python.services.s3_service.S3Service")
-@patch("python.services.github_service.GithubService")
-@patch("python.services.notify_service.NotifyService")
-@patch("python.services.slack_service.SlackService")
-@patch("python.bin.dormant_users.get_dormant_users")
+@patch("services.auth0_service.Auth0Service")
+@patch("services.s3_service.S3Service")
+@patch("services.github_service.GithubService")
+@patch("services.notify_service.NotifyService")
+@patch("services.slack_service.SlackService")
+@patch("bin.dormant_users.get_dormant_users")
 class TestRunStepOne(unittest.TestCase):
     def test_run_step_one_in_production_mode_when_no_dormant_users_find_unknown_user(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = []
@@ -336,7 +336,7 @@ class TestRunStepOne(unittest.TestCase):
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
 
     @freeze_time("2023-08-13")
-    @patch("python.bin.dormant_users.sleep", return_value=None)
+    @patch("bin.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         new_list = MINISTRY_OF_JUSTICE_ALLOW_LIST.copy()
         mock_github_service.get_org_members_login_names.return_value = new_list
@@ -364,7 +364,7 @@ class TestRunStepOne(unittest.TestCase):
             ["some-email"], MINISTRY_OF_JUSTICE)
 
     @freeze_time("2023-08-13")
-    @patch("python.bin.dormant_users.sleep", return_value=None)
+    @patch("bin.dormant_users.sleep", return_value=None)
     def test_run_step_one_in_production_mode_with_no_undelivered_email(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = MINISTRY_OF_JUSTICE_ALLOW_LIST
         user = create_saved_json_file_user("full-org-user")
@@ -389,8 +389,8 @@ class TestRunStepOne(unittest.TestCase):
         mock_slack_service.send_undelivered_emails_slack_message.assert_not_called()
 
 
-@patch("python.services.s3_service.S3Service")
-@patch("python.services.notify_service.NotifyService")
+@patch("services.s3_service.S3Service")
+@patch("services.notify_service.NotifyService")
 class TestRunStepTwo(unittest.TestCase):
     def test_run_step_two_in_debug_mode(self, mock_notify_service, mock_s3_service):
         mock_s3_service.get_users_have_emailed.return_value = [
@@ -448,12 +448,12 @@ class TestRunStepTwo(unittest.TestCase):
             "some-email", "13/07/2023")
 
 
-@patch("python.services.auth0_service.Auth0Service")
-@patch("python.services.s3_service.S3Service")
-@patch("python.services.github_service.GithubService")
-@patch("python.services.notify_service.NotifyService")
-@patch("python.services.slack_service.SlackService")
-@patch("python.bin.dormant_users.get_dormant_users")
+@patch("services.auth0_service.Auth0Service")
+@patch("services.s3_service.S3Service")
+@patch("services.github_service.GithubService")
+@patch("services.notify_service.NotifyService")
+@patch("services.slack_service.SlackService")
+@patch("bin.dormant_users.get_dormant_users")
 class TestRunStepThree(unittest.TestCase):
     def test_run_step_three_when_no_dormant_users(self, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = [
