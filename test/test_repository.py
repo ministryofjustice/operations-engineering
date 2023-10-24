@@ -400,7 +400,7 @@ class TestRepository4(unittest.TestCase):
 
     # Refactor Status: Done
     # Test moved to test_remove_repository_users_with_team_access_when_repo_user_doesnt_have_access()
-    @patch("python.lib.repository.RepositoryTeam")
+    @patch("lib.repository.RepositoryTeam")
     def test_do_not_remove_user_when_teams_exist_but_user_permission_doesnt_match_the_team(self, mock_repository_team):
         mock_repository_team.name = "other-team"
         mock_repository_team.users_usernames = ["user1"]
@@ -412,7 +412,7 @@ class TestRepository4(unittest.TestCase):
 
     # Refactor Status: Done
     # Test not needed
-    @patch("python.lib.repository.RepositoryTeam")
+    @patch("lib.repository.RepositoryTeam")
     def test_remove_user_when_teams_exist_and_user_permission_matches_the_team_do_not_create_issue_on_repo(self, mock_repository_team):
         mock_repository_team.name = "other-team"
         mock_repository_team.users_usernames = ["user1"]
@@ -428,7 +428,7 @@ class TestRepository4(unittest.TestCase):
 
     # Refactor Status: Done
     # Test moved to test_remove_repository_users_with_team_access()
-    @patch("python.lib.repository.RepositoryTeam")
+    @patch("lib.repository.RepositoryTeam")
     def test_remove_user_when_teams_exist_and_user_permission_matches_the_team(self, mock_repository_team):
         mock_repository_team.name = "other-team"
         mock_repository_team.users_usernames = ["user1"]

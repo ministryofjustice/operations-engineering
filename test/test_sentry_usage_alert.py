@@ -9,8 +9,8 @@ START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
 
 
-@patch("python.services.slack_service.SlackService.__new__")
-@patch("python.clients.sentry_client.SentryClient.__new__")
+@patch("services.slack_service.SlackService.__new__")
+@patch("clients.sentry_client.SentryClient.__new__")
 class TestSentryUsageAlertMain(unittest.TestCase):
 
     @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})

@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from services.sentry_service import SentryService
 
 
-@patch("python.clients.sentry_client.SentryClient.__new__")
+@patch("clients.sentry_client.SentryClient.__new__")
 class TestSentryServiceLogQuotaUsageForPeriodInDays(unittest.TestCase):
 
     def test_returns_values(self, mock_sentry_client: Mock):

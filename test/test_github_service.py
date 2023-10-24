@@ -755,7 +755,7 @@ class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
 
         self.assertEqual(issues, [])
 
-    @patch("python.services.github_service.GithubService.get_support_issues")
+    @patch("services.github_service.GithubService.get_support_issues")
     def test_with_correct_issue_but_fail(self, open_issues_mock):
         mock = MagicMock()
         open_issues_mock.return_value = [MagicMock()]
@@ -765,7 +765,7 @@ class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
         self.assertRaises(ValueError, github_service.assign_support_issues_to_self,
                           "test_repository_name", "test_org", mock.name)
 
-    @patch("python.services.github_service.GithubService.get_support_issues")
+    @patch("services.github_service.GithubService.get_support_issues")
     def test_with_correct_issue(self, open_issues_mock):
         mock_issue = MockGithubIssue(
             123, 456, "test complete", [], ["test_support_label"])
@@ -778,7 +778,7 @@ class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
 
         self.assertEqual(issues, [mock_issue])
 
-    @patch("python.services.github_service.GithubService.get_open_issues_from_repo")
+    @patch("services.github_service.GithubService.get_open_issues_from_repo")
     def test_get_support_issues(self, mock_get_open_issues_from_repo):
         mock_issue = MockGithubIssue(
             123, 456, "test getting issue", [], ["test_support_label"])
@@ -790,7 +790,7 @@ class TestGithubServiceAssignSupportToSelf(unittest.TestCase):
 
         self.assertEqual(issues, [mock_issue])
 
-    @patch("python.services.github_service.GithubService.get_open_issues_from_repo")
+    @patch("services.github_service.GithubService.get_open_issues_from_repo")
     def test_get_support_issues_with_no_issues(self, mock_get_open_issues_from_repo):
         mock_get_open_issues_from_repo.return_value = []
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1719,7 +1719,7 @@ class MockGithubIssue(MagicMock):
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
-@patch("python.services.github_service.Github")
+@patch("services.github_service.Github")
 class TestReportOnInactiveUsers(unittest.TestCase):
 
     def setUp(self) -> None:
