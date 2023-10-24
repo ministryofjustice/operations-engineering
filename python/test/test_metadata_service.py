@@ -6,7 +6,7 @@ from python.services.metadata_service import MetadataService
 class TestMetaDataService(unittest.TestCase):
 
     def setUp(self):
-        self.api_url = "http://api.example.com"
+        self.api_url = "https://api.example.com"
         self.api_token = "xxx"
         self.metadata_service = MetadataService(
             api_url=self.api_url, api_token=self.api_token)
@@ -35,7 +35,7 @@ class TestMetaDataService(unittest.TestCase):
 class TestMetadataService(unittest.TestCase):
 
     def setUp(self):
-        self.api_url = "http://api.example.com"
+        self.api_url = "https://api.example.com"
         self.api_token = "xxx"
         self.metadata_service = MetadataService(
             api_url=self.api_url, api_token=self.api_token)
@@ -116,7 +116,7 @@ class TestMetadataService(unittest.TestCase):
 class FilterUsernamesTest(unittest.TestCase):
 
     def setUp(self):
-        self.api_url = "http://api.example.com"
+        self.api_url = "https://api.example.com"
         self.api_token = "xxx"
         self.metadata_service = MetadataService(self.api_url, self.api_token)
 
