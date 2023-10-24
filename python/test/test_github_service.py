@@ -1446,6 +1446,7 @@ class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
 
         self.assertFalse(mock_open_issue_without_tag.edit.called)
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
@@ -1536,7 +1537,6 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
         self.assertEqual(len(members), 2)
         self.assertEqual(members[0]["username"], "test_user1")
         self.assertEqual(members[1]["username"], "test_user2")
-
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")

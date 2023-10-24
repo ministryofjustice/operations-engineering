@@ -1115,15 +1115,17 @@ class GithubService:
                 logging.info(f"Removed user {user.login} from team {team_id}")
             except Exception:
                 logging.error(
-                    f"An exception occurred while removing user {user.login} from team {team_name}")    
+                    f"An exception occurred while removing user {user.login} from team {team_name}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
-        logging.info(f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
-                
+        logging.info(
+            f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
+
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
-            raise ValueError(f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+
         query = gql("""
             query($org: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $org) {
@@ -1145,19 +1147,20 @@ class GithubService:
             "org": self.organisation_name,
             "page_size": page_size,
             "after_cursor": after_cursor
-        }      
+        }
 
         return self.github_client_gql_api.execute(query, variable_values)
-    
+
     def get_github_member_list(self):
         github_usernames = []
         next_page = True
         after_cursor = None
         all_members = []
-        
+
         while next_page:
-            response = self._get_paginated_organization_members_with_emails(after_cursor=after_cursor)
-                    
+            response = self._get_paginated_organization_members_with_emails(
+                after_cursor=after_cursor)
+
             if 'errors' in response:
                 print(response['errors'])
                 break
@@ -1177,5 +1180,5 @@ class GithubService:
                     after_cursor = member_data['pageInfo']['endCursor']
             else:
                 next_page = False
-            
+
         return github_usernames

@@ -12,7 +12,7 @@ class MetadataService:
             {"username": "sam.pepper"},
             {"username": "connor.glynn"}
         ]
-        
+
     def get_acceptable_github_usernames(self):
         return [
             {"username": "PepperMoJ"},
@@ -53,7 +53,7 @@ class MetadataService:
         ]
 
         return filtered_usernames
-    
+
     def combine_user_data(self, slack_user_data, github_user_data):
         """Combine user data from Slack and GitHub based on the email address
 
@@ -64,11 +64,12 @@ class MetadataService:
         Returns:
             list: A list of dictionaries containing combined user data.
         """
-    
+
         combined_user_data = []
 
-        github_email_to_username = {user['email']: user['username'] for user in github_user_data}
-        
+        github_email_to_username = {
+            user['email']: user['username'] for user in github_user_data}
+
         for slack_user in slack_user_data:
             email = slack_user['email']
             if email in github_email_to_username:
@@ -80,7 +81,7 @@ class MetadataService:
                 combined_user_data.append(combined_user)
 
         return combined_user_data
-    
+
     def add_new_usernames(self, usernames_to_add: list[dict]):
         """Send list of new usernames to be added to the Metadata API
 

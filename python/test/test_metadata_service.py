@@ -2,12 +2,14 @@ import unittest
 from unittest.mock import MagicMock, patch
 from python.services.metadata_service import MetadataService
 
+
 class TestMetaDataService(unittest.TestCase):
 
     def setUp(self):
         self.api_url = "http://api.example.com"
         self.api_token = "xxx"
-        self.metadata_service = MetadataService(api_url=self.api_url, api_token=self.api_token)
+        self.metadata_service = MetadataService(
+            api_url=self.api_url, api_token=self.api_token)
 
     def test_combine_user_data(self):
         slack_users = [
@@ -20,11 +22,14 @@ class TestMetaDataService(unittest.TestCase):
         ]
 
         expected_combined = [
-            {"slack_username": "slack_user1", "github_username": "github_user1", "email": "user1@example.com"}
+            {"slack_username": "slack_user1",
+                "github_username": "github_user1", "email": "user1@example.com"}
         ]
 
-        result = self.metadata_service.combine_user_data(slack_users, github_users)
+        result = self.metadata_service.combine_user_data(
+            slack_users, github_users)
         self.assertEqual(result, expected_combined)
+
 
 @patch('requests.post')
 class TestMetadataService(unittest.TestCase):
@@ -32,7 +37,8 @@ class TestMetadataService(unittest.TestCase):
     def setUp(self):
         self.api_url = "http://api.example.com"
         self.api_token = "xxx"
-        self.metadata_service = MetadataService(api_url=self.api_url, api_token=self.api_token)
+        self.metadata_service = MetadataService(
+            api_url=self.api_url, api_token=self.api_token)
 
     def test_add_new_usernames_success(self, mock_post):
         mock_response = MagicMock()
@@ -51,7 +57,7 @@ class TestMetadataService(unittest.TestCase):
                 "email": "user2@example.com"
             }
         ]
-        
+
         self.metadata_service.add_new_usernames(usernames_to_add)
 
         mock_post.assert_called_once_with(
@@ -77,11 +83,12 @@ class TestMetadataService(unittest.TestCase):
                 "email": "user2@example.com"
             }
         ]
-        
+
         with self.assertLogs(level='ERROR') as mock_error:
             self.metadata_service.add_new_usernames(usernames_to_add)
 
-        self.assertEqual(mock_error.output, [f"ERROR:root:Error adding new usernames: {mock_response.content}"])
+        self.assertEqual(mock_error.output, [
+                         f"ERROR:root:Error adding new usernames: {mock_response.content}"])
 
     def test_add_new_usernames_exception(self, mock_post):
         mock_post.side_effect = Exception("API is down")
@@ -98,11 +105,13 @@ class TestMetadataService(unittest.TestCase):
                 "email": "user2@example.com"
             }
         ]
-        
+
         with self.assertLogs(level='ERROR') as mock_exception:
             self.metadata_service.add_new_usernames(usernames_to_add)
 
-        self.assertEqual(mock_exception.output, ["ERROR:root:An error occurred while adding new usernames: API is down"])
+        self.assertEqual(mock_exception.output, [
+                         "ERROR:root:An error occurred while adding new usernames: API is down"])
+
 
 class FilterUsernamesTest(unittest.TestCase):
 
