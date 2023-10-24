@@ -1116,3 +1116,70 @@ class GithubService:
             except Exception:
                 logging.error(
                     f"An exception occurred while removing user {user.login} from team {team_name}")
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def _get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
+
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+
+        query = gql("""
+            query($org: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $org) {
+                    membersWithRole(first: $page_size, after: $after_cursor) {
+                        nodes {
+                            login
+                            organizationVerifiedDomainEmails(login: $org)
+                        }
+                        pageInfo {
+                            hasNextPage
+                            endCursor
+                        }
+                    }
+                }
+            }
+        """)
+
+        variable_values = {
+            "org": self.organisation_name,
+            "page_size": page_size,
+            "after_cursor": after_cursor
+        }
+
+        return self.github_client_gql_api.execute(query, variable_values)
+
+    def get_github_member_list(self):
+        github_usernames = []
+        next_page = True
+        after_cursor = None
+        all_members = []
+
+        while next_page:
+            response = self._get_paginated_organization_members_with_emails(
+                after_cursor=after_cursor)
+
+            if 'errors' in response:
+                logging.error(
+                    f"Error retrieving organization members: {response['errors']}")
+                break
+
+            if 'organization' in response and 'membersWithRole' in response['organization']:
+                all_members = response['organization']['membersWithRole']['nodes']
+                member_data = response['organization']['membersWithRole']
+
+                for member in all_members:
+                    email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
+                    github_usernames.append({
+                        "username": member["login"],
+                        "email": email
+                    })
+                next_page = member_data['pageInfo']['hasNextPage']
+                if next_page:
+                    after_cursor = member_data['pageInfo']['endCursor']
+            else:
+                next_page = False
+
+        return github_usernames

@@ -1,4 +1,5 @@
 import logging
+import time
 from textwrap import dedent
 from urllib.parse import quote
 
@@ -271,3 +272,49 @@ class SlackService:
                                                }
                                            ]
                                            )
+
+    def get_all_slack_usernames(self):
+        """Fetches all usernames and user email addresses from the Slack API.
+
+        Returns:
+            user_data: A list of of JSON objects
+        """
+
+        user_data = []
+        cursor = None
+        limit = 200
+        delay_seconds = 1
+
+        try:
+            while True:
+                response = self.slack_client.users_list(
+                    cursor=cursor, limit=limit)
+
+                if response['ok']:
+                    for user in response['members']:
+
+                        email = user['profile'].get('email')
+
+                        if email is None:
+                            continue
+
+                        user_info = {
+                            "username": user['name'],
+                            "email": email
+                        }
+                        user_data.append(user_info)
+
+                    cursor = response.get(
+                        'response_metadata', {}).get('next_cursor')
+                    if not cursor:
+                        break
+                else:
+                    logging.error(
+                        f"Error fetching user data: {response['error']}")
+                    break
+                time.sleep(delay_seconds)
+        except Exception as e:
+            logging.error(f"An error has occurred connecting to Slack: {e}")
+            return []
+
+        return user_data

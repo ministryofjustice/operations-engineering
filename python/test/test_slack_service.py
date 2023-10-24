@@ -318,5 +318,50 @@ class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
         )
 
 
+@patch('slack_sdk.WebClient.users_list')
+class GetAllSlackUsernamesTest(unittest.TestCase):
+
+    @patch("slack_sdk.WebClient")
+    def setUp(self, mock_web_client):
+        self.mock_web_client = mock_web_client
+        self.slack_service = SlackService("")
+
+    def test_get_all_slack_usernames_success(self, mock_users_list):
+        mock_response = {
+            'ok': True,
+            'members': [{'name': 'user1', 'profile': {'email': 'user1@example.com'}},
+                        {'name': 'user2', 'profile': {'email': 'user2@example.com'}}],
+            'response_metadata': {'next_cursor': ''}
+        }
+
+        mock_users_list.return_value = mock_response
+
+        result = self.slack_service.get_all_slack_usernames()
+
+        self.assertEqual(result, [
+            {'username': 'user1', 'email': 'user1@example.com'},
+            {'username': 'user2', 'email': 'user2@example.com'}
+        ])
+
+    def test_handle_api_error_gracefully(self, mock_user_list):
+        mock_response = {
+            'ok': False,
+            'error': 'error'
+        }
+
+        mock_user_list.return_value = mock_response
+
+        result = self.slack_service.get_all_slack_usernames()
+
+        self.assertEqual(result, [])
+
+    def test_handle_exception_gracefully(self, mock_user_list):
+        mock_user_list.side_effect = Exception("An unexpected error occurred")
+
+        result = self.slack_service.get_all_slack_usernames()
+
+        self.assertEqual(result, [])
+
+
 if __name__ == "__main__":
     unittest.main()

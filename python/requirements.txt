@@ -5,6 +5,7 @@ python-dateutil == 2.8.2
 gql
 aiohttp
 slack_sdk == 3.20.2
+requests == 2.31.0
 freezegun==1.2.2
 pyaml-env
 PyJWT
