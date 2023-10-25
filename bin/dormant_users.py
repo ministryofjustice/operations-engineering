@@ -200,9 +200,8 @@ def run_step_one(
                     )
             emailed_users.append(the_user)
 
-        s3_service.save_emailed_users_file(emailed_users)
-
         if not debug_mode:
+            s3_service.save_emailed_users_file(emailed_users)
             sleep(130)
 
         undelivered_emails = notify_service.check_for_undelivered_first_emails()
@@ -292,7 +291,8 @@ def run_step_three(
             slack_service.send_remove_users_slack_message(
                 number_of_users, organisation_name)
 
-    s3_service.delete_emailed_users_file()
+    if not debug_mode:
+        s3_service.delete_emailed_users_file()
 
 
 def main():
