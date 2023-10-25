@@ -40,6 +40,7 @@ MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "paulmcqueen",
     "junaid-kp",
     "chandrasinghmoj",
+    "dankoleary",
 ]
 
 MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [
