@@ -14,7 +14,7 @@ This mono repository includes code that performs a variety of operations enginee
 
 - **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://operations-engineering.service.justice.gov.uk/documentation/services/repository-standards.html). These reports help us maintain the quality of our code and streamline collaboration.
 
-- **Sentry Monitoring:** We monitor Sentry for over and under-utilisation, ensuring we're leveraging this error tracking tool to its full potential. This helps in identifying and rectifying application errors more efficiently.
+- **Sentry Monitoring:** We monitor Sentry for over and under-utilisation, ensuring we're leveraging this error-tracking tool to its full potential. This helps in identifying and rectifying application errors more efficiently.
 
 - **Dormant User Detection:** Our code can detect inactive GitHub users and remove them from the organisation, keeping our workspace tidy and secure.
 
@@ -25,11 +25,11 @@ These are just a few examples of the useful tools and features available in this
 1. **Clone the Repo:** `git clone https://github.com/ministryofjustice/operations-engineering.git`
 2. **Navigate to the Repo:** `cd operations-engineering`
 3. **Install Dependencies:** `pip install -r python/requirements.txt`
-4. **Run a script:** `python -m python.scripts.dormant_users # for example`
+4. **Run a script:** `python -m bin.dormant_users # for example`
 
 ## Support
 
-If you have any questions or need help with this repository, please contact us on the #ask-operations-engineering slack channel.
+If you have any questions or need help with this repository, don't hesitate to contact us on the #ask-operations-engineering slack channel.
 
 ## License
 
