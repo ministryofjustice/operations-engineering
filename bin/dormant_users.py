@@ -48,7 +48,8 @@ MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [
     "paigewelham",
     "adchester",
     "gilad-ravitz",
-    "joggers7"
+    "joggers7",
+    "jlane96work",
 ]
 
 
