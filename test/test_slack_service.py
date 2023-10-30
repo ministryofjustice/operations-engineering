@@ -8,6 +8,7 @@ from services.slack_service import SlackService
 START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://operations-engineering.service.justice.gov.uk/documentation/services/sentry.html#quota-management"
 
 
 @patch("slack_sdk.WebClient.__new__")
@@ -117,7 +118,7 @@ class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCa
              'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
              'accessory': {'type': 'button',
                            'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
-                           'url': 'https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html'}}])
+                           'url': SENTRY_QUOTA_MANAGEMENT_GUIDANCE}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
@@ -142,7 +143,7 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
              'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
              'accessory': {'type': 'button',
                            'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
-                           'url': 'https://operations-engineering.service.justice.gov.uk/documentation/runbooks/internal/respond-to-sentry-usage-alert.html'}}])
+                           'url': SENTRY_QUOTA_MANAGEMENT_GUIDANCE}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
