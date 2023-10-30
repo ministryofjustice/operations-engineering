@@ -11,7 +11,7 @@ from services.sentry_service import UsageStats
 class SlackService:
     OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID = "C033QBE511V"
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-    SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://operations-engineering.service.justice.gov.uk/documentation/services/sentry.html#quota-management"
+    SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://user-guide.operations-engineering.service.justice.gov.uk/documentation/services/sentry.html#quota-management"
 
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
