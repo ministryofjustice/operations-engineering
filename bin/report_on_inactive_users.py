@@ -123,7 +123,7 @@ def get_config(config_path: str) -> tuple[str, str, dict]:
 
 def main():
     org_name, inactivity, teams = get_config(
-        './python/config/inactive-users.toml')
+        './config/inactive-users.toml')
     github_token, slack_token = get_environment_variables()
     github_service = GithubService(github_token, org_name)
     slack_service = SlackService(slack_token)
