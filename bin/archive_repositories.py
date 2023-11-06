@@ -34,7 +34,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "Cicap",  # keep repo in list until collaborator Arcturus-Tom is removed
     "CareStandards",  # keep repo in list until collaborator Arcturus-Tom is removed
     "AdministrativeAppeals",  # keep repo in list until collaborator Arcturus-Tom is removed
-    "laa-ccms-opa-interview-initialiser"
+    "laa-ccms-opa-interview-initialiser",
+    "yjaf-gateway-proxy" # keep repo in list until collaborator is removed
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
