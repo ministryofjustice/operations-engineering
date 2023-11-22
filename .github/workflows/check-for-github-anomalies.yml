@@ -14,6 +14,6 @@ jobs:
         - run: python3 -m pip install -r requirements.txt
         - run: python3 -m bin.check_for_github_anomalies
           env:
-            ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+            ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
             ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
