@@ -60,18 +60,22 @@ class GithubService:
     USER_ACCESS_REMOVED_ISSUE_TITLE: str = "User access removed, access is now via a team"
     GITHUB_GQL_MAX_PAGE_SIZE = 100
     GITHUB_GQL_DEFAULT_PAGE_SIZE = 80
+    ENTERPRISE_NAME = "ministry-of-justice-uk"
 
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
     def __new__(cls, *_, **__):
         return super(GithubService, cls).__new__(cls)
 
-    def __init__(self, org_token: str, organisation_name: str) -> None:
+    def __init__(self, org_token: str, organisation_name: str,
+                 enterprise_name: str=ENTERPRISE_NAME) -> None:
+        self.organisation_name: str = organisation_name
+        self.enterprise_name: str = enterprise_name
+
         self.github_client_core_api: Github = Github(org_token)
         self.github_client_gql_api: Client = Client(transport=AIOHTTPTransport(
             url="https://api.github.com/graphql",
             headers={"Authorization": f"Bearer {org_token}"},
         ), execute_timeout=120)
-        self.organisation_name: str = organisation_name
         self.github_client_rest_api = Session()
         self.github_client_rest_api.headers.update(
             {
@@ -1183,3 +1187,14 @@ class GithubService:
                 next_page = False
 
         return github_usernames
+
+    def get_remaining_licences(self) -> int:
+        """
+        Fetches the number of remaining licenses in the GitHub Enterprise.
+
+        Returns:
+            int: The number of remaining licenses.
+        """
+        licence = self.github_client_core_api.get_enterprise(self.enterprise_name).get_consumed_licenses()
+        return licence.total_seats_purchased - licence.total_seats_consumed
+

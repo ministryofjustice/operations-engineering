@@ -18,6 +18,7 @@ from services.github_service import (
     GithubService, retries_github_rate_limit_exception_at_next_reset_once)
 
 ORGANISATION_NAME = "moj-analytical-services"
+ENTERPRISE_NAME = "ministry-of-justice-uk"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
@@ -109,6 +110,8 @@ class TestGithubServiceInit(unittest.TestCase):
             {'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer '})])
         self.assertEqual(ORGANISATION_NAME,
                          github_service.organisation_name)
+        self.assertEqual(ENTERPRISE_NAME,
+                        github_service.enterprise_name)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -1715,6 +1718,29 @@ class MockGithubIssue(MagicMock):
 
     def edit(self, assignees):
         self.assignees = assignees
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+class TestReturningLicences(unittest.TestCase):
+
+    @patch("services.github_service.Github")
+    def test_get_remaining_licences(self, mock_github):
+        org_token = 'dummy_token'
+        org_name = 'dummy_org'
+        enterprise_name = 'ministry-of-justice-uk'
+        service = GithubService(org_token, org_name, enterprise_name)
+
+        mock_enterprise = MagicMock()
+        mock_licenses = MagicMock()
+        mock_licenses.total_seats_purchased = 100
+        mock_licenses.total_seats_consumed = 50
+
+        mock_github.return_value.get_enterprise.return_value = mock_enterprise
+        mock_enterprise.get_consumed_licenses.return_value = mock_licenses
+
+        remaining_licenses = service.get_remaining_licences()
+
+        self.assertEqual(remaining_licenses, 50)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
