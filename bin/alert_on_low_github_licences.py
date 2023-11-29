@@ -18,7 +18,9 @@ def low_theshold_triggered_message(remaining_licences):
         f"Hi team 👋, \n\n"
         f"There are only {remaining_licences} \
     GitHub licences remaining in the enterprise account. \n\n"
-        f"Please add more licences to the enterprise account. \n\n"
+        f"Please add more licences using the instructions outlined here: \n"
+        f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html \n\n"
+
         f"Thanks, \n\n"
 
         "The GitHub Licence Alerting Bot"
