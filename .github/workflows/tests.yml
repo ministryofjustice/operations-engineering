@@ -7,7 +7,7 @@ on:
     branches: ["main"]
 
 jobs:
-  sonarcloud:
+  codecov:
     name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
