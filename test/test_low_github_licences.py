@@ -15,8 +15,11 @@ class TestGithubLicenseAlerting(unittest.TestCase):
         expected_message = (
             "Hi team 👋, \n\n"
             "There are only 5     GitHub licences remaining in the enterprise account. \n\n"
-            "Please add more licences to the enterprise account. \n\n"
-            "Thanks, \n\n"
+            f"Please add more licences using the instructions outlined here: \n"
+            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html \n\n"
+
+            f"Thanks, \n\n"
+
             "The GitHub Licence Alerting Bot"
         )
         self.assertEqual(low_theshold_triggered_message(
