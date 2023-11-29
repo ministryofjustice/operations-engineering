@@ -1,10 +1,11 @@
 name: Tests
 on:
+  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-    
+    branches: ["main"]
+
 jobs:
   sonarcloud:
     name: Run Unit Tests
@@ -17,12 +18,18 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: Install tox
-        run: pip install tox
-      - name: Run tox
-        run: tox
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run coverage
+        run: |
+          pytest --cov-config=.coveragerc --cov=./ci_course --cov-report=xml
+          cat coverage.xml
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          files: coverage.xml
