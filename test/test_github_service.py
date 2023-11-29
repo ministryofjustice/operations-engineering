@@ -111,7 +111,7 @@ class TestGithubServiceInit(unittest.TestCase):
         self.assertEqual(ORGANISATION_NAME,
                          github_service.organisation_name)
         self.assertEqual(ENTERPRISE_NAME,
-                        github_service.enterprise_name)
+                         github_service.enterprise_name)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -1718,6 +1718,7 @@ class MockGithubIssue(MagicMock):
 
     def edit(self, assignees):
         self.assignees = assignees
+
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
