@@ -67,7 +67,7 @@ class GithubService:
         return super(GithubService, cls).__new__(cls)
 
     def __init__(self, org_token: str, organisation_name: str,
-                 enterprise_name: str=ENTERPRISE_NAME) -> None:
+                 enterprise_name: str = ENTERPRISE_NAME) -> None:
         self.organisation_name: str = organisation_name
         self.enterprise_name: str = enterprise_name
 
@@ -1195,6 +1195,6 @@ class GithubService:
         Returns:
             int: The number of remaining licenses.
         """
-        licence = self.github_client_core_api.get_enterprise(self.enterprise_name).get_consumed_licenses()
+        licence = self.github_client_core_api.get_enterprise(
+            self.enterprise_name).get_consumed_licenses()
         return licence.total_seats_purchased - licence.total_seats_consumed
-

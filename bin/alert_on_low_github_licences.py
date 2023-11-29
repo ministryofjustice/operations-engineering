@@ -12,18 +12,20 @@ import os
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
+
 def low_theshold_triggered_message(remaining_licences):
     msg = (
-    f"Hi team 👋, \n\n"
-    f"There are only {remaining_licences} \
+        f"Hi team 👋, \n\n"
+        f"There are only {remaining_licences} \
     GitHub licences remaining in the enterprise account. \n\n"
-    f"Please add more licences to the enterprise account. \n\n"
-    f"Thanks, \n\n"
+        f"Please add more licences to the enterprise account. \n\n"
+        f"Thanks, \n\n"
 
-    "The GitHub Licence Alerting Bot"
+        "The GitHub Licence Alerting Bot"
     )
 
     return msg
+
 
 def alert_on_low_github_licences(threshold=10):
     github_token = os.environ.get("GITHUB_TOKEN")
@@ -40,16 +42,17 @@ def alert_on_low_github_licences(threshold=10):
     SLACK_CHANNEL = "operations-engineering-alerts"
 
     remaining_licences = GithubService(github_token, ORGANISATION, ENTERPRISE). \
-    get_remaining_licences()
+        get_remaining_licences()
     trigger_alert = remaining_licences < threshold
 
     if trigger_alert:
-        print("Low number of GitHub licences remaining, only %d remaining" \
-            % remaining_licences)
+        print("Low number of GitHub licences remaining, only %d remaining"
+              % remaining_licences)
 
         SlackService(slack_token). \
-        send_message_to_plaintext_channel_name\
-        (low_theshold_triggered_message(remaining_licences), SLACK_CHANNEL)
-        
+            send_message_to_plaintext_channel_name(
+                low_theshold_triggered_message(remaining_licences), SLACK_CHANNEL)
+
+
 if __name__ == "__main__":
     alert_on_low_github_licences(10)
