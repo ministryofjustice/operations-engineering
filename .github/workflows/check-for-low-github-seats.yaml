@@ -1,0 +1,20 @@
+name: Alarm if the number of GitHub seats is low
+
+on:
+  schedule:
+    - cron: "0 6,12,16 * * *" # Runs daily at 0600, 1200 and 1600
+  workflow_dispatch:
+
+jobs:
+  low-seats-threshold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m bin.alert_on_low_github_licences
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_ENTERPRISE_DATA }}
+          SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
