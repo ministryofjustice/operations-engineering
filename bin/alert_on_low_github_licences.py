@@ -30,11 +30,11 @@ def low_theshold_triggered_message(remaining_licences):
 
 
 def alert_on_low_github_licences(threshold=10):
-    github_token = os.environ.get("GITHUB_TOKEN")
+    github_token = os.environ.get("ADMIN_GITHUB_TOKEN")
     if github_token is None:
         print("No GITHUB_TOKEN environment variable set")
         exit(1)
-    slack_token = os.environ.get("SLACK_TOKEN")
+    slack_token = os.environ.get("ADMIN_SLACK_TOKEN")
     if slack_token is None:
         print("No SLACK_TOKEN environment variable set")
         exit(1)
