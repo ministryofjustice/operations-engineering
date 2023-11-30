@@ -16,8 +16,8 @@ jobs:
       - run: python3 -m pip install -r requirements.txt
       - run: python3 -m bin.alert_on_low_github_licences
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_ENTERPRISE_DATA }}
-          SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_ENTERPRISE_DATA }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
 
       - name: Report failure to Slack
         if: always()
