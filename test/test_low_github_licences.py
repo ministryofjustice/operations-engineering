@@ -31,7 +31,7 @@ class TestGithubLicenseAlerting(unittest.TestCase):
     def test_alert_on_low_github_licences(self, mock_env, mock_slack_service, mock_github_service):
         """ Test the alerting functionality for low GitHub licenses. """
         mock_env.get.side_effect = lambda k: 'mock_token' if k in [
-            'GITHUB_TOKEN', 'SLACK_TOKEN'] else None
+            'ADMIN_GITHUB_TOKEN', 'ADMIN_SLACK_TOKEN'] else None
 
         mock_github_instance = MagicMock()
         mock_github_service.return_value = mock_github_instance
