@@ -1,6 +1,6 @@
 # Production
 aiohttp==3.9.1
-boto3==1.33.4
+boto3==1.33.6
 cryptography==41.0.7
 gql==3.4.1
 notifications-python-client==8.1.0
