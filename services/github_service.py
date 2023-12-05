@@ -427,7 +427,7 @@ class GithubService:
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
                                                                           after_cursor: str | None,
                                                                           page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-        dict[str, Any]:
+            dict[str, Any]:
         logging.info(
             f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
@@ -605,7 +605,7 @@ class GithubService:
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
                     if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"][
-                        "isLocked"] == True:
+                            "isLocked"] == True:
                         continue
                     repository_names.append(repo["node"]["name"])
 
@@ -725,7 +725,6 @@ class GithubService:
                                required_approving_review_count=1,
                                dismiss_stale_reviews=True,
                                )
-
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_topic(self, topic: str, after_cursor: str | None,
@@ -919,7 +918,7 @@ class GithubService:
     def _is_user_inactive(self, user: NamedUser.NamedUser, repositories: list[Repository],
                           inactivity_months: int) -> bool:
         cutoff_date = datetime.now() - timedelta(days=inactivity_months *
-                                                      30)  # Roughly calculate the cutoff date
+                                                 30)  # Roughly calculate the cutoff date
 
         for repo in repositories:
             # Get the user's commits in the repo
