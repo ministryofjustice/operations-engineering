@@ -1287,6 +1287,7 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
         repos = github_service.fetch_all_repositories_in_org()
         self.assertEqual(len(repos), 0)
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -1844,7 +1845,8 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 @patch("github.Github.__new__")
 class TestSetStandards(unittest.TestCase):
     def test_set_standards(self, mock_github_client_core_api: MagicMock):
-        mock_github_client_core_api.return_value.get_repo().return_value = MagicMock(Repository)
+        mock_github_client_core_api.return_value.get_repo(
+        ).return_value = MagicMock(Repository)
 
         github_service = GithubService("", ORGANISATION_NAME)
 
