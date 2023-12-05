@@ -1,8 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from unittest import TestCase
-from unittest.mock import MagicMock, Mock, call, patch
+from unittest.mock import call, MagicMock, Mock, patch
 
 from freezegun import freeze_time
 from github import Github, GithubException, RateLimitExceededException
@@ -1288,125 +1287,6 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
         repos = github_service.fetch_all_repositories_in_org()
         self.assertEqual(len(repos), 0)
 
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetDefaulBranchProtection(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_default_branch_protection(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_default_branch_protection(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetEnforceAdmin(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_enforce_admins(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_enforce_admins(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetDimissStaleReviews(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_dismiss_stale_reviews(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_dismiss_stale_reviews(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceHasIssues(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_has_issues(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY),
-            call.get_repo().edit(has_issues=True)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_has_issues(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetRequiredReviews(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_required_review_count(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY),
-            call.get_repo().get_branch('main'),
-            call.get_repo().get_branch().edit_protection(required_approving_review_count=1)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_required_review_count(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -1961,19 +1841,24 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestSetStandards(unittest.TestCase):
-    def test_set_standards(self):
+    def test_set_standards(self, mock_github_client_core_api: MagicMock):
+        mock_github_client_core_api.return_value.get_repo().return_value = MagicMock(Repository)
+
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_default_branch_protection = Mock()
-        github_service._set_enforce_admins = Mock()
-        github_service._set_required_review_count = Mock()
-        github_service._set_dismiss_stale_reviews = Mock()
-        github_service._set_has_issues = Mock()
+
         github_service.set_standards("test_repository")
-        github_service.github_client_core_api.get_repo.assert_has_calls(
-            [call(TEST_REPOSITORY)]
-        )
+
+        mock_github_client_core_api.return_value.get_repo.assert_has_calls([call(),
+                                                                            call(
+                                                                                f'{ORGANISATION_NAME}/test_repository'),
+                                                                            call().edit(has_issues=True),
+                                                                            call().get_branch('main'),
+                                                                            call().get_branch().edit_protection(
+                                                                                enforce_admins=True,
+                                                                                required_approving_review_count=1,
+                                                                                dismiss_stale_reviews=True)])
 
 
 if __name__ == "__main__":

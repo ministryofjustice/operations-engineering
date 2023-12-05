@@ -14,7 +14,7 @@ class SlackService:
     SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/sentryio/respond-to-sentry-usage-alert"
 
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
-    def __new__(cls, *_, **__):
+    def __new__(cls, *args, **kwargs):
         return super(SlackService, cls).__new__(cls)
 
     def __init__(self, slack_token: str) -> None:
@@ -187,7 +187,8 @@ class SlackService:
                                            ]
                                            )
 
-    def send_remove_users_from_github_alert_to_operations_engineering(self, number_of_users: int, organisation_name: str):
+    def send_remove_users_from_github_alert_to_operations_engineering(self, number_of_users: int,
+                                                                      organisation_name: str):
         self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
                                            mrkdown=True,
                                            blocks=[
