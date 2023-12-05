@@ -5,6 +5,7 @@ from unittest.mock import call, MagicMock, Mock, patch
 
 from freezegun import freeze_time
 from github import Github, GithubException, RateLimitExceededException
+from github.Branch import Branch
 from github.Commit import Commit
 from github.GitCommit import GitCommit
 from github.Issue import Issue
@@ -1287,7 +1288,6 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
         repos = github_service.fetch_all_repositories_in_org()
         self.assertEqual(len(repos), 0)
 
-
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -1845,23 +1845,22 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 @patch("github.Github.__new__")
 class TestSetStandards(unittest.TestCase):
     def test_set_standards(self, mock_github_client_core_api: MagicMock):
-        mock_github_client_core_api.return_value.get_repo(
-        ).return_value = MagicMock(Repository)
+        mock_protection = Mock(required_status_checks=Mock(contexts=["test"], strict=True))
+        mock_branch = Mock(Branch)
+        mock_branch.get_protection.return_value = mock_protection
+        mock_repo = MagicMock(Repository)
+        mock_repo.get_branch.return_value = mock_branch
+        mock_github_client_core_api.return_value.get_repo.return_value = mock_repo
+
 
         github_service = GithubService("", ORGANISATION_NAME)
-
         github_service.set_standards("test_repository")
 
-        mock_github_client_core_api.return_value.get_repo.assert_has_calls([call(),
-                                                                            call(
-                                                                                f'{ORGANISATION_NAME}/test_repository'),
-                                                                            call().edit(has_issues=True),
-                                                                            call().get_branch('main'),
-                                                                            call().get_branch().edit_protection(
-                                                                                enforce_admins=True,
-                                                                                required_approving_review_count=1,
-                                                                                dismiss_stale_reviews=True)])
-
+        mock_branch.edit_protection.assert_called_with(contexts=["test"],
+                                                       strict=True,
+                                                       enforce_admins=True,
+                                                       required_approving_review_count=1,
+                                                       dismiss_stale_reviews=True, )
 
 if __name__ == "__main__":
     unittest.main()
