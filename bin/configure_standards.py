@@ -11,16 +11,21 @@ def get_environment_variables() -> str:
     return github_token
 
 
-github_token = get_environment_variables()
-github = GithubService(github_token, "ministryofjustice")
+def main():
+    github_token = get_environment_variables()
+    github = GithubService(github_token, "ministryofjustice")
 
-data = github.get_paginated_list_of_repositories_per_topic(
-    topic="standards-compliant",
-    after_cursor=None
-)
+    data = github.get_paginated_list_of_repositories_per_topic(
+        topic="standards-compliant",
+        after_cursor=None
+    )
 
-current_repos = [repo_dict['repo']['name']
-                 for repo_dict in data['search']['repos']]
+    current_repos = [repo_dict['repo']['name']
+                     for repo_dict in data['search']['repos']]
 
-for repos in current_repos:
-    github.set_standards(repository_name=repos)
+    for repos in current_repos:
+        github.set_standards(repository_name=repos)
+
+
+if __name__ == "__main__":
+    main()
