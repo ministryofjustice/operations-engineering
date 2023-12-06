@@ -716,8 +716,15 @@ class GithubService:
             f"{self.organisation_name}/{repository_name}")
 
         repo.edit(has_issues=True)
-        repo.get_branch("main").edit_protection(
-            enforce_admins=True, required_approving_review_count=1, dismiss_stale_reviews=True)
+
+        branch = repo.get_branch("main")
+        current_protection = branch.get_protection()
+        branch.edit_protection(contexts=current_protection.required_status_checks.contexts,
+                               strict=current_protection.required_status_checks.strict,
+                               enforce_admins=True,
+                               required_approving_review_count=1,
+                               dismiss_stale_reviews=True,
+                               )
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_topic(self, topic: str, after_cursor: str | None,
