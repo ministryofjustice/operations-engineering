@@ -719,8 +719,8 @@ class GithubService:
 
         branch = repo.get_branch("main")
         current_protection = branch.get_protection()
-        branch.edit_protection(contexts=current_protection.required_status_checks.contexts,
-                               strict=current_protection.required_status_checks.strict,
+        branch.edit_protection(contexts=current_protection.required_status_checks.contexts or [],
+                               strict=current_protection.required_status_checks.strict or False,
                                enforce_admins=True,
                                required_approving_review_count=1,
                                dismiss_stale_reviews=True,
