@@ -104,7 +104,7 @@ class GithubService:
                 f"Manually check repository: {repository.name}. Reason: No commits in repository")
             return False
 
-        if commit.commit.author.date < last_active_cutoff_date:
+        if (commit.commit.author.date).replace(tzinfo=None) < (last_active_cutoff_date).replace(tzinfo=None):
             if repository.name in allow_list:
                 logging.info(
                     f"Skipping repository: {repository.name}. Reason: Present in allow list")
