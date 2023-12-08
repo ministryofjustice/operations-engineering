@@ -2,8 +2,6 @@ name: MoJ Analytical Services - Archive repo if over a certain date
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * 1-5"
 
 jobs:
   archive-repos:
