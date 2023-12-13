@@ -39,6 +39,8 @@ def check_for_new_organisation_owners(in_last_days: int):
 
     admin_token = os.getenv("ADMIN_GITHUB_TOKEN")
     slack_token = os.getenv("ADMIN_SLACK_TOKEN")
+    if not admin_token or not slack_token:
+        raise Exception("ADMIN_GITHUB_TOKEN and ADMIN_SLACK_TOKEN must be set")
 
     gh = GithubService(str(admin_token), ORGINISATION)
     slack = SlackService(str(slack_token))
