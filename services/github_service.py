@@ -29,10 +29,10 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
          or contains only one non-idempotent method at the end of a call chain to GitHub.
 
          Example of idempotent methods are:
-                                                                        - Retrieving data
+                                                                                                                                                                                                                                                                        - Retrieving data
          Example of (potentially) non-idempotent methods are:
-                                                                        - Deleting data
-                                                                        - Updating data
+                                                                                                                                                                                                                                                                        - Deleting data
+                                                                                                                                                                                                                                                                        - Updating data
         """
         try:
             return func(*args, **kwargs)
@@ -101,19 +101,19 @@ class GithubService:
 
     def audit_log_member_changes(self, since_date: str) -> list:
         logging.info(f"Getting audit log entries since {since_date}")
+        today = datetime.now()
         query = """
-			query($organisation_name: String!, $since_date: String!) {
+			query($organisation_name: String!, $since_date: String!, $cursor: String) {
 				organization(login: $organisation_name) {
 					auditLog(
 						first: 100
+						after: $cursor
 						query: $since_date
-						orderBy: {field: CREATED_AT, direction: DESC}
 					) {
 						edges{
 							node{
 								... on OrgAddMemberAuditEntry {
 									action
-									actor
 									createdAt
 									actorLogin
 									operationType
@@ -122,7 +122,6 @@ class GithubService:
 								}
 								... on OrgUpdateMemberAuditEntry {
 									action
-									actor
 									createdAt
 									actorLogin
 									operationType
@@ -132,19 +131,33 @@ class GithubService:
 								}
 							}
 						}
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
 					}
 				}
 			}
 		"""
         variable_values = {
             "organisation_name": self.organisation_name,
-            "since_date": f"created:>{since_date}"
+            "since_date": f"action:org.add_member  action:org.update_member  created:{since_date}..{today.strftime('%Y-%m-%d')}",
+            "cursor": None
         }
 
-        data = self.github_client_gql_api.execute(
-            gql(query), variable_values=variable_values)
+        all_entries = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            all_entries.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
 
-        return [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]]
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return all_entries
 
     def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
         for repo in self.__get_repos_to_consider_for_archiving("all"):
@@ -202,12 +215,12 @@ class GithubService:
 
     def assign_support_issues_to_self(self, repository_name, org_name, tag: str) -> list[any]:
         """
-                                                                        Assigns issues with a specific tag to the user who created the issue.
-                                                                        This is used to assign support issues to the user who created the issue.
+                                                                                                                                                                                                                                                                        Assigns issues with a specific tag to the user who created the issue.
+                                                                                                                                                                                                                                                                        This is used to assign support issues to the user who created the issue.
 
-                                                                        :param repository_name: The name of the repository to assign issues in.
-                                                                        :param org_name: The name of the organisation to assign issues in.
-                                                                        :param tag: The tag to search for.
+                                                                                                                                                                                                                                                                        :param repository_name: The name of the repository to assign issues in.
+                                                                                                                                                                                                                                                                        :param org_name: The name of the organisation to assign issues in.
+                                                                                                                                                                                                                                                                        :param tag: The tag to search for.
         """
         name = f"{org_name}/{repository_name}"
         support_issues = self.get_support_issues(name, tag)
@@ -240,10 +253,10 @@ class GithubService:
     def get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
         """
         Args:
-                                                                        repository_name: Should be in the format of "organisation/repository"
+                                                                                                                                                                                                                                                                        repository_name: Should be in the format of "organisation/repository"
 
         Returns:
-                                                                        A list of open issues in the repository from the GitHub API.
+                                                                                                                                                                                                                                                                        A list of open issues in the repository from the GitHub API.
         """
         required_state = "open"
         repo = self.github_client_core_api.get_repo(repository_name)
@@ -587,7 +600,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get the team names in the organisation
 
         Returns:
-                                                                        list: A list of the team names
+                                                                                                                                                                                                                                                                        list: A list of the team names
         """
         has_next_page = True
         after_cursor = None
@@ -609,7 +622,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get a team repository names
 
         Returns:
-                                                                        list: A list of the team repository names
+                                                                                                                                                                                                                                                                        list: A list of the team repository names
         """
         has_next_page = True
         after_cursor = None
@@ -632,7 +645,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get a team user names
 
         Returns:
-                                                                        list: A list of the team user names
+                                                                                                                                                                                                                                                                        list: A list of the team user names
         """
         has_next_page = True
         after_cursor = None
@@ -655,7 +668,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get a list of the organisation repository names
 
         Returns:
-                                                                        list: A list of the organisation repository names
+                                                                                                                                                                                                                                                                        list: A list of the organisation repository names
         """
         has_next_page = True
         after_cursor = None
@@ -680,7 +693,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get the list of repositories in the organisation
 
         Returns:
-                                                                        list: A list of the organisation repos names
+                                                                                                                                                                                                                                                                        list: A list of the organisation repos names
         """
         repos = []
 
@@ -799,7 +812,7 @@ class GithubService:
         - topic (str): The GitHub topic for which to fetch associated repositories.
         - after_cursor (str | None): The pagination cursor to fetch results after a certain point. If None, fetches from the beginning.
         - page_size (int, optional): The number of repository results to return per page. Defaults to GITHUB_GQL_DEFAULT_PAGE_SIZE.
-                                                                        Note that there's an upper limit, GITHUB_GQL_MAX_PAGE_SIZE, beyond which an exception will be raised.
+                                                                                                                                                                                                                                                                        Note that there's an upper limit, GITHUB_GQL_MAX_PAGE_SIZE, beyond which an exception will be raised.
 
         Returns:
         - dict[str, Any]: A dictionary containing the repository data and pagination information.
@@ -936,19 +949,19 @@ class GithubService:
         """
         Identifies and returns a list of inactive users from a specified GitHub team based on a given inactivity period.
 
-                                                                        :param team_name: The name of the GitHub team to check for inactive users.
-                                                                        :type team_name: str
-                                                                        :param users_to_ignore: A list of usernames to ignore during the inactivity check.
-                                                                        :type users_to_ignore: list[str]
-                                                                        :param repositories_to_ignore: A list of repository names to exclude from the inactivity check.
-                                                                        :type repositories_to_ignore: list[str]
-                                                                        :param inactivity_months: The threshold for user inactivity, specified in months. Users inactive for longer than this period are considered inactive.
-                                                                        :type inactivity_months: int
-                                                                        :return: A list of NamedUser objects representing the users who are identified as inactive.
-                                                                        :rtype: list[NamedUser.NamedUser]
+                                                                                                                                                                                                                                                                        :param team_name: The name of the GitHub team to check for inactive users.
+                                                                                                                                                                                                                                                                        :type team_name: str
+                                                                                                                                                                                                                                                                        :param users_to_ignore: A list of usernames to ignore during the inactivity check.
+                                                                                                                                                                                                                                                                        :type users_to_ignore: list[str]
+                                                                                                                                                                                                                                                                        :param repositories_to_ignore: A list of repository names to exclude from the inactivity check.
+                                                                                                                                                                                                                                                                        :type repositories_to_ignore: list[str]
+                                                                                                                                                                                                                                                                        :param inactivity_months: The threshold for user inactivity, specified in months. Users inactive for longer than this period are considered inactive.
+                                                                                                                                                                                                                                                                        :type inactivity_months: int
+                                                                                                                                                                                                                                                                        :return: A list of NamedUser objects representing the users who are identified as inactive.
+                                                                                                                                                                                                                                                                        :rtype: list[NamedUser.NamedUser]
 
         Example Usage:
-                                                                        inactive_users = get_inactive_users("operations-engineering", ["user1"], ["repo1"], 18)
+                                                                                                                                                                                                                                                                        inactive_users = get_inactive_users("operations-engineering", ["user1"], ["repo1"], 18)
         """
         team_id = self.get_team_id_from_team_name(team_name)
         logging.info(
@@ -1008,16 +1021,16 @@ class GithubService:
         """
         Removes a list of specified users from a given team within the organisation.
 
-                                                                        This method takes a team name and a list of GitHub user objects (NamedUser)
-                                                                        to be removed from the team. If any exception occurs during the removal process,
-                                                                        an error message is logged, but the method continues to attempt removal of
-                                                                        the other users in the list.
+                                                                                                                                                                                                                                                                        This method takes a team name and a list of GitHub user objects (NamedUser)
+                                                                                                                                                                                                                                                                        to be removed from the team. If any exception occurs during the removal process,
+                                                                                                                                                                                                                                                                        an error message is logged, but the method continues to attempt removal of
+                                                                                                                                                                                                                                                                        the other users in the list.
 
-                                                                        :param team_name: The name of the team from which the users will be removed.
-                                                                        :type team_name: str
-                                                                        :param users: A list of GitHub user objects (NamedUser) representing the users to be removed.
-                                                                        :type users: list[NamedUser.NamedUser]
-                                                                        :return: None
+                                                                                                                                                                                                                                                                        :param team_name: The name of the team from which the users will be removed.
+                                                                                                                                                                                                                                                                        :type team_name: str
+                                                                                                                                                                                                                                                                        :param users: A list of GitHub user objects (NamedUser) representing the users to be removed.
+                                                                                                                                                                                                                                                                        :type users: list[NamedUser.NamedUser]
+                                                                                                                                                                                                                                                                        :return: None
         """
         logging.info(f"Removing users {users} from team {team_name}")
         team_id = self.get_team_id_from_team_name(team_name)
@@ -1105,7 +1118,7 @@ class GithubService:
         Fetches the number of remaining licenses in the GitHub Enterprise.
 
         Returns:
-                                                                        int: The number of remaining licenses.
+                                                                                                                                                                                                                                                                        int: The number of remaining licenses.
         """
         licence = self.github_client_core_api.get_enterprise(
             self.enterprise_name).get_consumed_licenses()
