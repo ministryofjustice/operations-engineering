@@ -16,9 +16,9 @@ def new_owner_detected_message(new_owner, date_added, added_by, org, audit_log_u
     msg = (
         f"Hi all, \n\n"
         f"A new owner has been detected in the `{org}` GitHub org. \n\n"
-        f"New owner: {new_owner}\n"
-        f"Date added: {date_added}\n"
-        f"By who: {added_by}\n\n"
+        f"*New owner:* {new_owner}\n"
+        f"*Date added:* {date_added}\n"
+        f"*By who:* {added_by}\n\n"
 
         f"Please review the audit log for more details: {audit_log_url}\n\n"
 
@@ -46,14 +46,12 @@ def check_for_new_organisation_owners(in_last_days: int):
     slack = SlackService(str(slack_token))
     changes = gh.flag_owner_permission_changes(_calculate_date(in_last_days))
 
-    if not changes:
-        print("No changes detected")
-
-    for change in changes:
-        message = new_owner_detected_message(
-            change["userLogin"], change["createdAt"], change["actorLogin"], ORGINISATION, audit_log_url)
-        slack.send_message_to_plaintext_channel_name(
-            message, SLACK_CHANNEL)
+    if changes:
+        for change in changes:
+            message = new_owner_detected_message(
+                change["userLogin"], change["createdAt"], change["actorLogin"], ORGINISATION, audit_log_url)
+            slack.send_message_to_plaintext_channel_name(
+                message, SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
