@@ -1051,18 +1051,22 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def update_team_repository_permission(self, team_name: str, repositories, permission: str):
-        org = self.github_client_core_api.get_organization(self.organisation_name)
+        org = self.github_client_core_api.get_organization(
+            self.organisation_name)
 
         try:
             team = org.get_team_by_slug(team_name)
         except UnknownObjectException:
-            raise ValueError(f"Team '{team_name}' does not exist in organization '{self.organisation_name}'")
-        
+            raise ValueError(
+                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'")
+
         for repo_name in repositories:
             try:
                 repo = org.get_repo(repo_name)
             except UnknownObjectException:
-                raise ValueError(f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'")
-            
-            logging.info(f"Updating {team_name} team's permission to {permission} on {repo_name}")
+                raise ValueError(
+                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'")
+
+            logging.info(
+                f"Updating {team_name} team's permission to {permission} on {repo_name}")
             team.set_repo_permission(repo, permission)

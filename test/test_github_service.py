@@ -1897,32 +1897,39 @@ class TestGithubServiceUpdateTeamRepositoryPermission(unittest.TestCase):
 
         repositories = ["repo1", "repo2"]
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.update_team_repository_permission("dev-team", repositories, "write")
+        github_service.update_team_repository_permission(
+            "dev-team", repositories, "write")
 
-        mock_github_client_core_api.return_value.get_organization.assert_called_once_with(ORGANISATION_NAME)
+        mock_github_client_core_api.return_value.get_organization.assert_called_once_with(
+            ORGANISATION_NAME)
         mock_org.get_team_by_slug.assert_called_once_with("dev-team")
         mock_org.get_repo.assert_has_calls([call("repo1"), call("repo2")])
-        mock_team.set_repo_permission.assert_has_calls([call(mock_repo1, "write"), call(mock_repo2, "write")])
+        mock_team.set_repo_permission.assert_has_calls(
+            [call(mock_repo1, "write"), call(mock_repo2, "write")])
 
     def test_raises_error_for_nonexistent_team(self, mock_github_client_core_api):
         mock_org = MagicMock()
-        mock_org.get_team_by_slug.side_effect = UnknownObjectException(404, "Team not found")
+        mock_org.get_team_by_slug.side_effect = UnknownObjectException(
+            404, "Team not found")
         mock_github_client_core_api.return_value.get_organization.return_value = mock_org
 
         github_service = GithubService("", ORGANISATION_NAME)
         with self.assertRaises(ValueError):
-            github_service.update_team_repository_permission("unknown-team", ["repo1"], "write")
+            github_service.update_team_repository_permission(
+                "unknown-team", ["repo1"], "write")
 
     def test_raises_error_for_nonexistent_repository(self, mock_github_client_core_api):
         mock_team = MagicMock()
         mock_org = MagicMock()
         mock_org.get_team_by_slug.return_value = mock_team
-        mock_org.get_repo.side_effect = UnknownObjectException(404, "Repository not found")
+        mock_org.get_repo.side_effect = UnknownObjectException(
+            404, "Repository not found")
         mock_github_client_core_api.return_value.get_organization.return_value = mock_org
 
         github_service = GithubService("", ORGANISATION_NAME)
         with self.assertRaises(ValueError):
-            github_service.update_team_repository_permission("dev-team", ["unknown-repo"], "write")
+            github_service.update_team_repository_permission(
+                "dev-team", ["unknown-repo"], "write")
 
 
 if __name__ == "__main__":
