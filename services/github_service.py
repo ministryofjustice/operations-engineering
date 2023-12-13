@@ -29,10 +29,10 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
          or contains only one non-idempotent method at the end of a call chain to GitHub.
 
          Example of idempotent methods are:
-            - Retrieving data
+                                                                        - Retrieving data
          Example of (potentially) non-idempotent methods are:
-            - Deleting data
-            - Updating data
+                                                                        - Deleting data
+                                                                        - Updating data
         """
         try:
             return func(*args, **kwargs)
@@ -83,6 +83,68 @@ class GithubService:
                 "Authorization": f"Bearer {org_token}",
             }
         )
+
+    def flag_owner_permission_changes(self, since_date: str) -> list:
+        recent_changes = self.audit_log_member_changes(since_date)
+        list_of_changes_to_flag = []
+        for change in recent_changes:
+            match change["action"]:
+                case "org.add_member" if change["permission"] == "ADMIN":
+                    list_of_changes_to_flag.append(change)
+                case "org.update_member" if change["permission"] == "ADMIN" and change["permissionWas"] == "READ":
+                    list_of_changes_to_flag.append(change)
+                case _:
+                    logging.info(
+                        f"Change {change} does not meet criteria to flag")
+
+        return list_of_changes_to_flag
+
+    def audit_log_member_changes(self, since_date: str) -> list:
+        logging.info(f"Getting audit log entries since {since_date}")
+        query = """
+			query($organisation_name: String!, $since_date: String!) {
+				organization(login: $organisation_name) {
+					auditLog(
+						first: 100
+						query: $since_date
+						orderBy: {field: CREATED_AT, direction: DESC}
+					) {
+						edges{
+							node{
+								... on OrgAddMemberAuditEntry {
+									action
+									actor
+									createdAt
+									actorLogin
+									operationType
+									permission
+									userLogin
+								}
+								... on OrgUpdateMemberAuditEntry {
+									action
+									actor
+									createdAt
+									actorLogin
+									operationType
+									permission
+									permissionWas
+									userLogin
+								}
+							}
+						}
+					}
+				}
+			}
+		"""
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "since_date": f"created:>{since_date}"
+        }
+
+        data = self.github_client_gql_api.execute(
+            gql(query), variable_values=variable_values)
+
+        return [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]]
 
     def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
         for repo in self.__get_repos_to_consider_for_archiving("all"):
@@ -140,12 +202,12 @@ class GithubService:
 
     def assign_support_issues_to_self(self, repository_name, org_name, tag: str) -> list[any]:
         """
-            Assigns issues with a specific tag to the user who created the issue.
-            This is used to assign support issues to the user who created the issue.
+                                                                        Assigns issues with a specific tag to the user who created the issue.
+                                                                        This is used to assign support issues to the user who created the issue.
 
-            :param repository_name: The name of the repository to assign issues in.
-            :param org_name: The name of the organisation to assign issues in.
-            :param tag: The tag to search for.
+                                                                        :param repository_name: The name of the repository to assign issues in.
+                                                                        :param org_name: The name of the organisation to assign issues in.
+                                                                        :param tag: The tag to search for.
         """
         name = f"{org_name}/{repository_name}"
         support_issues = self.get_support_issues(name, tag)
@@ -178,10 +240,10 @@ class GithubService:
     def get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
         """
         Args:
-            repository_name: Should be in the format of "organisation/repository"
+                                                                        repository_name: Should be in the format of "organisation/repository"
 
         Returns:
-            A list of open issues in the repository from the GitHub API.
+                                                                        A list of open issues in the repository from the GitHub API.
         """
         required_state = "open"
         repo = self.github_client_core_api.get_repo(repository_name)
@@ -196,28 +258,28 @@ class GithubService:
             title=self.USER_ACCESS_REMOVED_ISSUE_TITLE,
             assignee=user_name,
             body=dedent(f"""
-        Hi there
+		Hi there
 
-        The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
+		The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
 
-        Access is now only via a team.
+		Access is now only via a team.
 
-        If the user was already in a team, then their direct access to the repository has been removed.
+		If the user was already in a team, then their direct access to the repository has been removed.
 
-        If the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.
+		If the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.
 
-        The list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.
+		The list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.
 
-        The user will have the same level of access to the repository via the team.
+		The user will have the same level of access to the repository via the team.
 
-        The first user added to a team is made a team maintainer, this enables that user to manage the users within the team.
+		The first user added to a team is made a team maintainer, this enables that user to manage the users within the team.
 
-        Users with admin access are added to the admin team as a team maintainer.
+		Users with admin access are added to the admin team as a team maintainer.
 
-        If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
+		If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
 
-        This issue can be closed.
-        """).strip("\n")
+		This issue can be closed.
+		""").strip("\n")
         )
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -321,14 +383,14 @@ class GithubService:
     def get_team_id_from_team_name(self, team_name: str) -> int | TypeError:
         logging.info(f"Getting team ID for team name {team_name}")
         data = self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $team_name: String!) {
-                organization(login: $organisation_name) {
-                    team(slug: $team_name) {
-                        databaseId
-                    }
-                }
-            }
-        """), variable_values={"organisation_name": self.organisation_name, "team_name": team_name})
+			query($organisation_name: String!, $team_name: String!) {
+				organization(login: $organisation_name) {
+					team(slug: $team_name) {
+						databaseId
+					}
+				}
+			}
+		"""), variable_values={"organisation_name": self.organisation_name, "team_name": team_name})
 
         return data["organization"]["team"]["databaseId"]
 
@@ -341,26 +403,26 @@ class GithubService:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         return self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
-                organization(login: $organisation_name) {
-                    repositories(first: $page_size, after: $after_cursor) {
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                        edges {
-                            node {
-                                isArchived
-                                isDisabled
-                                isLocked
-                                name
-                            }
-                        }
-                    }
-                }
-            }
-        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
-                               "after_cursor": after_cursor})
+			query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+				organization(login: $organisation_name) {
+					repositories(first: $page_size, after: $after_cursor) {
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
+						edges {
+							node {
+								isArchived
+								isDisabled
+								isLocked
+								name
+							}
+						}
+					}
+				}
+			}
+		"""), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
+                         "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
@@ -372,56 +434,56 @@ class GithubService:
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         the_query = f"org:{self.organisation_name}, archived:false, is:{repo_type}"
         return self.github_client_gql_api.execute(gql("""
-            query($page_size: Int!, $after_cursor: String, $the_query: String!) {
-                search(
-                    type: REPOSITORY
-                    query: $the_query
-                    first: $page_size
-                    after: $after_cursor
-                ) {
-                repos: edges {
-                    repo: node {
-                        ... on Repository {
-                                isDisabled
-                                isPrivate
-                                isLocked
-                                name
-                                pushedAt
-                                url
-                                description
-                                hasIssuesEnabled
-                                defaultBranchRef {
-                                    name
-                                }
-                                collaborators(affiliation: DIRECT) {
-                                    totalCount
-                                }
-                                licenseInfo {
-                                    name
-                                }
-                                collaborators(affiliation: DIRECT) {
-                                    totalCount
-                                }
-                                branchProtectionRules(first: 10) {
-                                    edges {
-                                        node {
-                                            isAdminEnforced
-                                            pattern
-                                            requiredApprovingReviewCount
-                                            requiresApprovingReviews
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    pageInfo {
-                        hasNextPage
-                        endCursor
-                    }
-                }
-            }
-        """), variable_values={"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})
+			query($page_size: Int!, $after_cursor: String, $the_query: String!) {
+				search(
+					type: REPOSITORY
+					query: $the_query
+					first: $page_size
+					after: $after_cursor
+				) {
+				repos: edges {
+					repo: node {
+						... on Repository {
+								isDisabled
+								isPrivate
+								isLocked
+								name
+								pushedAt
+								url
+								description
+								hasIssuesEnabled
+								defaultBranchRef {
+									name
+								}
+								collaborators(affiliation: DIRECT) {
+									totalCount
+								}
+								licenseInfo {
+									name
+								}
+								collaborators(affiliation: DIRECT) {
+									totalCount
+								}
+								branchProtectionRules(first: 10) {
+									edges {
+										node {
+											isAdminEnforced
+											pattern
+											requiredApprovingReviewCount
+											requiresApprovingReviews
+										}
+									}
+								}
+							}
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+			}
+		"""), variable_values={"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
@@ -435,22 +497,22 @@ class GithubService:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         return self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $repository_name: String!, $page_size: Int!, $after_cursor: String) {
-                repository(name: $repository_name, owner: $organisation_name) {
-                    collaborators(first: $page_size, after:$after_cursor, affiliation: DIRECT) {
-                        edges {
-                            node {
-                                login
-                            }
-                        }
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                    }
-                }
-            }
-        """), variable_values={
+			query($organisation_name: String!, $repository_name: String!, $page_size: Int!, $after_cursor: String) {
+				repository(name: $repository_name, owner: $organisation_name) {
+					collaborators(first: $page_size, after:$after_cursor, affiliation: DIRECT) {
+						edges {
+							node {
+								login
+							}
+						}
+						pageInfo {
+							hasNextPage
+							endCursor
+						}
+					}
+				}
+			}
+		"""), variable_values={
             "repository_name": repository_name,
             "organisation_name": self.organisation_name,
             "page_size": page_size,
@@ -466,22 +528,22 @@ class GithubService:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         return self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
-                organization(login: $organisation_name) {
-                    teams(first: $page_size, after:$after_cursor) {
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                        edges {
-                            node {
-                                slug
-                            }
-                        }
-                    }
-                }
-            }
-        """), variable_values={
+			query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+				organization(login: $organisation_name) {
+					teams(first: $page_size, after:$after_cursor) {
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
+						edges {
+							node {
+								slug
+							}
+						}
+					}
+				}
+			}
+		"""), variable_values={
             "organisation_name": self.organisation_name,
             "page_size": page_size,
             "after_cursor": after_cursor
@@ -496,24 +558,24 @@ class GithubService:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         return self.github_client_gql_api.execute(gql("""
-        query($organisation_name: String!, $team_name: String!, $page_size: Int!, $after_cursor: String) {
-            organization(login: $organisation_name) {
-                team(slug: $team_name) {
-                    repositories(first: $page_size, after:$after_cursor) {
-                        edges {
-                            node {
-                                name
-                            }
-                        }
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                    }
-                }
-            }
-        }
-        """), variable_values={
+		query($organisation_name: String!, $team_name: String!, $page_size: Int!, $after_cursor: String) {
+			organization(login: $organisation_name) {
+				team(slug: $team_name) {
+					repositories(first: $page_size, after:$after_cursor) {
+						edges {
+							node {
+								name
+							}
+						}
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
+					}
+				}
+			}
+		}
+		"""), variable_values={
             "organisation_name": self.organisation_name,
             "team_name": team_name,
             "page_size": page_size,
@@ -525,7 +587,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get the team names in the organisation
 
         Returns:
-            list: A list of the team names
+                                                                        list: A list of the team names
         """
         has_next_page = True
         after_cursor = None
@@ -547,7 +609,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get a team repository names
 
         Returns:
-            list: A list of the team repository names
+                                                                        list: A list of the team repository names
         """
         has_next_page = True
         after_cursor = None
@@ -570,7 +632,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get a team user names
 
         Returns:
-            list: A list of the team user names
+                                                                        list: A list of the team user names
         """
         has_next_page = True
         after_cursor = None
@@ -593,7 +655,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get a list of the organisation repository names
 
         Returns:
-            list: A list of the organisation repository names
+                                                                        list: A list of the organisation repository names
         """
         has_next_page = True
         after_cursor = None
@@ -618,7 +680,7 @@ class GithubService:
         """A wrapper function to run a GraphQL query to get the list of repositories in the organisation
 
         Returns:
-            list: A list of the organisation repos names
+                                                                        list: A list of the organisation repos names
         """
         repos = []
 
@@ -655,24 +717,24 @@ class GithubService:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         return self.github_client_gql_api.execute(gql("""
-        query($organisation_name: String!, $team_name: String!, $page_size: Int!, $after_cursor: String) {
-            organization(login: $organisation_name) {
-                team(slug: $team_name) {
-                    members(first: $page_size, after: $after_cursor) {
-                        edges {
-                            node {
-                                login
-                            }
-                        }
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                    }
-                }
-            }
-        }
-        """), variable_values={
+		query($organisation_name: String!, $team_name: String!, $page_size: Int!, $after_cursor: String) {
+			organization(login: $organisation_name) {
+				team(slug: $team_name) {
+					members(first: $page_size, after: $after_cursor) {
+						edges {
+							node {
+								login
+							}
+						}
+						pageInfo {
+							hasNextPage
+							endCursor
+						}
+					}
+				}
+			}
+		}
+		"""), variable_values={
             "organisation_name": self.organisation_name,
             "team_name": team_name,
             "page_size": page_size,
@@ -737,7 +799,7 @@ class GithubService:
         - topic (str): The GitHub topic for which to fetch associated repositories.
         - after_cursor (str | None): The pagination cursor to fetch results after a certain point. If None, fetches from the beginning.
         - page_size (int, optional): The number of repository results to return per page. Defaults to GITHUB_GQL_DEFAULT_PAGE_SIZE.
-            Note that there's an upper limit, GITHUB_GQL_MAX_PAGE_SIZE, beyond which an exception will be raised.
+                                                                        Note that there's an upper limit, GITHUB_GQL_MAX_PAGE_SIZE, beyond which an exception will be raised.
 
         Returns:
         - dict[str, Any]: A dictionary containing the repository data and pagination information.
@@ -757,42 +819,42 @@ class GithubService:
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
         the_query = f"org:{self.organisation_name}, archived:false, topic:{topic}"
         query = gql("""
-            query($page_size: Int!, $after_cursor: String, $the_query: String!) {
-                search(
-                    type: REPOSITORY
-                    query: $the_query
-                    first: $page_size
-                    after: $after_cursor
-                ) {
-                repos: edges {
-                    repo: node {
-                        ... on Repository {
-                                name
-                                isDisabled
-                                isLocked
-                                hasIssuesEnabled
-                                repositoryTopics(first: 10) {
-                                    edges {
-                                        node {
-                                            topic {
-                                                name
-                                            }
-                                        }
-                                    }
-                                }
-                                collaborators(affiliation: DIRECT) {
-                                    totalCount
-                                }
-                            }
-                        }
-                    }
-                    pageInfo {
-                        hasNextPage
-                        endCursor
-                    }
-                }
-            }
-        """)
+			query($page_size: Int!, $after_cursor: String, $the_query: String!) {
+				search(
+					type: REPOSITORY
+					query: $the_query
+					first: $page_size
+					after: $after_cursor
+				) {
+				repos: edges {
+					repo: node {
+						... on Repository {
+								name
+								isDisabled
+								isLocked
+								hasIssuesEnabled
+								repositoryTopics(first: 10) {
+									edges {
+										node {
+											topic {
+												name
+											}
+										}
+									}
+								}
+								collaborators(affiliation: DIRECT) {
+									totalCount
+								}
+							}
+						}
+					}
+					pageInfo {
+						hasNextPage
+						endCursor
+					}
+				}
+			}
+		""")
         variable_values = {"the_query": the_query, "page_size": page_size,
                            "after_cursor": after_cursor}
         return self.github_client_gql_api.execute(query, variable_values)
@@ -819,12 +881,12 @@ class GithubService:
     def get_user_org_email_address(self, user_name) -> str | TypeError:
         logging.info(f"Getting user {user_name} email address")
         data = self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $user_name: String!) {
-                user(login: $user_name) {
-                    organizationVerifiedDomainEmails(login: $organisation_name)
-                }
-            }
-        """), variable_values={"organisation_name": self.organisation_name, "user_name": user_name})
+			query($organisation_name: String!, $user_name: String!) {
+				user(login: $user_name) {
+					organizationVerifiedDomainEmails(login: $organisation_name)
+				}
+			}
+		"""), variable_values={"organisation_name": self.organisation_name, "user_name": user_name})
 
         if data["user"]["organizationVerifiedDomainEmails"]:
             return data["user"]["organizationVerifiedDomainEmails"][0]
@@ -874,19 +936,19 @@ class GithubService:
         """
         Identifies and returns a list of inactive users from a specified GitHub team based on a given inactivity period.
 
-            :param team_name: The name of the GitHub team to check for inactive users.
-            :type team_name: str
-            :param users_to_ignore: A list of usernames to ignore during the inactivity check.
-            :type users_to_ignore: list[str]
-            :param repositories_to_ignore: A list of repository names to exclude from the inactivity check.
-            :type repositories_to_ignore: list[str]
-            :param inactivity_months: The threshold for user inactivity, specified in months. Users inactive for longer than this period are considered inactive.
-            :type inactivity_months: int
-            :return: A list of NamedUser objects representing the users who are identified as inactive.
-            :rtype: list[NamedUser.NamedUser]
+                                                                        :param team_name: The name of the GitHub team to check for inactive users.
+                                                                        :type team_name: str
+                                                                        :param users_to_ignore: A list of usernames to ignore during the inactivity check.
+                                                                        :type users_to_ignore: list[str]
+                                                                        :param repositories_to_ignore: A list of repository names to exclude from the inactivity check.
+                                                                        :type repositories_to_ignore: list[str]
+                                                                        :param inactivity_months: The threshold for user inactivity, specified in months. Users inactive for longer than this period are considered inactive.
+                                                                        :type inactivity_months: int
+                                                                        :return: A list of NamedUser objects representing the users who are identified as inactive.
+                                                                        :rtype: list[NamedUser.NamedUser]
 
         Example Usage:
-            inactive_users = get_inactive_users("operations-engineering", ["user1"], ["repo1"], 18)
+                                                                        inactive_users = get_inactive_users("operations-engineering", ["user1"], ["repo1"], 18)
         """
         team_id = self.get_team_id_from_team_name(team_name)
         logging.info(
@@ -946,16 +1008,16 @@ class GithubService:
         """
         Removes a list of specified users from a given team within the organisation.
 
-            This method takes a team name and a list of GitHub user objects (NamedUser)
-            to be removed from the team. If any exception occurs during the removal process,
-            an error message is logged, but the method continues to attempt removal of
-            the other users in the list.
+                                                                        This method takes a team name and a list of GitHub user objects (NamedUser)
+                                                                        to be removed from the team. If any exception occurs during the removal process,
+                                                                        an error message is logged, but the method continues to attempt removal of
+                                                                        the other users in the list.
 
-            :param team_name: The name of the team from which the users will be removed.
-            :type team_name: str
-            :param users: A list of GitHub user objects (NamedUser) representing the users to be removed.
-            :type users: list[NamedUser.NamedUser]
-            :return: None
+                                                                        :param team_name: The name of the team from which the users will be removed.
+                                                                        :type team_name: str
+                                                                        :param users: A list of GitHub user objects (NamedUser) representing the users to be removed.
+                                                                        :type users: list[NamedUser.NamedUser]
+                                                                        :return: None
         """
         logging.info(f"Removing users {users} from team {team_name}")
         team_id = self.get_team_id_from_team_name(team_name)
@@ -980,21 +1042,21 @@ class GithubService:
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
 
         query = gql("""
-            query($org: String!, $page_size: Int!, $after_cursor: String) {
-                organization(login: $org) {
-                    membersWithRole(first: $page_size, after: $after_cursor) {
-                        nodes {
-                            login
-                            organizationVerifiedDomainEmails(login: $org)
-                        }
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                    }
-                }
-            }
-        """)
+			query($org: String!, $page_size: Int!, $after_cursor: String) {
+				organization(login: $org) {
+					membersWithRole(first: $page_size, after: $after_cursor) {
+						nodes {
+							login
+							organizationVerifiedDomainEmails(login: $org)
+						}
+						pageInfo {
+							hasNextPage
+							endCursor
+						}
+					}
+				}
+			}
+		""")
 
         variable_values = {
             "org": self.organisation_name,
@@ -1043,7 +1105,7 @@ class GithubService:
         Fetches the number of remaining licenses in the GitHub Enterprise.
 
         Returns:
-            int: The number of remaining licenses.
+                                                                        int: The number of remaining licenses.
         """
         licence = self.github_client_core_api.get_enterprise(
             self.enterprise_name).get_consumed_licenses()
