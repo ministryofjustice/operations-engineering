@@ -1425,9 +1425,9 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
         self.assertEqual(members[1]["username"], "test_user2")
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__")
-@ patch("github.Github.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__")
+@patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
     def test_calls_downstream_services(self, mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1453,9 +1453,9 @@ class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
         self.assertEqual(response, "-")
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__", new=MagicMock)
-@ patch("github.Github.__new__")
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
     def test_calls_downstream_services(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1480,10 +1480,10 @@ class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
         self.assertEqual([], response)
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__", new=MagicMock)
-@ patch("github.Github.__new__", new=MagicMock)
-@ patch("requests.sessions.Session.__new__")
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+@patch("requests.sessions.Session.__new__")
 class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
 
     def test_calls_downstream_services(self, mock_github_client_rest_api):
@@ -1514,10 +1514,10 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
         self.assertEqual(0, response)
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__", new=MagicMock)
-@ patch("github.Github.__new__", new=MagicMock)
-@ patch.object(GithubService, "_get_user_from_audit_log")
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+@patch.object(GithubService, "_get_user_from_audit_log")
 class TestGithubServiceGetAuditLogActiveUsers(unittest.TestCase):
 
     def test_get_audit_log_active_users_when_no_users_passed_in(self, mock_get_user_from_audit_log):
@@ -1569,9 +1569,9 @@ class TestGithubServiceGetAuditLogActiveUsers(unittest.TestCase):
         self.assertEqual(1, len(response))
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__", new=MagicMock)
-@ patch("github.Github.__new__")
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestGithubServiceRemoveUserFromGitHub(unittest.TestCase):
     def test_remove_user_from_gitub(self, mock_github_client_core_api):
         mock_github_client_core_api.return_value.get_user.return_value = "mock-user"
@@ -1603,11 +1603,11 @@ class MockGithubIssue(MagicMock):
         self.assignees = assignees
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__", new=MagicMock)
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
 class TestReturningLicences(unittest.TestCase):
 
-    @ patch("services.github_service.Github")
+    @patch("services.github_service.Github")
     def test_get_remaining_licences(self, mock_github):
         org_token = 'dummy_token'
         org_name = 'dummy_org'
@@ -1627,9 +1627,9 @@ class TestReturningLicences(unittest.TestCase):
         self.assertEqual(remaining_licenses, 50)
 
 
-@ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@ patch("gql.Client.__new__", new=MagicMock)
-@ patch("services.github_service.Github")
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("services.github_service.Github")
 class TestReportOnInactiveUsers(unittest.TestCase):
 
     def setUp(self) -> None:
