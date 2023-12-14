@@ -1940,7 +1940,6 @@ class TestNewOwnerDetected(unittest.TestCase):
 
     def test_flag_owner_permission_changes(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
-        # Mock the data returned by audit_log_member_changes
         mock_audit_log = [
             {'action': 'org.add_member', 'createdAt': '2023-12-06T10:32:07.832Z', 'actorLogin': 'testAdmin',
              'operationType': 'CREATE', 'permission': 'READ', 'userLogin': 'testUser'},
