@@ -1,0 +1,25 @@
+name: Code Coverage
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Generate Report
+        run: |
+          pip install coverage
+          coverage run -m unittest
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v3
