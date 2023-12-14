@@ -6,7 +6,8 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import Github, NamedUser, RateLimitExceededException, UnknownObjectException
+from github import (Github, NamedUser, RateLimitExceededException,
+                    UnknownObjectException)
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Repository import Repository
@@ -1070,3 +1071,79 @@ class GithubService:
             logging.info(
                 f"Updating {team_name} team's permission to {permission} on {repo_name}")
             team.set_repo_permission(repo, permission)
+
+    def flag_owner_permission_changes(self, since_date: str) -> list:
+        recent_changes = self.audit_log_member_changes(since_date)
+        list_of_changes_to_flag = []
+        for change in recent_changes:
+            match change["action"]:
+                case "org.add_member" if change["permission"] == "ADMIN":
+                    list_of_changes_to_flag.append(change)
+                case "org.update_member" if change["permission"] == "ADMIN" and change["permissionWas"] == "READ":
+                    list_of_changes_to_flag.append(change)
+                case _:
+                    logging.info(
+                        f"Change {change} does not meet criteria to flag")
+
+        return list_of_changes_to_flag
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def audit_log_member_changes(self, since_date: str) -> list:
+        logging.info(f"Getting audit log entries since {since_date}")
+        today = datetime.now()
+        query = """
+			query($organisation_name: String!, $since_date: String!, $cursor: String) {
+				organization(login: $organisation_name) {
+					auditLog(
+						first: 100
+						after: $cursor
+						query: $since_date
+					) {
+						edges{
+							node{
+								... on OrgAddMemberAuditEntry {
+									action
+									createdAt
+									actorLogin
+									operationType
+									permission
+									userLogin
+								}
+								... on OrgUpdateMemberAuditEntry {
+									action
+									createdAt
+									actorLogin
+									operationType
+									permission
+									permissionWas
+									userLogin
+								}
+							}
+						}
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
+					}
+				}
+			}
+		"""
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "since_date": f"action:org.add_member  action:org.update_member  created:{since_date}..{today.strftime('%Y-%m-%d')}",
+            "cursor": None
+        }
+
+        all_entries = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            all_entries.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return all_entries
