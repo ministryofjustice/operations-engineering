@@ -18,6 +18,7 @@ jobs:
 
       - name: Generate Report
         run: |
+          pip install -r requirements.txt
           pip install coverage
           coverage run -m unittest
 
