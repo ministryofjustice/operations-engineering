@@ -1932,6 +1932,7 @@ class TestGithubServiceUpdateTeamRepositoryPermission(unittest.TestCase):
             github_service.update_team_repository_permission(
                 "dev-team", ["unknown-repo"], "write")
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("services.github_service.Github")
