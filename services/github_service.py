@@ -99,6 +99,7 @@ class GithubService:
 
         return list_of_changes_to_flag
 
+    @retries_github_rate_limit_exception_at_next_reset_once
     def audit_log_member_changes(self, since_date: str) -> list:
         logging.info(f"Getting audit log entries since {since_date}")
         today = datetime.now()
