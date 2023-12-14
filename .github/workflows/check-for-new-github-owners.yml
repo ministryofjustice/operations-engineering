@@ -1,0 +1,33 @@
+
+name: Alarm if a new GitHub owner is added
+
+on:
+  schedule:
+    # Runs once a week on Monday at 1200
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+
+jobs:
+  check-for-new-github-owners:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m bin.check_for_new_github_owners
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_AUDIT_LOG_TOKEN}}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed to check for new GitHub owners"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
