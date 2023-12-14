@@ -6,7 +6,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import Github, NamedUser, RateLimitExceededException
+from github import Github, NamedUser, RateLimitExceededException, UnknownObjectException
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Repository import Repository
@@ -1048,3 +1048,25 @@ class GithubService:
         licence = self.github_client_core_api.get_enterprise(
             self.enterprise_name).get_consumed_licenses()
         return licence.total_seats_purchased - licence.total_seats_consumed
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def update_team_repository_permission(self, team_name: str, repositories, permission: str):
+        org = self.github_client_core_api.get_organization(
+            self.organisation_name)
+
+        try:
+            team = org.get_team_by_slug(team_name)
+        except UnknownObjectException:
+            raise ValueError(
+                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'")
+
+        for repo_name in repositories:
+            try:
+                repo = org.get_repo(repo_name)
+            except UnknownObjectException:
+                raise ValueError(
+                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'")
+
+            logging.info(
+                f"Updating {team_name} team's permission to {permission} on {repo_name}")
+            team.set_repo_permission(repo, permission)
