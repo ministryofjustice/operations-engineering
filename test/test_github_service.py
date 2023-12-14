@@ -1345,7 +1345,6 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
                             "login": "test_user",
                             "organizationVerifiedDomainEmails": ["test_user@test.com"]
                         }
-                                        }
                     ],
                     "pageInfo": {
                         "hasNextPage": False,
