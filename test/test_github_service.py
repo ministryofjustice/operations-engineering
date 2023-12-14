@@ -1369,34 +1369,34 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
     def test_returns_correct_data(self):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._get_paginated_organization_members_with_emails = MagicMock(
-            return_value = self.return_data_with_members
+            return_value=self.return_data_with_members
         )
-        members= github_service.get_github_member_list()
+        members = github_service.get_github_member_list()
         self.assertEqual(len(members), 1)
         self.assertEqual(members[0]["username"], "test_user")
         self.assertEqual(members[0]["email"], "test_user@test.com")
 
     def test_handles_no_members(self):
-        github_service= GithubService("", ORGANISATION_NAME)
-        github_service._get_paginated_organization_members_with_emails= MagicMock(
-            return_value = self.return_data_no_members
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_paginated_organization_members_with_emails = MagicMock(
+            return_value=self.return_data_no_members
         )
-        members= github_service.get_github_member_list()
+        members = github_service.get_github_member_list()
         self.assertEqual(len(members), 0)
 
     def test_handles_rate_limiting(self):
-        github_service= GithubService("", ORGANISATION_NAME)
-        github_service._get_paginated_organization_members_with_emails= MagicMock(
-            side_effect = Exception("API rate limit exceeded")
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_paginated_organization_members_with_emails = MagicMock(
+            side_effect=Exception("API rate limit exceeded")
         )
         with self.assertRaises(Exception) as context:
             github_service.get_github_member_list()
         self.assertIn('API rate limit exceeded', str(context.exception))
 
     def test_handles_pagination_as_expected(self):
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
 
-        page_one= {
+        page_one = {
             "organization": {
                 "membersWithRole": {
                     "nodes": [{"login": "test_user1", "organizationVerifiedDomainEmails": ["test_user1@test.com"]}],
@@ -1415,10 +1415,10 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
         }
 
         github_service._get_paginated_organization_members_with_emails = MagicMock(
-            side_effect = [page_one, page_two]
+            side_effect=[page_one, page_two]
         )
 
-        members= github_service.get_github_member_list()
+        members = github_service.get_github_member_list()
         self.assertEqual(len(members), 2)
         self.assertEqual(members[0]["username"], "test_user1")
         self.assertEqual(members[1]["username"], "test_user2")
@@ -1429,7 +1429,7 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 @ patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
     def test_calls_downstream_services(self, mock_gql_client):
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_user_org_email_address("test_team_name")
         github_service.github_client_gql_api.assert_has_calls([
             call.execute().__getitem__('user'),
@@ -1438,7 +1438,7 @@ class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
         ])
 
     def test_returns_email(self, mock_gql_client):
-        mock_gql_client.return_value.execute.return_value= {
+        mock_gql_client.return_value.execute.return_value = {
             "user": {"organizationVerifiedDomainEmails": ["test-email"]}}
         github_service = GithubService("", ORGANISATION_NAME)
         response = github_service.get_user_org_email_address("test_team_name")
@@ -1463,19 +1463,19 @@ class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
             [call(ORGANISATION_NAME), call().get_members(), call().get_members().__bool__(), call().get_members().__iter__()])
 
     def test_returns_login_names(self, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value= [
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
             Mock(NamedUser, login="tom-smith"),
             Mock(NamedUser, login="john.smith"),
         ]
-        github_service= GithubService("", ORGANISATION_NAME)
-        response= github_service.get_org_members_login_names()
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_org_members_login_names()
         self.assertEqual(["tom-smith", "john.smith"], response)
 
     def test_returns_empty_list_when_members_returns_none(self, mock_github_client_core_api):
         mock_github_client_core_api.return_value.get_organization(
-        ).get_members.return_value= None
-        github_service= GithubService("", ORGANISATION_NAME)
-        response= github_service.get_org_members_login_names()
+        ).get_members.return_value = None
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_org_members_login_names()
         self.assertEqual([], response)
 
 
@@ -1486,8 +1486,8 @@ class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
 class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
 
     def test_calls_downstream_services(self, mock_github_client_rest_api):
-        github_service= GithubService("", ORGANISATION_NAME)
-        github_service.github_client_rest_api= mock_github_client_rest_api
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
         github_service._get_user_from_audit_log("some-user")
         mock_github_client_rest_api.assert_has_calls(
             [
@@ -1498,18 +1498,18 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
         )
 
     def test_returns_a_user(self, mock_github_client_rest_api):
-        github_service= GithubService("", ORGANISATION_NAME)
-        mock_github_client_rest_api.get().content= b"\"some-user\""
-        mock_github_client_rest_api.get().status_code= 200
-        github_service.github_client_rest_api= mock_github_client_rest_api
-        user= github_service._get_user_from_audit_log("some-user")
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_github_client_rest_api.get().content = b"\"some-user\""
+        mock_github_client_rest_api.get().status_code = 200
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        user = github_service._get_user_from_audit_log("some-user")
         self.assertEqual(user, "some-user")
 
     def test_returns_zero_when_response_is_not_okay(self, mock_github_client_rest_api):
-        github_service= GithubService("", ORGANISATION_NAME)
-        mock_github_client_rest_api.get().status_code= 404
-        github_service.github_client_rest_api= mock_github_client_rest_api
-        response= github_service._get_user_from_audit_log("some-user")
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_github_client_rest_api.get().status_code = 404
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        response = github_service._get_user_from_audit_log("some-user")
         self.assertEqual(0, response)
 
 
@@ -1520,51 +1520,51 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
 class TestGithubServiceGetAuditLogActiveUsers(unittest.TestCase):
 
     def test_get_audit_log_active_users_when_no_users_passed_in(self, mock_get_user_from_audit_log):
-        github_service= GithubService("", ORGANISATION_NAME)
-        response= github_service.get_audit_log_active_users([])
+        github_service = GithubService("", ORGANISATION_NAME)
+        response = github_service.get_audit_log_active_users([])
         self.assertEqual(0, len(response))
         mock_get_user_from_audit_log.assert_not_called()
 
     def test_get_audit_log_active_users_when_no_user_data_from_audit_log(self, mock_get_user_from_audit_log):
-        github_service= GithubService("", ORGANISATION_NAME)
-        users= [
+        github_service = GithubService("", ORGANISATION_NAME)
+        users = [
             {
                 "username": "some-user",
                 "is_outside_collaborator": False,
             }
         ]
-        mock_get_user_from_audit_log.return_value= []
-        response= github_service.get_audit_log_active_users(users)
+        mock_get_user_from_audit_log.return_value = []
+        response = github_service.get_audit_log_active_users(users)
         self.assertEqual(0, len(response))
 
     def test_get_audit_log_active_users_when_user_not_active(self, mock_get_user_from_audit_log):
-        github_service= GithubService("", ORGANISATION_NAME)
-        users= [
+        github_service = GithubService("", ORGANISATION_NAME)
+        users = [
             {
                 "username": "some-user",
                 "is_outside_collaborator": False,
             }
         ]
-        mock_get_user_from_audit_log.return_value= [
+        mock_get_user_from_audit_log.return_value = [
             {"@timestamp": 1080866000003}
         ]
-        response= github_service.get_audit_log_active_users(users)
+        response = github_service.get_audit_log_active_users(users)
         self.assertEqual(0, len(response))
 
     def test_get_audit_log_active_users_when_user_is_active(self, mock_get_user_from_audit_log):
-        github_service= GithubService("", ORGANISATION_NAME)
-        users= [
+        github_service = GithubService("", ORGANISATION_NAME)
+        users = [
             {
                 "username": "some-user",
                 "is_outside_collaborator": False,
             }
         ]
-        current_time= datetime.now(timezone.utc)
-        unix_timestamp= current_time.timestamp() * 1000
-        mock_get_user_from_audit_log.return_value= [
+        current_time = datetime.now(timezone.utc)
+        unix_timestamp = current_time.timestamp() * 1000
+        mock_get_user_from_audit_log.return_value = [
             {"@timestamp": unix_timestamp}
         ]
-        response= github_service.get_audit_log_active_users(users)
+        response = github_service.get_audit_log_active_users(users)
         self.assertEqual(1, len(response))
 
 
@@ -1573,8 +1573,8 @@ class TestGithubServiceGetAuditLogActiveUsers(unittest.TestCase):
 @ patch("github.Github.__new__")
 class TestGithubServiceRemoveUserFromGitHub(unittest.TestCase):
     def test_remove_user_from_gitub(self, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_user.return_value= "mock-user"
-        github_service= GithubService("", ORGANISATION_NAME)
+        mock_github_client_core_api.return_value.get_user.return_value = "mock-user"
+        github_service = GithubService("", ORGANISATION_NAME)
         github_service.remove_user_from_gitub("some-user")
         github_service.github_client_core_api.get_user.assert_has_calls(
             [call('some-user')]
@@ -1589,17 +1589,17 @@ class TestGithubServiceRemoveUserFromGitHub(unittest.TestCase):
 
 class MockGithubIssue(MagicMock):
     def __init__(self, the_id, number, title, assignees, label):
-        mock_label= MagicMock(name="test_support_label")
+        mock_label = MagicMock(name="test_support_label")
         super().__init__()
-        self.id= the_id
-        self.number= number
-        self.title= title
-        self.assignees= assignees
-        self.labels= [mock_label]
-        self.user= MagicMock()
+        self.id = the_id
+        self.number = number
+        self.title = title
+        self.assignees = assignees
+        self.labels = [mock_label]
+        self.user = MagicMock()
 
     def edit(self, assignees):
-        self.assignees= assignees
+        self.assignees = assignees
 
 
 @ patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -1608,20 +1608,20 @@ class TestReturningLicences(unittest.TestCase):
 
     @ patch("services.github_service.Github")
     def test_get_remaining_licences(self, mock_github):
-        org_token= 'dummy_token'
-        org_name= 'dummy_org'
-        enterprise_name= 'ministry-of-justice-uk'
-        service= GithubService(org_token, org_name, enterprise_name)
+        org_token = 'dummy_token'
+        org_name = 'dummy_org'
+        enterprise_name = 'ministry-of-justice-uk'
+        service = GithubService(org_token, org_name, enterprise_name)
 
-        mock_enterprise= MagicMock()
-        mock_licenses= MagicMock()
-        mock_licenses.total_seats_purchased= 100
-        mock_licenses.total_seats_consumed= 50
+        mock_enterprise = MagicMock()
+        mock_licenses = MagicMock()
+        mock_licenses.total_seats_purchased = 100
+        mock_licenses.total_seats_consumed = 50
 
-        mock_github.return_value.get_enterprise.return_value= mock_enterprise
-        mock_enterprise.get_consumed_licenses.return_value= mock_licenses
+        mock_github.return_value.get_enterprise.return_value = mock_enterprise
+        mock_enterprise.get_consumed_licenses.return_value = mock_licenses
 
-        remaining_licenses= service.get_remaining_licences()
+        remaining_licenses = service.get_remaining_licences()
 
         self.assertEqual(remaining_licenses, 50)
 
@@ -1632,65 +1632,65 @@ class TestReturningLicences(unittest.TestCase):
 class TestReportOnInactiveUsers(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.team= Mock()
-        self.team.name= "team1"
-        self.team.id= 1
+        self.team = Mock()
+        self.team.name = "team1"
+        self.team.id = 1
 
-        self.user1= Mock()
-        self.user1.login= "user1"
+        self.user1 = Mock()
+        self.user1.login = "user1"
         self.user1.comm
-        self.user2= Mock()
-        self.user2.login= "user2"
+        self.user2 = Mock()
+        self.user2.login = "user2"
 
-        self.repository1= Mock()
-        self.repository1.name= "repo1"
-        self.repository2= Mock()
-        self.repository2.name= "repo2"
+        self.repository1 = Mock()
+        self.repository1.name = "repo1"
+        self.repository2 = Mock()
+        self.repository2.name = "repo2"
 
-        self.users= [self.user1, self.user2]
-        self.repositories= [self.repository1, self.repository2]
-        self.ignored_users= ["user2"]
-        self.ignored_repositories= ["repo2"]
+        self.users = [self.user1, self.user2]
+        self.repositories = [self.repository1, self.repository2]
+        self.ignored_users = ["user2"]
+        self.ignored_repositories = ["repo2"]
 
-        self.inactivity_months= 18
+        self.inactivity_months = 18
 
     def test_identify_inactive_users_in_a_team(self, mock_github_client_core_api):
 
-        github_service= GithubService("", ORGANISATION_NAME)
-        github_service._get_repositories_managed_by_team= Mock(
-            return_value = self.repositories)
-        github_service._get_unignored_users_from_team= Mock(
-            return_value = self.users)
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_repositories_managed_by_team = Mock(
+            return_value=self.repositories)
+        github_service._get_unignored_users_from_team = Mock(
+            return_value=self.users)
 
-        inactive_users= github_service.get_inactive_users(
+        inactive_users = github_service.get_inactive_users(
             self.team.id, self.ignored_users, self.ignored_repositories, self.inactivity_months)
 
         self.assertEqual(2, len(inactive_users))
         self.assertEqual("user1", inactive_users[0].login)
 
     def test_identify_no_inactive_users_in_a_team(self, mock_github_client_core_api):
-        self.commit= Mock()
-        self.commit.commit.author.date= datetime.now()
-        self.repository1.get_commits.return_value= [self.commit]
+        self.commit = Mock()
+        self.commit.commit.author.date = datetime.now()
+        self.repository1.get_commits.return_value = [self.commit]
 
-        github_service= GithubService("", ORGANISATION_NAME)
-        github_service._get_repositories_managed_by_team= Mock(
-            return_value = self.repositories)
-        github_service._get_unignored_users_from_team= Mock(
-            return_value = self.users)
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service._get_repositories_managed_by_team = Mock(
+            return_value=self.repositories)
+        github_service._get_unignored_users_from_team = Mock(
+            return_value=self.users)
 
-        inactive_users= github_service.get_inactive_users(
+        inactive_users = github_service.get_inactive_users(
             self.team.id, self.ignored_users, self.ignored_repositories, self.inactivity_months)
 
         self.assertEqual(0, len(inactive_users))
 
     def test_identify_inactive_users(self, mock_github_client_core_api):
 
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
 
-        github_service._is_user_inactive= Mock(return_value=True)
+        github_service._is_user_inactive = Mock(return_value=True)
 
-        inactive_users= github_service._identify_inactive_users(
+        inactive_users = github_service._identify_inactive_users(
             self.users, self.repositories, self.inactivity_months)
 
         self.assertEqual(2, len(inactive_users))
@@ -1698,74 +1698,74 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
     def test_get_users_from_team_found(self, mock_github_client_core_api):
 
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value= [
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
             self.user1, self.user2
         ]
-        mock_team= mock_github_client_core_api.return_value.get_organization().get_team()
-        mock_team.get_members.return_value= [
+        mock_team = mock_github_client_core_api.return_value.get_organization().get_team()
+        mock_team.get_members.return_value = [
             self.user1, self.user2
         ]
-        mock_github_client_core_api.return_value.get_user.side_effect= [
+        mock_github_client_core_api.return_value.get_user.side_effect = [
             self.user1, self.user2
         ]
 
-        github_service= GithubService(
-            org_token = "test_token", organisation_name = "test_org")
+        github_service = GithubService(
+            org_token="test_token", organisation_name="test_org")
 
-        result= github_service._get_unignored_users_from_team(
+        result = github_service._get_unignored_users_from_team(
             self.team.id, self.ignored_users)
 
         self.assertEqual(1, len(result))
 
     def test_user_is_inactive(self, mock_github_client_core_api):
 
-        self.commit= Mock()
-        self.commit.commit.author.date= datetime.now(
+        self.commit = Mock()
+        self.commit.commit.author.date = datetime.now(
         ) - timedelta(days=self.inactivity_months * 30)
 
-        self.repository1.get_commits.return_value= [self.commit]
+        self.repository1.get_commits.return_value = [self.commit]
 
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
 
-        result= github_service._is_user_inactive(
+        result = github_service._is_user_inactive(
             self.user1, self.repositories, self.inactivity_months)
 
         self.assertEqual(True, result)
 
     def test_user_is_active(self, mock_github_client_core_api):
 
-        self.commit= Mock()
-        self.commit.commit.author.date= datetime.now()
+        self.commit = Mock()
+        self.commit.commit.author.date = datetime.now()
 
-        self.repository1.get_commits.return_value= [self.commit]
+        self.repository1.get_commits.return_value = [self.commit]
 
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
 
-        result= github_service._is_user_inactive(
+        result = github_service._is_user_inactive(
             self.user1, self.repositories, self.inactivity_months)
 
         self.assertEqual(False, result)
 
     def test_user_is_inactive_no_commits(self, mock_github_client_core_api):
 
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value= [
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
             self.user1, self.user2
         ]
-        mock_team= mock_github_client_core_api.return_value.get_organization().get_team()
-        mock_team.get_members.return_value= [
+        mock_team = mock_github_client_core_api.return_value.get_organization().get_team()
+        mock_team.get_members.return_value = [
             self.user1, self.user2
         ]
-        mock_github_client_core_api.return_value.get_user.side_effect= [
+        mock_github_client_core_api.return_value.get_user.side_effect = [
             self.user1, self.user2
         ]
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value= [
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             self.repository1, self.repository2
         ]
-        mock_github_client_core_api.return_value.get_organization().Repository.get_commits.side_effect= [
+        mock_github_client_core_api.return_value.get_organization().Repository.get_commits.side_effect = [
             GithubException(status=500, data="test", headers={})
         ]
 
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
 
         with self.assertLogs(level='ERROR') as cm:
             github_service._is_user_inactive(
@@ -1775,7 +1775,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
     def test_remove_list_of_users_from_team(self, mock_github_client_core_api):
 
-        github_service= GithubService("", ORGANISATION_NAME)
+        github_service = GithubService("", ORGANISATION_NAME)
 
         github_service.remove_list_of_users_from_team(
             self.team.name, self.users)
