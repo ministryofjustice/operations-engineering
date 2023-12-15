@@ -1,10 +1,11 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from unittest.mock import call, MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock, call, patch
 
 from freezegun import freeze_time
-from github import Github, GithubException, RateLimitExceededException, UnknownObjectException
+from github import (Github, GithubException, RateLimitExceededException,
+                    UnknownObjectException)
 from github.Branch import Branch
 from github.Commit import Commit
 from github.GitCommit import GitCommit
@@ -1930,6 +1931,57 @@ class TestGithubServiceUpdateTeamRepositoryPermission(unittest.TestCase):
         with self.assertRaises(ValueError):
             github_service.update_team_repository_permission(
                 "dev-team", ["unknown-repo"], "write")
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("services.github_service.Github")
+class TestNewOwnerDetected(unittest.TestCase):
+
+    def test_flag_owner_permission_changes(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_audit_log = [
+            {'action': 'org.add_member', 'createdAt': '2023-12-06T10:32:07.832Z', 'actorLogin': 'testAdmin',
+             'operationType': 'CREATE', 'permission': 'READ', 'userLogin': 'testUser'},
+            {'action': 'org.add_member', 'createdAt': '2023-12-06T10:33:07.832Z', 'actorLogin': 'johnsmith',
+             'operationType': 'CREATE', 'permission': 'ADMIN', 'userLogin': 'janedoe'}
+        ]
+        github_service.audit_log_member_changes = Mock(
+            return_value=mock_audit_log)
+
+        result = github_service.flag_owner_permission_changes("2023-12-01")
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]['action'], 'org.add_member')
+        self.assertEqual(result[0]['permission'], 'ADMIN')
+        self.assertEqual(result[0]['userLogin'], 'janedoe')
+
+    def test_audit_log_member_changes(self, mock_github_client_gql):
+        github_service = GithubService("", ORGANISATION_NAME)
+        return_value = {
+            "organization": {
+                "auditLog": {
+                    "edges": [
+                        {"node": {"action": "org.add_member", "createdAt": "2023-12-06T10:32:07.832Z",
+                                  "actorLogin": "user1", "permission": "READ"}},
+                        {"node": {"action": "org.update_member", "createdAt": "2023-12-06T10:33:07.832Z",
+                                  "actorLogin": "user2", "permission": "ADMIN"}}
+                    ],
+                    "pageInfo": {
+                        "endCursor": None,
+                        "hasNextPage": False
+                    }
+                }
+            }
+        }
+
+        github_service.github_client_gql_api.execute.return_value = return_value
+
+        result = github_service.audit_log_member_changes("2023-12-01")
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['action'], 'org.add_member')
+        self.assertEqual(result[0]['permission'], 'READ')
 
 
 if __name__ == "__main__":
