@@ -6,7 +6,8 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import Github, NamedUser, RateLimitExceededException
+from github import (Github, NamedUser, RateLimitExceededException,
+                    UnknownObjectException)
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Repository import Repository
@@ -104,7 +105,7 @@ class GithubService:
                 f"Manually check repository: {repository.name}. Reason: No commits in repository")
             return False
 
-        if commit.commit.author.date < last_active_cutoff_date:
+        if (commit.commit.author.date).replace(tzinfo=None) < (last_active_cutoff_date).replace(tzinfo=None):
             if repository.name in allow_list:
                 logging.info(
                     f"Skipping repository: {repository.name}. Reason: Present in allow list")
@@ -604,7 +605,8 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"]["isLocked"] == True:
+                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"][
+                            "isLocked"] == True:
                         continue
                     repository_names.append(repo["node"]["name"])
 
@@ -711,176 +713,20 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def set_standards(self, repository_name: str):
-        """
-        Set various standards for a GitHub repository.
-
-        Args:
-            repository_name (str): The name of the repository for which standards are to be set.
-
-        Returns:
-            None
-
-        """
-
-        # Get the GitHub repository object
         repo = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}")
 
-        # Set default branch protection
-        self._set_default_branch_protection(repository=repo)
+        repo.edit(has_issues=True)
 
-        # Set 'enforce_admins' protection
-        self._set_enforce_admins(repository=repo)
-
-        # Set the required review count
-        self._set_required_review_count(repository=repo)
-
-        # Set the 'dismiss stale reviews' option
-        self._set_dismiss_stale_reviews(repository=repo)
-
-        # Set whether issues are enabled
-        self._set_has_issues(repository=repo)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def _set_has_issues(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
-        """
-        Sets the has issues for a repository
-
-        Args:
-            repository_name (str): The name of the repository.
-            branch_name (str): The name of the branch. Defaults to "main".
-            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
-
-        Returns:
-            The result of calling the edit_protection method on the branch object.
-
-        """
-
-        # Check if repository_name is provided
-        if repository_name is not None:
-            # Fetch the repository using the provided repository_name
-            repository = self.github_client_core_api.get_repo(
-                f"{self.organisation_name}/{repository_name}"
-            )
-
-        # Check if repository object is provided
-        if repository is not None:
-            # Get the branch object for the specified branch_name from the repository
-            repository.edit(has_issues=True)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def _set_default_branch_protection(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
-        """
-        Sets the default branch protection for a repository.
-
-        Args:
-            repository_name (str): The name of the repository.
-            branch_name (str): The name of the branch. Defaults to "main".
-            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
-
-        Returns:
-            The result of calling the edit_protection method on the branch object.
-
-        """
-
-        # Check if repository_name is provided
-        if repository_name is not None:
-            # Fetch the repository using the provided repository_name
-            repository = self.github_client_core_api.get_repo(
-                f"{self.organisation_name}/{repository_name}"
-            )
-
-        # Check if repository object is provided
-        if repository is not None:
-            # Get the branch object for the specified branch_name from the repository
-            branch = repository.get_branch(branch_name)
-            # Call the edit_protection method on the branch object and return the result
-            return branch.edit_protection()
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def _set_enforce_admins(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
-        """
-        Sets enforce admins for a repository
-
-        Args:
-            repository_name (str): The name of the repository.
-            branch_name (str): The name of the branch. Defaults to "main".
-            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
-
-        Returns:
-            The result of calling the edit_protection method on the branch object.
-
-        """
-        # Check if repository_name is provided
-        if repository_name is not None:
-            # Fetch the repository using the provided repository_name
-            repository = self.github_client_core_api.get_repo(
-                f"{self.organisation_name}/{repository_name}"
-            )
-
-        # Check if repository object is provided
-        if repository is not None:
-            # Get the branch object for the specified branch_name from the repository
-            branch = repository.get_branch(branch_name)
-            # Call the edit_protection method on the branch object and return the result
-            return branch.edit_protection(enforce_admins=True)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def _set_dismiss_stale_reviews(self, repository_name: str = None, branch_name: str = "main", repository: Repository = None):
-        """
-        Sets dismiss stale reviews for a repository
-
-        Args:
-            repository_name (str): The name of the repository.
-            branch_name (str): The name of the branch. Defaults to "main".
-            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
-
-        Returns:
-            The result of calling the edit_protection method on the branch object.
-
-        """
-        # Check if repository_name is provided
-        if repository_name is not None:
-            # Fetch the repository using the provided repository_name
-            repository = self.github_client_core_api.get_repo(
-                f"{self.organisation_name}/{repository_name}"
-            )
-
-        # Check if repository object is provided
-        if repository is not None:
-            # Get the branch object for the specified branch_name from the repository
-            branch = repository.get_branch(branch_name)
-            # Call the edit_protection method on the branch object and return the result
-            return branch.edit_protection(dismiss_stale_reviews=True)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def _set_required_review_count(self, repository_name: str = None, required_review_count: int = 1, branch_name: str = "main", repository: Repository = None):
-        """
-        Sets the required review count for a repository
-
-        Args:
-            repository_name (str): The name of the repository.
-            branch_name (str): The name of the branch. Defaults to "main".
-            repository (Repository): The repository object. If not provided, it will be fetched using the repository_name.
-            required_review_count (int): The number of reviewers needed
-
-        Returns:
-            The result of calling the edit_protection method on the branch object.
-
-        """
-        # Check if repository_name is provided
-        if repository_name is not None:
-            # Fetch the repository using the provided repository_name
-            repository = self.github_client_core_api.get_repo(
-                f"{self.organisation_name}/{repository_name}"
-            )
-
-        # Check if repository object is provided
-        if repository is not None:
-            # Get the branch object for the specified branch_name from the repository
-            branch = repository.get_branch(branch_name)
-            # Call the edit_protection method on the branch object and return the result
-            return branch.edit_protection(required_approving_review_count=required_review_count)
+        branch = repo.get_branch("main")
+        current_protection = branch.get_protection()
+        branch.edit_protection(
+            contexts=current_protection.required_status_checks.contexts if current_protection.required_status_checks else [],
+            strict=current_protection.required_status_checks.strict if current_protection.required_status_checks else False,
+            enforce_admins=True,
+            required_approving_review_count=1,
+            dismiss_stale_reviews=True,
+        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_topic(self, topic: str, after_cursor: str | None,
@@ -1024,7 +870,8 @@ class GithubService:
         self.github_client_core_api.get_organization(
             self.organisation_name).remove_from_membership(github_user)
 
-    def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str], inactivity_months: int) -> list[NamedUser.NamedUser]:
+    def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str],
+                           inactivity_months: int) -> list[NamedUser.NamedUser]:
         """
         Identifies and returns a list of inactive users from a specified GitHub team based on a given inactivity period.
 
@@ -1050,7 +897,8 @@ class GithubService:
             team_id, repositories_to_ignore)
         return self._identify_inactive_users(users, repositories, inactivity_months)
 
-    def _identify_inactive_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository], inactivity_months: int) -> list[NamedUser.NamedUser]:
+    def _identify_inactive_users(self, users: list[NamedUser.NamedUser], repositories: list[Repository],
+                                 inactivity_months: int) -> list[NamedUser.NamedUser]:
         users_to_remove = []
         for user in users:
             if self._is_user_inactive(user, repositories, inactivity_months):
@@ -1069,7 +917,8 @@ class GithubService:
         repositories = self.__get_repositories_from_team(team_id)
         return [repo for repo in repositories if repo.name.lower() not in repositories_to_ignore]
 
-    def _is_user_inactive(self, user: NamedUser.NamedUser, repositories: list[Repository], inactivity_months: int) -> bool:
+    def _is_user_inactive(self, user: NamedUser.NamedUser, repositories: list[Repository],
+                          inactivity_months: int) -> bool:
         cutoff_date = datetime.now() - timedelta(days=inactivity_months *
                                                  30)  # Roughly calculate the cutoff date
 
@@ -1122,7 +971,8 @@ class GithubService:
                     f"An exception occurred while removing user {user.login} from team {team_name}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def _get_paginated_organization_members_with_emails(self, after_cursor: str | None, page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
+    def _get_paginated_organization_members_with_emails(self, after_cursor: str | None,
+                                                        page_size: int = GITHUB_GQL_MAX_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
             f"Getting paginated organization members with emails. Page size {page_size}, after cursor {bool(after_cursor)}")
 
@@ -1175,7 +1025,8 @@ class GithubService:
                 member_data = response['organization']['membersWithRole']
 
                 for member in all_members:
-                    email = member['organizationVerifiedDomainEmails'][0] if member['organizationVerifiedDomainEmails'] else None
+                    email = member['organizationVerifiedDomainEmails'][0] if member[
+                        'organizationVerifiedDomainEmails'] else None
                     github_usernames.append({
                         "username": member["login"],
                         "email": email
@@ -1198,3 +1049,101 @@ class GithubService:
         licence = self.github_client_core_api.get_enterprise(
             self.enterprise_name).get_consumed_licenses()
         return licence.total_seats_purchased - licence.total_seats_consumed
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def update_team_repository_permission(self, team_name: str, repositories, permission: str):
+        org = self.github_client_core_api.get_organization(
+            self.organisation_name)
+
+        try:
+            team = org.get_team_by_slug(team_name)
+        except UnknownObjectException:
+            raise ValueError(
+                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'")
+
+        for repo_name in repositories:
+            try:
+                repo = org.get_repo(repo_name)
+            except UnknownObjectException:
+                raise ValueError(
+                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'")
+
+            logging.info(
+                f"Updating {team_name} team's permission to {permission} on {repo_name}")
+            team.set_repo_permission(repo, permission)
+
+    def flag_owner_permission_changes(self, since_date: str) -> list:
+        recent_changes = self.audit_log_member_changes(since_date)
+        list_of_changes_to_flag = []
+        for change in recent_changes:
+            match change["action"]:
+                case "org.add_member" if change["permission"] == "ADMIN":
+                    list_of_changes_to_flag.append(change)
+                case "org.update_member" if change["permission"] == "ADMIN" and change["permissionWas"] == "READ":
+                    list_of_changes_to_flag.append(change)
+                case _:
+                    logging.info(
+                        f"Change {change} does not meet criteria to flag")
+
+        return list_of_changes_to_flag
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def audit_log_member_changes(self, since_date: str) -> list:
+        logging.info(f"Getting audit log entries since {since_date}")
+        today = datetime.now()
+        query = """
+			query($organisation_name: String!, $since_date: String!, $cursor: String) {
+				organization(login: $organisation_name) {
+					auditLog(
+						first: 100
+						after: $cursor
+						query: $since_date
+					) {
+						edges{
+							node{
+								... on OrgAddMemberAuditEntry {
+									action
+									createdAt
+									actorLogin
+									operationType
+									permission
+									userLogin
+								}
+								... on OrgUpdateMemberAuditEntry {
+									action
+									createdAt
+									actorLogin
+									operationType
+									permission
+									permissionWas
+									userLogin
+								}
+							}
+						}
+						pageInfo {
+							endCursor
+							hasNextPage
+						}
+					}
+				}
+			}
+		"""
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "since_date": f"action:org.add_member  action:org.update_member  created:{since_date}..{today.strftime('%Y-%m-%d')}",
+            "cursor": None
+        }
+
+        all_entries = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            all_entries.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return all_entries

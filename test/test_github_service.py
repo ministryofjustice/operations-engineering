@@ -1,11 +1,12 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from unittest import TestCase
 from unittest.mock import MagicMock, Mock, call, patch
 
 from freezegun import freeze_time
-from github import Github, GithubException, RateLimitExceededException
+from github import (Github, GithubException, RateLimitExceededException,
+                    UnknownObjectException)
+from github.Branch import Branch
 from github.Commit import Commit
 from github.GitCommit import GitCommit
 from github.Issue import Issue
@@ -1292,124 +1293,6 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
-class TestGitHubServiceSetDefaulBranchProtection(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_default_branch_protection(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_default_branch_protection(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetEnforceAdmin(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_enforce_admins(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_enforce_admins(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetDimissStaleReviews(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_dismiss_stale_reviews(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_dismiss_stale_reviews(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceHasIssues(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_has_issues(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY),
-            call.get_repo().edit(has_issues=True)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_has_issues(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGitHubServiceSetRequiredReviews(unittest.TestCase):
-    def test_looks_up_repository_with_name(self, mock_github_client_core_api):
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_required_review_count(
-            repository_name="test_repository")
-
-        github_service.github_client_core_api.assert_has_calls([
-            call.get_repo(TEST_REPOSITORY),
-            call.get_repo().get_branch('main'),
-            call.get_repo().get_branch().edit_protection(required_approving_review_count=1)
-        ])
-
-    def test_does_not_look_up_repository_without_name(self, mock_github_client_core_api):
-        github_service = GithubService("", ORGANISATION_NAME)
-
-        github_service._set_required_review_count(
-            repository_name=None)
-
-        github_service.github_client_core_api.assert_not_called()
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
 class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
     def test_calls_downstream_services_when_no_issues_to_close(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1961,19 +1844,144 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestSetStandards(unittest.TestCase):
-    def test_set_standards(self):
+    def test_set_standards(self, mock_github_client_core_api: MagicMock):
+        mock_protection = Mock(required_status_checks=Mock(
+            contexts=["test"], strict=True))
+        mock_branch = Mock(Branch)
+        mock_branch.get_protection.return_value = mock_protection
+        mock_repo = MagicMock(Repository)
+        mock_repo.get_branch.return_value = mock_branch
+        mock_github_client_core_api.return_value.get_repo.return_value = mock_repo
+
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service._set_default_branch_protection = Mock()
-        github_service._set_enforce_admins = Mock()
-        github_service._set_required_review_count = Mock()
-        github_service._set_dismiss_stale_reviews = Mock()
-        github_service._set_has_issues = Mock()
         github_service.set_standards("test_repository")
-        github_service.github_client_core_api.get_repo.assert_has_calls(
-            [call(TEST_REPOSITORY)]
-        )
+
+        mock_branch.edit_protection.assert_called_with(contexts=["test"],
+                                                       strict=True,
+                                                       enforce_admins=True,
+                                                       required_approving_review_count=1,
+                                                       dismiss_stale_reviews=True, )
+
+    def test_set_standards_handles_null_required_checks(self, mock_github_client_core_api: MagicMock):
+        mock_protection = Mock(required_status_checks=None)
+        mock_branch = Mock(Branch)
+        mock_branch.get_protection.return_value = mock_protection
+        mock_repo = MagicMock(Repository)
+        mock_repo.get_branch.return_value = mock_branch
+        mock_github_client_core_api.return_value.get_repo.return_value = mock_repo
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.set_standards("test_repository")
+
+        mock_branch.edit_protection.assert_called_with(contexts=[],
+                                                       strict=False,
+                                                       enforce_admins=True,
+                                                       required_approving_review_count=1,
+                                                       dismiss_stale_reviews=True, )
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceUpdateTeamRepositoryPermission(unittest.TestCase):
+
+    def test_updates_team_repository_permission(self, mock_github_client_core_api):
+        mock_team = MagicMock()
+        mock_repo1 = MagicMock()
+        mock_repo2 = MagicMock()
+        mock_org = MagicMock()
+        mock_org.get_team_by_slug.return_value = mock_team
+        mock_org.get_repo.side_effect = [mock_repo1, mock_repo2]
+        mock_github_client_core_api.return_value.get_organization.return_value = mock_org
+
+        repositories = ["repo1", "repo2"]
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.update_team_repository_permission(
+            "dev-team", repositories, "write")
+
+        mock_github_client_core_api.return_value.get_organization.assert_called_once_with(
+            ORGANISATION_NAME)
+        mock_org.get_team_by_slug.assert_called_once_with("dev-team")
+        mock_org.get_repo.assert_has_calls([call("repo1"), call("repo2")])
+        mock_team.set_repo_permission.assert_has_calls(
+            [call(mock_repo1, "write"), call(mock_repo2, "write")])
+
+    def test_raises_error_for_nonexistent_team(self, mock_github_client_core_api):
+        mock_org = MagicMock()
+        mock_org.get_team_by_slug.side_effect = UnknownObjectException(
+            404, "Team not found")
+        mock_github_client_core_api.return_value.get_organization.return_value = mock_org
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        with self.assertRaises(ValueError):
+            github_service.update_team_repository_permission(
+                "unknown-team", ["repo1"], "write")
+
+    def test_raises_error_for_nonexistent_repository(self, mock_github_client_core_api):
+        mock_team = MagicMock()
+        mock_org = MagicMock()
+        mock_org.get_team_by_slug.return_value = mock_team
+        mock_org.get_repo.side_effect = UnknownObjectException(
+            404, "Repository not found")
+        mock_github_client_core_api.return_value.get_organization.return_value = mock_org
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        with self.assertRaises(ValueError):
+            github_service.update_team_repository_permission(
+                "dev-team", ["unknown-repo"], "write")
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("services.github_service.Github")
+class TestNewOwnerDetected(unittest.TestCase):
+
+    def test_flag_owner_permission_changes(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_audit_log = [
+            {'action': 'org.add_member', 'createdAt': '2023-12-06T10:32:07.832Z', 'actorLogin': 'testAdmin',
+             'operationType': 'CREATE', 'permission': 'READ', 'userLogin': 'testUser'},
+            {'action': 'org.add_member', 'createdAt': '2023-12-06T10:33:07.832Z', 'actorLogin': 'johnsmith',
+             'operationType': 'CREATE', 'permission': 'ADMIN', 'userLogin': 'janedoe'}
+        ]
+        github_service.audit_log_member_changes = Mock(
+            return_value=mock_audit_log)
+
+        result = github_service.flag_owner_permission_changes("2023-12-01")
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]['action'], 'org.add_member')
+        self.assertEqual(result[0]['permission'], 'ADMIN')
+        self.assertEqual(result[0]['userLogin'], 'janedoe')
+
+    def test_audit_log_member_changes(self, mock_github_client_gql):
+        github_service = GithubService("", ORGANISATION_NAME)
+        return_value = {
+            "organization": {
+                "auditLog": {
+                    "edges": [
+                        {"node": {"action": "org.add_member", "createdAt": "2023-12-06T10:32:07.832Z",
+                                  "actorLogin": "user1", "permission": "READ"}},
+                        {"node": {"action": "org.update_member", "createdAt": "2023-12-06T10:33:07.832Z",
+                                  "actorLogin": "user2", "permission": "ADMIN"}}
+                    ],
+                    "pageInfo": {
+                        "endCursor": None,
+                        "hasNextPage": False
+                    }
+                }
+            }
+        }
+
+        github_service.github_client_gql_api.execute.return_value = return_value
+
+        result = github_service.audit_log_member_changes("2023-12-01")
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['action'], 'org.add_member')
+        self.assertEqual(result[0]['permission'], 'READ')
 
 
 if __name__ == "__main__":
