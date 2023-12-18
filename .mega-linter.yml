@@ -31,4 +31,4 @@ VALIDATE_ALL_CODEBASE: false
 LOG_LEVEL: INFO
 MARKDOWN_MARKDOWN_LINK_CHECK_ARGUMENTS: "-q"
 PLUGINS:
-  - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck
+  - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml
