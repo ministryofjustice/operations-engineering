@@ -1,0 +1,18 @@
+# This GitHub Action derives the repos that operations-engineering are responisible for
+name: Get operations engineering repositories
+
+on:
+  workflow_dispatch:
+
+jobs:
+  report-repo-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m bin.get_repo_metadata
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}

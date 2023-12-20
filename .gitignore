@@ -11,6 +11,7 @@ coverage.xml
 .tox*
 htmlcov
 *__pycache__*
+.DS_Store
 
 ministryofjustice_first_email_list.json
 moj-analytical-services_first_email_list.json
