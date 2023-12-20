@@ -1,0 +1,34 @@
+---
+# Configuration file for MegaLinter
+# See all available variables at https://megalinter.io/latest/config-file/ and in linters documentation
+
+APPLY_FIXES: all # all, none, or list of linter keys
+ENABLE_LINTERS:
+  - ACTION_ACTIONLINT
+  - BASH_SHELLCHECK
+  - MARKDOWN_MARKDOWNLINT
+  - MAKEFILE_CHECKMAKE
+  - DOCKERFILE_HADOLINT
+  - REPOSITORY_TRIVY
+  - REPOSITORY_GITLEAKS
+  - YAML_PRETTIER
+  - YAML_YAMLLINT
+  - JSON_PRETTIER
+  - PYTHON_PYLINT
+  - PYTHON_FLAKE8
+  - PYTHON_BLACK
+  - PYTHON_ISORT
+
+DISABLE_ERRORS: false
+SPELL_CSPELL_DISABLE_ERRORS: true
+MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
+SHOW_ELAPSED_TIME: true
+FILEIO_REPORTER: false
+PARALLEL: true
+GITHUB_STATUS_REPORTER: true
+GITHUB_COMMENT_REPORTER: true
+VALIDATE_ALL_CODEBASE: false
+LOG_LEVEL: INFO
+MARKDOWN_MARKDOWN_LINK_CHECK_ARGUMENTS: "-q"
+PLUGINS:
+  - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml
