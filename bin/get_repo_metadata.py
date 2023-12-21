@@ -44,20 +44,6 @@ def main():
     df["n_topics"] = df["topic_list"].apply(lambda x: len(x))
     df.to_csv("temp-data/repo_names_and_topics.csv", index=False)
 
-    # Get text of just topics and count frequency
-    topics = [[t for t in r[1]] for r in github_repos_and_topics if r[1]]
-    topics = [t for ts in topics for t in ts]
-    topics_count_dict = Counter(topics)
-
-    # Create and generate a word cloud image:
-    wordcloud = WordCloud(width=1600, height=800, collocations=False).generate_from_frequencies(topics_count_dict)
-    plt.figure( figsize=(20,10) )
-    plt.imshow(wordcloud)
-    plt.axis("off")
-    plt.tight_layout(pad=0)
-    # plt.savefig("output/ministryofjustice_topics_wordcloud.png")
-    plt.show()
-
     # Print out all repos with operations-engineering topic or prefix
     opseng_prefixed_repos = df[df.repository_name.str.contains(r"^operations-engineering*")]["repository_name"].to_list()
     df = df.explode("topic_list").reset_index(drop=True).dropna()
