@@ -1,8 +1,8 @@
-# This GitHub Action derives the repos that operations-engineering are responisible for
+# This GitHub Action performs some repository metadata analysis
 name: Get operations engineering repositories
 
 on:
-  workflow_dispatch:
+  - pull_request
 
 jobs:
   report-repo-metadata:
