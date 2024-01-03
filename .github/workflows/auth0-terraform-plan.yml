@@ -1,10 +1,10 @@
-name: "Terraform Plan"
+name: "Auth0 Terraform Plan"
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - "**.tf"
+      - "terraform/auth0/**.tf"
     branches:
       - main
 
@@ -13,7 +13,7 @@ env:
 
 jobs:
   terraform:
-    name: "Terraform Plan"
+    name: "Auth0 Terraform Plan"
     strategy:
       matrix:
         path:
@@ -31,7 +31,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.ECR_ROLE_TO_ASSUME }}
+          role-to-assume: ${{ secrets.TERRAFORM_AUTH0_S3_ROLE_ARN_DEV}}
           aws-region: eu-west-2
 
     - name: Terraform fmt
