@@ -5,6 +5,10 @@ from requests import Response
 
 
 class SentryClient:
+    # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444
+    def __new__(cls, *_, **__):
+        return super(SentryClient, cls).__new__(cls)
+
     def __init__(self, base_url: str, token: str) -> None:
         self.__base_url = base_url
         self.__request_headers = {"Authorization": f"Bearer {token}"}
