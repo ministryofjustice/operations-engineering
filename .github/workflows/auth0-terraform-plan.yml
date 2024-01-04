@@ -14,15 +14,18 @@ env:
 jobs:
   terraform:
     name: "Auth0 Terraform Plan"
-    strategy:
-      matrix:
-        path:
-          - "auth0/operations-engineering-test"
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
       id-token: write
+    strategy:
+      matrix:
+        path:
+          - "operations-engineering-test"
+    defaults:
+      run:
+        working-directory: "terraform/auth0/${{ matrix.path }}"
     steps:
     - uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
@@ -37,18 +40,15 @@ jobs:
 
     - name: Terraform fmt
       id: fmt
-      working-directory: terraform/${{ matrix.path }}
       run: terraform fmt -check -diff -recursive ./terraform
       continue-on-error: true
 
     - name: Terraform Init
       id: init
-      working-directory: terraform/${{ matrix.path }}
       run: terraform init -input=false -no-color
 
     - name: Terraform Validate
       id: validate
-      working-directory: terraform/${{ matrix.path }}
       run: terraform validate -input=false -no-color
 
     # When I get secrets manager working in github actions, we can uncomment the below.
