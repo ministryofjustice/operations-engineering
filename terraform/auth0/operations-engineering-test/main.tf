@@ -1,7 +1,10 @@
 terraform {
   backend "s3" {
-    bucket = "cloud-platform-7a8908cb6aea78a104f6ff554c4db90b"
-    region = "eu-west-2"
+    acl     = "private"
+    bucket  = "cloud-platform-7a8908cb6aea78a104f6ff554c4db90b"
+    encrypt = true
+    key     = "terraform/auth0/operations-engineering-test/terraform.tfstate"
+    region  = "eu-west-2"
   }
   required_providers {
     aws = {
