@@ -56,7 +56,6 @@ jobs:
 
     - name: Terraform Plan
       id: plan
-      working-directory: terraform/${{ matrix.path }}
       run: terraform plan -input=false -no-color
       continue-on-error: true
 
