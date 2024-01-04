@@ -1,30 +1,32 @@
-name: Close the move users to teams expired issues
+name: Alarm if a new GitHub owner is added
 
 on:
   schedule:
-    - cron: "0 12 1,8,15,22 * *"
+    # Runs once a week on Monday at 1200
+    - cron: "0 12 * * 1"
   workflow_dispatch:
 
+
 jobs:
-  close-move-users-to-teams-expired-issues:
+  check-for-new-github-owners:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.close_move_users_to_teams_expired_issues
+      - run: python3 -m bin.check_for_new_github_owners
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
-          CONFIG_FILE: "config/empty-config.yml"
-          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN}}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
         with:
           status: ${{ job.status }}
           notify_when: "failure"
-          notification_title: "Failed GitHub Action Run"
+          notification_title: "Failed to check for new GitHub owners"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
