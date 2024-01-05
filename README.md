@@ -27,6 +27,34 @@ These are just a few examples of the useful tools and features available in this
 3. **Install Dependencies:** `pip install -r python/requirements.txt`
 4. **Run a script:** `python -m bin.dormant_users # for example`
 
+## Naming Standards For Workflow Files
+
+To aide navigation, findability, standardisation and deprecation our of workflows - we have opted to follow a simple naming convetion for the different types of workflows that are contained within the repository.
+
+For this, we use a prefix in the workflow filename - to ensure similar workflows are next to each other in most local development environments and an emoji in the workflow name - to ensure it's easily findable in the GitHub Actions UI.
+
+Please ensure any new workflow files in prefixed with one of the below standards.
+
+#### `cicd-`
+
+For any workflow that is purely related to Continious Integreation and Continuios Deployment i.e. checks on PRs, deploying to environments etc.
+
+Prefix the workflow name with: ♻️
+
+#### `job-`
+
+For any workflow that relates to executing code that should be run periodically (whether automated or manual). This mainly relates to business processes that are automated to some degree.
+
+If the job is completely automated (i.e. runs on a defined schedule), prefix the workflow name with: 🤖
+
+If the job needs to be triggered manually, prefix the workflow name with: 🧑‍🔧
+
+#### `experiment-`
+
+For any workflow this is currently under testing, potentially for a proof-of-concept and isn't essential to any current process.
+
+Prefix the workflow name with: 🧪
+
 ## Support
 
 If you have any questions or need help with this repository, don't hesitate to contact us on the #ask-operations-engineering slack channel.
