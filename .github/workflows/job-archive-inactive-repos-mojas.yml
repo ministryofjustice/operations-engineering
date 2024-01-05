@@ -1,28 +1,30 @@
-name: Configure standards for repos
+name: 🤖 Archive Inactive Repos (MoJAS)
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "0 7 * * *" # Every day at 0700
-  workflow_dispatch: # So we can trigger manually
+    - cron: "0 12 * * 1-5"
 
 jobs:
-  configure-standards:
+  archive-repos:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.configure_standards
+      - run: pip install -r requirements.txt
+      - run: python -m bin.archive_repositories
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          GITHUB_ORGANIZATION_NAME: moj-analytical-services
+          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
         with:
           status: ${{ job.status }}
           notify_when: "failure"
-          notification_title: "Failed to report on unowned_repositories"
+          notification_title: "Failed GitHub Action Run"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

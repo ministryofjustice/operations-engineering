@@ -1,11 +1,12 @@
-name: Add org members to team
+name: 🤖 Apply Standards to Repos
+
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 8,10,12,14,16 * * 1-5"
+    - cron: "0 7 * * *" # Every day at 0700
+  workflow_dispatch: # So we can trigger manually
 
 jobs:
-  run-script:
+  configure-standards:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,17 +14,15 @@ jobs:
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.add_users_all_org_members_github_team
+      - run: python3 -m bin.configure_standards
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
-          GITHUB_ORGANIZATION_NAME: ministryofjustice
-          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
         with:
           status: ${{ job.status }}
           notify_when: "failure"
-          notification_title: "Failed GitHub Action Run"
+          notification_title: "Failed to report on unowned_repositories"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

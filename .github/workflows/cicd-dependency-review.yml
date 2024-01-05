@@ -1,6 +1,6 @@
 # Need a GitHub Advanced Security license to run this action on private repos.
 
-name: Dependency Review
+name: ♻️ Dependency Review
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]

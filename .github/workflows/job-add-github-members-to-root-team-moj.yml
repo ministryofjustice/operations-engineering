@@ -1,21 +1,22 @@
-name: Sentry projects rate limiting
-
+name: 🤖 Add GitHub Members to Root Team (MoJ)
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 8,10,12,14,16 * * 1-5"
 
 jobs:
-  sentry-check:
+  run-script:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
-      - run: pip install -r requirements.txt
-      - run: python -m bin.sentry_projects_rate_limiting
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m bin.add_users_all_org_members_github_team
         env:
-          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          GITHUB_ORGANIZATION_NAME: ministryofjustice
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()

@@ -1,4 +1,4 @@
-name: Sentry Usage Alert
+name: 🤖 Alert if Sentry Usage Over Threshold
 
 on:
   schedule:

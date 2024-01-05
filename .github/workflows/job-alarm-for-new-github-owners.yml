@@ -1,12 +1,14 @@
-name: Generate GitHub Standards Report
+name: 🤖 Alarm if a New GitHub Owner is Added
 
 on:
   schedule:
-    - cron: "0 4 * * *"
+    # Runs once a week on Monday at 1200
+    - cron: "0 12 * * 1"
   workflow_dispatch:
 
+
 jobs:
-  generate-github-standards-report:
+  check-for-new-github-owners:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -14,13 +16,17 @@ jobs:
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.report_on_repository_standards --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }} --api-key ${{ secrets.REPORTS_API_KEY }} --url https://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk --endpoint /api/v2/update-github-reports
+      - run: python3 -m bin.check_for_new_github_owners
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN}}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
         with:
           status: ${{ job.status }}
           notify_when: "failure"
-          notification_title: "Failed to generate GitHub Standards Report"
+          notification_title: "Failed to check for new GitHub owners"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

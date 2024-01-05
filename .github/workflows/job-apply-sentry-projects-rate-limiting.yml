@@ -1,23 +1,21 @@
-name: MoJ Analytical Services - Archive repo if over a certain date
+name: 🤖 Apply Rate Limiting to Sentry Projects
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 12 * * 1-5"
 
 jobs:
-  archive-repos:
+  sentry-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
       - run: pip install -r requirements.txt
-      - run: python -m bin.archive_repositories
+      - run: python -m bin.sentry_projects_rate_limiting
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
-          GITHUB_ORGANIZATION_NAME: moj-analytical-services
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
       - name: Report failure to Slack
         if: always()
