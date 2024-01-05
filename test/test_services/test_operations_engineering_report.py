@@ -64,7 +64,7 @@ class TestOperationsEngineeringReportsService(unittest.TestCase):
                      {'report_id': 2, 'data': 'report data 2'}]
 
         # Call the method being tested, and expect an Exception to be raised
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError):
             service.override_repository_standards_reports(test_data)
 
         # Assertions

@@ -1,5 +1,5 @@
-from services.github_service import GithubService
 import os
+from services.github_service import GithubService
 
 
 def get_environment_variables() -> str:

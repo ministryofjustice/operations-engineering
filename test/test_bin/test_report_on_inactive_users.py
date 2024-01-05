@@ -3,8 +3,6 @@ import unittest
 from unittest.mock import Mock, patch, MagicMock
 
 import bin.report_on_inactive_users as report_test
-from services.github_service import GithubService
-from services.slack_service import SlackService
 
 
 class TestReportOnInactiveUsers(unittest.TestCase):
