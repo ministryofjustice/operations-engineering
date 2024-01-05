@@ -1,0 +1,11 @@
+---
+
+yaml-files:
+  - '*.yaml'
+  - '*.yml'
+  - '.yamllint'
+
+rules:
+  document-end: disable
+  document-start: disable
+  truthy: disable
