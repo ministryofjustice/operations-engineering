@@ -1,4 +1,4 @@
-name: Stale Pull Request Check
+name: 🤖 Alarm if Stale Pull Request Exist
 
 on:
   schedule:

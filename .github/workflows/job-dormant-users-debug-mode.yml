@@ -1,4 +1,4 @@
-name: Dormant Users debug mode
+name: 🧑‍🔧 Dormant Users Debug Mode
 
 on:
   workflow_dispatch:

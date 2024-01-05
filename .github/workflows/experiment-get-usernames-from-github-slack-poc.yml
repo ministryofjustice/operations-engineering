@@ -1,4 +1,4 @@
-name: Get Slack and GitHub Usernames
+name: 🧪 Get Slack and GitHub Usernames
 
 on:
   workflow_dispatch:
