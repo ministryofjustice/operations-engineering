@@ -1,4 +1,4 @@
-name: "Auth0 Terraform Plan"
+name: "🤖 Terraform Plan Auth0"
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ env:
 
 jobs:
   terraform:
-    name: "Auth0 Terraform Plan"
+    name: "Terraform Plan Auth0"
     runs-on: ubuntu-latest
     permissions:
       contents: read
