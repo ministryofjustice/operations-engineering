@@ -1,11 +1,11 @@
-name: Delete dormant Auth0 users
+name: 🤖 Delete Inactive Auth0 Users
 on:
   workflow_dispatch:
   schedule:
     - cron: 0 0 * * MON
 
 jobs:
-  delete-dormant-auth0-users:
+  delete-inactive-auth0-users:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

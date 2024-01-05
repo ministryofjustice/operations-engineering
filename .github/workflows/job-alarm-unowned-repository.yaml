@@ -1,4 +1,4 @@
-name: Report any repository identified as "unowned"
+name: 🤖 Alarm Unowned Repositories
 
 on:
   schedule:

@@ -1,4 +1,4 @@
-name: Check for GitHub Anomalies
+name: 🧪 Check for GitHub Anomalies
 
 on:
   workflow_dispatch:

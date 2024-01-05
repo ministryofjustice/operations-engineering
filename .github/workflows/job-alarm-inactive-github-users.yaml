@@ -1,6 +1,6 @@
 # This GitHub Action utilises the script to review and remove GitHub users from teams defined in TOML file: ../../config/inactive-users.toml
 # Please see here for more infomation: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/github/self-managed-github-teams.html
-name: Review GitHub users older than n months from select teams
+name: 🤖 Alarm if GitHub Inactive Users in Select Teams
 
 on:
   schedule:

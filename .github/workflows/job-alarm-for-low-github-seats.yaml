@@ -1,4 +1,4 @@
-name: Alarm if the number of GitHub seats is low
+name: 🤖 Alarm if The Number of GitHub Seats is Low
 
 on:
   schedule:

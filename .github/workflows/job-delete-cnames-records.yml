@@ -1,4 +1,4 @@
-name: Delete AWS Route53 CNAME records
+name: 🤖 Delete AWS Route53 CNAME records
 
 on:
   workflow_dispatch:

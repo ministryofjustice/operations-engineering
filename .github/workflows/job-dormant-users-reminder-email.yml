@@ -1,4 +1,4 @@
-name: Dormant Users reminder email
+name: 🧑‍🔧 Dormant Users Reminder Email
 
 on:
   workflow_dispatch:
