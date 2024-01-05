@@ -5,7 +5,7 @@ from services.github_service import GithubService
 
 
 def read_repository_list(file_path):
-    with open(file_path, 'r') as file:
+    with open(file=file_path, mode='r', encoding='utf-8') as file:
         return json.load(file)
 
 

@@ -1,0 +1,41 @@
+name: 🤖 Alert if Sentry Usage Over Threshold
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      period_in_days:
+        description: 'Period in days'
+        required: false
+        type: string
+      usage_threshold:
+        description: 'Usage threshold (%)'
+        required: false
+        type: string
+
+jobs:
+  sentry-usage-alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python -m bin.sentry_usage_alert
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+          SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          PERIOD_IN_DAYS: ${{ inputs.period_in_days }}
+          USAGE_THRESHOLD: ${{ inputs.usage_threshold }}
+          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run: Sentry Usage Alert"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

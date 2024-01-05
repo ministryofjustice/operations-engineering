@@ -1,6 +1,5 @@
 import argparse
 
-import logging
 from services.github_service import GithubService
 from services.operations_engineering_reports import \
     OperationsEngineeringReportsService as reports_service
