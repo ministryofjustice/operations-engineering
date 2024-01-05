@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from unittest.mock import patch
 import requests
 from services.notify_service import NotifyService
-from test.test_config import test_config
+from test.files.test_config import test_config
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 # pylint: disable=W0212

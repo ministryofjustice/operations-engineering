@@ -46,7 +46,7 @@ jobs:
         with:
           role-to-assume: ${{secrets.AWS_ID_DORMANT_USERS}}
           aws-region: eu-west-2
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r requirements.txt
