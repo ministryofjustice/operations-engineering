@@ -391,6 +391,15 @@ class GithubService:
                                 url
                                 description
                                 hasIssuesEnabled
+                                repositoryTopics(first: 10) {
+                                    edges {
+                                        node {
+                                            topic {
+                                                name
+                                            }
+                                        }
+                                    }
+                                }
                                 defaultBranchRef {
                                     name
                                 }
