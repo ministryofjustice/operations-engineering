@@ -59,14 +59,14 @@ jobs:
       run: terraform plan -input=false -no-color
       continue-on-error: true
 
-    # - name: Post Plan to GitHub PR
-    #   uses: mshick/add-pr-comment@v1
-    #   with:
-    #     allow-repeats: true
-    #     repo-token: ${{ secrets.GITHUB_TOKEN }}
-    #     repo-token-user-login: 'github-actions[bot]'
-    #     message: |
-    #       ## ${{ matrix.path }} plan
-    #       ```
-    #       ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
-    #       ```
+    - name: Post Plan to GitHub PR
+      uses: mshick/add-pr-comment@v1
+      with:
+        allow-repeats: true
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          ## ${{ matrix.path }} plan
+          ```
+          ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+          ```
