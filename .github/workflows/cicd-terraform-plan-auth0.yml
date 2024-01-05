@@ -1,4 +1,4 @@
-name: "🤖 Terraform Plan Auth0"
+name: "♻️ Terraform Plan Auth0"
 
 on:
   workflow_dispatch:
