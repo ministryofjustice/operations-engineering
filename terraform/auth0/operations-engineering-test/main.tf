@@ -20,7 +20,7 @@ terraform {
 }
 
 provider "auth0" {
-  domain        = var.auth0_domain.secret_string
-  client_id     = var.auth0_client_id.secret_string
-  client_secret = var.auth0_client_secret.secret_string
+  domain        = var.auth0_domain
+  client_id     = var.auth0_client_id
+  client_secret = var.auth0_client_secret
 }
