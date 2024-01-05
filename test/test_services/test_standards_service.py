@@ -98,7 +98,7 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
             "name": "repo_name",
             "pushedAt": "2022-01-01",
             "url": "https://github.com",
-            "repositoryTopics": {
+            "repositoryTopics": { # Non-empty topic raw format
                 "edges": [
                     {'node': {'topic': {'name': 'topic-1'}}},
                     {'node': {'topic': {'name': 'topic-2'}}}
@@ -188,12 +188,7 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
             "name": "repo_name",
             "pushedAt": "2022-01-01",
             "url": "https://github.com",
-            "repositoryTopics": {
-                "edges": [
-                    {'node': {'topic': {'name': 'topic-1'}}},
-                    {'node': {'topic': {'name': 'topic-2'}}}
-                ]
-            }            
+            "repositoryTopics": {"edges": []} # Empty topic raw format
         }
         repository_report = RepositoryReport(empty_data_set)
         to_json = json.loads(repository_report.output)
