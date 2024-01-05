@@ -61,6 +61,7 @@ def main():
     repos = GithubService(
         args.oauth_token, args.org).fetch_all_repositories_in_org()
     repo_reports = [RepositoryReport(repo).output for repo in repos]
+
     reports_service(args.url, args.endpoint, args.api_key). \
         override_repository_standards_reports(repo_reports)
 
