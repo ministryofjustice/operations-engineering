@@ -1,8 +1,6 @@
-from config.logging_config import logging
-
-from gql import gql
 import sys
-
+from gql import gql
+from config.logging_config import logging
 from services.github_service import GithubService
 
 
@@ -84,7 +82,7 @@ def fetch_repository_data(repository_name, github_service: GithubService) -> tup
     return collaborators_list, is_repository_locked
 
 
-class repository:
+class Repository:
     """A struct to store repository info ie name, collaborators, locked status"""
 
     name: str
@@ -123,7 +121,7 @@ def fetch_repositories(github_service: GithubService) -> list:
             repository_name, github_service
         )
         repositories_list.append(
-            repository(repository_name, collaborators_list,
+            Repository(repository_name, collaborators_list,
                        is_repository_locked)
         )
 
