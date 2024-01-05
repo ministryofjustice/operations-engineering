@@ -29,19 +29,19 @@ These are just a few examples of the useful tools and features available in this
 
 ## Naming Standards For Workflow Files
 
-To aide navigation, findability, standardisation and deprecation our of workflows - we have opted to follow a simple naming convetion for the different types of workflows that are contained within the repository.
+To aide navigation, standardisation and deprecation our of workflows - we have opted to follow a simple naming convention for the different types of workflows that are contained within the repository.
 
 For this, we use a prefix in the workflow filename - to ensure similar workflows are next to each other in most local development environments and an emoji in the workflow name - to ensure it's easily findable in the GitHub Actions UI.
 
 Please ensure any new workflow files in prefixed with one of the below standards.
 
-#### `cicd-`
+### `cicd-`
 
-For any workflow that is purely related to Continious Integreation and Continuios Deployment i.e. checks on PRs, deploying to environments etc.
+For any workflow that is purely related to Continuous Integration and Continuos Deployment i.e. checks on PRs, deploying to environments etc.
 
 Prefix the workflow name with: ♻️
 
-#### `job-`
+### `job-`
 
 For any workflow that relates to executing code that should be run periodically (whether automated or manual). This mainly relates to business processes that are automated to some degree.
 
