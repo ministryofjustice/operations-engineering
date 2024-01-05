@@ -5,3 +5,5 @@ MISSING_EMAIL_ADDRESS = "-"
 NO_ACTIVITY = "no activity"
 RESPONSE_OKAY = 200
 RESPONSE_NO_CONTENT = 204
+ENTERPRISE = "ministry-of-justice-uk"
+SLACK_CHANNEL = "operations-engineering-alerts"

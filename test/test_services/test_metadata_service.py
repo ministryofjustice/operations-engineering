@@ -63,6 +63,7 @@ class TestMetadataService(unittest.TestCase):
         mock_post.assert_called_once_with(
             f"{self.api_url}/user/add",
             json={"users": usernames_to_add},
+            timeout=60
         )
 
     def test_add_new_usernames_api_error(self, mock_post):

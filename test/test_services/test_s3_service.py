@@ -8,8 +8,6 @@ from freezegun import freeze_time
 from services.s3_service import S3Service
 from config.constants import NO_ACTIVITY
 
-# pylint: disable=W0212, W0221, R6301, W0612
-
 
 class TestS3Service(unittest.TestCase):
     @patch("services.s3_service.boto3")

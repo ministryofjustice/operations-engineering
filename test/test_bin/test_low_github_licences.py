@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from bin.alert_on_low_github_licences import low_theshold_triggered_message, alert_on_low_github_licences
+from bin.alert_on_low_github_licences import low_threshold_triggered_message, alert_on_low_github_licences
 
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -15,14 +15,14 @@ class TestGithubLicenseAlerting(unittest.TestCase):
         expected_message = (
             "Hi team 👋, \n\n"
             "There are only 5     GitHub licences remaining in the enterprise account. \n\n"
-            f"Please add more licences using the instructions outlined here: \n"
-            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html \n\n"
+            "Please add more licences using the instructions outlined here: \n"
+            "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html \n\n"
 
-            f"Thanks, \n\n"
+            "Thanks, \n\n"
 
             "The GitHub Licence Alerting Bot"
         )
-        self.assertEqual(low_theshold_triggered_message(
+        self.assertEqual(low_threshold_triggered_message(
             remaining_licences), expected_message)
 
     @patch.object(GithubService, "__new__")

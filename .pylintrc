@@ -416,6 +416,7 @@ disable=raw-checker-failed,
         useless-suppression,
         deprecated-pragma,
         use-symbolic-message-instead,
+        missing-class-docstring,
         missing-module-docstring,
         missing-function-docstring,
         line-too-long

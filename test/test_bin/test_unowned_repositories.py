@@ -1,8 +1,5 @@
 import unittest
-import bin.dormant_users
 from unittest.mock import patch, MagicMock
-from services.slack_service import SlackService
-
 from bin.unowned_repositories import (
     main,
     get_cli_arguments,

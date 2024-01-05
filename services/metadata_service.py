@@ -1,5 +1,5 @@
-import requests
 import logging
+import requests
 
 
 class MetadataService:
@@ -21,13 +21,13 @@ class MetadataService:
 
     def get_existing_slack_users(self):
         response = requests.get(
-            f"{self.api_url}/slack_users", headers={"Authorization": f"Bearer {self.api_token}"})
+            f"{self.api_url}/slack_users", headers={"Authorization": f"Bearer {self.api_token}"}, timeout=60)
         if response.status_code == 200:
             return response.json()
-        else:
-            logging.error(
-                "Error fetching existing Slack usernames: %s", response.content)
-            return []
+
+        logging.error(
+            "Error fetching existing Slack usernames: %s", response.content)
+        return []
 
     def filter_usernames(self, username_list: list[dict], accepted_username_list: list[dict]):
         """Filter out all usernames deemed not acceptable.
@@ -91,6 +91,7 @@ class MetadataService:
         response = requests.post(
             f"{self.api_url}/user/add",
             json=payload,
+            timeout=60
         )
 
         if response.status_code == 200 or response.status_code == 201:

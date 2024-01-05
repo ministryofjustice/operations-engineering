@@ -3,17 +3,18 @@ GitHub License Monitoring Script
 
 Purpose:
 --------
-This script monitors the number of available licenses in a GitHub Enterprise account. 
-It is designed to provide alerts when the license count falls below a 
-specified threshold. 
+This script monitors the number of available licenses in a GitHub Enterprise account.
+It is designed to provide alerts when the license count falls below a
+specified threshold.
 """
 
 import os
+from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
 
-def low_theshold_triggered_message(remaining_licences):
+def low_threshold_triggered_message(remaining_licences):
     msg = (
         f"Hi team 👋, \n\n"
         f"There are only {remaining_licences} \
@@ -39,21 +40,17 @@ def alert_on_low_github_licences(threshold=10):
         print("No SLACK_TOKEN environment variable set")
         exit(1)
 
-    ORGANISATION = "ministryofjustice"
-    ENTERPRISE = "ministry-of-justice-uk"
-    SLACK_CHANNEL = "operations-engineering-alerts"
-
-    remaining_licences = GithubService(github_token, ORGANISATION, ENTERPRISE). \
-        get_remaining_licences()
+    remaining_licences = GithubService(
+        github_token, MINISTRY_OF_JUSTICE, ENTERPRISE).get_remaining_licences()
     trigger_alert = remaining_licences < threshold
 
     if trigger_alert:
-        print("Low number of GitHub licences remaining, only %d remaining"
-              % remaining_licences)
+        print(
+            f"Low number of GitHub licences remaining, only {remaining_licences} remaining")
 
         SlackService(slack_token). \
             send_message_to_plaintext_channel_name(
-                low_theshold_triggered_message(remaining_licences), SLACK_CHANNEL)
+                low_threshold_triggered_message(remaining_licences), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
