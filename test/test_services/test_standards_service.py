@@ -30,7 +30,13 @@ class TestCompliantRepositoryReport(unittest.TestCase):
             "licenseInfo": "MIT",
             "name": "repo_name",
             "pushedAt": "2022-01-01",
-            "url": "https://github.com"
+            "url": "https://github.com",
+            "repositoryTopics": {
+                "edges": [
+                    {'node': {'topic': {'name': 'topic-1'}}},
+                    {'node': {'topic': {'name': 'topic-2'}}}
+                ]
+            }
         }
 
         self.repository_report = RepositoryReport(self.repository_data)
@@ -54,7 +60,7 @@ class TestCompliantRepositoryReport(unittest.TestCase):
         self.assertEqual(self.to_json['status'], True)
 
     def test_report_output_keys(self):
-        self.assertEqual(len(self.to_json.keys()), 8)
+        self.assertEqual(len(self.to_json.keys()), 9)
 
     def test_compliance_report(self):
         self.assertEqual(self.to_json['report']
@@ -91,7 +97,13 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
             "licenseInfo": None,
             "name": "repo_name",
             "pushedAt": "2022-01-01",
-            "url": "https://github.com"
+            "url": "https://github.com",
+            "repositoryTopics": { # Non-empty topic raw format
+                "edges": [
+                    {'node': {'topic': {'name': 'topic-1'}}},
+                    {'node': {'topic': {'name': 'topic-2'}}}
+                ]
+            }            
         }
 
         self.repository_report = RepositoryReport(self.repository_data)
@@ -101,7 +113,7 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
         self.assertEqual(self.to_json['status'], False)
 
     def test_bad_data_report_output_keys(self):
-        self.assertEqual(len(self.to_json.keys()), 8)
+        self.assertEqual(len(self.to_json.keys()), 9)
 
     def test_bad_data_compliance_report(self):
         self.assertEqual(self.to_json['report']
@@ -175,7 +187,8 @@ class TestNonCompliantRepositoryReport(unittest.TestCase):
             "licenseInfo": None,
             "name": "repo_name",
             "pushedAt": "2022-01-01",
-            "url": "https://github.com"
+            "url": "https://github.com",
+            "repositoryTopics": {"edges": []} # Empty topic raw format
         }
         repository_report = RepositoryReport(empty_data_set)
         to_json = json.loads(repository_report.output)
