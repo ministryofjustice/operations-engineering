@@ -19,6 +19,7 @@ class GitHubRepositoryStandardsReport:
     report: dict
     status: bool
     url: str
+    topics: list
 
     def to_json(self) -> str:
         """Convert the dataclass to a json object."""
@@ -51,7 +52,8 @@ class RepositoryReport:
             default_branch=self.__default_branch(),
             url=self.__url(),
             report=self.__compliance_report(),
-            infractions=self.__infractions
+            infractions=self.__infractions,
+            topics=self.__topics()
         )
 
     @property
@@ -161,3 +163,9 @@ class RepositoryReport:
         if self.gh_repository_data["description"] is not None:
             return True
         return False
+
+    def __topics(self) -> list:
+        if self.gh_repository_data["repositoryTopics"] is not None:
+            topics = [edge["node"]["topic"]["name"] for edge in self.gh_repository_data["repositoryTopics"]["edges"]]
+            return topics
+        return []
