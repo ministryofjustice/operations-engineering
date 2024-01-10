@@ -66,6 +66,7 @@ def main():
                 new_members_added_externally += individual_message
                 
         percentage = round((total_members_added_by_oe / len(new_members)) * 100)
+        print(f"Total members by OE = {total_members_added_by_oe}, Total members = {len(new_members)}")
         
         print(f"Percentage: {percentage}%")
 
