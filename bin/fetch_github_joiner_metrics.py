@@ -52,6 +52,7 @@ def main():
     new_members = github_service.check_for_audit_log_new_members(_calculate_date(time_delta_in_days))
     new_members_added_by_oe = ""
     new_members_added_externally = ""
+    total_members_added_by_oe = 0
     total_new_members = len(new_members)
 
 
