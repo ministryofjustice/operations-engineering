@@ -16,5 +16,7 @@ OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
     "AntonyBishop",
     "connormaglynn",
     "PepperMoJ",
-    "levgorbunov1"
+    "levgorbunov1",
+    "NickWalt01",
+    "ben-al"
 ]
