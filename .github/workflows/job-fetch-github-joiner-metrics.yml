@@ -15,5 +15,5 @@ jobs:
         - run: python3 -m bin.fetch_github_joiner_metrics
           env:
             ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
-            ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+            ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
             SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
