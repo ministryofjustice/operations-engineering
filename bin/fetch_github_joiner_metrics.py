@@ -27,8 +27,8 @@ def _calculate_date(in_last_days: int) -> str:
 def new_members_detected_message(new_members, org, audit_log_url, time_delta_in_days):
     msg = (
         f"Hi all, \n\n"
-        f"Here are the members added in the last '{time_delta_in_days}' within the '{org}' GitHub org. \n\n"
-        f"{new_members}\n"
+        f"Here are the members added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
+        f"{new_members}\n\n"
         f"Please review the audit log for more details: {audit_log_url}\n\n"
         f"Have a swell day, \n\n"
         "The GitHub Organisation Monitoring Bot"
@@ -45,18 +45,16 @@ def main():
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
     slack_service = SlackService(str(slack_token))
     new_members = github_service.check_for_audit_log_new_members(_calculate_date(time_delta_in_days))
-    message = []
+    full_member_list = ""
 
     if new_members:
         for member in new_members:
             print(f"New member detected: {member['userLogin']}")
-            individual_message = (
-                f"*New member:* {member['userLogin']} added by {member['actorLogin']}.\n"
-            )
-            message.append(individual_message)
+            individual_message = f"*New member:* {member['userLogin']} added by {member['actorLogin']}.\n"
+            full_member_list.append(individual_message)
 
         slack_service.send_message_to_plaintext_channel_name(
-            new_members_detected_message(message, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
+            new_members_detected_message(full_member_list, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
