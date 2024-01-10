@@ -24,14 +24,15 @@ def _calculate_date(in_last_days: int) -> str:
     timestamp_format = "%Y-%m-%d"
     return date.strftime(timestamp_format)
 
-def new_members_detected_message(new_members_added_by_oe, new_members_added_externally, org, audit_log_url, time_delta_in_days):
+def new_members_detected_message(new_members_added_by_oe, new_members_added_externally, percentage, org, audit_log_url, time_delta_in_days):
     msg = (
         f"Hi all, \n\n"
         f"Here are the new members added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
-        f"Added by us:\n"
+        f"*Added by Operations Engineering:*\n"
         f"{new_members_added_by_oe}\n\n"
-        f"Added externally:\n"
+        f"*Added externally:*\n"
         f"{new_members_added_externally}\n\n"
+        f"{percentage}% of the total additions were done by operations engineering.\n\n"
         f"Please review the audit log for more details: {audit_log_url}\n\n"
         f"Have a swell day, \n\n"
         "The GitHub Organisation Monitoring Bot"
@@ -47,20 +48,27 @@ def main():
 
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
     slack_service = SlackService(str(slack_token))
+    
+    total_members_added_by_oe = 0
     new_members = github_service.check_for_audit_log_new_members(_calculate_date(time_delta_in_days))
     new_members_added_by_oe = ""
     new_members_added_externally = ""
 
     if new_members:
         for member in new_members:
-            individual_message = f"*New member:* {member['userLogin']} added by {member['actorLogin']}.\n"
+            individual_message = f"{member['userLogin']} added by {member['actorLogin']}.\n"
             if member['actorLogin'] in OPERATIONS_ENGINEERING_GITHUB_USERNAMES:
                 new_members_added_by_oe += individual_message
+                total_members_added_by_oe += 1
             else:
                 new_members_added_externally += individual_message
+                
+        percentage = (round(total_members_added_by_oe / len(new_members)) * 100)
+        
+        print(f"Percentage: {percentage}%")
 
-        slack_service.send_message_to_plaintext_channel_name(
-            new_members_detected_message(new_members_added_by_oe, new_members_added_externally, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
+        # slack_service.send_message_to_plaintext_channel_name(
+        #     new_members_detected_message(new_members_added_by_oe, new_members_added_externally, percentage, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
