@@ -43,7 +43,7 @@ def new_members_detected_message(new_members_added_by_oe, new_members_added_exte
 def main():
     audit_log_url = f"https://github.com/organizations/{MINISTRY_OF_JUSTICE}/settings/audit-log?q=action%3Aorg.add_member"
 
-    time_delta_in_days = 7
+    time_delta_in_days = 365
     slack_token, github_token = get_environment_variables()
 
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
@@ -60,15 +60,15 @@ def main():
         for member in new_members:
             individual_message = f"{member['userLogin']} added by {member['actorLogin']}.\n"
             if member['actorLogin'] in OPERATIONS_ENGINEERING_GITHUB_USERNAMES:
-                new_members_added_by_oe += individual_message
+                # new_members_added_by_oe += individual_message
                 total_members_added_by_oe += 1
-            else:
-                new_members_added_externally += individual_message
+            # else:
+            #     new_members_added_externally += individual_message
                 
         percentage = round((total_members_added_by_oe / len(new_members)) * 100)
 
         slack_service.send_message_to_plaintext_channel_name(
-            new_members_detected_message(new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
+            new_members_detected_message("new members from ops eng", "new external members", percentage, total_new_members, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
