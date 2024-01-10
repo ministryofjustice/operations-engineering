@@ -51,7 +51,7 @@ def main():
         for member in new_members:
             print(f"New member detected: {member['userLogin']}")
             individual_message = f"*New member:* {member['userLogin']} added by {member['actorLogin']}.\n"
-            full_member_list.append(individual_message)
+            full_member_list += individual_message
 
         slack_service.send_message_to_plaintext_channel_name(
             new_members_detected_message(full_member_list, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
