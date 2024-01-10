@@ -24,24 +24,39 @@ def _calculate_date(in_last_days: int) -> str:
     timestamp_format = "%Y-%m-%d"
     return date.strftime(timestamp_format)
 
+def new_members_detected_message(new_members, org, audit_log_url, time_delta_in_days):
+    msg = (
+        f"Hi all, \n\n"
+        f"Here are the members added in the last '{time_delta_in_days}' within the '{org}' GitHub org. \n\n"
+        f"{new_members}\n"
+        f"Please review the audit log for more details: {audit_log_url}\n\n"
+        f"Have a swell day, \n\n"
+        "The GitHub Organisation Monitoring Bot"
+    )
+
+    return msg
 
 def main():
-    # audit_log_url = f"https://github.com/organizations/{MINISTRY_OF_JUSTICE}/settings/audit-log?q=action%3Aorg.add_member"
+    audit_log_url = f"https://github.com/organizations/{MINISTRY_OF_JUSTICE}/settings/audit-log?q=action%3Aorg.add_member"
 
     time_delta_in_days = 7
     slack_token, github_token = get_environment_variables()
 
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
-    slack = SlackService(str(slack_token))
+    slack_service = SlackService(str(slack_token))
     new_members = github_service.check_for_audit_log_new_members(_calculate_date(time_delta_in_days))
+    message = []
 
     if new_members:
         for member in new_members:
             print(f"New member detected: {member['userLogin']}")
-            # message = new_member_detected_message(
-            #     member["userLogin"], member["createdAt"], member["actorLogin"], MINISTRY_OF_JUSTICE, audit_log_url)
-            # slack.send_message_to_plaintext_channel_name(
-            #     message, SLACK_CHANNEL)
+            individual_message = (
+                f"*New member:* {member['userLogin']} added by {member['actorLogin']}.\n"
+            )
+            message.append(individual_message)
+
+        slack_service.send_message_to_plaintext_channel_name(
+            new_members_detected_message(message, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
