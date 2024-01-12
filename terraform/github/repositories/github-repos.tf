@@ -1,7 +1,6 @@
 module "repository" {
-  source  = "mineiros-io/repository/github"
-  version = "~> 0.18.0"
+  source  = "https://github.com/ministryofjustice/data-platform/tree/main/terraform/github/modules/repository"
 
-  name               = "test-repo-levg"
-  license_template   = "mit"
+  name = "test-repo-levg"
+  description = "This repo was created using terraform by the operations engineering team"
 }
