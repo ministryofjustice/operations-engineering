@@ -62,7 +62,6 @@ jobs:
       continue-on-error: true
 
     - name: Post Plan to GitHub PR
-      if: github.ref != 'refs/heads/main'
       uses: mshick/add-pr-comment@v1
       with:
         allow-repeats: true
