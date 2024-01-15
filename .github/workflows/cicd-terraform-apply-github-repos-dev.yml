@@ -1,0 +1,62 @@
+name: "♻️ Terraform Apply Github Repos"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "terraform/github/**"
+    branches: [ "main" ]
+
+env:
+  TERRAFORM_VERSION: "1.6.6"
+  TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  terraform:
+    name: "Terraform Apply Github Repos"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    strategy:
+      matrix:
+        path:
+          - "repositories"
+    defaults:
+      run:
+        working-directory: "terraform/github/${{ matrix.path }}"
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_DEV}}
+        aws-region: eu-west-2
+
+    - name: Terraform fmt
+      id: fmt
+      run: terraform fmt -check -recursive -diff -no-color
+      continue-on-error: true
+
+    - name: Terraform Init
+      id: init
+      run: ls -latr; terraform init -input=false -no-color
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -input=false -no-color
+      continue-on-error: true
+
+    - name: Terraform Apply
+      id: apply
+      run: terraform apply -input=false -no-color
+      continue-on-error: true
