@@ -1156,3 +1156,53 @@ class GithubService:
                 break
 
         return all_entries
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def check_for_audit_log_new_members(self, since_date: str) -> list:
+        logging.info(f"Getting audit log entries for new members since {since_date}")
+        today = datetime.now()
+        query = """
+            query($organisation_name: String!, $since_date: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $since_date
+                    ) {
+                        edges{
+                            node{
+                                ... on OrgAddMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    userLogin
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "since_date": f"action:org.add_member created:{since_date}..{today.strftime('%Y-%m-%d')}",
+            "cursor": None
+        }
+
+        new_members = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            new_members.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return new_members
