@@ -1156,7 +1156,6 @@ class GithubService:
                 break
 
         return all_entries
-    
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_for_audit_log_new_members(self, since_date: str) -> list:
