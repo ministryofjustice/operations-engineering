@@ -45,7 +45,8 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "pq-tool",
     "opg-data-processing",
     "df_criminal_court_research",
-    "criminal-forecasting-rap"
+    "criminal-forecasting-rap",
+    "airflow-matrix-scraper"
 ]
 
 
