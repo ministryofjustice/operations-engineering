@@ -14,7 +14,7 @@ on:
 
 env:
   TERRAFORM_VERSION: "1.6.6"
-  TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
+  TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   terraform:
@@ -76,5 +76,5 @@ jobs:
     - name: Terraform Apply
       # if: github.ref == 'refs/heads/main'
       id: apply
-      run: TF_LOG=TRACE && terraform apply -input=false -no-color -auto-approve
+      run: terraform apply -input=false -no-color -auto-approve
       continue-on-error: true
