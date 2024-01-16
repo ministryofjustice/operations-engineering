@@ -23,7 +23,7 @@ locals {
 }
 
 module "operations_engineering_repositories" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories/releases/0.0.1"
+  source = "https://github.com/ministryofjustice/operations-engineering-terraform-github-repositories/tree/0.0.1"
 
   for_each = { for repository in local.operations_engineering_repositories : repository.name => repository }
 
