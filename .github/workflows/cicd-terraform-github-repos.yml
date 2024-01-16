@@ -1,4 +1,4 @@
-name: "♻️ Terraform Plan Github Repos"
+name: "♻️ Terraform Github Repos"
 
 on:
   workflow_dispatch:
@@ -14,11 +14,11 @@ on:
 
 env:
   TERRAFORM_VERSION: "1.6.6"
-  TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+  TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
 
 jobs:
   terraform:
-    name: "Terraform Plan Github Repos"
+    name: "Terraform Github Repos"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -59,7 +59,7 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -no-color
-      continue-on-error: true
+      continue-on-error: false
 
     - name: Post Plan to GitHub PR
       uses: mshick/add-pr-comment@v1
