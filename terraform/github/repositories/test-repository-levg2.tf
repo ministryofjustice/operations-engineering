@@ -1,4 +1,4 @@
-module "repository" {
+module "test-repository-levg2" {
   source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories"
 
   name = "test-repository-levg2"
