@@ -14,7 +14,7 @@ on:
 
 env:
   TERRAFORM_VERSION: "1.6.6"
-  TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
+  TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN2_DEV_LEVG }}
 
 jobs:
   terraform:
