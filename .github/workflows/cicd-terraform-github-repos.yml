@@ -76,5 +76,6 @@ jobs:
     - name: Terraform Apply
       # if: github.ref == 'refs/heads/main'
       id: apply
-      run: terraform apply -input=false -no-color TF_LOG=DEBUG
+      run: TF_LOG=DEBUG
+      run: terraform apply -input=false -no-color
       continue-on-error: true
