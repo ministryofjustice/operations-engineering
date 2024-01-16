@@ -1,4 +1,4 @@
-name: "♻️ Terraform Plan Github Repos"
+name: "♻️ Terraform Github Repos"
 
 on:
   workflow_dispatch:
@@ -76,5 +76,5 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main'
       id: apply
-      run: terraform apply -input=false -no-color
+      run: terraform apply -input=false -no-color TF_LOG=DEBUG
       continue-on-error: true
