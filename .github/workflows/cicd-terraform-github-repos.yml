@@ -18,7 +18,7 @@ env:
 
 jobs:
   terraform:
-    name: "Terraform Plan Github Repos"
+    name: "Terraform Github Repos"
     runs-on: ubuntu-latest
     permissions:
       contents: read
