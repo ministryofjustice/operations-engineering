@@ -2,7 +2,7 @@ locals {
   operations_engineering_repositories = {
 
     "test-repository-levg1" = {
-      name            = "test-repository-levg1"
+      name            = "test-repository-levg"
       description = "this repository was create by terraform managed by operations-engineering team"
       topics = ["github", "terraform", "operations-engineering"]
     }
