@@ -74,10 +74,6 @@ jobs:
           ```
     
     - name: Terraform Apply
-      # if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main'
       id: apply
       run: terraform apply -input=false -no-color -auto-approve
-
-    - name: Terraform Destroy
-      id: destroy
-      run: terraform destroy -input=false -no-color -auto-approve
