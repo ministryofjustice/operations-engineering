@@ -78,10 +78,15 @@ jobs:
           ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
           ```
     
-    - name: Terraform Destroy
-      id: destroy
-      run: terraform destroy -input=false -no-color
+    - name: Terraform Plan Destroy
+      id: plan-destroy
+      run: terraform plan-destroy -input=false -no-color
       continue-on-error: false
+
+    # - name: Terraform Destroy
+    #   id: destroy
+    #   run: terraform destroy -input=false -no-color
+    #   continue-on-error: false
 
     # - name: Terraform Apply
     #   # if: github.ref == 'refs/heads/main'
