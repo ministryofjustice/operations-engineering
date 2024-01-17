@@ -77,6 +77,11 @@ jobs:
           ```
           ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
           ```
+
+    - name: Terraform Apply
+      # if: github.ref == 'refs/heads/main'
+      id: apply
+      run: terraform apply -input=false -no-color -auto-approve
     
     - name: Terraform Plan Destroy
       id: plan-destroy
