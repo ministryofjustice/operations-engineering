@@ -9,4 +9,7 @@ module "test-repository-levg" {
     Team = "operations-engineering"
     Phase = "POC"
   }
+  secrets = {
+    TEST_SECRET = ""
+  }
 }
