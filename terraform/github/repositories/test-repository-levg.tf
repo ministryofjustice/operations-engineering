@@ -10,7 +10,6 @@ module "test-repository-levg" {
     Phase = "POC"
   }
   secrets = {
-    TEST_SECRET = ""
-    BLANK_SECRET = ""
+    UPDATED_TEST_SECRET = ""
   }
 }
