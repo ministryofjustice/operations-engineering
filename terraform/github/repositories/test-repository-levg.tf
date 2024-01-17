@@ -11,5 +11,6 @@ module "test-repository-levg" {
   }
   secrets = {
     TEST_SECRET = ""
+    BLANK_SECRET = ""
   }
 }
