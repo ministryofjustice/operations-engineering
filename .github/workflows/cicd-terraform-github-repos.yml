@@ -90,5 +90,5 @@ jobs:
 
     - name: Terraform Destroy
       id: destroy
-      run: TF_LOG=TRACE && terraform destroy -input=false -no-color
+      run: TF_LOG=TRACE && terraform destroy -input=false -no-color -auto-approve
       continue-on-error: false
