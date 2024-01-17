@@ -9,4 +9,7 @@ module "test-repository-levg4" {
     Team = "operations-engineering"
     Phase = "DEV"
     }
+  secrets = {
+    CLICKOPS_SECRET = "ABCD"
+  }
 }
