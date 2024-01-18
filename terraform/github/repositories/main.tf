@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
     acl     = "private"
-    bucket  = "cloud-platform-91d489cf0077d4786792c06920fa7f61"
+    bucket  = "XXX"
     encrypt = true
-    key     = "terraform/github-repos/operations-engineering-dev/terraform.tfstate"
+    key     = "terraform/github-repos/operations-engineering-prod/terraform.tfstate"
     region  = "eu-west-2"
   }
   required_providers {
@@ -21,5 +21,5 @@ terraform {
 
 provider "github" {
   token = var.github_token
-  owner = "ministryofjustice-test"
+  owner = "ministryofjustice"
 }
