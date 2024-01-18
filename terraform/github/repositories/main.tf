@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     acl     = "private"
-    bucket  = "XXX"
+    bucket  = "cloud-platform-fad89ef06d68fdbc1928cb37acd8fc9f"
     encrypt = true
     key     = "terraform/github-repos/operations-engineering-prod/terraform.tfstate"
     region  = "eu-west-2"
