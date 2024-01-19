@@ -1,4 +1,4 @@
-name: "♻️ Terraform Plan Auth0"
+name: "♻️ Terraform Auth0"
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ env:
 
 jobs:
   terraform:
-    name: "Terraform Plan Auth0"
+    name: "Terraform Auth0"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -44,7 +44,7 @@ jobs:
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check -recursive -diff -no-color
-      continue-on-error: true
+      continue-on-error: false
 
     - name: Terraform Init
       id: init
@@ -57,7 +57,7 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -no-color
-      continue-on-error: true
+      continue-on-error: false
 
     - name: Post Plan to GitHub PR
       uses: mshick/add-pr-comment@v1
@@ -70,3 +70,8 @@ jobs:
           ```
           ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
           ```
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      id: apply
+      run: terraform apply -input=false -no-color -auto-approve
