@@ -40,7 +40,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_DEV}}
+        role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
         aws-region: eu-west-2
 
     - name: Terraform fmt
