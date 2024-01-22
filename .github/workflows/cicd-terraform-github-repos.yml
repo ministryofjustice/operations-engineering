@@ -52,6 +52,11 @@ jobs:
       id: init
       run: ls -latr; terraform init -input=false -no-color
 
+    - name: Terraform Import
+      id: import
+      run: sh import_repositories.sh
+      continue-on-error: false
+
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
