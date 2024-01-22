@@ -1,4 +1,4 @@
-module ".github" {
+module "github" {
   source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.1"
 
   name             = ".github"
