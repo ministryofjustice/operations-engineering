@@ -1,5 +1,5 @@
 module "operations-engineering-devcontainer" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories"
+  source = "https://github.com/ministryofjustice/operations-engineering-terraform-github-repositories/releases/tag/0.0.1"
 
   name             = "operations-engineering-devcontainer"
   application_name = "operations-engineering-devcontainer"
