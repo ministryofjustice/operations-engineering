@@ -4,7 +4,6 @@ module "cloud-platform-maintenance-pages" {
   name             = "cloud-platform-maintenance-pages"
   application_name = "cloud-platform-maintenance-pages"
   description      = "Web application to serve gov.uk maintenance pages for multiple domains"
-  topics           = ["operations-engineering"]
   tags = {
     Team  = "operations-engineering"
     Phase = "production"

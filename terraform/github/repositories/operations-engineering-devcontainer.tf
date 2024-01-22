@@ -4,7 +4,6 @@ module "operations-engineering-devcontainer" {
   name             = "operations-engineering-devcontainer"
   application_name = "operations-engineering-devcontainer"
   description      = ""
-  topics           = ["operations-engineering"]
   tags = {
     Team  = "operations-engineering"
     Phase = "POC"

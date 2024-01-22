@@ -4,7 +4,6 @@ module "github-collaborators" {
   name             = "github-collaborators"
   application_name = "github-collaborators"
   description      = "Manage outside collaborators on our Github repositories"
-  topics           = ["operations-engineering"]
   tags = {
     Team  = "operations-engineering"
     Phase = "production"

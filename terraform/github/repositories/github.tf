@@ -4,7 +4,6 @@ module "github" {
   name             = ".github"
   application_name = ".github"
   description      = "Default organisational policies for the Ministry of Justice"
-  topics           = []
   tags = {
     Team  = "operations-engineering"
     Phase = "production"

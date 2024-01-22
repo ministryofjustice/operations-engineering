@@ -5,7 +5,7 @@ module "moj-terraform-aws-sso" {
   name             = "moj-terraform-aws-sso"
   application_name = "moj-terraform-aws-sso"
   description      = "A Terraform module for setting up AWS SSO and Auth0, to allow users to sign-in to AWS using GitHub"
-  topics           = ["aws", "terraform", "iam", "sso", "terraform-module", "civil-service", "aws-sso", "operations-engineering"]
+  topics           = ["aws", "terraform", "iam", "sso", "terraform-module", "civil-service", "aws-sso"]
   tags = {
     Team  = "operations-engineering"
     Phase = "production"
