@@ -68,7 +68,7 @@ def main():
         percentage = round((total_members_added_by_oe / len(new_members)) * 100)
 
         slack_service.send_message_to_plaintext_channel_name(
-            new_members_detected_message("new members from ops eng", "new external members", percentage, total_new_members, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
+            new_members_detected_message(new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
