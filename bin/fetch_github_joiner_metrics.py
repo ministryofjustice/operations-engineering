@@ -64,7 +64,7 @@ def main():
                 new_members_added_by_oe += individual_message
                 total_members_added_by_oe += 1
             else:
-                new_members_added_externally += individual_message       
+                new_members_added_externally += individual_message
         percentage = round((total_members_added_by_oe / len(new_members)) * 100)
 
         slack_service.send_message_to_plaintext_channel_name(
