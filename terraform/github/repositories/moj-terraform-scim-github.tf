@@ -1,5 +1,5 @@
 module "moj-terraform-scim-github" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.2"
 
   name             = "moj-terraform-scim-github"
   application_name = "moj-terraform-scim-github"
