@@ -1,5 +1,5 @@
 module "moj-terraform-aws-sso" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.1"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories"
 
   type             = "module"
   name             = "moj-terraform-aws-sso"

@@ -1,5 +1,5 @@
 module "github-actions" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.1"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories"
 
   name             = "github-actions"
   application_name = "github-actions"

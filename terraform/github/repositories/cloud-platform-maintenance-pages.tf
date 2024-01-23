@@ -1,5 +1,5 @@
 module "cloud-platform-maintenance-pages" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.1"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories"
 
   name             = "cloud-platform-maintenance-pages"
   application_name = "cloud-platform-maintenance-pages"
