@@ -4,8 +4,8 @@ module "operations-engineering-terraform-github-repositories" {
   name             = "operations-engineering-terraform-github-repositories"
   application_name = "operations-engineering-terraform-github-repositories"
   description      = "A Terraform module for GiHub repositories in the Ministry of Justice"
-  has_discussions = true
-  topics = ["github", "terraform", "terraform-module"]
+  has_discussions  = true
+  topics           = ["github", "terraform", "terraform-module"]
   type             = "module"
   tags = {
     Team  = "operations-engineering"
