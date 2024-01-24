@@ -4,7 +4,6 @@ module "operations-engineering-metadata-poc" {
   name             = "operations-engineering-metadata-poc"
   application_name = "operations-engineering-metadata-poc"
   description      = "PoC For Cross Identification Between MoJ Services"
-  has_discussions  = true
   tags = {
     Team  = "operations-engineering"
     Phase = "poc"

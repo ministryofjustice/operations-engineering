@@ -4,7 +4,7 @@ module "operations-engineering-example" {
   name             = "operations-engineering-example"
   application_name = "operations-engineering-example"
   description      = "Example application to showcase how to deploy code"
-  homepage_url     = "operations-engineering-example-dev.cloud-platform.service.justice.gov.uk/"
+  homepage_url     = "https://operations-engineering-example-dev.cloud-platform.service.justice.gov.uk/"
   tags = {
     Team  = "operations-engineering"
     Phase = "production"
