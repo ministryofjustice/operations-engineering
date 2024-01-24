@@ -10,15 +10,15 @@ The Operations Engineering team buy, build, and run tools to help build and oper
 
 ## What's in This Repo
 
-This mono repository includes code that performs a variety of operations engineering tasks to streamline our workflow and maintain high operational standards. Here are some highlights:
+This mono repository includes code that performs various operations engineering tasks to streamline our workflow and maintain high operational standards. Here are some highlights:
 
-- **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://operations-engineering.service.justice.gov.uk/documentation/services/repository-standards.html). These reports help us maintain the quality of our code and streamline collaboration.
+- **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://user-guide.operations-engineering.service.justice.gov.uk/documentation/information/mojrepostandards.html). These reports help us maintain the quality of our code and streamline collaboration.
 
-- **Sentry Monitoring:** We monitor Sentry for over and under-utilisation, ensuring we're leveraging this error-tracking tool to its full potential. This helps in identifying and rectifying application errors more efficiently.
+- **Sentry Monitoring:** We monitor Sentry for over and under-utilisation, ensuring we leverage this error-tracking tool to its full potential. This helps in identifying and rectifying application errors more efficiently.
 
 - **Dormant User Detection:** Our code can detect inactive GitHub users and remove them from the organisation, keeping our workspace tidy and secure.
 
-These are just a few examples of the useful tools and features available in this repository. For more detailed information about each tool, feature, and how they assist us in our operations, see the GitHub workflows in the `.github/workflows` directory for more information.
+These are just a few examples of this repository's useful tools and features. For more detailed information about each tool and feature and how they assist us in our operations, see the GitHub workflows in the `.github/workflows` directory for more information.
 
 ## Getting Started
 
@@ -29,21 +29,21 @@ These are just a few examples of the useful tools and features available in this
 
 ## Naming Standards For Workflow Files
 
-To aide navigation, standardisation and deprecation our of workflows - we have opted to follow a simple naming convention for the different types of workflows that are contained within the repository.
+To aid navigation, standardisation and deprecation of workflows - we have opted to follow a simple naming convention for the different types of workflows that are contained within the repository.
 
 For this, we use a prefix in the workflow filename - to ensure similar workflows are next to each other in most local development environments and an emoji in the workflow name - to ensure it's easily findable in the GitHub Actions UI.
 
-Please ensure any new workflow files in prefixed with one of the below standards.
+Please ensure any new workflow files are prefixed with one of the below standards.
 
 ### `cicd-`
 
-For any workflow that is purely related to Continuous Integration and Continuos Deployment i.e. checks on PRs, deploying to environments etc.
+For any workflow that is purely related to Continuous Integration and Continuous Deployment, i.e. checks on PRs, deploying to environments etc.
 
 Prefix the workflow name with: ♻️
 
 ### `job-`
 
-For any workflow that relates to executing code that should be run periodically (whether automated or manual). This mainly relates to business processes that are automated to some degree.
+For any workflow related to executing code that should be run periodically (whether automated or manual). This mainly relates to business processes that are automated to some degree.
 
 If the job is completely automated (i.e. runs on a defined schedule), prefix the workflow name with: 🤖
 
@@ -51,13 +51,13 @@ If the job needs to be triggered manually, prefix the workflow name with: 🧑�
 
 #### `experiment-`
 
-For any workflow this is currently under testing, potentially for a proof-of-concept and isn't essential to any current process.
+For any workflow that is currently under testing, potentially for a proof-of-concept and isn't essential to any current process.
 
 Prefix the workflow name with: 🧪
 
 ## Support
 
-If you have any questions or need help with this repository, don't hesitate to contact us on the #ask-operations-engineering slack channel.
+If you have any questions or need help with this repository, please contact us on the #ask-operations-engineering slack channel.
 
 ## License
 
