@@ -59,6 +59,7 @@ jobs:
     - name: Terraform Import
       id: import
       run: |
+        terraform state rm 'module.operations-engineering-join-github.github_actions_secret.default["KUBE_CLUSTER"]'
         terraform import -input=false -no-color 'module.operations-engineering-join-github.github_actions_secret.default["KUBE_CLUSTER"]' operations-engineering-reports/KUBE_CLUSTER
       continue-on-error: false
 
