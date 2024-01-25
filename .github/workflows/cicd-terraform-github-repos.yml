@@ -56,10 +56,6 @@ jobs:
       id: validate
       run: terraform validate -no-color
 
-    - name: Terraform State List
-      id: state-list
-      run: terraform state rm $(terraform state list | grep github_actions_secret)
-
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -no-color
