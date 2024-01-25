@@ -10,9 +10,5 @@ module "operations-engineering-metadata-poc" {
   }
   secrets = {
     DEVELOPMENT_ECR_ROLE_TO_ASSUME = ""
-    DEV_KUBE_CERT                  = ""
-    DEV_KUBE_NAMESPACE             = ""
-    DEV_KUBE_TOKEN                 = ""
-    DEV_KUBE_CLUSTER               = ""
   }
 }

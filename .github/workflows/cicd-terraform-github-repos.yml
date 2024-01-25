@@ -56,6 +56,10 @@ jobs:
       id: validate
       run: terraform validate -no-color
 
+    - name: Terraform State Remove
+      id: state-remove
+      run: sh remove_from_state.sh
+
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -no-color

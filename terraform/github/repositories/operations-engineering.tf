@@ -47,8 +47,5 @@ module "operations-engineering" {
     SLACK_WEBHOOK_URL                                     = ""
     SONAR_TOKEN                                           = ""
     TERRAFORM_ADMIN_DEV_LEVG                              = ""
-    TERRAFORM_AUTH0_S3_ROLE_ARN_DEV                       = ""
-    TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_DEV                = ""
-    TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD               = ""
   }
 }

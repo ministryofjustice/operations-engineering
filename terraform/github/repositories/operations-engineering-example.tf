@@ -11,14 +11,6 @@ module "operations-engineering-example" {
   }
   secrets = {
     DEVELOPMENT_ECR_ROLE_TO_ASSUME = ""
-    DEV_KUBE_CERT                  = ""
-    DEV_KUBE_CLUSTER               = ""
-    DEV_KUBE_NAMESPACE             = ""
-    DEV_KUBE_TOKEN                 = ""
     PRODUCTION_ECR_ROLE_TO_ASSUME  = ""
-    PROD_KUBE_CERT                 = ""
-    PROD_KUBE_CLUSTER              = ""
-    PROD_KUBE_NAMESPACE            = ""
-    PROD_KUBE_TOKEN                = ""
   }
 }
