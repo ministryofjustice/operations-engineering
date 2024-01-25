@@ -9,7 +9,4 @@ module "acronyms" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    SLACK_WEBHOOK_URL = ""
-  }
 }

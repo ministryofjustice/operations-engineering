@@ -58,7 +58,7 @@ jobs:
 
     - name: Terraform State List
       id: state-list
-      run: terraform state list | grep github_actions_secret
+      run: terraform state rm $(terraform state list | grep github_actions_secret)
 
     - name: Terraform Plan
       id: plan

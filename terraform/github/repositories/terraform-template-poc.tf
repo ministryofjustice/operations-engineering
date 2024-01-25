@@ -10,9 +10,4 @@ module "terraform-template-poc" {
     Team  = "operations-engineering"
     Phase = "poc"
   }
-  secrets = {
-    AWS_STATE_ACCESS_KEY_ID     = ""
-    AWS_STATE_SECRET_ACCESS_KEY = ""
-    GH_ACCESS_TOKEN             = ""
-  }
 }

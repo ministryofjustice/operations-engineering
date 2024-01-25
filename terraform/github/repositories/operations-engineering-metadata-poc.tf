@@ -8,7 +8,4 @@ module "operations-engineering-metadata-poc" {
     Team  = "operations-engineering"
     Phase = "poc"
   }
-  secrets = {
-    DEVELOPMENT_ECR_ROLE_TO_ASSUME = ""
-  }
 }

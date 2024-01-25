@@ -9,8 +9,4 @@ module "operations-engineering-example" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    DEVELOPMENT_ECR_ROLE_TO_ASSUME = ""
-    PRODUCTION_ECR_ROLE_TO_ASSUME  = ""
-  }
 }

@@ -10,26 +10,4 @@ module "operations-engineering-reports" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    AUTH0_CLIENT_ID                             = ""
-    AUTH0_CLIENT_SECRET                         = ""
-    DEVELOPMENT_ECR_ROLE_TO_ASSUME              = ""
-    DEV_FLASK_APP_SECRET                        = ""
-    FLASK_APP_SECRET                            = ""
-    KUBE_CERT                                   = ""
-    KUBE_CLUSTER                                = ""
-    KUBE_NAMESPACE                              = ""
-    KUBE_TOKEN                                  = ""
-    PRODUCTION_ECR_ROLE_TO_ASSUME               = ""
-    PROD_FLASK_APP_SECRET                       = ""
-    SLACK_WEBHOOK_URL                           = ""
-    CVE_SCAN_SLACK_WEBHOOK                      = ""
-    DEV_OPERATIONS_ENGINEERING_REPORTS_API_KEY  = ""
-    DEV_OPS_ENG_REPORTS_ENCRYPT_KEY             = ""
-    OPERATIONS_ENGINEERING_REPORTS_API_KEY      = ""
-    OPS_ENG_REPORTS_ENCRYPT_KEY                 = ""
-    PROD_OPERATIONS_ENGINEERING_REPORTS_API_KEY = ""
-    PROD_OPS_ENG_REPORTS_ENCRYPT_KEY            = ""
-    ECR_REGISTRY                                = ""
-  }
 }
