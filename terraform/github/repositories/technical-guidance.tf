@@ -9,10 +9,4 @@ module "technical-guidance" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    GH_BOT_PAT_TOKEN       = ""
-    OPERATIONS_ENGINEERING = ""
-    OPS_BOT_TOKEN          = ""
-    SLACK_WEBHOOK_URL      = ""
-  }
 }

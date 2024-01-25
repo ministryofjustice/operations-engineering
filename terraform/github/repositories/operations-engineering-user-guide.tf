@@ -10,7 +10,4 @@ module "operations-engineering-user-guide" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    GH_BOT_PAT_TOKEN = ""
-  }
 }

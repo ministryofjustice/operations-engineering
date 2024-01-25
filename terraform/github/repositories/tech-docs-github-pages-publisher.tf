@@ -9,7 +9,4 @@ module "tech-docs-github-pages-publisher" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    SLACK_WEBHOOK_URL = ""
-  }
 }

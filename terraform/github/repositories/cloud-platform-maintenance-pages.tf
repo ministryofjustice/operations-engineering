@@ -8,11 +8,4 @@ module "cloud-platform-maintenance-pages" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    ECR_ROLE_TO_ASSUME = ""
-    KUBE_CERT          = ""
-    KUBE_CLUSTER       = ""
-    KUBE_NAMESPACE     = ""
-    KUBE_TOKEN         = ""
-  }
 }

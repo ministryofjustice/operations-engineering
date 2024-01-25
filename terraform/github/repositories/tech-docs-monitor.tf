@@ -8,9 +8,4 @@ module "tech-docs-monitor" {
     Team  = "operations-engineering"
     Phase = "production"
   }
-  secrets = {
-    REALLY_POST_TO_SLACK = ""
-    SLACK_TOKEN          = ""
-    SLACK_WEBHOOK_URL    = ""
-  }
 }
