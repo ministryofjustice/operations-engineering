@@ -1,5 +1,5 @@
 module "tech-docs-github-pages-publisher" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.2"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
 
   name             = "tech-docs-github-pages-publisher"
   application_name = "tech-docs-github-pages-publisher"
