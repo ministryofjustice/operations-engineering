@@ -56,10 +56,11 @@ jobs:
       id: validate
       run: terraform validate -no-color
       
-    - name: Terraform import
-      id: import
+    - name: Terraform remove state
+      id: remove-state
       run: |
-        terraform import -input=false -no-color module.operations-engineering-terraform-github-repository.github_repository_tag_protection.default operations-engineering-terraform-github-repository/165167
+        terraform state rm module.operations-engineering-terraform-github-repositories.github_branch_protection.default
+        terraform state rm module.operations-engineering-terraform-github-repositories.github_repository_tag_protection.default
 
     - name: Terraform Plan
       id: plan
