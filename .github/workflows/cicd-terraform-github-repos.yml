@@ -55,14 +55,12 @@ jobs:
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
-
-    - name: Terraform state remove
-      id: state-rm
-      run: terraform state rm module.operations-engineering-terraform-github-repositories.github_repository.default
       
     - name: Terraform import
       id: import
-      run: terraform import -input=false -no-color module.operations-engineering-terraform-github-repository.github_repository.default operations-engineering-terraform-github-repository
+      run: |
+      terraform import -input=false -no-color module.operations-engineering-terraform-github-repository.github_branch_protection.default operations-engineering-terraform-github-repository:main
+      terraform import -input=false -no-color module.operations-engineering-terraform-github-repository.github_repository_tag_protection.default operations-engineering-terraform-github-repository:*
 
     - name: Terraform Plan
       id: plan
