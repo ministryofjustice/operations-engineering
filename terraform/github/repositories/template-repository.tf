@@ -1,5 +1,5 @@
 module "template-repository" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.2"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
 
   name             = "template-repository"
   application_name = "template-repository"

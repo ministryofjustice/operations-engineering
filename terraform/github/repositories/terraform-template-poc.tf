@@ -1,5 +1,5 @@
 module "terraform-template-poc" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.2"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
 
   name             = "terraform-template-poc"
   application_name = "terraform-template-poc"

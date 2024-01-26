@@ -1,5 +1,5 @@
 module "tech-docs-monitor" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repositories?ref=0.0.2"
+  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
 
   name             = "tech-docs-monitor"
   application_name = "tech-docs-monitor"
