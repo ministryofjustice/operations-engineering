@@ -55,11 +55,7 @@ jobs:
     - name: Terraform Validate
       id: validate
       run: terraform validate -no-color
-
-    - name: Terraform import
-      id: import
-      run: terraform import -input=false -no-color 'module.operations-engineering-example.github_actions_variable.default["DEVELOPMENT_ECR_REGION"]' operations-engineering-example:DEVELOPMENT_ECR_REGION
-
+      
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -no-color
