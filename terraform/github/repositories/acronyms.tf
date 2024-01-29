@@ -1,12 +1,9 @@
 module "acronyms" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
+  source  = "ministryofjustice/repository/github"
+  version = "0.0.3"
 
   name             = "acronyms"
   application_name = "acronyms"
   description      = "List of abbreviations used within the MoJ, and their definitions"
   homepage_url     = "https://ministry-of-justice-acronyms.service.justice.gov.uk/"
-  tags = {
-    Team  = "operations-engineering"
-    Phase = "production"
-  }
 }
