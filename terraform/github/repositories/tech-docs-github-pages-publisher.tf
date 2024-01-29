@@ -1,6 +1,6 @@
 module "tech-docs-github-pages-publisher" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.3"
+  version = "0.0.4"
 
   name             = "tech-docs-github-pages-publisher"
   application_name = "tech-docs-github-pages-publisher"
