@@ -58,7 +58,7 @@ jobs:
 
     - name: Terraform import
       id: import
-      run: sh import_resources.sh
+      run: terraform import -input=false -no-color 'module.operations-engineering-example.github_actions_variable.default["DEVELOPMENT_ECR_REGION"]' operations-engineering-example:DEVELOPMENT_ECR_REGION
 
     - name: Terraform Plan
       id: plan
