@@ -7,4 +7,8 @@ module "terraform-github-repository" {
   has_discussions  = true
   topics           = ["github", "terraform", "terraform-module"]
   type             = "module"
+  tags = {
+    Team  = "operations-engineering"
+    Phase = "production"
+  }
 }
