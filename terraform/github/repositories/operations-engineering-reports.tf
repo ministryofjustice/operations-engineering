@@ -8,10 +8,10 @@ module "operations-engineering-reports" {
   homepage_url     = "https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/"
   topics           = ["flask", "reporting"]
   variables = {
-    DEVELOPMENT_ECR_REGION = var.ECR_REGION
+    DEVELOPMENT_ECR_REGION     = var.ECR_REGION
     DEVELOPMENT_ECR_REPOSITORY = "operations-engineering/operations-engineering-reports-dev-ecr"
-    ECR_REGISTRY = var.ECR_REGISTRY
-    PRODUCTION_ECR_REGION = var.ECR_REGION
-    PRODUCTION_ECR_REPOSITORY = "operations-engineering/operations-engineering-reports-prod-ecr"
+    ECR_REGISTRY               = var.ECR_REGISTRY
+    PRODUCTION_ECR_REGION      = var.ECR_REGION
+    PRODUCTION_ECR_REPOSITORY  = "operations-engineering/operations-engineering-reports-prod-ecr"
   }
 }
