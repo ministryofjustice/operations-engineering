@@ -1,6 +1,6 @@
 module "cloud-platform-maintenance-pages" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.3"
+  version = "0.0.4"
 
   name             = "cloud-platform-maintenance-pages"
   application_name = "cloud-platform-maintenance-pages"

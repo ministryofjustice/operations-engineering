@@ -1,6 +1,6 @@
 module "template-repository" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.3"
+  version = "0.0.4"
 
   name             = "template-repository"
   application_name = "template-repository"

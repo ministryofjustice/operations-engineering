@@ -1,6 +1,6 @@
 module "operations-engineering-documentation-browser-extension" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.3"
+  version = "0.0.4"
 
   name             = "operations-engineering-documentation-browser-extension"
   application_name = "operations-engineering-documentation-browser-extension"

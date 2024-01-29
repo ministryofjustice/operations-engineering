@@ -1,6 +1,6 @@
 module "tech-docs-monitor" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.3"
+  version = "0.0.4"
 
   name             = "tech-docs-monitor"
   application_name = "tech-docs-monitor"
