@@ -1,13 +1,10 @@
 module "moj-terraform-aws-sso" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
+  source  = "ministryofjustice/repository/github"
+  version = "0.0.3"
 
   type             = "module"
   name             = "moj-terraform-aws-sso"
   application_name = "moj-terraform-aws-sso"
   description      = "A Terraform module for setting up AWS SSO and Auth0, to allow users to sign-in to AWS using GitHub"
   topics           = ["aws", "terraform", "iam", "sso", "terraform-module", "civil-service", "aws-sso"]
-  tags = {
-    Team  = "operations-engineering"
-    Phase = "production"
-  }
 }

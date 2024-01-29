@@ -1,5 +1,6 @@
 module "operations-engineering" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
+  source  = "ministryofjustice/repository/github"
+  version = "0.0.3"
 
   name             = "operations-engineering"
   application_name = "operations-engineering"
@@ -7,8 +8,4 @@ module "operations-engineering" {
   homepage_url     = "https://user-guide.operations-engineering.service.justice.gov.uk/"
   has_discussions  = true
   topics           = ["python", "issue-tracker"]
-  tags = {
-    Team  = "operations-engineering"
-    Phase = "production"
-  }
 }

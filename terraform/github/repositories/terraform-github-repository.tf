@@ -1,5 +1,6 @@
 module "terraform-github-repository" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
+  source  = "ministryofjustice/repository/github"
+  version = "0.0.3"
 
   name             = "terraform-github-repository"
   application_name = "terraform-github-repository"
@@ -7,8 +8,4 @@ module "terraform-github-repository" {
   has_discussions  = true
   topics           = ["github", "terraform", "terraform-module"]
   type             = "module"
-  tags = {
-    Team  = "operations-engineering"
-    Phase = "production"
-  }
 }

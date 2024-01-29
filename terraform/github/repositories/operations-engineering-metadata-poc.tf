@@ -1,11 +1,8 @@
 module "operations-engineering-metadata-poc" {
-  source = "github.com/ministryofjustice/operations-engineering-terraform-github-repository?ref=0.0.2"
+  source  = "ministryofjustice/repository/github"
+  version = "0.0.3"
 
   name             = "operations-engineering-metadata-poc"
   application_name = "operations-engineering-metadata-poc"
   description      = "PoC For Cross Identification Between MoJ Services"
-  tags = {
-    Team  = "operations-engineering"
-    Phase = "poc"
-  }
 }
