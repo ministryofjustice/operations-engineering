@@ -18,6 +18,8 @@ This mono repository includes code that performs various operations engineering 
 
 - **Dormant User Detection:** Our code can detect inactive GitHub users and remove them from the organisation, keeping our workspace tidy and secure.
 
+- **Github Repository Terraform:** Our Github repositories are defined in Terraform. How to create a new repository is outlined in our [User Guide]().
+
 These are just a few examples of this repository's useful tools and features. For more detailed information about each tool and feature and how they assist us in our operations, see the GitHub workflows in the `.github/workflows` directory for more information.
 
 ## Getting Started
