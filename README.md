@@ -12,13 +12,13 @@ The Operations Engineering team buy, build, and run tools to help build and oper
 
 This mono repository includes code that performs various operations engineering tasks to streamline our workflow and maintain high operational standards. Here are some highlights:
 
-- **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://user-guide.operations-engineering.service.justice.gov.uk/documentation/information/mojrepostandards.html). These reports help us maintain the quality of our code and streamline collaboration.
+- **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/github/repository-terraform.html). These reports help us maintain the quality of our code and streamline collaboration.
 
 - **Sentry Monitoring:** We monitor Sentry for over and under-utilisation, ensuring we leverage this error-tracking tool to its full potential. This helps in identifying and rectifying application errors more efficiently.
 
 - **Dormant User Detection:** Our code can detect inactive GitHub users and remove them from the organisation, keeping our workspace tidy and secure.
 
-- **Github Repository Terraform:** Our Github repositories are defined in Terraform. How to create a new repository is outlined in our [User Guide](https://user-guide.operations-engineering.service.justice.gov.uk/documentation/information/repository-terraform.html).
+- **Github Repository Terraform:** Our Github repositories are defined in Terraform. How to create a new repository is outlined in a [Runbook](https://user-guide.operations-engineering.service.justice.gov.uk/documentation/information/repository-terraform.html).
 
 These are just a few examples of this repository's useful tools and features. For more detailed information about each tool and feature and how they assist us in our operations, see the GitHub workflows in the `.github/workflows` directory for more information.
 
