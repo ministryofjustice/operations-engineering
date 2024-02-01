@@ -5,5 +5,5 @@ module "test-repository-levg" {
   name             = "test-repository-levg"
   application_name = "test-repository-levg"
   description      = "test repo for demo"
-  homepage_url = "https://www.asda.com/"
+  homepage_url     = "https://www.asda.com/"
 }
