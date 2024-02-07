@@ -52,9 +52,9 @@ jobs:
       id: check-dynamodb
       run: aws dynamodb describe-table --table-name cp-1aaae79e1c9a29a8
 
-    - name: Get Dynamodb Item
-      id: get-item
-      run: aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key LockID=e5abd5f0445012d1167a33cc3d4cc062 
+    - name: Terrraform State Unlock
+      id: state-unlock
+      run: terraform force-unlock -force e5abd5f0445012d1167a33cc3d4cc062
 
     - name: Terraform Init
       id: init
