@@ -56,7 +56,7 @@ jobs:
     - name: Debugging
       id: debugging
       run: |
-        terraform state list
+        terraform refresh
 
     - name: Terraform Validate
       id: validate
