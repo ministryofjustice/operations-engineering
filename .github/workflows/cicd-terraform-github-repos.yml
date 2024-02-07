@@ -51,6 +51,7 @@ jobs:
     - name: Terraform Init
       id: init
       run: ls -latr; terraform init -input=false -no-color
+      continue-on-error: true
 
     - name: Debugging
       id: debugging
