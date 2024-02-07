@@ -49,7 +49,7 @@ jobs:
       continue-on-error: false
 
     - name: Check running terraform processes
-      id: check running terraform processes
+      id: check-processes
       run: ps aux | grep terraform
 
     - name: Terraform Init
