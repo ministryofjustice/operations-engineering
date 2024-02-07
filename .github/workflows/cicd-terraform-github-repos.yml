@@ -56,7 +56,7 @@ jobs:
     - name: Debugging
       id: debugging
       run: |
-        terraform refresh
+        aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S": "terraform/github-repos/operations-engineering-prod/terraform.tfstate"}}'
 
     - name: Terraform Validate
       id: validate
