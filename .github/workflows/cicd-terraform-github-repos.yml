@@ -56,7 +56,8 @@ jobs:
     - name: Debugging
       id: debugging
       run: |
-       aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{ "LockID": {"S":"2885065479"} }' 
+        aws sts get-caller-identity \
+        && aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{ "LockID": {"S":"2885065479"} }' 
 
     - name: Terraform Validate
       id: validate
