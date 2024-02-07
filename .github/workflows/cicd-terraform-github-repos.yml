@@ -57,9 +57,13 @@ jobs:
       run: ls -latr; terraform init -input=false -no-color
       continue-on-error: true
 
+    - name: Check .terraform directory
+      id: check-directory
+      run: cd .terraform && ls -a 
+
     - name: Terrraform State Unlock
       id: state-unlock
-      run: ls -a && terraform force-unlock -force 893fc752ecab84ebd396da07d2b7f6ff
+      run: terraform force-unlock -force e5abd5f0445012d1167a33cc3d4cc062
 
     - name: Terraform Validate
       id: validate
