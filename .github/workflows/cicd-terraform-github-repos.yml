@@ -52,9 +52,9 @@ jobs:
     #   id: debugging
     #   run: aws dynamodb scan --table-name cp-1aaae79e1c9a29a8
 
-    - name: Terraform Init
+    - name: Terraform Init 
       id: init
-      run: ls -latr; terraform init -input=false -no-color
+      run: ls -latr; terraform init -input=false -no-color -lock=false
 
     - name: Terraform Validate
       id: validate
@@ -62,7 +62,7 @@ jobs:
       
     - name: Terraform Plan
       id: plan
-      run: terraform plan -input=false -no-color
+      run: terraform plan -input=false -no-color -lock=false
       continue-on-error: false
 
     - name: Post Plan to GitHub PR
