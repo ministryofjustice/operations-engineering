@@ -59,7 +59,7 @@ jobs:
 
     - name: Terrraform State Unlock
       id: state-unlock
-      run: terraform force-unlock -force 893fc752ecab84ebd396da07d2b7f6ff
+      run: pwd && terraform force-unlock -force 893fc752ecab84ebd396da07d2b7f6ff
 
     - name: Terraform Validate
       id: validate
