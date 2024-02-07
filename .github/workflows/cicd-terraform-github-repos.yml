@@ -52,6 +52,10 @@ jobs:
       id: check-dynamodb
       run: aws dynamodb describe-table --table-name cp-1aaae79e1c9a29a8
 
+    - name: Get Dynamodb Item
+      id: get-item
+      run: aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key LockID 
+
     - name: Terraform Init
       id: init
       run: ls -latr; terraform init -input=false -no-color
