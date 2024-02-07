@@ -48,9 +48,9 @@ jobs:
       run: terraform fmt -check -recursive -diff -no-color
       continue-on-error: false
 
-    - name: Force Unlock State
-      id: force-unlock
-      run: terraform force-unlock -force e5abd5f0445012d1167a33cc3d4cc062
+    - name: Check running terraform processes
+      id: check running terraform processes
+      run: ps aux | grep terraform
 
     - name: Terraform Init
       id: init
