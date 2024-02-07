@@ -50,7 +50,7 @@ jobs:
 
     - name: Check DynamoDB
       id: check-dynamodb
-      run: aws dynamodb describe-table --table-name cp-1aaae79e1c9a29a8
+      run: aws dynamodb scan --table-name cp-1aaae79e1c9a29a8
 
     - name: Terraform Init
       id: init
