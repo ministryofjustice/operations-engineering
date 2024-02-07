@@ -51,7 +51,7 @@ jobs:
     - name: Debugging
       id: debugging
       run: |
-        aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":""}}' 
+        aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":" "}}' 
       # run: aws dynamodb scan --table-name cp-1aaae79e1c9a29a8
 
     - name: Terraform Init
