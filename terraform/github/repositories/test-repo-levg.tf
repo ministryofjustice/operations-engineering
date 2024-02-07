@@ -1,5 +1,5 @@
 module "test-repo-levg" {
-  source   = "github.com/ministryofjustice/terraform-github-repository/tree/provider-config"
+  source = "github.com/ministryofjustice/terraform-github-repository/tree/provider-config"
   providers = {
     github.organisation = github.ministryofjustice-test
   }
