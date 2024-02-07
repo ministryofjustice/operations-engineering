@@ -48,10 +48,10 @@ jobs:
       run: terraform fmt -check -recursive -diff -no-color
       continue-on-error: false
 
-    - name: Remove dynamodb state lock
-      id: state-lock-remove
+    - name: Debugging
+      id: debugging
       run: |
-        aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":"893fc752ecab84ebd396da07d2b7f6ff"}}'
+        terraform state list
 
     - name: Terraform Init
       id: init
