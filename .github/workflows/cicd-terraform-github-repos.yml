@@ -48,13 +48,13 @@ jobs:
       run: terraform fmt -check -recursive -diff -no-color
       continue-on-error: false
     
-    # - name: Debugging
-    #   id: debugging
-    #   run: aws dynamodb scan --table-name cp-1aaae79e1c9a29a8
+    - name: Debugging
+      id: debugging
+      run: aws dynamodb scan --table-name cp-1aaae79e1c9a29a8
 
     - name: Terraform Init 
       id: init
-      run: ls -latr; terraform init -input=false -no-color -lock=false
+      run: ls -latr; terraform init -input=false -no-color
 
     - name: Terraform Validate
       id: validate
@@ -62,7 +62,7 @@ jobs:
       
     - name: Terraform Plan
       id: plan
-      run: terraform plan -input=false -no-color -lock=false
+      run: terraform plan -input=false -no-color 
       continue-on-error: false
 
     - name: Post Plan to GitHub PR
