@@ -56,8 +56,11 @@ jobs:
     - name: Debugging
       id: debugging
       run: |
-        cd .terraform && cat terraform.tfstate
-        aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":"3e6e39d2-a17a-bfc0-ec08-f3d143b63091"}}'
+        cd .terraform && cat terraform.tfstate \
+        && aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":"3e6e39d2-a17a-bfc0-ec08-f3d143b63091"}}' \
+        && aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":"2885065479"}}' \
+        && aws dynamodb get-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":"2885065479"}}' \
+        && aws dynamodb query --table-name cp-1aaae79e1c9a29a8 --key-condition-expression "LockID = *"
 
     - name: Terraform Validate
       id: validate
