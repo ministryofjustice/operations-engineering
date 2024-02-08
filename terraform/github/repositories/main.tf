@@ -24,3 +24,9 @@ provider "github" {
   token = var.github_token
   owner = "ministryofjustice"
 }
+
+provider "github" {
+  alias = "ministryofjustice-test"
+  token = var.github_token
+  owner = "ministryofjustice-test"
+}
