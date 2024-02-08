@@ -48,11 +48,6 @@ jobs:
       run: terraform fmt -check -recursive -diff -no-color
       continue-on-error: false
     
-    - name: Debugging
-      id: debugging
-      run: |
-        aws dynamodb delete-item --table-name cp-1aaae79e1c9a29a8 --key '{"LockID": {"S":"cloud-platform-fad89ef06d68fdbc1928cb37acd8fc9f/terraform/github-repos/operations-engineering-prod/terraform.tfstate-md5"}}'
-
     - name: Terraform Init 
       id: init
       run: ls -latr; terraform init -input=false -no-color
