@@ -1,9 +1,9 @@
 module "github-collaborators" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.4"
+  version = "0.0.6"
 
-  name             = "github-collaborators"
-  application_name = "github-collaborators"
-  description      = "Manage outside collaborators on our Github repositories"
-  has_discussions  = true
+  name            = "github-collaborators"
+  description     = "Manage outside collaborators on our Github repositories"
+  has_discussions = true
+  topics          = ["operations-engineering"]
 }
