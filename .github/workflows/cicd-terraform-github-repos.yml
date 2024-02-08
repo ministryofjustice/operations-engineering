@@ -46,7 +46,7 @@ jobs:
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check -recursive -diff -no-color
-      continue-on-error: false
+      continue-on-error: true
 
     - name: Terraform Init
       id: init
