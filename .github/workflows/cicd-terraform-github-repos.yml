@@ -62,6 +62,7 @@ jobs:
       if: steps.fmt-check.outcome == 'failure'
       id: fmt
       run: |
+        git status
         git config --global user.name "moj-operations-engineering-bot"
         git config --global user.email "operations-engineering@noreply.github.com"
         terraform fmt 
