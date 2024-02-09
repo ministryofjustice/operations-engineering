@@ -57,6 +57,9 @@ jobs:
       run: |
         terraform fmt 
         git status
+        git add *
+        git commit -m 'formatted Terraform'
+        git push 
       continue-on-error: false
 
     # - name: Terraform Init
