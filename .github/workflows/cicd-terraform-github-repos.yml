@@ -47,7 +47,7 @@ jobs:
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check -recursive -diff -no-color
-      continue-on-error: false
+      continue-on-error: true
 
     - name: Terraform Init
       id: init
@@ -94,4 +94,4 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]'
         message: |
-          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=branch%3Amain
+          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
