@@ -62,8 +62,8 @@ jobs:
       if: steps.fmt-check.outcome == 'failure'
       id: fmt
       run: |
-        # git checkout ${{ github.event.pull_request.head.ref }}
-        git status
+        echo $GITHUB_SHA
+        echo $GITHUB_REF
         # git config --global user.name "moj-operations-engineering-bot"
         # git config --global user.email "operations-engineering@noreply.github.com"
         # terraform fmt 
