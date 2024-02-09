@@ -43,6 +43,15 @@ jobs:
       with:
         role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
         aws-region: eu-west-2
+    
+    - name: Post Link to Apply Pipeline
+      if: github.ref == 'refs/heads/main-levg-test'
+      uses: mshick/add-pr-comment@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
 
     - name: Terraform fmt
       id: fmt
@@ -72,6 +81,7 @@ jobs:
         issue: '${{github.event.number}}'
 
     - name: Post Plan to GitHub PR
+      if: github.ref != 'refs/heads/main-levg-test'
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -86,12 +96,3 @@ jobs:
       if: github.ref == 'refs/heads/main'
       id: apply
       run: terraform apply -input=false -no-color -auto-approve
-
-    - name: Post Link to Apply Pipeline
-      if: github.event.pull_request.merged == true
-      uses: mshick/add-pr-comment@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        repo-token-user-login: 'github-actions[bot]'
-        message: |
-          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
