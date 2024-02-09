@@ -1,5 +1,5 @@
 module "test_tamf_repo" {
-  source = "github.com:ministryofjustice/terraform-github-repository.git?ref=output-repo-name"
+  source = "github.com/ministryofjustice/terraform-github-repository.git?ref=output-repo-name"
 
   providers = {
     github = github.ministryofjustice-test
