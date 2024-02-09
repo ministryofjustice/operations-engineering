@@ -18,6 +18,8 @@ env:
   TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
 
 jobs:
+  terraform-fmt:
+    uses: ./.github/workflows/terraform-fmt.yml
   terraform:
     name: "Terraform Github Repos"
     runs-on: ubuntu-latest
@@ -52,8 +54,6 @@ jobs:
         repo-token-user-login: 'github-actions[bot]'
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
-
-    - uses: ministryofjustice/operations-engineering/.github/workflows/terraform-fmt.yml@pipeline-improvements
 
     # - name: Terraform Init
     #   id: init
