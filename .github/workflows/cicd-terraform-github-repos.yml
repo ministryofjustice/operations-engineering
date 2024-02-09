@@ -52,7 +52,7 @@ jobs:
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
 
-     - name: Terraform fmt check
+    - name: Terraform fmt check
       id: fmt-check
       run: terraform fmt -check -recursive -diff -no-color
       continue-on-error: true
@@ -79,7 +79,7 @@ jobs:
     # - name: Terraform Plan
     #   id: plan
     #   run: terraform plan -input=false -no-color
-    
+
     # - name: Delete Old Comments
     #   uses: maheshrayas/action-pr-comment-delete@v3.0
     #   with:
