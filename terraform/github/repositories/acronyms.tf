@@ -10,6 +10,6 @@ module "acronyms" {
 
 resource "github_team_repository" "acronyms_ops_eng_admin" {
   team_id    = data.github_team.operations_engineering
-  repository = github_repository.this.name
+  repository = acronyms.name
   permission = "admin"
 }
