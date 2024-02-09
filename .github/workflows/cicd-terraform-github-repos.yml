@@ -58,6 +58,7 @@ jobs:
         terraform fmt 
         git config --global user.name "moj-operations-engineering-bot"
         git config --global user.email "operations-engineering@noreply.github.com"
+        git config --global user.password "${{ secrets.OPS_BOT_TOKEN }}"
         git add *
         git commit -m 'formatted Terraform'
         git push 
