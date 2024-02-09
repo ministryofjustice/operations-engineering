@@ -7,9 +7,3 @@ module "acronyms" {
   homepage_url = "https://ministry-of-justice-acronyms.service.justice.gov.uk/"
   topics       = ["operations-engineering"]
 }
-
-resource "github_team_repository" "acronyms_ops_eng_admin" {
-  team_id    = data.github_team.operations_engineering
-  repository = acronyms.name
-  permission = "admin"
-}
