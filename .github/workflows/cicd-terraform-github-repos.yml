@@ -55,6 +55,8 @@ jobs:
     - name: Terraform fmt
       id: fmt
       run: |
+        git config --global user.name "moj-operations-engineering-bot"
+        git config --global user.email "operations-engineering@noreply.github.com"
         terraform fmt 
         git add *
         git commit -m 'formatted Terraform'
