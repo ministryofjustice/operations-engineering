@@ -53,23 +53,7 @@ jobs:
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
 
-    - name: Terraform fmt check
-      id: fmt-check
-      run: terraform fmt -check -recursive -diff -no-color
-      continue-on-error: true
-
-    - name: Terraform fmt
-      if: steps.fmt-check.outcome == 'failure'
-      id: fmt
-      run: |
-        echo $GITHUB_SHA
-        echo $GITHUB_REF
-        # git config --global user.name "moj-operations-engineering-bot"
-        # git config --global user.email "operations-engineering@noreply.github.com"
-        # terraform fmt 
-        # git add *
-        # git commit -m 'formatted Terraform'
-        # git push 
+    - uses: ministryofjustice/operations-engineering/.github/workflows/terraform-fmt.yml@pipeline-improvements
 
     # - name: Terraform Init
     #   id: init
