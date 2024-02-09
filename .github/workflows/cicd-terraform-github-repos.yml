@@ -7,7 +7,6 @@ on:
       - "terraform/github/**"
     branches:
       - main
-      - main-levg-test
   push:
     paths:
       - "terraform/github/**"
@@ -18,8 +17,6 @@ env:
   TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
 
 jobs:
-  terraform-fmt:
-    uses: ./.github/workflows/terraform-fmt.yml
   terraform:
     name: "Terraform Github Repos"
     runs-on: ubuntu-latest
@@ -55,40 +52,40 @@ jobs:
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
 
-    # - name: Terraform Init
-    #   id: init
-    #   run: ls -latr; terraform init -input=false -no-color
+    - name: Terraform Init
+      id: init
+      run: ls -latr; terraform init -input=false -no-color
 
-    # - name: Terraform Validate
-    #   id: validate
-    #   run: terraform validate -no-color
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
       
-    # - name: Terraform Plan
-    #   id: plan
-    #   run: terraform plan -input=false -no-color
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -input=false -no-color
 
-    # - name: Delete Old Comments
-    #   uses: maheshrayas/action-pr-comment-delete@v3.0
-    #   with:
-    #     github_token: '${{ secrets.GITHUB_TOKEN }}'
-    #     org: ministryofjustice
-    #     repo: operations-engineering
-    #     user: 'github-actions[bot]' 
-    #     issue: '${{github.event.number}}'
+    - name: Delete Old Comments
+      uses: maheshrayas/action-pr-comment-delete@v3.0
+      with:
+        github_token: '${{ secrets.GITHUB_TOKEN }}'
+        org: ministryofjustice
+        repo: operations-engineering
+        user: 'github-actions[bot]' 
+        issue: '${{github.event.number}}'
 
-    # - name: Post Plan to GitHub PR
-    #   if: github.ref != 'refs/heads/main'
-    #   uses: mshick/add-pr-comment@v1
-    #   with:
-    #     repo-token: ${{ secrets.GITHUB_TOKEN }}
-    #     repo-token-user-login: 'github-actions[bot]'
-    #     message: |
-    #       ## ${{ matrix.path }} plan
-    #       ```
-    #       ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
-    #       ```
+    - name: Post Plan to GitHub PR
+      if: github.ref != 'refs/heads/main'
+      uses: mshick/add-pr-comment@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          ## ${{ matrix.path }} plan
+          ```
+          ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+          ```
   
-    # - name: Terraform Apply
-    #   if: github.ref == 'refs/heads/main'
-    #   id: apply
-    #   run: terraform apply -input=false -no-color -auto-approve
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      id: apply
+      run: terraform apply -input=false -no-color -auto-approve
