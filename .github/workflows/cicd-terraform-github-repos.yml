@@ -7,10 +7,11 @@ on:
       - "terraform/github/**"
     branches:
       - main
+      - main-levg-test
   push:
     paths:
       - "terraform/github/**"
-    branches: [ "main" ]
+    branches: [ "main", "main-levg-test" ]
 
 env:
   TERRAFORM_VERSION: "1.6.6"
