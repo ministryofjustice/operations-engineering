@@ -66,6 +66,7 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]'
+        message-id: message1
         message: |
           ## ${{ matrix.path }} plan
           ```
