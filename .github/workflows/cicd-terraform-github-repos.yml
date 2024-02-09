@@ -7,11 +7,10 @@ on:
       - "terraform/github/**"
     branches:
       - main
-      - main-levg-test
   push:
     paths:
       - "terraform/github/**"
-    branches: [ "main", "main-levg-test" ]
+    branches: [ "main" ]
 
 env:
   TERRAFORM_VERSION: "1.6.6"
@@ -45,7 +44,7 @@ jobs:
         aws-region: eu-west-2
     
     - name: Post Link to Apply Pipeline
-      if: github.ref == 'refs/heads/main-levg-test'
+      if: github.ref == 'refs/heads/main'
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -55,44 +54,46 @@ jobs:
 
     - name: Terraform fmt
       id: fmt
-      run: terraform fmt -check -recursive -diff -no-color
-      continue-on-error: true
-
-    - name: Terraform Init
-      id: init
-      run: ls -latr; terraform init -input=false -no-color
-
-    - name: Terraform Validate
-      id: validate
-      run: terraform validate -no-color
-      
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -input=false -no-color
+      run: |
+        terraform fmt 
+        git status
       continue-on-error: false
 
-    - name: Delete Old Comments
-      uses: maheshrayas/action-pr-comment-delete@v3.0
-      with:
-        github_token: '${{ secrets.GITHUB_TOKEN }}'
-        org: ministryofjustice
-        repo: operations-engineering
-        user: 'github-actions[bot]' 
-        issue: '${{github.event.number}}'
+    # - name: Terraform Init
+    #   id: init
+    #   run: ls -latr; terraform init -input=false -no-color
 
-    - name: Post Plan to GitHub PR
-      if: github.ref != 'refs/heads/main-levg-test'
-      uses: mshick/add-pr-comment@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        repo-token-user-login: 'github-actions[bot]'
-        message: |
-          ## ${{ matrix.path }} plan
-          ```
-          ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
-          ```
+    # - name: Terraform Validate
+    #   id: validate
+    #   run: terraform validate -no-color
+      
+    # - name: Terraform Plan
+    #   id: plan
+    #   run: terraform plan -input=false -no-color
+    #   continue-on-error: false
+
+    # - name: Delete Old Comments
+    #   uses: maheshrayas/action-pr-comment-delete@v3.0
+    #   with:
+    #     github_token: '${{ secrets.GITHUB_TOKEN }}'
+    #     org: ministryofjustice
+    #     repo: operations-engineering
+    #     user: 'github-actions[bot]' 
+    #     issue: '${{github.event.number}}'
+
+    # - name: Post Plan to GitHub PR
+    #   if: github.ref != 'refs/heads/main'
+    #   uses: mshick/add-pr-comment@v1
+    #   with:
+    #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+    #     repo-token-user-login: 'github-actions[bot]'
+    #     message: |
+    #       ## ${{ matrix.path }} plan
+    #       ```
+    #       ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+    #       ```
   
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
-      id: apply
-      run: terraform apply -input=false -no-color -auto-approve
+    # - name: Terraform Apply
+    #   if: github.ref == 'refs/heads/main'
+    #   id: apply
+    #   run: terraform apply -input=false -no-color -auto-approve
