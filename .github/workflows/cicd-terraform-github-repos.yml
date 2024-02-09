@@ -61,7 +61,7 @@ jobs:
       run: terraform plan -input=false -no-color
       continue-on-error: false
 
-    - name: delete old comments
+    - name: Delete Old Comments
       uses: maheshrayas/action-pr-comment-delete@v3.0
       with:
         github_token: '${{ secrets.GITHUB_TOKEN }}'
@@ -75,7 +75,6 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]'
-        message-id: message1
         message: |
           ## ${{ matrix.path }} plan
           ```
@@ -86,3 +85,12 @@ jobs:
       if: github.ref == 'refs/heads/main'
       id: apply
       run: terraform apply -input=false -no-color -auto-approve
+
+    - name: Post Link to Apply Pipeline
+      if: github.event.pull_request.merged == true
+      uses: mshick/add-pr-comment@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=branch%3Amain
