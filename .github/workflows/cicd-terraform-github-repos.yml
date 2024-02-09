@@ -43,13 +43,6 @@ jobs:
         role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
         aws-region: eu-west-2
 
-    - name: Remove old comments
-      uses: izhangzhihao/delete-comment@master
-      with: 
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        delete_user_name: github-actions[bot]
-        issue_number: ${{ github.event.number }}
-
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check -recursive -diff -no-color
@@ -67,6 +60,15 @@ jobs:
       id: plan
       run: terraform plan -input=false -no-color
       continue-on-error: false
+
+    - name: delete old comments
+      uses: maheshrayas/action-pr-comment-delete@v3.0
+      with:
+        github_token: '${{ secrets.GITHUB_TOKEN }}'
+        org: ministryofjustice
+        repo: operations-engineering
+        user: 'github-actions[bot]' 
+        issue: '${{github.event.number}}'
 
     - name: Post Plan to GitHub PR
       uses: mshick/add-pr-comment@v1
