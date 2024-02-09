@@ -43,6 +43,13 @@ jobs:
         role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
         aws-region: eu-west-2
 
+    - name: Remove old comments
+      uses: izhangzhihao/delete-comment@master
+      with: 
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        delete_user_name: github-actions[bot]
+        issue_number: ${{ github.event.number }}
+
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check -recursive -diff -no-color
