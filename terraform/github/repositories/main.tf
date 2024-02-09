@@ -30,9 +30,3 @@ provider "github" {
   token = var.github_token
   owner = "ministryofjustice-test"
 }
-
-resource "github_team_repository" "acronyms_ops_eng_admin" {
-  team_id    = data.github_team.operations_engineering
-  repository = acronyms.name
-  permission = "admin"
-}
