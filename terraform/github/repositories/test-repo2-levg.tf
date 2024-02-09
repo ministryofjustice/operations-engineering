@@ -8,5 +8,4 @@ module "test-repo2-levg" {
   name        = "test-repo2-levg"
   description = "test repo2"
   topics      = ["operations-engineering"]
-
 }
