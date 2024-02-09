@@ -7,6 +7,7 @@ on:
       - "terraform/github/**"
     branches:
       - main
+      - main-levg-test
   push:
     paths:
       - "terraform/github/**"
@@ -44,7 +45,7 @@ jobs:
         aws-region: eu-west-2
     
     - name: Post Link to Apply Pipeline
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/main-levg-test'
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
