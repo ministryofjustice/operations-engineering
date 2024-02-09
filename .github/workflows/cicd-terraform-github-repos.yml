@@ -58,7 +58,7 @@ jobs:
         terraform fmt 
         git config --global user.name "moj-operations-engineering-bot"
         git config --global user.email "operations-engineering@noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ministryofjustice/operations-engineering
+        git config --global user.password "${{ secrets.GH_BOT_PAT_TOKEN }}"
         git add *
         git commit -m 'formatted Terraform'
         git push 
