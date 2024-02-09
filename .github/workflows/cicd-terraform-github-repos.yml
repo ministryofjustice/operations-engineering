@@ -45,7 +45,7 @@ jobs:
         aws-region: eu-west-2
     
     - name: Post Link to Apply Pipeline
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/main-levg-test'
+      if: github.ref == 'refs/heads/main' 
       uses: mshick/add-pr-comment@v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,13 +62,14 @@ jobs:
       if: steps.fmt-check.outcome == 'failure'
       id: fmt
       run: |
-        git status
-        git config --global user.name "moj-operations-engineering-bot"
-        git config --global user.email "operations-engineering@noreply.github.com"
-        terraform fmt 
-        git add *
-        git commit -m 'formatted Terraform'
-        git push 
+        echo ${{ github.event.pull_request.head.ref }}
+        # git status
+        # git config --global user.name "moj-operations-engineering-bot"
+        # git config --global user.email "operations-engineering@noreply.github.com"
+        # terraform fmt 
+        # git add *
+        # git commit -m 'formatted Terraform'
+        # git push 
 
     # - name: Terraform Init
     #   id: init
