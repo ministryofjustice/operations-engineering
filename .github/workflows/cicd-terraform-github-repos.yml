@@ -21,7 +21,7 @@ jobs:
     name: "Terraform Github Repos"
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       id-token: write
     strategy:
@@ -56,9 +56,6 @@ jobs:
       id: fmt
       run: |
         terraform fmt 
-        git config --global user.name "levgorbunov1"
-        git config --global user.email "lev.gorbunov@digital.justice.gov.uk"
-        git config --global user.password "${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}"
         git add *
         git commit -m 'formatted Terraform'
         git push 
