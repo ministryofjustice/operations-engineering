@@ -67,12 +67,13 @@ jobs:
         allow-repeats: true
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]'
+        message-id: message-1
         message: |
           ## ${{ matrix.path }} plan
           ```
           ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
           ```
-
+  
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main'
       id: apply
