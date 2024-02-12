@@ -42,12 +42,21 @@ jobs:
       with:
         role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
         aws-region: eu-west-2
+    
+    - name: Post Link to Apply Pipeline
+      if: github.ref == 'refs/heads/main' 
+      uses: mshick/add-pr-comment@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        repo-token-user-login: 'github-actions[bot]'
+        message: |
+          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
 
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check -recursive -diff -no-color
       continue-on-error: false
-
+    
     - name: Terraform Init
       id: init
       run: ls -latr; terraform init -input=false -no-color
@@ -59,12 +68,20 @@ jobs:
     - name: Terraform Plan
       id: plan
       run: terraform plan -input=false -no-color
-      continue-on-error: false
+
+    - name: Delete Old Comments
+      uses: maheshrayas/action-pr-comment-delete@v3.0
+      with:
+        github_token: '${{ secrets.GITHUB_TOKEN }}'
+        org: ministryofjustice
+        repo: operations-engineering
+        user: 'github-actions[bot]' 
+        issue: '${{github.event.number}}'
 
     - name: Post Plan to GitHub PR
+      if: github.ref != 'refs/heads/main'
       uses: mshick/add-pr-comment@v1
       with:
-        allow-repeats: true
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         repo-token-user-login: 'github-actions[bot]'
         message: |
@@ -72,7 +89,7 @@ jobs:
           ```
           ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
           ```
-
+  
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main'
       id: apply
