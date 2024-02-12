@@ -51,8 +51,9 @@ def get_unowned_repositories(github_service: GithubService) -> list:
                 break
 
         if repository_has_team is False:
-            # Check repository has any outside collaborators
-            if len(github_service.get_repository_collaborators(repository_name)) == 0:
+            # Check repository has any outside collaborators or direct users
+            if (len(github_service.get_repository_collaborators(repository_name)) == 0
+                    and len(github_service.get_repository_direct_users(repository_name)) == 0):
                 # Repository has no owners
                 repositories_with_no_associations.append(repository_name)
 
