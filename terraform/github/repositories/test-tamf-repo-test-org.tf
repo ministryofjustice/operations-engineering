@@ -1,5 +1,6 @@
 module "test_tamf_repo_test_org" {
-  source = "github.com/ministryofjustice/terraform-github-repository.git?ref=add-team-option"
+  source  = "ministryofjustice/repository/github"
+  version = "0.0.7"
 
   providers = {
     github = github.ministryofjustice-test
