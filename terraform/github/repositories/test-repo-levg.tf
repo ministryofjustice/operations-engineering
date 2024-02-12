@@ -1,6 +1,6 @@
 module "test-repo-levg" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.6"
+  version = "0.0.7"
   providers = {
     github = github.ministryofjustice-test
   }

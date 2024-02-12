@@ -1,6 +1,6 @@
 module "operations-engineering-runbooks" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.6"
+  version = "0.0.7"
 
   name         = "operations-engineering-runbooks"
   description  = "Runbook documentation for Operations Engineering"

@@ -1,6 +1,6 @@
 module "terraform-aws-mtasts" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.6"
+  version = "0.0.7"
 
   name        = "terraform-aws-mtasts"
   type        = "module"
