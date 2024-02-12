@@ -5,7 +5,7 @@ module "test-repo-levg" {
     github = github.ministryofjustice-test
   }
 
-  name        = "test-repo-levg"
-  description = "test repo"
-  topics      = ["operations-engineering"]
+  name        =     "test-repo-levg"
+  description =     "test repo"
+  topics      =     ["operations-engineering"]
 }
