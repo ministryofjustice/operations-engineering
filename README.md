@@ -25,9 +25,10 @@ These are just a few examples of this repository's useful tools and features. Fo
 ## Getting Started
 
 1. **Clone the Repo:** `git clone https://github.com/ministryofjustice/operations-engineering.git`
-2. **Navigate to the Repo:** `cd operations-engineering`
-3. **Install Dependencies:** `pip install -r python/requirements.txt`
-4. **Run a script:** `python -m bin.dormant_users # for example`
+2. **Install pre-commit:** `make local-setup`
+3. **Navigate to the Repo:** `cd operations-engineering`
+4. **Install Dependencies:** `pip install -r python/requirements.txt`
+5. **Run a script:** `python -m bin.dormant_users # for example`
 
 ## Naming Standards For Workflow Files
 
