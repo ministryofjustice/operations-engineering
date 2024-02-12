@@ -21,7 +21,7 @@ jobs:
     name: "Terraform Github Repos"
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       id-token: write
     strategy:
