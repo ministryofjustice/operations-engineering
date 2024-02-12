@@ -136,6 +136,36 @@ class TestUnownedRepositories(unittest.TestCase):
         self.assertEqual(len(repos), 0)
         mock_github_service.get_repository_collaborators.assert_not_called()
 
+    @patch("services.github_service.GithubService")
+    @patch("bin.unowned_repositories.get_org_teams")
+    def test_repository_with_no_collaborators_and_no_direct_users(self, mock_get_org_teams, mock_github_service):
+        mock_get_org_teams.return_value = []
+        mock_github_service.get_repository_collaborators.return_value = []
+        mock_github_service.get_repository_direct_users.return_value = []
+        mock_github_service.get_org_repo_names.return_value = ["org-repo"]
+        repos = get_unowned_repositories(mock_github_service)
+        self.assertEqual(len(repos), 1)
+
+    @patch("services.github_service.GithubService")
+    @patch("bin.unowned_repositories.get_org_teams")
+    def test_repository_with_collaborators_but_no_direct_users(self, mock_get_org_teams, mock_github_service):
+        mock_get_org_teams.return_value = []
+        mock_github_service.get_repository_collaborators.return_value = ["collaborator"]
+        mock_github_service.get_repository_direct_users.return_value = []
+        mock_github_service.get_org_repo_names.return_value = ["org-repo"]
+        repos = get_unowned_repositories(mock_github_service)
+        self.assertEqual(len(repos), 0)
+
+    @patch("services.github_service.GithubService")
+    @patch("bin.unowned_repositories.get_org_teams")
+    def test_repository_with_direct_users_but_no_collaborators(self, mock_get_org_teams, mock_github_service):
+        mock_get_org_teams.return_value = []
+        mock_github_service.get_repository_collaborators.return_value = []
+        mock_github_service.get_repository_direct_users.return_value = ["direct-user"]
+        mock_github_service.get_org_repo_names.return_value = ["org-repo"]
+        repos = get_unowned_repositories(mock_github_service)
+        self.assertEqual(len(repos), 0)
+
     @patch("services.slack_service.SlackService")
     def test_send_slack_message(self, mock_slack_service):
         send_slack_message(mock_slack_service, ["repo"])
