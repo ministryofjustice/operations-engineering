@@ -3,5 +3,6 @@ data "github_team" "operations_engineering" {
 }
 
 data "github_team" "operations_engineering_test" {
-  slug = "operations-engineering-test"
+  provider = github.ministryofjustice-test
+  slug     = "operations-engineering-test"
 }
