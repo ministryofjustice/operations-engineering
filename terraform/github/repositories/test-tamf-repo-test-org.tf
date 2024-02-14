@@ -11,5 +11,6 @@ module "test_tamf_repo_test_org" {
   topics      = ["operations-engineering"]
   team_access = {
     maintain = [data.github_team.operations_engineering_test.id]
+    push     = [data.github_team.test_team_access.id]
   }
 }
