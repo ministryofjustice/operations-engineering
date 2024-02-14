@@ -6,6 +6,6 @@ import {
 
 # Imports to ministryofjustice operations-engineering team
 import {
-  to = module.test_tamf_repo_test_org.github_team_repository.admin["operations-engineering"]
+  to = module.acronyms.github_team_repository.admin["operations-engineering"]
   id = "operations-engineering:acronyms"
 }
