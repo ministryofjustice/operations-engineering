@@ -27,7 +27,7 @@ import {
 
 import {
   to = module.github.github_team_repository.admin["4192115"]
-  id = "4192115:github"
+  id = "4192115:.github"
 }
 
 import {
