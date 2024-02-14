@@ -1,8 +1,12 @@
 module "tech-docs-monitor" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.6"
+  version = "0.0.7"
 
   name        = "tech-docs-monitor"
   description = "Part of alphagov/tech-docs-template (issues 👉https://github.com/alphagov/tech-docs-template/issues)"
   topics      = ["operations-engineering"]
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
 }
