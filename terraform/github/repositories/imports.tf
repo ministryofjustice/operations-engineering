@@ -9,3 +9,8 @@ import {
   to = module.acronyms.github_team_repository.admin["4192115"]
   id = "4192115:acronyms"
 }
+
+import {
+  to = module.cloud-platform-maintenance-pages.github_team_repository.admin["4192115"]
+  id = "4192115:cloud-platform-maintenance-pages"
+}
