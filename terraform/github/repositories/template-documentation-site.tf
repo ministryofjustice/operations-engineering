@@ -7,4 +7,8 @@ module "template-documentation-site" {
   description  = "Template repo. for a gov.uk tech-docs-template documentation site published via github pages"
   homepage_url = "https://ministryofjustice.github.io/template-documentation-site/"
   topics       = ["operations-engineering"]
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
 }

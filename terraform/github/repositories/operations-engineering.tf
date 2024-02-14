@@ -7,4 +7,8 @@ module "operations-engineering" {
   homepage_url    = "https://user-guide.operations-engineering.service.justice.gov.uk/"
   has_discussions = true
   topics          = ["operations-engineering", "python", "issue-tracker"]
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
 }

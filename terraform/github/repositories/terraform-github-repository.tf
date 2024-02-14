@@ -7,4 +7,8 @@ module "terraform-github-repository" {
   has_discussions = true
   topics          = ["operations-engineering", "github", "terraform", "terraform-module"]
   type            = "module"
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
 }

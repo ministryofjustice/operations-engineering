@@ -5,6 +5,10 @@ module "operations-engineering-metadata-poc" {
   name        = "operations-engineering-metadata-poc"
   description = "PoC For Cross Identification Between MoJ Services"
   topics      = ["operations-engineering"]
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
   variables = {
     DEVELOPMENT_ECR_REGION     = var.ECR_REGION
     DEVELOPMENT_ECR_REPOSITORY = "operations-engineering/operations-engineering-metadata-poc-ecr"

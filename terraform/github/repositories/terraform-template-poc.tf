@@ -6,4 +6,8 @@ module "terraform-template-poc" {
   type        = "template"
   description = "A Proof of Concept for a resilient and scalable Terraform template, suitable for team use"
   topics      = ["operations-engineering", "standards-compliant"]
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
 }

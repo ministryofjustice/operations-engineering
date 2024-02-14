@@ -5,4 +5,8 @@ module "operations-engineering-devcontainer" {
   name        = "operations-engineering-devcontainer"
   description = ""
   topics      = ["operations-engineering"]
+
+  team_access = {
+    admin = [data.github_team.operations_engineering.id]
+  }
 }
