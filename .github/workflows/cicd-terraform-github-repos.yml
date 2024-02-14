@@ -55,6 +55,10 @@ jobs:
     - name: Terraform Init
       id: init
       run: ls -latr; terraform init -input=false -no-color
+
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
       
     - name: Terraform Plan
       id: plan
