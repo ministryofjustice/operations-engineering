@@ -42,7 +42,7 @@ import {
 
 import {
   to = module.operations-engineering-certificate-renewal.github_team_repository.admin["4192115"]
-  id = "4192115:gitoperations-engineering-certificate-renewalhub"
+  id = "4192115:operations-engineering-certificate-renewal"
 }
 
 import {
