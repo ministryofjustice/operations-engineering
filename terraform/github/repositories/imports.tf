@@ -5,7 +5,7 @@ import {
 }
 
 # Imports to ministryofjustice operations-engineering team
-import {
-  to = module.acronyms.github_team_repository.admin["operations-engineering"]
-  id = "operations-engineering:acronyms"
-}
+# import {
+#   to = module.acronyms.github_team_repository.admin["operations-engineering"]
+#   id = "operations-engineering:acronyms"
+# }
