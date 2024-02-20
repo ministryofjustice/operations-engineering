@@ -3,7 +3,7 @@ module "teraform-aws-route53-backup" {
   version = "0.0.8"
 
   name            = "teraform-aws-route53-backup"
-  description     = "A Terraform module for backup and restore of Amazon Route 53 records."
+  description     = "A Terraform module for backup and restoration of Amazon Route 53 records."
   has_discussions = true
   topics          = ["operations-engineering", "terraform", "terraform-module"]
   type            = "module"
