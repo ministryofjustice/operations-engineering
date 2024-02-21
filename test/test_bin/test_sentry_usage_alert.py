@@ -28,12 +28,19 @@ class TestSentryUsageAlertMain(unittest.TestCase):
         mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = 10000000, START_TIME, END_TIME
         sentry_usage_alert.main()
         mock_slack_service.return_value \
-            .send_error_usage_alert_to_operations_engineering \
-            .assert_called_with(1, UsageStats(total=10000000,
-                                              max_usage=129032,
-                                              percentage_of_quota_used=77.50015500031,
-                                              start_time=START_TIME,
-                                              end_time=END_TIME), 0.2)
+            .send_usage_alert_to_operations_engineering \
+            .assert_called_with(
+                1,
+                UsageStats(
+                    total=10000000,
+                    max_usage=129032,
+                    percentage_of_quota_used=77.50015500031,
+                    start_time=START_TIME,
+                    end_time=END_TIME
+                ),
+                0.2,
+                "error"
+            )
         mock_slack_service.return_value \
             .send_transaction_usage_alert_to_operations_engineering. \
             assert_called_with(1, UsageStats(total=10000000,
