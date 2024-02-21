@@ -1,6 +1,7 @@
 name: "♻️ Terraform Github Repos"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "terraform/github/**"
