@@ -169,61 +169,6 @@ class SlackService:
                                                }
                                            ])
 
-    def send_transaction_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
-                                                               usage_threshold: float):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           :warning: *Sentry Transactions Usage Alert :sentry::warning:*
-                                                           - Usage threshold: {usage_threshold:.0%}
-                                                           - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
-                                                           - Max usage for period: {usage_stats.max_usage} Transactions
-                                                           - Transactions consumed over period: {usage_stats.total}
-                                                           - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
-                                                       """).strip("\n")
-                                                   }
-                                               },
-                                               {
-                                                   "type": "divider"
-                                               },
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": "Check Sentry for projects consuming excessive transactions :eyes:"
-                                                   },
-                                                   "accessory": {
-                                                       "type": "button",
-                                                       "text": {
-                                                           "type": "plain_text",
-                                                           "text": ":sentry: Transaction usage for period",
-                                                           "emoji": True
-                                                       },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
-                                                   }
-                                               },
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": "See Sentry usage alert runbook for help with this alert"
-                                                   },
-                                                   "accessory": {
-                                                       "type": "button",
-                                                       "text": {
-                                                           "type": "plain_text",
-                                                           "text": ":blue_book: Runbook",
-                                                           "emoji": True
-                                                       },
-                                                       "url": self.SENTRY_QUOTA_MANAGEMENT_GUIDANCE
-                                                   }
-                                               }
-                                           ])
     def send_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
                                                                usage_threshold: float, usage_type: str):
         usage_type_lower = usage_type.lower()
