@@ -170,9 +170,9 @@ class SlackService:
                                            ])
 
     def send_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
-                                                               usage_threshold: float, usage_type: str):
-        usage_type_lower = usage_type.lower()
-        usage_type_capitalised = usage_type.capitalize()
+                                                               usage_threshold: float, category: str):
+        category_lower = category.lower()
+        category_capitalised = category.capitalize()
         self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
                                            mrkdown=True,
                                            blocks=[
@@ -181,11 +181,11 @@ class SlackService:
                                                    "text": {
                                                        "type": "mrkdwn",
                                                        "text": dedent(f"""
-                                                           :warning: *Sentry {usage_type_capitalised} Usage Alert :sentry::warning:*
+                                                           :warning: *Sentry {category_capitalised} Usage Alert :sentry::warning:*
                                                            - Usage threshold: {usage_threshold:.0%}
                                                            - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
-                                                           - Max usage for period: {usage_stats.max_usage} {usage_type_capitalised}s
-                                                           - {usage_type_capitalised}s consumed over period: {usage_stats.total}
+                                                           - Max usage for period: {usage_stats.max_usage} {category_capitalised}s
+                                                           - {category_capitalised}s consumed over period: {usage_stats.total}
                                                            - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
                                                        """).strip("\n")
                                                    }
@@ -197,16 +197,16 @@ class SlackService:
                                                    "type": "section",
                                                    "text": {
                                                        "type": "mrkdwn",
-                                                       "text": f"Check Sentry for projects consuming excessive {usage_type_lower}s :eyes:"
+                                                       "text": f"Check Sentry for projects consuming excessive {category_lower}s :eyes:"
                                                    },
                                                    "accessory": {
                                                        "type": "button",
                                                        "text": {
                                                            "type": "plain_text",
-                                                           "text": f":sentry: {usage_type_capitalised} usage for period",
+                                                           "text": f":sentry: {category_capitalised} usage for period",
                                                            "emoji": True
                                                        },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory={usage_type_lower}s&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
+                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory={category_lower}s&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
                                                    }
                                                },
                                                {
