@@ -28,20 +28,28 @@ def main():
         SentryClient("https://sentry.io", sentry_token))
     slack_service = SlackService(slack_token)
 
-    error_usage_stats, transaction_usage_stats = sentry_service.get_quota_usage_for_period_in_days(
+    error_usage_stats, transaction_usage_stats, replay_usage_stats = sentry_service.get_quota_usage_for_period_in_days(
         period_in_days)
 
     logging.info(
         f"Error quota consumed over past {period_in_days} {'days' if period_in_days > 1 else 'day'} [ {error_usage_stats.total} / {error_usage_stats.max_usage} ]. Percentage consumed over period: [ {error_usage_stats.percentage_of_quota_used:.0%} ]")
     logging.info(
         f"Transaction quota consumed over past {period_in_days} {'days' if period_in_days > 1 else 'day'} [ {transaction_usage_stats.total} / {transaction_usage_stats.max_usage} ]. Percentage consumed over period: [ {transaction_usage_stats.percentage_of_quota_used:.0%} ]")
+    logging.info(
+        f"Replay quota consumed over past {period_in_days} {'days' if period_in_days > 1 else 'day'} [ {replay_usage_stats.total} / {replay_usage_stats.max_usage} ]. Percentage consumed over period: [ {replay_usage_stats.percentage_of_quota_used:.0%} ]")
 
     if error_usage_stats.percentage_of_quota_used > usage_threshold:
-        slack_service.send_error_usage_alert_to_operations_engineering(period_in_days, error_usage_stats,
-                                                                       usage_threshold)
+        slack_service.send_error_usage_alert_to_operations_engineering(
+            period_in_days, error_usage_stats, usage_threshold
+        )
     if transaction_usage_stats.percentage_of_quota_used > usage_threshold:
-        slack_service.send_transaction_usage_alert_to_operations_engineering(period_in_days, transaction_usage_stats,
-                                                                             usage_threshold)
+        slack_service.send_transaction_usage_alert_to_operations_engineering(
+            period_in_days, transaction_usage_stats, usage_threshold
+        )
+    if replay_usage_stats.percentage_of_quota_used > usage_threshold:
+        slack_service.send_usage_alert_to_operations_engineering(
+            period_in_days, replay_usage_stats, usage_threshold, "replay"
+        )
 
 
 if __name__ == "__main__":
