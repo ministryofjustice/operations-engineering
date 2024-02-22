@@ -20,7 +20,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ID}}
+          role-to-assume: ${{ secrets.AWS_DSD_R53_EXPORT_ROLE_ARN}}
           aws-region: eu-west-2
 
       - run: python3 -m pip install -r requirements.txt
