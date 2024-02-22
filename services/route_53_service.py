@@ -25,7 +25,7 @@ class Route53Service:
             print(zone_id)
             print(record_set)
             record = None
-            if record_set["ResourceRecords"]:
+            if "ResourceRecords" in record_set:
                 record = {
                     "Name": record_set['Name'],
                     "Type": record_set['Type'],
