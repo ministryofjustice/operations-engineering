@@ -25,7 +25,6 @@ jobs:
 
       - run: python3 -m pip install -r requirements.txt
       - run: python3 -m bin.backup_route_53 
-      - run: cat hosted_zones.json
 
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v4
