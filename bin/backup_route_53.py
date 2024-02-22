@@ -4,7 +4,6 @@ import json
 def test(route_53_service: Route53Service):
     data_to_backup = route_53_service.bulk_export_route53_records()
     print(data_to_backup)
-    print(json.load(data_to_backup))
 
 def main():
     route_53_service = Route53Service()
