@@ -38,8 +38,8 @@ class TestSentryUsageAlertMain(unittest.TestCase):
                             total=10000000,
                             max_usage=129032,
                             percentage_of_quota_used=77.50015500031,
-                            start_time='2023-06-08T00:00:00Z',
-                            end_time='2023-06-09T00:00:00Z'
+                            start_time=START_TIME,
+                            end_time=END_TIME
                         ),
                         0.2,
                         'error'
@@ -50,8 +50,8 @@ class TestSentryUsageAlertMain(unittest.TestCase):
                             total=10000000,
                             max_usage=967741,
                             percentage_of_quota_used=10.333343322231878,
-                            start_time='2023-06-08T00:00:00Z',
-                            end_time='2023-06-09T00:00:00Z'
+                            start_time=START_TIME,
+                            end_time=END_TIME
                         ),
                         0.2,
                         'transaction'
@@ -62,8 +62,8 @@ class TestSentryUsageAlertMain(unittest.TestCase):
                             total=10000000,
                             max_usage=16,
                             percentage_of_quota_used=625000.0,
-                            start_time='2023-06-08T00:00:00Z',
-                            end_time='2023-06-09T00:00:00Z'
+                            start_time=START_TIME,
+                            end_time=END_TIME
                         ),
                         0.2,
                         'replay'
