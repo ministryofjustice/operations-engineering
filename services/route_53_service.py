@@ -22,8 +22,6 @@ class Route53Service:
         records = []
 
         for record_set in response['ResourceRecordSets']:
-            print(zone_id)
-            print(record_set)
             record = None
             if "ResourceRecords" in record_set:
                 record = {
