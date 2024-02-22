@@ -5,9 +5,8 @@ def test(route_53_service: Route53Service):
     print(data_to_backup)
 
 def main():
-    route_53_service = Route53Service
+    route_53_service = Route53Service()
     test(route_53_service)
 
 if __name__ == "__main__":
-    route_53_service = Route53Service()
     main()
