@@ -57,173 +57,128 @@ class SlackService:
 
         return channel_id
 
-    def send_error_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
-                                                         usage_threshold: float):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           :warning: *Sentry Errors Usage Alert :sentry::warning:*
-                                                           - Usage threshold: {usage_threshold:.0%}
-                                                           - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
-                                                           - Max usage for period: {usage_stats.max_usage} Errors
-                                                           - Errors consumed over period: {usage_stats.total}
-                                                           - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
-                                                       """).strip("\n")
-                                                   }
-                                               },
-                                               {
-                                                   "type": "divider"
-                                               },
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": " Check Sentry for projects reporting excessive errors :eyes:"
-                                                   },
-                                                   "accessory": {
-                                                       "type": "button",
-                                                       "text": {
-                                                           "type": "plain_text",
-                                                           "text": ":sentry: Error usage for period",
-                                                           "emoji": True
-                                                       },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
-                                                   }
-                                               },
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": "See Sentry usage alert runbook for help with this alert"
-                                                   },
-                                                   "accessory": {
-                                                       "type": "button",
-                                                       "text": {
-                                                           "type": "plain_text",
-                                                           "text": ":blue_book: Runbook",
-                                                           "emoji": True
-                                                       },
-                                                       "url": self.SENTRY_QUOTA_MANAGEMENT_GUIDANCE
-                                                   }
-                                               }
-                                           ])
-
-    def send_transaction_usage_alert_to_operations_engineering(self, period_in_days: int, usage_stats: UsageStats,
-                                                               usage_threshold: float):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           :warning: *Sentry Transactions Usage Alert :sentry::warning:*
-                                                           - Usage threshold: {usage_threshold:.0%}
-                                                           - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
-                                                           - Max usage for period: {usage_stats.max_usage} Transactions
-                                                           - Transactions consumed over period: {usage_stats.total}
-                                                           - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
-                                                       """).strip("\n")
-                                                   }
-                                               },
-                                               {
-                                                   "type": "divider"
-                                               },
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": "Check Sentry for projects consuming excessive transactions :eyes:"
-                                                   },
-                                                   "accessory": {
-                                                       "type": "button",
-                                                       "text": {
-                                                           "type": "plain_text",
-                                                           "text": ":sentry: Transaction usage for period",
-                                                           "emoji": True
-                                                       },
-                                                       "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
-                                                   }
-                                               },
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": "See Sentry usage alert runbook for help with this alert"
-                                                   },
-                                                   "accessory": {
-                                                       "type": "button",
-                                                       "text": {
-                                                           "type": "plain_text",
-                                                           "text": ":blue_book: Runbook",
-                                                           "emoji": True
-                                                       },
-                                                       "url": self.SENTRY_QUOTA_MANAGEMENT_GUIDANCE
-                                                   }
-                                               }
-                                           ])
+    def send_usage_alert_to_operations_engineering(
+            self, period_in_days: int, usage_stats: UsageStats, usage_threshold: float, category: str
+        ):
+        category_lower = category.lower()
+        category_capitalised = category.capitalize()
+        self.slack_client.chat_postMessage(
+            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": dedent(f"""
+                            :warning: *Sentry {category_capitalised} Usage Alert :sentry::warning:*
+                            - Usage threshold: {usage_threshold:.0%}
+                            - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
+                            - Max usage for period: {usage_stats.max_usage} {category_capitalised}s
+                            - {category_capitalised}s consumed over period: {usage_stats.total}
+                            - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
+                        """).strip("\n")
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"Check Sentry for projects with excessive {category_lower}s :eyes:"
+                    },
+                    "accessory": {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": f":sentry: {category_capitalised} usage for period",
+                            "emoji": True
+                        },
+                        "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory={category_lower}s&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "See Sentry usage alert runbook for help with this alert"
+                    },
+                    "accessory": {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": ":blue_book: Runbook",
+                            "emoji": True
+                        },
+                        "url": self.SENTRY_QUOTA_MANAGEMENT_GUIDANCE
+                    }
+                }
+            ]
+        )
 
     def send_unknown_user_alert_to_operations_engineering(self, users: list):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           *Dormants Users Automation*
-                                                           Remove these users from the Dormants Users allow list:
-                                                           {users}
-                                                       """).strip("\n")
-                                                   }
-                                               }
-                                           ]
-                                           )
+        self.slack_client.chat_postMessage(
+            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": dedent(f"""
+                            *Dormants Users Automation*
+                            Remove these users from the Dormants Users allow list:
+                            {users}
+                        """).strip("\n")
+                    }
+                }
+            ]
+        )
 
-    def send_remove_users_from_github_alert_to_operations_engineering(self, number_of_users: int,
-                                                                      organisation_name: str):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           *Dormants Users Automation*
-                                                           Removed {number_of_users} users from the {organisation_name} GitHub Organisation.
-                                                           See the GH Action for more info: https://github.com/ministryofjustice/operations-engineering
-                                                       """).strip("\n")
-                                                   }
-                                               }
-                                           ]
-                                           )
+    def send_remove_users_from_github_alert_to_operations_engineering(
+            self, number_of_users: int, organisation_name: str
+        ):
+        self.slack_client.chat_postMessage(
+            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": dedent(f"""
+                            *Dormants Users Automation*
+                            Removed {number_of_users} users from the {organisation_name} GitHub Organisation.
+                            See the GH Action for more info: https://github.com/ministryofjustice/operations-engineering
+                        """).strip("\n")
+                    }
+                }
+            ]
+        )
 
-    def send_undelivered_email_alert_to_operations_engineering(self, email_addresses: list, organisation_name: str):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           *Dormants Users Automation*
-                                                           Undelivered emails for {organisation_name} GitHub Organisation:
-                                                           {email_addresses}
-                                                           Remove these users manually
-                                                       """).strip("\n")
-                                                   }
-                                               }
-                                           ]
-                                           )
+    def send_undelivered_email_alert_to_operations_engineering(
+            self, email_addresses: list, organisation_name: str
+        ):
+        self.slack_client.chat_postMessage(
+            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": dedent(f"""
+                            *Dormants Users Automation*
+                            Undelivered emails for {organisation_name} GitHub Organisation:
+                            {email_addresses}
+                            Remove these users manually
+                        """).strip("\n")
+                    }
+                }
+            ]
+        )
 
     def send_remove_users_slack_message(self, number_of_users: int, organisation_name: str):
         message = f"*Dormants Users Automation*\nRemoved {number_of_users} users from the {organisation_name} GitHub Organisation.\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering"
@@ -258,22 +213,23 @@ class SlackService:
         ]
 
     def send_unowned_repos_slack_message(self, repositories: list):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=[
-                                               {
-                                                   "type": "section",
-                                                   "text": {
-                                                       "type": "mrkdwn",
-                                                       "text": dedent(f"""
-                                                           *Unowned Repositories Automation*
-                                                           Repositories on the GitHub Organisation that have no team or collaborator:
-                                                           {repositories}
-                                                       """).strip("\n")
-                                                   }
-                                               }
-                                           ]
-                                           )
+        self.slack_client.chat_postMessage(
+            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": dedent(f"""
+                            *Unowned Repositories Automation*
+                            Repositories on the GitHub Organisation that have no team or collaborator:
+                            {repositories}
+                        """).strip("\n")
+                    }
+                }
+            ]
+        )
 
     def get_all_slack_usernames(self):
         """Fetches all usernames and user email addresses from the Slack API.
