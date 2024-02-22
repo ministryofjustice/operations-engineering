@@ -38,7 +38,7 @@ class Route53Service:
                 }
             records.append(record)
 
-        return json.dumps(records, indent=4)
+        return records
     
     def bulk_export_route53_records(self):
 
