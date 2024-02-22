@@ -25,7 +25,7 @@ jobs:
       
       - name: Test S3 bucket access 
         id: test-s3
-        run: aws s3 ls arn:aws:s3:::cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --summarize
+        run: aws s3 ls cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --summarize
 
       # - run: python3 -m pip install -r requirements.txt
       # - run: python3 -m bin.backup_route_53 
