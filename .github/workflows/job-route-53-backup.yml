@@ -20,15 +20,21 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN}}
+          role-to-assume: ${{ secrets.AWS_ID}}
           aws-region: eu-west-2
-      
-      - name: Test S3 bucket access 
-        id: test-s3
-        run: aws s3 ls cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --summarize
 
       - run: python3 -m pip install -r requirements.txt
       - run: python3 -m bin.backup_route_53 
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN}}
+      #     aws-region: eu-west-2
+
+      # - name: Test S3 bucket access 
+      #   id: test-s3
+      #   run: aws s3 ls cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --summarize
 
       # - name: Report failure to Slack
       #   if: always()
