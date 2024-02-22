@@ -20,7 +20,8 @@ class SentryClient:
 
     def get_usage_total_for_period_in_days(self, category: str, period_in_days: int) -> tuple[int, datetime, datetime]:
         json_data = self.__get(
-            f"/api/0/organizations/ministryofjustice/stats_v2/?statsPeriod={period_in_days}d&field=sum(quantity)&category={category}&outcome=accepted").json()
+            f"/api/0/organizations/ministryofjustice/stats_v2/?statsPeriod={period_in_days}d&field=sum(quantity)&category={category}&outcome=accepted"
+        ).json()
         total = json_data["groups"][0]["totals"]["sum(quantity)"]
         start_time = datetime.strptime(
             json_data["start"], "%Y-%m-%dT%H:%M:%SZ")

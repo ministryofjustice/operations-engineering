@@ -46,12 +46,24 @@ class SentryService:
         percentage_of_replay_quota_used = replay_total / max_replay_usage
 
         error_usage_stats = UsageStats(
-            error_total, max_error_usage, percentage_of_error_quota_used, error_start_time, error_end_time)
-        transaction_usage_stats = UsageStats(transaction_total, max_transaction_usage,
-                                             percentage_of_transaction_quota_used, transaction_start_time,
-                                             transaction_end_time)
-        replay_usage_stats = UsageStats(replay_total, max_replay_usage,
-                                             percentage_of_replay_quota_used, replay_start_time,
-                                             replay_end_time)
+            error_total,
+            max_error_usage,
+            percentage_of_error_quota_used,
+            error_start_time,
+            error_end_time
+        )
+        transaction_usage_stats = UsageStats(
+            transaction_total, max_transaction_usage,
+            percentage_of_transaction_quota_used,
+            transaction_start_time,
+            transaction_end_time
+        )
+        replay_usage_stats = UsageStats(
+            replay_total,
+            max_replay_usage,
+            percentage_of_replay_quota_used,
+            replay_start_time,
+            replay_end_time
+        )
 
         return error_usage_stats, transaction_usage_stats, replay_usage_stats
