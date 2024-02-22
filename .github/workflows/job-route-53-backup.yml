@@ -1,0 +1,38 @@
+name: Backup Route 53
+
+on:
+  # schedule:
+  #   - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  backup-route-53:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN}}
+          aws-region: eu-west-2
+      
+      - name: Test S3 bucket access 
+        id: test-s3
+        run: aws s3 ls
+
+      # - run: python3 -m pip install -r requirements.txt
+      # - run: python3 -m bin.backup_route_53 
+
+      # - name: Report failure to Slack
+      #   if: always()
+      #   uses: ravsamhq/notify-slack-action@v2
+      #   with:
+      #     status: ${{ job.status }}
+      #     notify_when: "failure"
+      #     notification_title: "Failed to backup Route 53"
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
