@@ -9,4 +9,5 @@ def main():
     test(route_53_service)
 
 if __name__ == "__main__":
+    route_53_service = Route53Service()
     main()
