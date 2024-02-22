@@ -21,9 +21,8 @@ class Route53Service:
 
         records = []
 
-        print(response['ResourceRecordSets'])
-        
         for record_set in response['ResourceRecordSets']:
+            print(record_set)
             record = {
                 "Name": record_set['Name'],
                 "Type": record_set['Type'],
