@@ -24,7 +24,7 @@ jobs:
           aws-region: eu-west-2
 
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.backup_route_53 
+      - run: python3 -m bin.export_route_53
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
