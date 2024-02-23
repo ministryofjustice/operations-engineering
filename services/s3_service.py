@@ -13,6 +13,7 @@ class S3Service:
         self.bucket_name = bucket_name
         self.emailed_users_file_name = f"{organisation_name.lower()}_first_email_list.json"
         self.emailed_users_file_path = self.emailed_users_file_name
+        self.r53_backup_file_path = "hosted_zones.json"
         self.dormant_users_file_name = "dormant.csv"
         self.dormant_users_file_path = "dormant.csv"
         self.org_people_file_name = f"export-{organisation_name.lower()}.json"
@@ -26,6 +27,9 @@ class S3Service:
             the_file.write(json.dumps(users))
         self._upload_file(
             self.emailed_users_file_name, self.emailed_users_file_path)
+    
+    def save_r53_backup_file(self):
+        self._upload_file(self.r53_backup_file_path, self.r53_backup_file_path)
 
     def get_users_have_emailed(self):
         self._download_file(
