@@ -1,8 +1,8 @@
 name: Backup Route 53
 
 on:
-  # schedule:
-  #   - cron: "0 4 * * *"
+  schedule:
+    - cron: "* * * * *"
   workflow_dispatch:
   pull_request:
 
@@ -34,16 +34,12 @@ jobs:
 
       - run: python3 -m bin.send_route_53_backup_to_s3
 
-      - run: aws s3 ls cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --summarize
-      - run: aws s3api get-object --bucket cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --key hosted_zones.json test.json
-      - run: cat test.json
-
-      # - name: Report failure to Slack
-      #   if: always()
-      #   uses: ravsamhq/notify-slack-action@v2
-      #   with:
-      #     status: ${{ job.status }}
-      #     notify_when: "failure"
-      #     notification_title: "Failed to backup Route 53"
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed to backup Route 53"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

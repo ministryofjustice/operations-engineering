@@ -1,5 +1,4 @@
 from services.route_53_service import Route53Service
-import json
 
 def export_hosted_zones_to_json(route_53_service: Route53Service):
     data_to_backup = route_53_service.bulk_export_route53_records()
