@@ -52,6 +52,10 @@ jobs:
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
     
+    - name: Terraform Format Check
+      id: fmt-check
+      run: terraform fmt -check
+    
     - name: Terraform Init
       id: init
       run: ls -latr; terraform init -input=false -no-color
