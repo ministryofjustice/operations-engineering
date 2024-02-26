@@ -28,9 +28,9 @@ jobs:
       matrix:
         path:
           - "iam"
-    defaults:
-      run:
-        working-directory: "terraform/github/${{ matrix.path }}"
+    # defaults:
+    #   run:
+    #     working-directory: "terraform/github/${{ matrix.path }}"
     steps:
     - uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
@@ -43,7 +43,7 @@ jobs:
         role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
         aws-region: eu-west-2
 
-    - run: printenv
+    - run: cat ~/.aws/credentials
     
     # - name: Post Link to Apply Pipeline
     #   if: github.ref == 'refs/heads/main' 
