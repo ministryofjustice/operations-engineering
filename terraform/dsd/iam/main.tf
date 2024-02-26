@@ -26,7 +26,7 @@ provider "github" {
   owner = "ministryofjustice"
 }
 
-# provider "aws" {
-#   profile = "infra_profile"
-#   region  = "eu-west-2"
-# }
+provider "aws" {
+  profile = "infra_profile"
+  region  = "eu-west-2"
+}
