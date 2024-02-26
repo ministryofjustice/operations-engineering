@@ -30,7 +30,7 @@ jobs:
           - "iam"
     defaults:
       run:
-        working-directory: "terraform/github/${{ matrix.path }}"
+        working-directory: "terraform/dsd/${{ matrix.path }}"
     steps:
     - uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
@@ -44,7 +44,6 @@ jobs:
         aws-region: eu-west-2
   
     - name: Setup State Profile
-      working-directory: /
       run: |
         aws configure set region ${{ env.AWS_REGION }} --profile state_profile
         aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile state_profile
@@ -58,7 +57,6 @@ jobs:
         aws-region: eu-west-2
   
     - name: Setup Infra Profile
-      working-directory: /
       run: |
         aws configure set region ${{ env.AWS_REGION }} --profile infra_profile
         aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile infra_profile
