@@ -17,6 +17,22 @@ env:
   TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
 
 jobs:
+  configure-state-profile:
+    uses: ./.github/workflows/configure-aws-profile.yml
+    with: 
+      region: "eu-west-2"
+      profile: "state_profile"
+    secrets:
+      role-arn: ${{ secrets.R53_BACKUP_ROLE_ARN }}
+
+  configure-infra-profile:
+    uses: ./.github/workflows/configure-aws-profile.yml
+    with:
+      region: "eu-west-2"
+      profile: "infra_profile"
+    secrets:
+      role-arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
+
   terraform:
     name: "Terraform DSD"
     runs-on: ubuntu-latest
@@ -37,18 +53,6 @@ jobs:
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-    - uses: ministryofjustice/operations-engineering/tree/main/.githubconfigure-aws-profile.yml@r53-backup=iam
-      with: 
-        region: "eu-west-2"
-        profile: "state_profile"
-      secrets:
-        role-arn: ${{ secrets.R53_BACKUP_ROLE_ARN }}
-    - uses: ministryofjustice/operations-engineering/tree/main/.githubconfigure-aws-profile.yml@r53-backup=iam
-      with:
-        region: "eu-west-2"
-        profile: "infra_profile"
-      secrets:
-        role-arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
     - run: aws configure list-profiles
     
     # - name: Post Link to Apply Pipeline
