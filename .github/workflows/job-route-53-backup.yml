@@ -19,7 +19,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_DSD_R53_EXPORT_ROLE_ARN}}
+          role-to-assume: ${{ secrets.AWS_DSD_R53_EXPORT_ROLE_ARN }}
           aws-region: eu-west-2
 
       - run: python3 -m pip install -r requirements.txt
@@ -28,7 +28,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN}}
+          role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
           aws-region: eu-west-2
 
       - run: python3 -m bin.send_route_53_backup_to_s3

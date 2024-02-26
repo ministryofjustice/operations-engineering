@@ -6,7 +6,6 @@ terraform {
     encrypt        = true
     key            = "terraform/dsd/iam/terraform.tfstate"
     region         = "eu-west-2"
-    # profile        = "state_profile"
   }
   required_providers {
     aws = {
@@ -27,6 +26,6 @@ provider "github" {
 }
 
 provider "aws" {
-  profile = "infra_profile"
+  profile = "dsd_profile"
   region  = "eu-west-2"
 }
