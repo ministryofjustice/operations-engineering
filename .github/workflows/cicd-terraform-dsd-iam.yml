@@ -17,38 +17,6 @@ env:
   TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
 
 jobs:
-  configure-aws-profiles:
-    name: "Configure AWS Profiles"
-    runs-on: ubuntu-latest
-    permissions:
-        id-token: write
-    steps:
-    - name: Configure AWS Credentials for State Account
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
-        aws-region: eu-west-2
-    
-    - name: Setup State Profile
-      run: |
-        aws configure set region ${{ env.AWS_REGION }} --profile state_profile
-        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile state_profile
-        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile state_profile
-        aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile state_profile
-
-    - name: Configure AWS Credentials for Infra Account
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
-        aws-region: eu-west-2
-
-    - name: Setup Infra Profile
-      run: |
-        aws configure set region ${{ env.AWS_REGION }} --profile infra_profile
-        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile infra_profile
-        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile infra_profile
-        aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile infra_profile
-
   terraform:
     name: "Terraform DSD"
     runs-on: ubuntu-latest
@@ -60,15 +28,27 @@ jobs:
       matrix:
         path:
           - "iam"
-    # defaults:
-    #   run:
-    #     working-directory: "terraform/github/${{ matrix.path }}"
+    defaults:
+      run:
+        working-directory: "terraform/github/${{ matrix.path }}"
     steps:
     - uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
 
+    - uses: ministryofjustice/operations-engineering/tree/main/.githubconfigure-aws-profile.yml@r53-backup=iam
+      with: 
+        region: "eu-west-2"
+        profile: "state_profile"
+      secrets:
+        role-arn: ${{ secrets.R53_BACKUP_ROLE_ARN }}
+    - uses: ministryofjustice/operations-engineering/tree/main/.githubconfigure-aws-profile.yml@r53-backup=iam
+      with:
+        region: "eu-west-2"
+        profile: "infra_profile"
+      secrets:
+        role-arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
     - run: aws configure list-profiles
     
     # - name: Post Link to Apply Pipeline
