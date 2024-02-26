@@ -43,7 +43,7 @@ jobs:
         role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
         aws-region: eu-west-2
 
-    - run: cat ~/.aws/credentials
+    - run: printenv
     
     # - name: Post Link to Apply Pipeline
     #   if: github.ref == 'refs/heads/main' 
