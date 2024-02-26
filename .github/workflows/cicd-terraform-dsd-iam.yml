@@ -40,10 +40,10 @@ jobs:
       contents: read
       pull-requests: write
       id-token: write
-    strategy:
-      matrix:
-        path:
-          - "iam"
+    # strategy:
+    #   matrix:
+    #     path:
+    #       - "iam"
     defaults:
       run:
         working-directory: "terraform/github/${{ matrix.path }}"
