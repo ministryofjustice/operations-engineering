@@ -3,6 +3,7 @@ name: Backup Route 53
 on:
   schedule:
     - cron: "0 4 * * 1"
+  workflow_dispatch:
 
 jobs:
   backup-route-53:
