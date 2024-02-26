@@ -17,34 +17,17 @@ env:
   TF_VAR_github_token: ${{ secrets.TERRAFORM_ADMIN_DEV_LEVG }}
 
 jobs:
-  configure-state-profile:
-    uses: ./.github/workflows/configure-aws-profile.yml
-    with: 
-      region: "eu-west-2"
-      profile: "state_profile"
-    secrets:
-      role-arn: ${{ secrets.R53_BACKUP_ROLE_ARN }}
-
-  configure-infra-profile:
-    uses: ./.github/workflows/configure-aws-profile.yml
-    with:
-      region: "eu-west-2"
-      profile: "infra_profile"
-    secrets:
-      role-arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
-
   terraform:
     name: "Terraform DSD"
-    needs: [ configure-state-profile, configure-infra-profile ]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
       id-token: write
-    # strategy:
-    #   matrix:
-    #     path:
-    #       - "iam"
+    strategy:
+      matrix:
+        path:
+          - "iam"
     defaults:
       run:
         working-directory: "terraform/github/${{ matrix.path }}"
@@ -53,6 +36,34 @@ jobs:
     - uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
+    
+    - name: Configure AWS Credentials for State Account
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
+        aws-region: eu-west-2
+  
+    - name: Setup State Profile
+      working-directory: /
+      run: |
+        aws configure set region ${{ env.AWS_REGION }} --profile state_profile
+        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile state_profile
+        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile state_profile
+        aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile state_profile
+
+    - name: Configure AWS Credentials for Infra Account
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
+        aws-region: eu-west-2
+  
+    - name: Setup Infra Profile
+      working-directory: /
+      run: |
+        aws configure set region ${{ env.AWS_REGION }} --profile infra_profile
+        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile infra_profile
+        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile infra_profile
+        aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile infra_profile
 
     - run: aws configure list-profiles
     
