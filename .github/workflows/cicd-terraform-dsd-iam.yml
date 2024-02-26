@@ -20,6 +20,8 @@ jobs:
   configure-aws-profiles:
     name: "Configure AWS Profiles"
     runs-on: ubuntu-latest
+    permissions:
+        id-token: write
     steps:
     - name: Configure AWS Credentials for State Account
       uses: aws-actions/configure-aws-credentials@v4
