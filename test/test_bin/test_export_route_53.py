@@ -1,4 +1,5 @@
 import json
+import os 
 import unittest
 from unittest.mock import patch
 from bin.export_route_53 import main
@@ -24,6 +25,8 @@ class TestExportRoute53(unittest.TestCase):
         res = json.load(file)
 
         file.close()
+
+        os.remove("hosted_zones.json")
 
         assert records == res
 
