@@ -1,4 +1,4 @@
-name: "♻️ Terraform DSD"
+name: "♻️ Terraform AWS DSD Account"
 
 on:
   workflow_dispatch:
