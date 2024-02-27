@@ -6,7 +6,7 @@ data "aws_iam_openid_connect_provider" "github" {
   url = "https://${local.oidc_provider}"
 }
 
-resource "aws_iam_role" "r53-backup-role" {
+resource "aws_iam_role" "r53_backup_role" {
   name               = "operations-engineering-r53-backup-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy_document.json
 }
