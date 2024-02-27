@@ -11,6 +11,7 @@ python-dateutil==2.8.2
 requests==2.31.0
 slack_sdk==3.26.1
 toml==0.10.2
+moto==5.0.2
 
 # Development
 coverage==7.3.3
