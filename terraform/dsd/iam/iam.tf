@@ -56,12 +56,12 @@ resource "aws_iam_policy" "r53_read_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "r53_read_policy_attachment" {
-  role       = aws_iam_role.r53-backup-role.name
+  role       = aws_iam_role.r53_backup_role.name
   policy_arn = aws_iam_policy.r53_read_policy.arn
 }
 
 resource "github_actions_secret" "role_arn" {
   repository      = "operations-engineering"
   secret_name     = "AWS_DSD_R53_EXPORT_ROLE_ARN"
-  plaintext_value = aws_iam_role.r53-backup-role.arn
+  plaintext_value = aws_iam_role.r53_backup_role.arn
 }
