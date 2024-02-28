@@ -1,7 +1,6 @@
 name: Restore DSD Hosted Zones From S3 Backup 
 
 on:
-    pull_request:
     workflow_dispatch:
         inputs:
             hosted_zone_ids:
