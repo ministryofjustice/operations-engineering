@@ -5,7 +5,6 @@ import sys
 import json
 
 def restore_route53_from_backup(s3_service: S3Service, r53_service: Route53Service, hosted_zones):
-    s3_service._download_file('hosted_zones.json', 'hosted_zones.json')
 
     f = open('hosted_zones.json')
 

@@ -22,18 +22,26 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+          role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - run: python3 -m bin.import_route53_backup 
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
           role-to-assume: ${{ secrets.AWS_DSD_R53_RESTORE_FROM_BACKUP_ROLE_ARN }}
           aws-region: eu-west-2
 
       - run: python3 -m pip install -r requirements.txt
-    #   - run: python3 -m bin.restore_route53_from_backup ${{inputs.hosted_zone_ids}}
+      - run: python3 -m bin.restore_route53_from_backup ${{inputs.hosted_zone_ids}}
 
-    #   - name: Report failure to Slack
-    #     if: always()
-    #     uses: ravsamhq/notify-slack-action@v2
-    #     with:
-    #       status: ${{ job.status }}
-    #       notify_when: "failure"
-    #       notification_title: "Failed to backup Route 53"
-    #     env:
-    #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed to backup Route 53"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
