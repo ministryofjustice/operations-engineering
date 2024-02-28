@@ -121,11 +121,11 @@ class Route53Service:
 
     def bulk_restore_hosted_zones(self, json_backup, hosted_zones_to_restore):
 
-        backup_data = json.loads(json_backup)
+        backup_data = json_backup
 
         new_zone_ids = []
 
-        if hosted_zones_to_restore == 'all':
+        if hosted_zones_to_restore == ['all']:
             for hz_id in backup_data.keys():
                 new_zone_id = self.restore_hosted_zone(hz_id, backup_data[hz_id]['name'])
                 self.restore_hosted_zone_records(new_zone_id, backup_data[hz_id]['records'])
