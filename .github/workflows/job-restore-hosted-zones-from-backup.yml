@@ -1,12 +1,13 @@
 name: Restore DSD Hosted Zones From S3 Backup 
 
 on:
-  workflow_dispatch:
-    inputs:
-        hosted_zone_ids:
-            description: "A comma separated string of hosted zone ids to restore e.g. 'id1,id2,id3', or 'all' to restore all hosted zones"
-            required: true
-            type: string
+    pull_request:
+    workflow_dispatch:
+        inputs:
+            hosted_zone_ids:
+                description: "A comma separated string of hosted zone ids to restore e.g. 'id1,id2,id3', or 'all' to restore all hosted zones"
+                required: true
+                type: string
 
 jobs:
   restore-from-backup:
@@ -26,7 +27,7 @@ jobs:
           aws-region: eu-west-2
 
       - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.restore_route53_from_backup ${{inputs.hosted_zone_ids}}
+    #   - run: python3 -m bin.restore_route53_from_backup ${{inputs.hosted_zone_ids}}
 
     #   - name: Report failure to Slack
     #     if: always()
