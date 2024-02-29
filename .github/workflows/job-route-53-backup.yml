@@ -33,6 +33,8 @@ jobs:
 
       - run: python3 -m bin.send_route_53_backup_to_s3
 
+      - run: aws s3api get-object --bucket cloud-platform-50ad54b3b789d9fba7b301cce9d35f39 --key hosted_zones.json test.json && cat test.json 
+
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

@@ -18,7 +18,8 @@ class TestRoute53Service(unittest.TestCase):
 
         res = self.route_53_service.get_route53_hosted_zones()
 
-        assert res[0] == zone['HostedZone']['Id']
+        assert res[0]['id'] == zone['HostedZone']['Id']
+        assert res[0]['name'] == zone['HostedZone']['Name']
 
     @mock_aws
     def test_export_route53_records(self):
@@ -73,7 +74,7 @@ class TestRoute53Service(unittest.TestCase):
     @patch.object(Route53Service, "export_route53_records")
     def test_bulk_export_route53_records(self, mock_records, mock_zone_id):
 
-        mock_zone_id.return_value = ["/hostedzone/Z31RX3GZS94JZS"]
+        mock_zone_id.return_value = [{"id": "/hostedzone/Z31RX3GZS94JZS", "name": "testdns.aws.com."}]
         mock_records.return_value = [
             {'Name': 'testdns.aws.com.', 'Type': 'NS', 'TTL': 172800, 'ResourceRecords': ['ns-2048.awsdns-64.com', 'ns-2049.awsdns-65.net', 'ns-2050.awsdns-66.org', 'ns-2051.awsdns-67.co.uk']}, 
             {'Name': 'testdns.aws.com.', 'Type': 'SOA', 'TTL': 900, 'ResourceRecords': ["{'Value': 'ns-2048.awsdns-64.com. hostmaster.example.com. 1 7200 900 1209600 86400'}"]}
@@ -81,7 +82,7 @@ class TestRoute53Service(unittest.TestCase):
 
         res = self.route_53_service.bulk_export_route53_records()
 
-        assert json.loads(res) == {'/hostedzone/Z31RX3GZS94JZS': [{'Name': 'testdns.aws.com.', 'Type': 'NS', 'TTL': 172800, 'ResourceRecords': ['ns-2048.awsdns-64.com', 'ns-2049.awsdns-65.net', 'ns-2050.awsdns-66.org', 'ns-2051.awsdns-67.co.uk']}, {'Name': 'testdns.aws.com.', 'Type': 'SOA', 'TTL': 900, 'ResourceRecords': ["{'Value': 'ns-2048.awsdns-64.com. hostmaster.example.com. 1 7200 900 1209600 86400'}"]}]}
+        assert json.loads(res) == {'/hostedzone/Z31RX3GZS94JZS': {'name': 'testdns.aws.com.', 'records': [{'Name': 'testdns.aws.com.', 'Type': 'NS', 'TTL': 172800, 'ResourceRecords': ['ns-2048.awsdns-64.com', 'ns-2049.awsdns-65.net', 'ns-2050.awsdns-66.org', 'ns-2051.awsdns-67.co.uk']}, {'Name': 'testdns.aws.com.', 'Type': 'SOA', 'TTL': 900, 'ResourceRecords': ["{'Value': 'ns-2048.awsdns-64.com. hostmaster.example.com. 1 7200 900 1209600 86400'}"]}]}}
 
 
 if __name__ == "__main__":
