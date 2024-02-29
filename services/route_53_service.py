@@ -1,7 +1,5 @@
 import boto3
 import json
-from datetime import datetime
-
 
 class Route53Service:
     def __init__(self) -> None:
@@ -11,9 +9,11 @@ class Route53Service:
 
         response = self.client.list_hosted_zones()
 
-        hosted_zone_ids = [zone['Id'] for zone in response['HostedZones']]
+        hosted_zone_data = []
+        for zone in response['HostedZones']:
+            hosted_zone_data.append({'id': zone['Id'], 'name': zone['Name']})
 
-        return hosted_zone_ids
+        return hosted_zone_data 
     
     def export_route53_records(self, zone_id: str):
 
@@ -42,12 +42,12 @@ class Route53Service:
     
     def bulk_export_route53_records(self):
 
-        hosted_zone_ids = self.get_route53_hosted_zones()
+        hosted_zone_data = self.get_route53_hosted_zones()
 
         exported_records = {}
 
-        for zone_id in hosted_zone_ids:
-            records = self.export_route53_records(zone_id)
-            exported_records[zone_id] = records
+        for zone in hosted_zone_data:
+            records = self.export_route53_records(zone['id'])
+            exported_records[zone['id']] = {'name': zone['name'], 'records': records}
 
         return json.dumps(exported_records, indent=4)
