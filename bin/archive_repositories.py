@@ -35,7 +35,8 @@ MINISTRYOFJUSTICE_REPOS_ALLOW_LIST = [
     "CareStandards",  # keep repo in list until collaborator Arcturus-Tom is removed
     "AdministrativeAppeals",  # keep repo in list until collaborator Arcturus-Tom is removed
     "laa-ccms-opa-interview-initialiser",
-    "yjaf-gateway-proxy"  # keep repo in list until collaborator is removed
+    "yjaf-gateway-proxy",  # keep repo in list until collaborator is removed
+    "safety-diagnostic-tool"
 ]
 
 MOJ_ANALYTICAL_SERVICES_GITHUB_ORGANIZATION_NAME = "moj-analytical-services"
@@ -46,7 +47,16 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "opg-data-processing",
     "df_criminal_court_research",
     "criminal-forecasting-rap",
-    "airflow-matrix-scraper"
+    "airflow-matrix-scraper",
+    "airflow-shs-qual",
+    "airflow-assaults-reasons-locations",
+    "airflow-spells-correction",
+    "airflow-viper",
+    "airflow-viper-test",
+    "airflow-sh-location",
+    "airflow-sdt-extras",
+    "airflow-sdt",
+    "airflow-viper-to-external-ds"
 ]
 
 
