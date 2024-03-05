@@ -23,3 +23,45 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
+
+      - name: CVE Description escaped extraction and print
+        run: |
+          SCAN_RESULTS=$(jq -r '.runs[0].tool.driver.rules | map(.help.text) | join("\\n")' results.sarif)
+          echo "CVE_CRITICAL=$(echo $SCAN_RESULTS | grep -o CRITICAL | wc -l)" >> $GITHUB_ENV
+          echo "CVE_HIGH=$(echo $SCAN_RESULTS | grep -o HIGH | wc -l)" >> $GITHUB_ENV
+          echo "CVE_MEDIUM=$(echo $SCAN_RESULTS | grep -o MEDIUM | wc -l)" >> $GITHUB_ENV
+
+          echo $SCAN_RESULTS
+
+      - name: Fails if CVE HIGH or CRITICAL are detected
+        id: cve-threshold
+        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0 || env.CVE_MEDIUM > 0
+        run: exit 1
+
+      - name: Send notification to Slack
+        id: slack
+        if: always() && github.event_name == 'schedule' && steps.cve-threshold.outcome == 'failure'
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 #v1.24.0
+        with:
+            payload: |
+                {
+                "blocks": [
+                    {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "[ ${{ github.event.repository.name }} ]"
+                    }
+                    },
+                    {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": " `CRITICAL` : *${{ env.CVE_CRITICAL }}*\n\n`HIGH` : *${{ env.CVE_HIGH }}*\n\n`MEDIUM` : *${{ env.CVE_MEDIUM }}*\n\n<https://github.com/${{ github.repository }}/security/code-scanning |See details on GitHub>"
+                    }
+                    }
+                ]
+                }
+            env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
