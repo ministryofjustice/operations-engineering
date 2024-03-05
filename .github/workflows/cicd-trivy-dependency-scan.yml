@@ -40,7 +40,7 @@ jobs:
 
       - name: Send notification to Slack
         id: slack
-        if: always() && github.event_name == 'schedule' && steps.cve-threshold.outcome == 'failure'
+        if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.cve-threshold.outcome == 'failure'
         uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 #v1.24.0
         with:
             payload: |
@@ -57,7 +57,7 @@ jobs:
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": " `CRITICAL` : *${{ env.CVE_CRITICAL }}*\n\n`HIGH` : *${{ env.CVE_HIGH }}*\n\n`MEDIUM` : *${{ env.CVE_MEDIUM }}*\n\n<https://github.com/${{ github.repository }}/security/code-scanning |See details on GitHub>"
+                        "text": " `CRITICAL` : *${{ env.CVE_CRITICAL }}*\n\n`HIGH` : *${{ env.CVE_HIGH }}*\n\n`MEDIUM` : *${{ env.CVE_MEDIUM }}*\n\n<https://github.com/${{ github.repository }}/security/code-scanning | See details on GitHub>"
                     }
                     }
                 ]
