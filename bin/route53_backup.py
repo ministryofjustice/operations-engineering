@@ -4,7 +4,7 @@ from services.s3_service import S3Service
 def export_hosted_zones_to_json(route_53_service: Route53Service):
     data_to_backup = route_53_service.bulk_export_route53_records()
 
-    with open('hosted_zones.json', "w") as json_file:
+    with open('hosted_zones_dev.json', "w") as json_file:
         json_file.write(data_to_backup)
 
 # Use CP profile 
