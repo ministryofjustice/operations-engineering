@@ -13,7 +13,7 @@ class S3Service:
         self.bucket_name = bucket_name
         self.emailed_users_file_name = f"{organisation_name.lower()}_first_email_list.json"
         self.emailed_users_file_path = self.emailed_users_file_name
-        self.r53_backup_file_path = "hosted_zone_dev.json"
+        self.r53_backup_file_path = "hosted_zones_dev.json"
         self.dormant_users_file_name = "dormant.csv"
         self.dormant_users_file_path = "dormant.csv"
         self.org_people_file_name = f"export-{organisation_name.lower()}.json"
