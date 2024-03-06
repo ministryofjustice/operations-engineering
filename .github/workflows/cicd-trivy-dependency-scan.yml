@@ -35,8 +35,16 @@ jobs:
 
       - name: Fails if CVE HIGH or CRITICAL are detected
         id: cve-threshold
-        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0 || env.CVE_MEDIUM > 0
+        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
         run: exit 1
+
+      - name: Create an Issue for Detected Vulnerabilities
+        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 #v2.8.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: .github/ISSUE_TEMPLATE/trivy-vulnerability-template.md
 
       - name: Send notification to Slack
         id: slack
@@ -45,22 +53,46 @@ jobs:
         with:
             payload: |
                 {
-                "blocks": [
+                    "blocks": [
                     {
-                    "type": "header",
-                    "text": {
+                        "type": "header",
+                        "text": {
                         "type": "plain_text",
-                        "text": "[ ${{ github.event.repository.name }} ]"
-                    }
+                        "text": "Vulnerability Scan Report: ${{ github.event.repository.name }}"
+                        }
                     },
                     {
-                    "type": "section",
-                    "text": {
+                        "type": "section",
+                        "text": {
                         "type": "mrkdwn",
-                        "text": " `CRITICAL` : *${{ env.CVE_CRITICAL }}*\n\n`HIGH` : *${{ env.CVE_HIGH }}*\n\n`MEDIUM` : *${{ env.CVE_MEDIUM }}*\n\n<https://github.com/${{ github.repository }}/security/code-scanning | See details on GitHub>"
+                        "text": "*Scan Summary:*"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*CRITICAL:* :rotating_light: ${{ env.CVE_CRITICAL }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*HIGH:* :warning: ${{ env.CVE_HIGH }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*MEDIUM:* :yellow_heart: ${{ env.CVE_MEDIUM }}"
+                        }
+                        ]
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                        "type": "mrkdwn",
+                        "text": "Please review the detailed scan results and take necessary actions. <https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>"
+                        }
                     }
-                    }
-                ]
+                    ]
                 }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
