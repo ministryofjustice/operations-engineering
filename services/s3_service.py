@@ -29,7 +29,9 @@ class S3Service:
             self.emailed_users_file_name, self.emailed_users_file_path)
     
     def save_r53_backup_file(self):
-        self._upload_file(self.r53_backup_file_path, self.r53_backup_file_path)
+        session = boto3.Session(profile_name='cp_r53_backup_profile')
+        client = session.client('s3')
+        client.upload_file(self.r53_backup_file_path, self.bucket_name, self.r53_backup_file_path)
 
     def get_users_have_emailed(self):
         self._download_file(

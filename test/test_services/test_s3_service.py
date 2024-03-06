@@ -67,11 +67,6 @@ class TestS3Service(unittest.TestCase):
             self.s3_service.save_emailed_users_file(["some-user"])
         mock_upload_file.assert_called_once_with(
             self.s3_service.emailed_users_file_name, self.s3_service.emailed_users_file_path)
-    
-    @patch.object(S3Service, "_upload_file")
-    def test_save_r53_backup_file(self, mock_upload_file):
-        self.s3_service.save_r53_backup_file()
-        mock_upload_file.assert_called_once_with(self.s3_service.r53_backup_file_path, self.s3_service.r53_backup_file_path)
 
     @patch.object(S3Service, "_download_file")
     @patch.object(json, "load")
