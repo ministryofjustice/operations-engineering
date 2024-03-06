@@ -51,49 +51,54 @@ jobs:
         if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.cve-threshold.outcome == 'failure'
         uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 #v1.24.0
         with:
-            payload: |
+          payload: |
+            {
+              "blocks": [
                 {
-                    "blocks": [
-                    {
-                        "type": "header",
-                        "text": {
-                        "type": "plain_text",
-                        "text": "Vulnerability Scan Report: ${{ github.event.repository.name }}"
-                        }
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                        "type": "mrkdwn",
-                        "text": "*Scan Summary:*"
-                        }
-                    },
-                    {
-                        "type": "section",
-                        "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*CRITICAL:* :rotating_light: ${{ env.CVE_CRITICAL }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*HIGH:* :warning: ${{ env.CVE_HIGH }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*MEDIUM:* :yellow_heart: ${{ env.CVE_MEDIUM }}"
-                        }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                        "type": "mrkdwn",
-                        "text": "Please review the detailed scan results and take necessary actions. <https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>"
-                        }
-                    }
-                    ]
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Vulnerability Scan Report: ${{ github.event.repository.name }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Scan Summary:*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*CRITICAL:* :rotating_light: ${{ env.CVE_CRITICAL }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*HIGH:* :warning: ${{ env.CVE_HIGH }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*MEDIUM:* :yellow_heart: ${{ env.CVE_MEDIUM }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Please review the detailed scan results and take necessary actions. <https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>\n\n*Issue Created:* <${{ steps.issue-creator.outputs.url }}|View Issue>"
+                  }
                 }
+              ]
+            }
+      
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
