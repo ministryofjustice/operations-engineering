@@ -23,3 +23,84 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
+
+      - name: CVE Description escaped extraction and print
+        run: |
+          SCAN_RESULTS=$(jq -r '.runs[0].tool.driver.rules | map(.help.text) | join("\\n")' trivy-results.sarif)
+          echo "CVE_CRITICAL=$(echo $SCAN_RESULTS | grep -o CRITICAL | wc -l)" >> $GITHUB_ENV
+          echo "CVE_HIGH=$(echo $SCAN_RESULTS | grep -o HIGH | wc -l)" >> $GITHUB_ENV
+          echo "CVE_MEDIUM=$(echo $SCAN_RESULTS | grep -o MEDIUM | wc -l)" >> $GITHUB_ENV
+
+          echo $SCAN_RESULTS
+
+      - name: Create an Issue for Detected Vulnerabilities
+        id: issue-creator
+        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 #v2.8.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          update_existing: false
+          filename: .github/ISSUE_TEMPLATE/trivy-vulnerability-template.md
+
+      - name: Fails if CVE HIGH or CRITICAL are detected
+        id: cve-threshold
+        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
+        run: exit 1
+
+      - name: Send notification to Slack
+        id: slack
+        if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.cve-threshold.outcome == 'failure'
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 #v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Vulnerability Scan Report: ${{ github.event.repository.name }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Scan Summary:*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*CRITICAL:* :rotating_light: ${{ env.CVE_CRITICAL }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*HIGH:* :warning: ${{ env.CVE_HIGH }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*MEDIUM:* :yellow_heart: ${{ env.CVE_MEDIUM }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "Please review the detailed scan results and take necessary actions. <https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>\n\n*Issue Created:* <${{ steps.issue-creator.outputs.url }}|View Issue>"
+                  }
+                }
+              ]
+            }
+      
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
