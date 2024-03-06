@@ -33,11 +33,6 @@ jobs:
 
           echo $SCAN_RESULTS
 
-      - name: Fails if CVE HIGH or CRITICAL are detected
-        id: cve-threshold
-        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
-        run: exit 1
-
       - name: Create an Issue for Detected Vulnerabilities
         if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 #v2.8.2
@@ -45,6 +40,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           filename: .github/ISSUE_TEMPLATE/trivy-vulnerability-template.md
+
+      - name: Fails if CVE HIGH or CRITICAL are detected
+        id: cve-threshold
+        if: env.CVE_HIGH > 0 || env.CVE_CRITICAL > 0
+        run: exit 1
 
       - name: Send notification to Slack
         id: slack
