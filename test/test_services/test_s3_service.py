@@ -7,7 +7,6 @@ from unittest.mock import call, patch, mock_open
 from freezegun import freeze_time
 from services.s3_service import S3Service
 from config.constants import NO_ACTIVITY
-from moto import mock_aws
 
 
 class TestS3Service(unittest.TestCase):
