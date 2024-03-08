@@ -1210,4 +1210,5 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
         logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
-        return AuthenticatedUser.AuthenticatedUser.get_orgs(self) or []
+        user = self.github_client_core_api.get_user()
+        return user.get_orgs() or []
