@@ -8,7 +8,8 @@ def alert_on_low_github_actions_quota():
     
     organisations = github_service.get_all_organisations_in_enterprise()
 
-    print(organisations)
+    for org in organisations:
+        print(org.login)
 
 if __name__ == "__main__":
     alert_on_low_github_actions_quota()
