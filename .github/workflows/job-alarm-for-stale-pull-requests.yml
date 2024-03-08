@@ -28,7 +28,7 @@ jobs:
           while read -r pr; do
             PR_ATTACHMENTS="$PR_ATTACHMENTS,{\"title\": \"Pull Request\",\"value\": \"$pr\",\"short\": false}"
           done <<< "$PR_JSON"
-          
+
           echo "HAS_STALE_PRS=true" >> $GITHUB_ENV
           echo "PR_ATTACHMENTS=${PR_ATTACHMENTS:1}" >> $GITHUB_ENV
         else
