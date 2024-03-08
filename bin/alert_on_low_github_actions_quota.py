@@ -4,12 +4,17 @@ import os
 
 def alert_on_low_github_actions_quota():
     github_token = os.environ.get("ADMIN_GITHUB_TOKEN")
+    if github_token is None:
+        print("No GITHUB_TOKEN environment variable set")
+        exit(1)
+
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
     
-    organisations = github_service.get_all_organisations_in_enterprise()
+    print(github_service.get_enterprise())
+    # organisations = github_service.get_all_organisations_in_enterprise()
 
-    for org in organisations:
-        print(org)
+    # for org in organisations:
+    #     print(org)
 
 if __name__ == "__main__":
     alert_on_low_github_actions_quota()
