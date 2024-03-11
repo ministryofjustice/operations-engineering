@@ -1211,7 +1211,13 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_used_for_organisation(self, organization) -> int:
         logging.info(f"Getting all github actions minutes used for organization {organization}")
-        command = f"gh api -H \"Accept: application/vnd.github+json\" -H \"X-GitHub-Api-Version: 2022-11-28\" /orgs/{organization}/settings/billing/actions"
+        command = [
+            "gh", 
+            "api",
+            "-H", "Accept: application/vnd.github+json",
+            "-H", "X-GitHub-Api-Version: 2022-11-28",
+            f"/orgs/{organization}/settings/billing/actions"
+        ]       
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         output = result.stdout.strip()
         return output
