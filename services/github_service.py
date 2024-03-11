@@ -16,6 +16,7 @@ from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
 from requests import Session
+import subprocess
 
 from config.logging_config import logging
 
@@ -1210,7 +1211,10 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_used_for_organisation(self, organization) -> int:
         logging.info(f"Getting all github actions minutes used for organization {organization}")
-        return organization.get_actions_usage()
+        command = f"gh api -H \"Accept: application/vnd.github+json\" -H \"X-GitHub-Api-Version: 2022-11-28\" /orgs/{organization}/settings/billing/actions"
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        output = result.stdout.strip()
+        return output
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
