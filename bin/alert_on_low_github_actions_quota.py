@@ -10,7 +10,7 @@ def alert_on_low_github_actions_quota():
     organisations = github_service.get_all_organisations_in_enterprise()
 
     for org in organisations:
-        print(github_service.get_gha_minutes_used_for_organisation(org.login))
+        print(github_service.get_gha_minutes_used_for_organisation(org))
         
 if __name__ == "__main__":
     alert_on_low_github_actions_quota()
