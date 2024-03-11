@@ -1224,7 +1224,7 @@ class GithubService:
             output = result.stdout.strip()
             return output
         except subprocess.CalledProcessError as e:
-            print(f"couldn't get billing data:\norganization: {organization}\nreturncode: {e.returncode}\noutput: {e.output}")
+            print(f"(Warning) Couldn't get billing data:\norganization: {organization}\nreturncode: {e.returncode}\noutput: {e.output}")
             if json.loads(e.output)["message"] == "Not Found":
                 return json.dumps({"total_minutes_used": 0})
 
