@@ -1221,12 +1221,11 @@ class GithubService:
 
         try:
             result = subprocess.run(command, capture_output=True, text=True, check=True)
+            output = result.stdout.strip()
+            return output
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
-
-        output = result.stdout.strip()
-        return output
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
