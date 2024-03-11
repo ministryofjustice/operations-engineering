@@ -1206,6 +1206,11 @@ class GithubService:
                 break
 
         return new_members
+    
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_gha_minutes_used_for_organisation(self, organization) -> int:
+        logging.info(f"Getting all github actions minutes used for organization {organization}")
+        return organization.get_actions_usage()
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
