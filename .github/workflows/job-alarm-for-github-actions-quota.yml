@@ -6,6 +6,11 @@ on:
   workflow_dispatch:
   pull_request:
 
+env:
+  # ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+  ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
+  ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+
 jobs:
   low-quota-threshold:
     runs-on: ubuntu-latest
@@ -15,14 +20,10 @@ jobs:
         with:
           python-version: "3.11"
       - run: python3 -m pip install -r requirements.txt
-      # - run: gh org list
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+
+      - run: |
+          gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /orgs/ministryofjustice/settings/billing/actions
       - run: python3 -m bin.alert_on_low_github_actions_quota
-        env:
-          # ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
-          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
 
     #   - name: Report failure to Slack
     #     if: always()
