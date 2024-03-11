@@ -614,8 +614,8 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"][
-                            "isLocked"] == True:
+                    if repo["node"]["isDisabled"] or repo["node"]["isArchived"] or repo["node"][
+                            "isLocked"]:
                         continue
                     repository_names.append(repo["node"]["name"])
 
@@ -644,7 +644,7 @@ class GithubService:
 
                 if data["search"]["repos"] is not None:
                     for repo in data["search"]["repos"]:
-                        if repo["repo"]["isDisabled"] == True or repo["repo"]["isLocked"] == True:
+                        if repo["repo"]["isDisabled"] or repo["repo"]["isLocked"]:
                             continue
                         repos.append(repo["repo"])
 
@@ -1101,42 +1101,42 @@ class GithubService:
         logging.info(f"Getting audit log entries since {since_date}")
         today = datetime.now()
         query = """
-			query($organisation_name: String!, $since_date: String!, $cursor: String) {
-				organization(login: $organisation_name) {
-					auditLog(
-						first: 100
-						after: $cursor
-						query: $since_date
-					) {
-						edges{
-							node{
-								... on OrgAddMemberAuditEntry {
-									action
-									createdAt
-									actorLogin
-									operationType
-									permission
-									userLogin
-								}
-								... on OrgUpdateMemberAuditEntry {
-									action
-									createdAt
-									actorLogin
-									operationType
-									permission
-									permissionWas
-									userLogin
-								}
-							}
-						}
-						pageInfo {
-							endCursor
-							hasNextPage
-						}
-					}
-				}
-			}
-		"""
+            query($organisation_name: String!, $since_date: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $since_date
+                    ) {
+                        edges{
+                            node{
+                                ... on OrgAddMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    operationType
+                                    permission
+                                    userLogin
+                                }
+                                ... on OrgUpdateMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    operationType
+                                    permission
+                                    permissionWas
+                                    userLogin
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
         variable_values = {
             "organisation_name": self.organisation_name,
             "since_date": f"action:org.add_member  action:org.update_member  created:{since_date}..{today.strftime('%Y-%m-%d')}",
