@@ -1227,7 +1227,7 @@ class GithubService:
             print(e.returncode)
             print(e.output)
             if json.loads(e.output)["message"] == "Not Found":
-                return json.dumps({{"total_minutes_used": 0}})
+                return json.dumps({"total_minutes_used": 0})
 
 
     @retries_github_rate_limit_exception_at_next_reset_once
