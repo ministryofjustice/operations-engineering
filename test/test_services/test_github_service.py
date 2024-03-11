@@ -1982,8 +1982,7 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['action'], 'org.add_member')
         self.assertEqual(result[0]['permission'], 'READ')
-        
-        
+
     def test_check_for_audit_log_new_members(self, mock_github_client_gql):
         github_service = GithubService("", ORGANISATION_NAME)
         return_value = {
@@ -1991,9 +1990,9 @@ class TestNewOwnerDetected(unittest.TestCase):
                 "auditLog": {
                     "edges": [
                         {"node": {"action": "org.add_member", "createdAt": "2023-12-06T10:32:07.832Z",
-                                "actorLogin": "user1", "userLogin": "new_member1"}},
+                                            "actorLogin": "user1", "userLogin": "new_member1"}},
                         {"node": {"action": "org.add_member", "createdAt": "2023-12-07T11:32:07.832Z",
-                                "actorLogin": "user2", "userLogin": "new_member2"}}
+                                            "actorLogin": "user2", "userLogin": "new_member2"}}
                     ],
                     "pageInfo": {
                         "endCursor": None,
@@ -2011,7 +2010,7 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[0]['action'], 'org.add_member')
         self.assertEqual(result[0]['actorLogin'], 'user1')
         self.assertEqual(result[0]['userLogin'], 'new_member1')
-        
+
         self.assertEqual(result[1]['action'], 'org.add_member')
         self.assertEqual(result[1]['actorLogin'], 'user2')
         self.assertEqual(result[1]['userLogin'], 'new_member2')
