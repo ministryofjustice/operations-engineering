@@ -1226,7 +1226,7 @@ class GithubService:
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
-            if e.output["message"] == "Not Found":
+            if json.loads(e.output)["message"] == "Not Found":
                 return json.dumps({{"total_minutes_used": 0}})
 
 
