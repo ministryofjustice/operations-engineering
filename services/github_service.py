@@ -1226,6 +1226,9 @@ class GithubService:
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
+            if e.output["message"] == "Not Found":
+                return json.dumps({{"total_minutes_used": 0}})
+
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
