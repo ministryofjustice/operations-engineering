@@ -1218,7 +1218,13 @@ class GithubService:
             "-H", "X-GitHub-Api-Version: 2022-11-28",
             f"/orgs/{organization}/settings/billing/actions"
         ]       
-        result = subprocess.run(command, capture_output=True, text=True, check=True)
+
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+        except subprocess.CalledProcessError as e:
+            print(e.returncode)
+            print(e.output)
+
         output = result.stdout.strip()
         return output
 
