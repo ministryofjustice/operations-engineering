@@ -1226,8 +1226,6 @@ class GithubService:
         except subprocess.CalledProcessError as e:
             print(e.returncode)
             print(e.output)
-            print(result.stderr)
-            print(result.stdout)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
