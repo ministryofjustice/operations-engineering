@@ -1,6 +1,7 @@
 from services.github_service import GithubService
 from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 import os
+import json
 
 def alert_on_low_github_actions_quota():
     github_token = os.environ.get("GH_TOKEN")
@@ -11,7 +12,8 @@ def alert_on_low_github_actions_quota():
 
     for org in organisations:
         billing_data = github_service.get_gha_minutes_used_for_organisation(org.login)
-        minutes_used = billing_data["total_minutes_used"]
+        processed_data = json.loads(billing_data)
+        minutes_used = processed_data["total_minutes_used"]
         print(minutes_used)
         
 if __name__ == "__main__":
