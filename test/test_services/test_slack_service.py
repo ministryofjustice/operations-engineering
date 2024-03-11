@@ -159,6 +159,7 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
                            'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
                            'url': SENTRY_QUOTA_MANAGEMENT_GUIDANCE}}])
 
+
 @patch("slack_sdk.WebClient.__new__")
 class TestSlackServiceSendReplayUsageAlertToOperationsEngineering(unittest.TestCase):
 
