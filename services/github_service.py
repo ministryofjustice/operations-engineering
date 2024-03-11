@@ -1225,9 +1225,6 @@ class GithubService:
             return output
         except subprocess.CalledProcessError as e:
             print(f"(Warning) Couldn't get billing data:\norganization: {organization}\nreturncode: {e.returncode}\noutput: {e.output}")
-            if json.loads(e.output)["message"] == "Not Found":
-                return json.dumps({"total_minutes_used": 0})
-
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
