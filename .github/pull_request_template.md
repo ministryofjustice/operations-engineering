@@ -11,7 +11,7 @@
 •
 
 ---
-<!-- Ensure you've completed the following actions before submitting the PR -->
+<!-- Optionally, check you've completed the following actions before submitting the PR -->
 ### :white_check_mark: Things to Check (Optional)
 - [ ] I have run all unit tests, and they pass.
 - [ ] I have ensured my code follows the project's coding standards.
