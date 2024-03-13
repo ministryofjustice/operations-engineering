@@ -10,7 +10,7 @@ def calculate_percentage_used(total_minutes_used):
     return (total_minutes_used / total_available) * 100
 
 def low_threshold_triggered_message(percentage_used):
-    return f":siren: Warning:\n\n {100 - percentage_used}% of the Github Actions minutes quota remains."
+    return f"Warning:\n\n {round(100 - percentage_used, 1)}% of the Github Actions minutes quota remains."
 
 def calculate_total_minutes_used(organisations, github_service):
     total = 0 
@@ -37,9 +37,7 @@ def alert_on_low_github_actions_quota():
 
     percentage_used = calculate_percentage_used(total_minutes_used)
 
-    threshold = os.environ.get("GHA_MINUTES_QUOTA_THRESHOLD")
-
-    print(threshold)
+    threshold = int(os.environ.get("GHA_MINUTES_QUOTA_THRESHOLD"))
 
     if percentage_used >= threshold:
         slack_service.send_message_to_plaintext_channel_name(low_threshold_triggered_message(percentage_used), SLACK_CHANNEL)
