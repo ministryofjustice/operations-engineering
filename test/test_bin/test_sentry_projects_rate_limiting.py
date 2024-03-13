@@ -17,10 +17,10 @@ class TestSentry(unittest.TestCase):
         mock_get_org_teams.assert_called()
         mock_check_sentry_projects.assert_called()
 
-    @patch("bin.sentry_projects_rate_limiting.get_project_keys")
-    def test_check_sentry_projects_with_no_teams(self, mock_get_project_keys):
+    @patch("bin.sentry_projects_rate_limiting.check_sentry_projects_teams")
+    def test_check_sentry_projects_with_no_teams(self, mock_check_sentry_projects_teams):
         sentry_projects_rate_limiting.check_sentry_projects("", "", None)
-        mock_get_project_keys.assert_not_called()
+        mock_check_sentry_projects_teams.assert_not_called()
 
     @patch("bin.sentry_projects_rate_limiting.get_project_keys")
     @patch("bin.sentry_projects_rate_limiting.print_project_key_info")
@@ -28,7 +28,7 @@ class TestSentry(unittest.TestCase):
         teams = [{"name": "some-team", "projects": [{"slug": "some-slug",
                                                      "name": "some-name", "status": "some-status"}]}]
         mock_get_project_keys.return_value = None
-        sentry_projects_rate_limiting.check_sentry_projects("", "", teams)
+        sentry_projects_rate_limiting.check_sentry_projects_teams("", "", teams)
         mock_get_project_keys.assert_called()
         mock_print_project_key_info.assert_not_called()
 
@@ -39,7 +39,7 @@ class TestSentry(unittest.TestCase):
                                                      "name": "some-name", "status": "some-status"}]}]
         project_key = {"rateLimit": None}
         mock_get_project_keys.return_value = [project_key]
-        sentry_projects_rate_limiting.check_sentry_projects("", "", teams)
+        sentry_projects_rate_limiting.check_sentry_projects_teams("", "", teams)
         mock_get_project_keys.assert_called()
         mock_print_project_key_info.assert_called()
 
