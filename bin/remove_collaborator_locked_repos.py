@@ -37,10 +37,10 @@ def repository_query(after_cursor=None, repo_name=None) -> gql:
     """.replace(
         # This is the next page ID to start the fetch from
         "AFTER",
-        '"{}"'.format(after_cursor) if after_cursor else "null",
+        f'"{after_cursor}"' if after_cursor else "null",
     ).replace(
         "REPO_NAME",
-        '"{}"'.format(repo_name) if repo_name else "null",
+        f'"{repo_name}"' if repo_name else "null",
     )
 
     return gql(query)
