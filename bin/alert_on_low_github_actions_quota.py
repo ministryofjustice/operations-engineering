@@ -10,7 +10,7 @@ def calculate_percentage_used(total_minutes_used):
     return (total_minutes_used / total_available) * 100
 
 def low_threshold_triggered_message(percentage_used):
-    return f"Warning:\n\n {100 - percentage_used}% of the Github Actions minutes quota remains."
+    return f":siren: Warning:\n\n {100 - percentage_used}% of the Github Actions minutes quota remains."
 
 def calculate_total_minutes_used(organisations, github_service):
     total = 0 
