@@ -3,6 +3,13 @@ from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 import os
 import json
 from services.slack_service import SlackService
+import datetime
+
+def reset_alerting_threshold_if_first_day_of_month(github_service):
+    base_alerting_threshold = 70
+
+    if datetime.date.today().day == 1:
+        github_service.modify_gha_minutes_quota_threshold(base_alerting_threshold)
 
 def calculate_percentage_used(total_minutes_used):
     total_available = 50000
@@ -37,13 +44,14 @@ def alert_on_low_github_actions_quota():
 
     percentage_used = calculate_percentage_used(total_minutes_used)
 
+    reset_alerting_threshold_if_first_day_of_month(github_service)
+
     threshold = int(os.environ.get("GHA_MINUTES_QUOTA_THRESHOLD"))
 
-    github_service.modify_gha_minutes_quota_threshold(80)
+    if percentage_used >= threshold:
+        slack_service.send_message_to_plaintext_channel_name(low_threshold_triggered_message(percentage_used), SLACK_CHANNEL)
+        github_service.modify_gha_minutes_quota_threshold(threshold + 10)
 
-    # if percentage_used >= threshold:
-    #     slack_service.send_message_to_plaintext_channel_name(low_threshold_triggered_message(percentage_used), SLACK_CHANNEL)
-        
 if __name__ == "__main__":
     alert_on_low_github_actions_quota()
 
