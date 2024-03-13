@@ -37,7 +37,9 @@ def alert_on_low_github_actions_quota():
 
     percentage_used = calculate_percentage_used(total_minutes_used)
 
-    threshold = 10
+    threshold = os.environ.get("GHA_MINUTES_QUOTA_THRESHOLD")
+
+    print(threshold)
 
     if percentage_used >= threshold:
         slack_service.send_message_to_plaintext_channel_name(low_threshold_triggered_message(percentage_used), SLACK_CHANNEL)
