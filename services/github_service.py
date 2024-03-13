@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, NamedUser, RateLimitExceededException,
-                    UnknownObjectException, AuthenticatedUser)
+                    UnknownObjectException, Variable)
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Repository import Repository
@@ -1231,3 +1231,8 @@ class GithubService:
         logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
         user = self.github_client_core_api.get_user()
         return user.get_orgs() or []
+    
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def modify_gha_minutes_quota_threshold(self, new_threshold):
+        logging.info(f"Changing the alerting threshold to {new_threshold}%")
+        Variable.Variable.edit("GHA_MINUTES_QUOTA_THRESHOLD", str(new_threshold))
