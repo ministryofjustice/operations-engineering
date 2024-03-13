@@ -1246,3 +1246,9 @@ class GithubService:
         ]       
         
         subprocess.run(command)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_gha_minutes_quota_threshold(self):
+        repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
+        return repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD").value
+
