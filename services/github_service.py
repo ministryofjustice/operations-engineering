@@ -1242,8 +1242,8 @@ class GithubService:
             "-H", "Accept: application/vnd.github+json",
             "-H", "X-GitHub-Api-Version: 2022-11-28",
             "/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD",
-            "-f", "'GHA_MINUTES_QUOTA_THRESHOLD'",
-            "-f", f"value='{str(new_threshold)}'"
+            "-f", "name=\'GHA_MINUTES_QUOTA_THRESHOLD\'",
+            "-f", f"value=\'{str(new_threshold)}\'"
         ]       
         
         subprocess.run(command)
