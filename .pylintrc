@@ -420,7 +420,8 @@ disable=raw-checker-failed,
         missing-module-docstring,
         missing-function-docstring,
         line-too-long,
-        E0401
+        E0401,  # Failed to import package
+        R0903  # Too few public methods
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
