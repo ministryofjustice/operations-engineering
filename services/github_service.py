@@ -1236,6 +1236,6 @@ class GithubService:
     def modify_gha_minutes_quota_threshold(self, new_threshold):
         logging.info(f"Changing the alerting threshold to {new_threshold}%")
         repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
-        actions_variable = repo.get_workflow_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        actions_variable = repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
         print(actions_variable)
         # actions_variable.edit("GHA_MINUTES_QUOTA_THRESHOLD", str(new_threshold))
