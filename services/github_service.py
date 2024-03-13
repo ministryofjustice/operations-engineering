@@ -111,10 +111,9 @@ class GithubService:
                     f"Skipping repository: {repository.name}. Reason: Present in allow list")
                 return False
             return True
-        else:
-            logging.info(
-                f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-            return False
+        logging.info(
+            f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+        return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
