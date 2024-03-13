@@ -8,7 +8,7 @@ import datetime
 def reset_alerting_threshold_if_first_day_of_month(github_service):
     base_alerting_threshold = 70
 
-    if datetime.date.today().day == 1:
+    if datetime.date.today().day == 13:
         github_service.modify_gha_minutes_quota_threshold(base_alerting_threshold)
 
 def calculate_percentage_used(total_minutes_used):
