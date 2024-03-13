@@ -422,6 +422,7 @@ disable=raw-checker-failed,
         line-too-long,
         E0401,  # Failed to import package
         R0903,  # Too few public methods
+        R0904,  # Too many public methods
         C0302  # Too many lines in module
 
 # Enable the message, report, category or checker with the given id(s). You can
