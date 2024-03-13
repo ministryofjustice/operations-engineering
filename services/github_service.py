@@ -1235,6 +1235,15 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def modify_gha_minutes_quota_threshold(self, new_threshold):
         logging.info(f"Changing the alerting threshold to {new_threshold}%")
-        repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
-        actions_variable = repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
-        actions_variable.edit(str(new_threshold))
+        command = [
+            "gh", 
+            "api",
+            "--method", "PATCH",
+            "-H", "Accept: application/vnd.github+json",
+            "-H", "X-GitHub-Api-Version: 2022-11-28",
+            "/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD",
+            "-f", "name='GHA_MINUTES_QUOTA_THRESHOLD'",
+            "-f", f"{new_threshold}"
+        ]       
+        
+        subprocess.run(command)
