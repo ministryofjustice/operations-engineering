@@ -1243,7 +1243,7 @@ class GithubService:
             "-H", "X-GitHub-Api-Version: 2022-11-28",
             "/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD",
             "-f", "name='GHA_MINUTES_QUOTA_THRESHOLD'",
-            "-f", f"value='{new_threshold}'"
+            "-f", f"value='{str(new_threshold)}'"
         ]       
         
         subprocess.run(command)
