@@ -9,6 +9,7 @@ specified threshold.
 """
 
 import os
+import sys
 from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -34,11 +35,11 @@ def alert_on_low_github_licences(threshold=10):
     github_token = os.environ.get("ADMIN_GITHUB_TOKEN")
     if github_token is None:
         print("No GITHUB_TOKEN environment variable set")
-        exit(1)
+        sys.exit(1)
     slack_token = os.environ.get("ADMIN_SLACK_TOKEN")
     if slack_token is None:
         print("No SLACK_TOKEN environment variable set")
-        exit(1)
+        sys.exit(1)
 
     remaining_licences = GithubService(
         github_token, MINISTRY_OF_JUSTICE, ENTERPRISE).get_remaining_licences()

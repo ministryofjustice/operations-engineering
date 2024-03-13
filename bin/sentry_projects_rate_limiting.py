@@ -49,38 +49,42 @@ def print_project_key_info(project_key):
 
 def check_sentry_projects(headers, base_url, teams):
     if teams is not None:
-        rate_limited_keys = 0
-        total_keys = 0
+        check_sentry_projects_teams(headers, base_url, teams)
 
-        for team in teams:
-            team_name = team["name"]
-            print(f"Team: {team_name}")
 
-            for project in team["projects"]:
-                project_slug = project["slug"]
-                project_name = project["name"]
-                project_status = project["status"]
+def check_sentry_projects_teams(headers, base_url, teams):
+    total_keys = 0
+    rate_limited_keys = 0
 
-                print(f" Project: {project_name}")
-                print(f" Status: {project_status}")
+    for team in teams:
+        team_name = team["name"]
+        print(f"Team: {team_name}")
 
-                project_keys = get_project_keys(
-                    headers, base_url, project_slug)
+        for project in team["projects"]:
+            project_slug = project["slug"]
+            project_name = project["name"]
+            project_status = project["status"]
 
-                if project_keys is not None:
-                    for project_key in project_keys:
-                        total_keys += 1
+            print(f" Project: {project_name}")
+            print(f" Status: {project_status}")
 
-                        print_project_key_info(project_key)
+            project_keys = get_project_keys(
+                headers, base_url, project_slug)
 
-                        if project_key["rateLimit"] is None:
-                            rate_limited_keys += 1
+            if project_keys is not None:
+                for project_key in project_keys:
+                    total_keys += 1
 
-                        print("")
+                    print_project_key_info(project_key)
 
-        print(f"Total Keys: {total_keys}")
-        print(f"Rate Limited Keys: {(total_keys - rate_limited_keys)}")
-        print(f"Non Rate Limited Keys: {rate_limited_keys}")
+                    if project_key["rateLimit"] is None:
+                        rate_limited_keys += 1
+
+                    print("")
+
+    print(f"Total Keys: {total_keys}")
+    print(f"Rate Limited Keys: {(total_keys - rate_limited_keys)}")
+    print(f"Non Rate Limited Keys: {rate_limited_keys}")
 
 
 def main():

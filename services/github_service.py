@@ -41,8 +41,8 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
             logging.warning(
                 f"Caught {type(exception).__name__}, retrying calls when rate limit resets.")
             rate_limits = args[0].github_client_core_api.get_rate_limit()
-            rate_limit_to_use = rate_limits.core if type(
-                exception) is RateLimitExceededException else rate_limits.graphql
+            rate_limit_to_use = rate_limits.core if isinstance(
+                exception, RateLimitExceededException) else rate_limits.graphql
 
             reset_timestamp = timegm(rate_limit_to_use.reset.timetuple())
             now_timestamp = timegm(gmtime())
@@ -111,10 +111,9 @@ class GithubService:
                     f"Skipping repository: {repository.name}. Reason: Present in allow list")
                 return False
             return True
-        else:
-            logging.info(
-                f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-            return False
+        logging.info(
+            f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+        return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
