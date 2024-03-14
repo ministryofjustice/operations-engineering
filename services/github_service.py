@@ -1236,9 +1236,9 @@ class GithubService:
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        payload = {'name': 'GHA_MINUTES_QUOTA_THRESHOLD', 'value' : f"{new_threshold}" }
+        payload = { 'value' : f"{new_threshold}" }
 
-        self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", payload, headers=headers)
+        self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", data=payload, headers=headers)
         
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_quota_threshold(self):
