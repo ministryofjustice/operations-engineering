@@ -47,6 +47,7 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
 
         self.assertEqual(calculate_total_minutes_used(["org1", "org2"], GithubService), 20)
 
+    @patch("github.Github.__new__")
     @patch("bin.alert_on_low_github_actions_quota.low_threshold_triggered_message")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     @patch.object(SlackService, "send_message_to_plaintext_channel_name")
@@ -63,7 +64,8 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
         mock_get_gha_minutes_quota_threshold, 
         mock_send_message_to_plaintext_channel_name,
         mock_modify_gha_minutes_quota_threshold,
-        mock_low_threshold_triggered_message
+        mock_low_threshold_triggered_message,
+        mock_github_client_core_api
     ):
 
         mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
@@ -78,6 +80,7 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
         mock_send_message_to_plaintext_channel_name.assert_called_once_with(f"Warning:\n\n 25% of the Github Actions minutes quota remains.", "operations-engineering-alerts")
         mock_modify_gha_minutes_quota_threshold.assert_called_once_with(80)
 
+    @patch("github.Github.__new__")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     @patch.object(SlackService, "send_message_to_plaintext_channel_name")
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
@@ -92,7 +95,8 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_gha_minutes_quota_threshold, 
         mock_send_message_to_plaintext_channel_name,
-        mock_modify_gha_minutes_quota_threshold
+        mock_modify_gha_minutes_quota_threshold,
+        mock_github_client_core_api
     ):
 
         mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
