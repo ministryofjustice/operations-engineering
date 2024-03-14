@@ -4,7 +4,6 @@ import os
 import json
 from services.slack_service import SlackService
 import datetime
-import time
 
 def reset_alerting_threshold_if_first_day_of_month(github_service):
     base_alerting_threshold = 70
