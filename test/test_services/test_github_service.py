@@ -23,7 +23,7 @@ ENTERPRISE_NAME = "ministry-of-justice-uk"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
-# pylint: disable=E1101, W0212
+# pylint: disable=E1101, W0212, C2801
 
 
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
@@ -1429,7 +1429,7 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_gql_client):
+    def test_calls_downstream_services(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_user_org_email_address("test_team_name")
         github_service.github_client_gql_api.assert_has_calls([
@@ -1457,7 +1457,7 @@ class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_org_members_login_names()
         github_service.github_client_core_api.get_organization.assert_has_calls(
@@ -1634,6 +1634,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
     def setUp(self) -> None:
         self.team = Mock()
+        self.commit = Mock()
         self.team.name = "team1"
         self.team.id = 1
 
@@ -1718,7 +1719,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(1, len(result))
 
-    def test_user_is_inactive(self, mock_github_client_core_api):
+    def test_user_is_inactive(self, _mock_github_client_core_api):
 
         self.commit = Mock()
         self.commit.commit.author.date = datetime.now(
@@ -1733,7 +1734,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(True, result)
 
-    def test_user_is_active(self, mock_github_client_core_api):
+    def test_user_is_active(self, _mock_github_client_core_api):
 
         self.commit = Mock()
         self.commit.commit.author.date = datetime.now()
