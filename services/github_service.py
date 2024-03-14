@@ -1219,9 +1219,9 @@ class GithubService:
 
         response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
 
-        print(response)
+        print(response.json())
 
-        return response
+        return response.json()
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
