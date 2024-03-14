@@ -1236,7 +1236,7 @@ class GithubService:
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        payload = { 'value' : new_threshold }
+        payload = { 'value' : str(new_threshold) }
 
         response = self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
 
