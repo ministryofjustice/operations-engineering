@@ -1065,16 +1065,16 @@ class GithubService:
 
         try:
             team = org.get_team_by_slug(team_name)
-        except UnknownObjectException:
+        except UnknownObjectException as exc:
             raise ValueError(
-                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'")
+                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'") from exc
 
         for repo_name in repositories:
             try:
                 repo = org.get_repo(repo_name)
-            except UnknownObjectException:
+            except UnknownObjectException as exc:
                 raise ValueError(
-                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'")
+                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'") from exc
 
             logging.info(
                 f"Updating {team_name} team's permission to {permission} on {repo_name}")

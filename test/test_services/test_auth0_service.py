@@ -9,7 +9,7 @@ from config.constants import (
     RESPONSE_NO_CONTENT
 )
 
-# pylint: disable=W0212
+# pylint: disable=R0902, W0212
 
 
 class TestAuth0Service(unittest.TestCase):

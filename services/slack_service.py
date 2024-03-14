@@ -30,15 +30,14 @@ class SlackService:
         """
         channel_id = self._lookup_channel_id(channel_name)
         if channel_id is None:
-            logging.error(f"Could not find channel {channel_name}")
+            logging.error("Could not find channel %s", channel_name)
         else:
             response = self.slack_client.chat_postMessage(
                 channel=channel_id, text=message)
             if not response['ok']:
-                logging.error(
-                    f"Error sending message to channel {channel_name}: {response['error']}")
+                logging.error("Error sending message to channel %s: %s", channel_name, response['error'])
             else:
-                logging.info(f"Message sent to channel {channel_name}")
+                logging.info("Message sent to channel %s", channel_name)
 
     def _lookup_channel_id(self, channel_name, cursor=''):
         channel_id = None
@@ -58,8 +57,8 @@ class SlackService:
         return channel_id
 
     def send_usage_alert_to_operations_engineering(
-            self, period_in_days: int, usage_stats: UsageStats, usage_threshold: float, category: str
-        ):
+                self, period_in_days: int, usage_stats: UsageStats, usage_threshold: float, category: str
+            ):
         category_lower = category.lower()
         category_capitalised = category.capitalize()
         self.slack_client.chat_postMessage(
@@ -138,8 +137,8 @@ class SlackService:
         )
 
     def send_remove_users_from_github_alert_to_operations_engineering(
-            self, number_of_users: int, organisation_name: str
-        ):
+                self, number_of_users: int, organisation_name: str
+            ):
         self.slack_client.chat_postMessage(
             channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
             mrkdown=True,
@@ -159,8 +158,8 @@ class SlackService:
         )
 
     def send_undelivered_email_alert_to_operations_engineering(
-            self, email_addresses: list, organisation_name: str
-        ):
+                self, email_addresses: list, organisation_name: str
+            ):
         self.slack_client.chat_postMessage(
             channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
             mrkdown=True,
@@ -267,12 +266,11 @@ class SlackService:
                     if not cursor:
                         break
                 else:
-                    logging.error(
-                        f"Error fetching user data: {response['error']}")
+                    logging.error("Error fetching user data: %s}", response['error'])
                     break
                 time.sleep(delay_seconds)
         except Exception as e:
-            logging.error(f"An error has occurred connecting to Slack: {e}")
+            logging.error("An error has occurred connecting to Slack: %s", e)
             return []
 
         return user_data

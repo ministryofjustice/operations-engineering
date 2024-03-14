@@ -3,6 +3,10 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime
 from freezegun import freeze_time
 from config.constants import MISSING_EMAIL_ADDRESS
+from config.constants import (
+    MINISTRY_OF_JUSTICE,
+    MOJ_ANALYTICAL_SERVICES,
+)
 
 from bin.dormant_users import (
     main,
@@ -18,13 +22,6 @@ from bin.dormant_users import (
     MINISTRY_OF_JUSTICE_ALLOW_LIST,
     MOJ_ANALYTICAL_SERVICES_ALLOW_LIST,
 )
-
-from config.constants import (
-    MINISTRY_OF_JUSTICE,
-    MOJ_ANALYTICAL_SERVICES,
-)
-
-# pylint: disable=W0611 W0613
 
 
 def create_undelivered_email_user(email_address):
@@ -312,7 +309,7 @@ class TestRunStepOne(unittest.TestCase):
     @freeze_time("2023-07-13")
     @patch("bin.dormant_users.get_allow_list_users", return_value=[])
     @patch("bin.dormant_users.sleep", return_value=None)
-    def test_run_step_one_when_user_missing_email_address(self, mock_sleep, mock_get_allow_list_users, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
+    def test_run_step_one_when_user_missing_email_address(self, _mock_sleep, _mock_get_allow_list_users, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = [
             "full-org-user"]
         user = create_saved_json_file_user("full-org-user")
@@ -338,7 +335,7 @@ class TestRunStepOne(unittest.TestCase):
 
     @freeze_time("2023-08-13")
     @patch("bin.dormant_users.sleep", return_value=None)
-    def test_run_step_one_in_production_mode(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
+    def test_run_step_one_in_production_mode(self, _mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         new_list = MINISTRY_OF_JUSTICE_ALLOW_LIST.copy()
         mock_github_service.get_org_members_login_names.return_value = new_list
         user = create_saved_json_file_user("full-org-user")
@@ -366,7 +363,7 @@ class TestRunStepOne(unittest.TestCase):
 
     @freeze_time("2023-08-13")
     @patch("bin.dormant_users.sleep", return_value=None)
-    def test_run_step_one_in_production_mode_with_no_undelivered_email(self, mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
+    def test_run_step_one_in_production_mode_with_no_undelivered_email(self, _mock_sleep, mock_get_dormant_users, mock_slack_service, mock_notify_service, mock_github_service, mock_s3_service, mock_auth0_service):
         mock_github_service.get_org_members_login_names.return_value = MINISTRY_OF_JUSTICE_ALLOW_LIST
         user = create_saved_json_file_user("full-org-user")
         mock_get_dormant_users.return_value = [user]

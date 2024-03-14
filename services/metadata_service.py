@@ -94,7 +94,7 @@ class MetadataService:
             timeout=60
         )
 
-        if response.status_code == 200 or response.status_code == 201:
+        if response.status_code in (200, 201):
             logging.info("New usernames added successfully!")
         else:
             logging.error(
