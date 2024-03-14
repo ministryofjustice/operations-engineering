@@ -1217,7 +1217,7 @@ class GithubService:
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        response = self.github_client_rest_api.get(f"/orgs/{organization}/settings/billing/actions", headers=headers)
+        response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
 
         print(response)
 
