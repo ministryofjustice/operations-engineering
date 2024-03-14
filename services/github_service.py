@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, NamedUser, RateLimitExceededException,
-                    UnknownObjectException, Variable)
+                    UnknownObjectException)
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Repository import Repository
@@ -16,7 +16,6 @@ from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
 from requests import Session
-import subprocess
 
 from config.logging_config import logging
 
@@ -1209,6 +1208,12 @@ class GithubService:
         return new_members
     
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_all_organisations_in_enterprise(self) -> list[Organization]:
+        logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
+
+        return [ org.login for org in self.github_client_core_api.get_user().get_orgs() ] or []
+    
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_used_for_organisation(self, organization) -> int:
         logging.info(f"Getting all github actions minutes used for organization {organization}")
 
@@ -1220,12 +1225,6 @@ class GithubService:
         response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
 
         return response.json()
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_all_organisations_in_enterprise(self) -> list[Organization]:
-        logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
-        user = self.github_client_core_api.get_user()
-        return user.get_orgs() or []
     
     @retries_github_rate_limit_exception_at_next_reset_once
     def modify_gha_minutes_quota_threshold(self, new_threshold):
@@ -1242,6 +1241,6 @@ class GithubService:
         
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_quota_threshold(self):
-        repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
-        return int(repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD").value)
+        actions_variable = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        return int(actions_variable.value)
 

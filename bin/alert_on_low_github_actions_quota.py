@@ -1,7 +1,6 @@
 from services.github_service import GithubService
 from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 import os
-import json
 from services.slack_service import SlackService
 import datetime
 
@@ -23,7 +22,7 @@ def calculate_total_minutes_used(organisations, github_service):
     total = 0 
     
     for org in organisations:
-        billing_data = github_service.get_gha_minutes_used_for_organisation(org.login)
+        billing_data = github_service.get_gha_minutes_used_for_organisation(org)
         minutes_used = billing_data["total_minutes_used"]
         total += minutes_used
 

@@ -1,4 +1,5 @@
 import unittest
+import json
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import MagicMock, Mock, call, patch
@@ -12,7 +13,9 @@ from github.GitCommit import GitCommit
 from github.Issue import Issue
 from github.NamedUser import NamedUser
 from github.Repository import Repository
+from github.Organization import Organization
 from github.Team import Team
+from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
 
 from services.github_service import (
@@ -2015,6 +2018,46 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[1]['actorLogin'], 'user2')
         self.assertEqual(result[1]['userLogin'], 'new_member2')
 
+@patch("github.Github.__new__")
+@patch("requests.sessions.Session.__new__")
+class TestGHAMinutesQuotaOperations(unittest.TestCase):
+
+    def test_get_all_organisations_in_enterprise(self, mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_user().get_orgs.return_value = [
+            Mock(Organization, login="org1"),
+            Mock(Organization, login="org2"),
+        ]
+
+        response = GithubService("", ORGANISATION_NAME).get_all_organisations_in_enterprise()
+
+        self.assertEqual(["org1", "org2"], response)
+
+    def test_get_gha_minutes_used_for_organisation(self, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.get_gha_minutes_used_for_organisation("org1")
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+            ]
+        )
+
+    def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.modify_gha_minutes_quota_threshold(80)
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD', '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+            ]
+        )
+
+    def test_get_gha_minutes_quota_threshold(self, mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70" )
+
+        response = GithubService("", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
+
+        self.assertEqual(70, response)
 
 if __name__ == "__main__":
     unittest.main()
