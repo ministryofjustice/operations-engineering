@@ -23,7 +23,7 @@ ENTERPRISE_NAME = "ministry-of-justice-uk"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
-# pylint: disable=E1101, W0212, C2801
+# pylint: disable=E1101, W0212, C2801, R0902
 
 
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
@@ -1640,7 +1640,6 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.user1 = Mock()
         self.user1.login = "user1"
-        self.user1.comm
         self.user2 = Mock()
         self.user2.login = "user2"
 
