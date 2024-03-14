@@ -15,7 +15,7 @@ class TestSentryUsageAlertMain(unittest.TestCase):
 
     @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
     @patch.dict(os.environ, {"SLACK_TOKEN": "token"})
-    def test_main_smoke_test(self, mock_sentry_client: MagicMock, mock_slack_service: MagicMock):
+    def test_main_smoke_test(self, mock_sentry_client: MagicMock, _mock_slack_service: MagicMock):
         mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = 1, START_TIME, END_TIME
         sentry_usage_alert.main()
 
