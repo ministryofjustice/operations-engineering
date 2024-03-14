@@ -1231,24 +1231,23 @@ class GithubService:
     def modify_gha_minutes_quota_threshold(self, new_threshold):
         logging.info(f"Changing the alerting threshold to {new_threshold}%")
 
-        # headers = {
-        #     "Accept": "application/vnd.github+json",
-        #     "X-GitHub-Api-Version": "2022-11-28"
-        # }
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
 
-        # payload = { 'value' : f"{new_threshold}" }
+        payload = { 'value' : f"{new_threshold}" }
 
-        # response = self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", payload, headers=headers)
+        response = self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", payload, headers=headers)
 
-        # print(response.status_code)
-        # print(response.text)
+        print(response.status_code)
+        print(response.text)
 
-        repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
-        actions_variable = repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
-        print(actions_variable.value)
-        response = actions_variable.edit(value=str(new_threshold))
+        # repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
+        # actions_variable = repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        # response = actions_variable.edit(value=str(new_threshold))
 
-        print(response)
+        # print(response)
         
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_quota_threshold(self):
