@@ -1,5 +1,4 @@
 import unittest
-import json
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest.mock import MagicMock, Mock, call, patch
