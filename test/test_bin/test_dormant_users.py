@@ -3,6 +3,10 @@ from unittest.mock import patch, MagicMock
 from datetime import datetime
 from freezegun import freeze_time
 from config.constants import MISSING_EMAIL_ADDRESS
+from config.constants import (
+    MINISTRY_OF_JUSTICE,
+    MOJ_ANALYTICAL_SERVICES,
+)
 
 from bin.dormant_users import (
     main,
@@ -17,11 +21,6 @@ from bin.dormant_users import (
     get_dormant_users,
     MINISTRY_OF_JUSTICE_ALLOW_LIST,
     MOJ_ANALYTICAL_SERVICES_ALLOW_LIST,
-)
-
-from config.constants import (
-    MINISTRY_OF_JUSTICE,
-    MOJ_ANALYTICAL_SERVICES,
 )
 
 # pylint: disable=W0611 W0613
