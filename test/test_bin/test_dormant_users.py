@@ -23,8 +23,6 @@ from bin.dormant_users import (
     MOJ_ANALYTICAL_SERVICES_ALLOW_LIST,
 )
 
-# pylint: disable=W0611 W0613
-
 
 def create_undelivered_email_user(email_address):
     return {
