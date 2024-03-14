@@ -1245,6 +1245,7 @@ class GithubService:
 
         repo = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering')
         actions_variable = repo.get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        print(actions_variable.value)
         response = actions_variable.edit(value=str(new_threshold))
 
         print(response)
