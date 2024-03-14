@@ -27,7 +27,7 @@ class S3Service:
             the_file.write(json.dumps(users))
         self._upload_file(
             self.emailed_users_file_name, self.emailed_users_file_path)
-    
+
     def save_r53_backup_file(self):
         session = boto3.Session(profile_name='cp_r53_backup_profile')
         client = session.client('s3')
