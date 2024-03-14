@@ -2019,6 +2019,7 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[1]['userLogin'], 'new_member2')
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 @patch("requests.sessions.Session.__new__")
 class TestGHAMinutesQuotaOperations(unittest.TestCase):

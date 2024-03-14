@@ -49,6 +49,7 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
 
 
     @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+    @patch("gql.Client.__new__", new=MagicMock)
     @patch("github.Github.__new__")
     @patch("bin.alert_on_low_github_actions_quota.low_threshold_triggered_message")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
@@ -83,6 +84,7 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
         mock_modify_gha_minutes_quota_threshold.assert_called_once_with(80)
 
     @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+    @patch("gql.Client.__new__", new=MagicMock)
     @patch("github.Github.__new__")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     @patch.object(SlackService, "send_message_to_plaintext_channel_name")
