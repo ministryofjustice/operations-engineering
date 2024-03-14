@@ -24,10 +24,12 @@ def calculate_total_minutes_used(organisations, github_service):
     
     for org in organisations:
         billing_data = github_service.get_gha_minutes_used_for_organisation(org.login)
-        processed_data = json.loads(billing_data)
-        minutes_used = processed_data["total_minutes_used"]
+        # processed_data = json.loads(billing_data)
+        minutes_used = billing_data["total_minutes_used"]
         total += minutes_used
 
+    print(total)
+    
     return total
 
 def alert_on_low_quota():
