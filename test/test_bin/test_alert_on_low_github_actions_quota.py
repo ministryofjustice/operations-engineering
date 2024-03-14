@@ -47,6 +47,8 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
 
         self.assertEqual(calculate_total_minutes_used(["org1", "org2"], GithubService), 20)
 
+
+    @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
     @patch("github.Github.__new__")
     @patch("bin.alert_on_low_github_actions_quota.low_threshold_triggered_message")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
@@ -80,6 +82,7 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
         mock_send_message_to_plaintext_channel_name.assert_called_once_with(f"Warning:\n\n 25% of the Github Actions minutes quota remains.", "operations-engineering-alerts")
         mock_modify_gha_minutes_quota_threshold.assert_called_once_with(80)
 
+    @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
     @patch("github.Github.__new__")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     @patch.object(SlackService, "send_message_to_plaintext_channel_name")
