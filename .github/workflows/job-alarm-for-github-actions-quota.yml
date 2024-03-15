@@ -1,4 +1,4 @@
-name: Alarm if remaining GIthub Actions quota is low
+name: Alarm if remaining GitHub Actions quota is low
 
 on:
   schedule:
