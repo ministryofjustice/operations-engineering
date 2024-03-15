@@ -28,9 +28,9 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     @patch.object(SlackService, "send_message_to_plaintext_channel_name")
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
-    @patch("bin.alert_on_low_github_actions_quota.reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch("bin.alert_on_low_github_actions_quota.calculate_percentage_used")
-    @patch("bin.alert_on_low_github_actions_quota.calculate_total_minutes_used")
+    @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
     def test_alert_on_low_quota_if_low(self, 
         mock_get_all_organisations_in_enterprise, 
@@ -62,9 +62,9 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     @patch.object(SlackService, "send_message_to_plaintext_channel_name")
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
-    @patch("bin.alert_on_low_github_actions_quota.reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch("bin.alert_on_low_github_actions_quota.calculate_percentage_used")
-    @patch("bin.alert_on_low_github_actions_quota.calculate_total_minutes_used")
+    @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
     def test_alert_on_low_quota_if_not_low(self, 
         mock_get_all_organisations_in_enterprise, 
