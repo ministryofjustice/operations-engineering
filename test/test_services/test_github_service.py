@@ -2060,5 +2060,23 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         self.assertEqual(70, response)
 
+    @freeze_time("2021-02-01")
+    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
+    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.reset_alerting_threshold_if_first_day_of_month()
+
+        mock_modify_gha_minutes_quota_threshold.assert_called_once_with(70)
+
+    @freeze_time("2021-02-22")
+    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
+    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.reset_alerting_threshold_if_first_day_of_month()
+
+        assert not mock_modify_gha_minutes_quota_threshold.called
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,6 @@
 import json
 from calendar import timegm
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
@@ -1243,4 +1243,11 @@ class GithubService:
     def get_gha_minutes_quota_threshold(self):
         actions_variable = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
         return int(actions_variable.value)
+    
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def reset_alerting_threshold_if_first_day_of_month(self):
+        base_alerting_threshold = 70
+
+        if date.today().day == 1:
+            self.modify_gha_minutes_quota_threshold(base_alerting_threshold)
 

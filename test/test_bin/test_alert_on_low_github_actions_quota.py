@@ -1,9 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from freezegun import freeze_time
 
-from bin.alert_on_low_github_actions_quota import ( 
-    reset_alerting_threshold_if_first_day_of_month, 
+from bin.alert_on_low_github_actions_quota import (
     calculate_percentage_used,
     low_threshold_triggered_message,
     calculate_total_minutes_used,
@@ -15,22 +13,6 @@ from services.slack_service import SlackService
 
 
 class TestGithubACtionsQuotaAlerting(unittest.TestCase):
-
-    @freeze_time("2021-02-01")
-    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
-    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold):
-
-        reset_alerting_threshold_if_first_day_of_month(GithubService)
-
-        mock_modify_gha_minutes_quota_threshold.assert_called_once_with(70)
-
-    @freeze_time("2021-02-22")
-    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
-    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold):
-
-        reset_alerting_threshold_if_first_day_of_month(GithubService)
-
-        assert not mock_modify_gha_minutes_quota_threshold.called
 
     def test_calculate_percentage_used(self):
 
