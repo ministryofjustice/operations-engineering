@@ -1251,3 +1251,13 @@ class GithubService:
         if date.today().day == 1:
             self.modify_gha_minutes_quota_threshold(base_alerting_threshold)
 
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def calculate_total_minutes_used(self, organisations):
+        total = 0 
+        
+        for org in organisations:
+            billing_data = self.get_gha_minutes_used_for_organisation(org)
+            minutes_used = billing_data["total_minutes_used"]
+            total += minutes_used
+
+        return total

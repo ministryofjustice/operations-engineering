@@ -2078,5 +2078,13 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         assert not mock_modify_gha_minutes_quota_threshold.called
 
+    @patch.object(GithubService, "get_gha_minutes_used_for_organisation")
+    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_gha_minutes_used_for_organisation.return_value = { "total_minutes_used": 10 }
+
+        self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
+
 if __name__ == "__main__":
     unittest.main()

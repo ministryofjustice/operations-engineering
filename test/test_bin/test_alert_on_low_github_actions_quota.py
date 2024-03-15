@@ -4,7 +4,6 @@ from unittest.mock import patch, MagicMock
 from bin.alert_on_low_github_actions_quota import (
     calculate_percentage_used,
     low_threshold_triggered_message,
-    calculate_total_minutes_used,
     alert_on_low_quota 
 )
 
@@ -21,14 +20,6 @@ class TestGithubACtionsQuotaAlerting(unittest.TestCase):
     def test_low_threshold_triggered_message(self):
 
         self.assertEqual(low_threshold_triggered_message(10), f"Warning:\n\n 90% of the Github Actions minutes quota remains.")
-
-    @patch.object(GithubService, "get_gha_minutes_used_for_organisation")
-    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation):
-
-        mock_get_gha_minutes_used_for_organisation.return_value = { "total_minutes_used": 10 }
-
-        self.assertEqual(calculate_total_minutes_used(["org1", "org2"], GithubService), 20)
-
 
     @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
     @patch("gql.Client.__new__", new=MagicMock)
