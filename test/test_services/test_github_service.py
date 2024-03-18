@@ -12,7 +12,9 @@ from github.GitCommit import GitCommit
 from github.Issue import Issue
 from github.NamedUser import NamedUser
 from github.Repository import Repository
+from github.Organization import Organization
 from github.Team import Team
+from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
 
 from services.github_service import (
@@ -2015,6 +2017,121 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[1]['actorLogin'], 'user2')
         self.assertEqual(result[1]['userLogin'], 'new_member2')
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+@patch("requests.sessions.Session.__new__")
+class TestGHAMinutesQuotaOperations(unittest.TestCase):
+
+    def test_get_all_organisations_in_enterprise(self, mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_user().get_orgs.return_value = [
+            Mock(Organization, login="org1"),
+            Mock(Organization, login="org2"),
+        ]
+
+        response = GithubService("", ORGANISATION_NAME).get_all_organisations_in_enterprise()
+
+        self.assertEqual(["org1", "org2"], response)
+
+    def test_get_gha_minutes_used_for_organisation(self, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.get_gha_minutes_used_for_organisation("org1")
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+            ]
+        )
+
+    def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.modify_gha_minutes_quota_threshold(80)
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD', '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+            ]
+        )
+
+    def test_get_gha_minutes_quota_threshold(self, mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70" )
+
+        response = GithubService("", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
+
+        self.assertEqual(70, response)
+
+    @freeze_time("2021-02-01")
+    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
+    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.reset_alerting_threshold_if_first_day_of_month()
+
+        mock_modify_gha_minutes_quota_threshold.assert_called_once_with(70)
+
+    @freeze_time("2021-02-22")
+    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
+    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.reset_alerting_threshold_if_first_day_of_month()
+
+        assert not mock_modify_gha_minutes_quota_threshold.called
+
+    @patch.object(GithubService, "get_gha_minutes_used_for_organisation")
+    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, mock_github_client_rest_api, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_gha_minutes_used_for_organisation.return_value = { "total_minutes_used": 10 }
+
+        self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
+
+    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    def test_alert_on_low_quota_if_low(self, 
+        mock_get_all_organisations_in_enterprise, 
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        mock_github_client_rest_api, 
+        mock_github_client_core_api
+    ):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_calculate_total_minutes_used.return_value = 37500
+        mock_get_gha_minutes_quota_threshold.return_value = 70
+
+        result = github_service.check_if_quota_is_low()
+
+        mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
+        self.assertEqual(result['threshold'], 70)
+        self.assertEqual(result['percentage_used'], 75)
+
+    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    def test_alert_on_low_quota_if_not_low(self, 
+        mock_get_all_organisations_in_enterprise, 
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        mock_github_client_rest_api, 
+        mock_github_client_core_api
+    ):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_calculate_total_minutes_used.return_value = 5000
+        mock_get_gha_minutes_quota_threshold.return_value = 70
+
+        result = github_service.check_if_quota_is_low()
+
+        mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
+        self.assertEqual(result, False)
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,32 @@
+name: Alarm if remaining GitHub Actions quota is low
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+env:
+  ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+  GH_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
+
+jobs:
+  low-quota-threshold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python3 -m pip install -r requirements.txt
+
+      - run: python3 -m bin.alert_on_low_github_actions_quota
+
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed to check for low GitHub actions minutes"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
