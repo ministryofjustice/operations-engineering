@@ -1,0 +1,33 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+list_outdated = "pip list --outdated"
+tests = "coverage run -m unittest"
+tests_report = "coverage report --omit=./test/** --sort=cover --show-missing --skip-empty"
+
+[packages]
+aiohttp = "==3.9.2"
+boto3 = "==1.34.10"
+cryptography = "==42.0.4"
+gql = "==3.4.1"
+notifications-python-client = "==8.1.0"
+pyaml-env = "==1.2.1"
+pygithub = "==2.1.1"
+pyjwt = "==2.8.0"
+python-dateutil = "==2.8.2"
+requests = "==2.31.0"
+slack-sdk = "==3.27.1"
+toml = "==0.10.2"
+
+[dev-packages]
+coverage = "==7.3.3"
+freezegun = "==1.2.2"
+moto = "==5.0.2"
+pytest = "==8.0.1"
+requests-mock = "==1.11.0"
+
+[requires]
+python_version = "3.11"
