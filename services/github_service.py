@@ -1261,3 +1261,20 @@ class GithubService:
             total += minutes_used
 
         return total
+    
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def check_if_quota_is_low(self):
+        organisations = self.get_all_organisations_in_enterprise()
+
+        total_minutes_used = self.calculate_total_minutes_used(organisations)
+
+        percentage_used = (total_minutes_used / 50000) * 100
+
+        self.reset_alerting_threshold_if_first_day_of_month()
+
+        threshold = self.get_gha_minutes_quota_threshold()
+
+        if percentage_used >= threshold:
+            return { 'threshold': threshold, 'percentage_used': percentage_used }
+        else:
+            return False
