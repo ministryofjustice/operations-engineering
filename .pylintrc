@@ -420,12 +420,15 @@ disable=raw-checker-failed,
         missing-module-docstring,
         missing-function-docstring,
         line-too-long,
+        C0302,  # Too many lines in module
+        C2801,  # Unnecessarily calls dunder method
         E0401,  # Failed to import package
+        R0801,  # Similar lines in two files
+        R0902,  # Too many instance attributes
         R0903,  # Too few public methods
         R0904,  # Too many public methods
-        C0302,  # Too many lines in module
-        W0212,  # Access to a protected member (we do this for testing)
-        C2801  # Unnecessarily calls dunder method
+        W0212  # Access to a protected member (we do this for testing)
+
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
