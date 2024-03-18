@@ -5,6 +5,8 @@ from unittest.mock import MagicMock, patch
 from services.sentry_service import UsageStats
 from services.slack_service import SlackService
 
+# pylint: disable=W0221
+
 START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
