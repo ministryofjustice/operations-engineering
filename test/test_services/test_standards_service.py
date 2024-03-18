@@ -3,6 +3,8 @@ import unittest
 
 from services.standards_service import RepositoryReport
 
+# pylint: disable=R0801
+
 
 class TestCompliantRepositoryReport(unittest.TestCase):
     def setUp(self):

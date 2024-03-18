@@ -1,12 +1,12 @@
 import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
+from test.files.test_config import test_config
 import requests
 from services.notify_service import NotifyService
-from test.files.test_config import test_config
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
-# pylint: disable=W0212
+# pylint: disable=W0212, W0221
 
 
 class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
