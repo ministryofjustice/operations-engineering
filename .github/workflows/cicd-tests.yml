@@ -1,12 +1,12 @@
 name: ♻️ Tests
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
-  sonarcloud:
+  run-unit-tests:
     name: Run Unit Tests
     runs-on: ubuntu-latest
     steps:
@@ -16,14 +16,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
+          cache: 'pipenv'
+      - name: Install Pipenv
+        run: pip install pipenv
+      - name: Verify Pipfile.lock is in sync
+        run: pipenv verify
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install coverage
+        run: pipenv install --dev
       - name: Run Unit Tests
-        run: coverage run -m unittest
-
+        run: pipenv run tests
+      - name: Show Coverage
+        run: pipenv run tests_report
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
