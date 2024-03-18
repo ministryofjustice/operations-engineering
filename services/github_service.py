@@ -1263,7 +1263,7 @@ class GithubService:
         return total
     
     @retries_github_rate_limit_exception_at_next_reset_once
-    def check_if_quota_is_low(self):
+    def check_if_gha_minutes_quota_is_low(self):
         organisations = self.get_all_organisations_in_enterprise()
 
         total_minutes_used = self.calculate_total_minutes_used(organisations)
