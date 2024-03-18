@@ -2104,7 +2104,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_calculate_total_minutes_used.return_value = 37500
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
-        result = github_service.check_if_quota_is_low()
+        result = github_service.check_if_gha_minutes_quota_is_low()
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result['threshold'], 70)
@@ -2128,7 +2128,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_calculate_total_minutes_used.return_value = 5000
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
-        result = github_service.check_if_quota_is_low()
+        result = github_service.check_if_gha_minutes_quota_is_low()
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result, False)

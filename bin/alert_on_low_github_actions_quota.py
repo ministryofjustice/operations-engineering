@@ -20,7 +20,7 @@ def alert_on_low_quota():
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
     slack_service = SlackService(slack_token)
 
-    check_result = github_service.check_if_quota_is_low()
+    check_result = github_service.check_if_gha_minutes_quota_is_low()
 
     if check_result != False:
         slack_service.send_message_to_plaintext_channel_name(low_threshold_triggered_message(check_result['percentage_used']), SLACK_CHANNEL)
