@@ -23,7 +23,7 @@ ENTERPRISE_NAME = "ministry-of-justice-uk"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
 
-# pylint: disable=E1101, W0212, C2801, R0902
+# pylint: disable=E1101, R0902
 
 
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
