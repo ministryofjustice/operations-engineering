@@ -1,9 +1,9 @@
 import json
 import unittest
 from unittest.mock import patch
-from services.route_53_service import Route53Service
-from moto import mock_aws
 import boto3
+from moto import mock_aws
+from services.route_53_service import Route53Service
 
 
 class TestRoute53Service(unittest.TestCase):
