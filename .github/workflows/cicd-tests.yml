@@ -1,9 +1,9 @@
 name: ♻️ Tests
 on:
   push:
-    branches: [ "main" ]
+    branches: ['main']
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
 
 jobs:
   run-unit-tests:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
           cache: 'pipenv'
       - name: Install Pipenv
         run: pip install pipenv
@@ -27,7 +27,7 @@ jobs:
       - name: Run Unit Tests
         run: pipenv run tests
       - name: Show Coverage
-        run: pipenv run tests_coverage
+        run: pipenv run tests_report
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
