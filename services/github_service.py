@@ -1268,7 +1268,9 @@ class GithubService:
 
         total_minutes_used = self.calculate_total_minutes_used(organisations)
 
-        percentage_used = (total_minutes_used / 50000) * 100
+        total_quota = 50000
+
+        percentage_used = (total_minutes_used / total_quota) * 100
 
         self.reset_alerting_threshold_if_first_day_of_month()
 

@@ -2086,5 +2086,52 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
 
+    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    def test_alert_on_low_quota_if_low(self, 
+        mock_get_all_organisations_in_enterprise, 
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        mock_github_client_rest_api, 
+        mock_github_client_core_api
+    ):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_calculate_total_minutes_used.return_value = 37500
+        mock_get_gha_minutes_quota_threshold.return_value = 70
+
+        result = github_service.check_if_quota_is_low()
+
+        mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
+        self.assertEqual(result['threshold'], 70)
+        self.assertEqual(result['percentage_used'], 75)
+
+    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    def test_alert_on_low_quota_if_not_low(self, 
+        mock_get_all_organisations_in_enterprise, 
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        mock_github_client_rest_api, 
+        mock_github_client_core_api
+    ):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_calculate_total_minutes_used.return_value = 5000
+        mock_get_gha_minutes_quota_threshold.return_value = 70
+
+        result = github_service.check_if_quota_is_low()
+
+        mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
+        self.assertEqual(result, False)
+
 if __name__ == "__main__":
     unittest.main()
