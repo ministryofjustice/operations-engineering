@@ -18,7 +18,7 @@ from gql.transport.exceptions import TransportQueryError
 from services.github_service import (
     GithubService, retries_github_rate_limit_exception_at_next_reset_once)
 
-# pylint: disable=E1101, W0212, C2801, R0902
+# pylint: disable=E1101
 
 ORGANISATION_NAME = "moj-analytical-services"
 ENTERPRISE_NAME = "ministry-of-justice-uk"
