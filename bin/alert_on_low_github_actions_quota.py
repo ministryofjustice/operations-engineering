@@ -6,7 +6,7 @@ from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 
 def low_threshold_triggered_message(percentage_used):
-    return f"Warning:\n\n {round(100 - percentage_used, 1)}% of the Github Actions minutes quota remains."
+    return f"Warning:\n\n {round(100 - percentage_used, 1)}% of the Github Actions minutes quota remains.\n\n What to do next: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-actions-minutes-procedure.html#low-github-actions-minutes-procedure"
 
 
 def alert_on_low_quota():

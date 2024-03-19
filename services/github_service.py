@@ -1270,6 +1270,8 @@ class GithubService:
 
         total_minutes_used = self.calculate_total_minutes_used(organisations)
 
+        print(f"Total minutes used: {total_minutes_used}")
+
         total_quota = 50000
 
         percentage_used = (total_minutes_used / total_quota) * 100
