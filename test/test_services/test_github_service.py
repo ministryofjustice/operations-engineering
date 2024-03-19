@@ -2017,13 +2017,14 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[1]['actorLogin'], 'user2')
         self.assertEqual(result[1]['userLogin'], 'new_member2')
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 @patch("requests.sessions.Session.__new__")
 class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
-    def test_get_all_organisations_in_enterprise(self, mock_github_client_rest_api, mock_github_client_core_api):
+    def test_get_all_organisations_in_enterprise(self, _mock_github_client_rest_api, mock_github_client_core_api):
         mock_github_client_core_api.return_value.get_user().get_orgs.return_value = [
             Mock(Organization, login="org1"),
             Mock(Organization, login="org2"),
@@ -2033,7 +2034,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         self.assertEqual(["org1", "org2"], response)
 
-    def test_get_gha_minutes_used_for_organisation(self, mock_github_client_rest_api, mock_github_client_core_api):
+    def test_get_gha_minutes_used_for_organisation(self, mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.github_client_rest_api = mock_github_client_rest_api
         github_service.get_gha_minutes_used_for_organisation("org1")
@@ -2043,7 +2044,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
             ]
         )
 
-    def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, mock_github_client_core_api):
+    def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.github_client_rest_api = mock_github_client_rest_api
         github_service.modify_gha_minutes_quota_threshold(80)
@@ -2053,8 +2054,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
             ]
         )
 
-    def test_get_gha_minutes_quota_threshold(self, mock_github_client_rest_api, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70" )
+    def test_get_gha_minutes_quota_threshold(self, _mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
 
         response = GithubService("", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
 
@@ -2062,7 +2063,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
     @freeze_time("2021-02-01")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
-    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, mock_github_client_rest_api, mock_github_client_core_api):
+    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
 
         github_service.reset_alerting_threshold_if_first_day_of_month()
@@ -2071,7 +2072,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
     @freeze_time("2021-02-22")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
-    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, mock_github_client_rest_api, mock_github_client_core_api):
+    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
 
         github_service.reset_alerting_threshold_if_first_day_of_month()
@@ -2079,10 +2080,10 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         assert not mock_modify_gha_minutes_quota_threshold.called
 
     @patch.object(GithubService, "get_gha_minutes_used_for_organisation")
-    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, mock_github_client_rest_api, mock_github_client_core_api):
+    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, _mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_gha_minutes_used_for_organisation.return_value = { "total_minutes_used": 10 }
+        mock_get_gha_minutes_used_for_organisation.return_value = {"total_minutes_used": 10}
 
         self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
 
@@ -2090,13 +2091,14 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
-    def test_alert_on_low_quota_if_low(self, 
-        mock_get_all_organisations_in_enterprise, 
+    def test_alert_on_low_quota_if_low(
+        self,
+        mock_get_all_organisations_in_enterprise,
         mock_calculate_total_minutes_used,
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_gha_minutes_quota_threshold,
-        mock_github_client_rest_api, 
-        mock_github_client_core_api
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
@@ -2114,13 +2116,14 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
-    def test_alert_on_low_quota_if_not_low(self, 
-        mock_get_all_organisations_in_enterprise, 
+    def test_alert_on_low_quota_if_not_low(
+        self,
+        mock_get_all_organisations_in_enterprise,
         mock_calculate_total_minutes_used,
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_gha_minutes_quota_threshold,
-        mock_github_client_rest_api, 
-        mock_github_client_core_api
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
@@ -2132,6 +2135,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result, False)
+
 
 if __name__ == "__main__":
     unittest.main()
