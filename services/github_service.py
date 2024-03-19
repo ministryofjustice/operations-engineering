@@ -1206,13 +1206,13 @@ class GithubService:
                 break
 
         return new_members
-    
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
         logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
 
-        return [ org.login for org in self.github_client_core_api.get_user().get_orgs() ] or []
-    
+        return [org.login for org in self.github_client_core_api.get_user().get_orgs()] or []
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_used_for_organisation(self, organization) -> int:
         logging.info(f"Getting all github actions minutes used for organization {organization}")
@@ -1225,7 +1225,7 @@ class GithubService:
         response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
 
         return response.json()
-    
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def modify_gha_minutes_quota_threshold(self, new_threshold):
         logging.info(f"Changing the alerting threshold to {new_threshold}%")
@@ -1235,15 +1235,15 @@ class GithubService:
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        payload = { 'value' : str(new_threshold) }
+        payload = {'value': str(new_threshold)}
 
         self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
-        
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_quota_threshold(self):
         actions_variable = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
         return int(actions_variable.value)
-    
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def reset_alerting_threshold_if_first_day_of_month(self):
         base_alerting_threshold = 70
@@ -1253,15 +1253,15 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def calculate_total_minutes_used(self, organisations):
-        total = 0 
-        
+        total = 0
+
         for org in organisations:
             billing_data = self.get_gha_minutes_used_for_organisation(org)
             minutes_used = billing_data["total_minutes_used"]
             total += minutes_used
 
         return total
-    
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_if_gha_minutes_quota_is_low(self):
         organisations = self.get_all_organisations_in_enterprise()
@@ -1277,6 +1277,5 @@ class GithubService:
         threshold = self.get_gha_minutes_quota_threshold()
 
         if percentage_used >= threshold:
-            return { 'threshold': threshold, 'percentage_used': percentage_used }
-        else:
-            return False
+            return {'threshold': threshold, 'percentage_used': percentage_used}
+        return False
