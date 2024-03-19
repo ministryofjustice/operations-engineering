@@ -28,9 +28,9 @@ jobs:
         run: |
           SCAN_RESULTS=$(jq -r '.runs[0].tool.driver.rules | map(.help.text) | join("\\n")' trivy-results.sarif)
           {
-            echo "CVE_CRITICAL=$(echo $SCAN_RESULTS | grep -o CRITICAL | wc -l)"
-            echo "CVE_HIGH=$(echo $SCAN_RESULTS | grep -o HIGH | wc -l)"
-            echo "CVE_MEDIUM=$(echo $SCAN_RESULTS | grep -o MEDIUM | wc -l)"
+            echo "CVE_CRITICAL=$(echo "$SCAN_RESULTS" | grep -o CRITICAL | wc -l)"
+            echo "CVE_HIGH=$(echo "$SCAN_RESULTS" | grep -o HIGH | wc -l)"
+            echo "CVE_MEDIUM=$(echo "$SCAN_RESULTS" | grep -o MEDIUM | wc -l)"
           } >> $GITHUB_ENV
 
           echo $SCAN_RESULTS
