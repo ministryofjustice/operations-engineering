@@ -30,5 +30,6 @@ class TestSentryServiceLogQuotaUsageForPeriodInDays(unittest.TestCase):
             replay_usage_stats.percentage_of_quota_used, 2))
         self.assertEqual(16, replay_usage_stats.max_usage)
 
+
 if __name__ == "__main__":
     unittest.main()
