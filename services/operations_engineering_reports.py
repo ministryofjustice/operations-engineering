@@ -46,10 +46,8 @@ class OperationsEngineeringReportsService:
             chunk = reports[i:i+100]
             status = self.__http_post(chunk)
             if status != 200:
-                self.logger.error(
-                    "Failed to send chunk starting from index %s. Received status: %s", i, status)
-                raise ValueError(
-                    f"Failed to send repository standards reports to API. Received: {status}")
+                self.logger.error("Failed to send chunk starting from index %s. Received status: %s", i, status)
+                raise ValueError(f"Failed to send repository standards reports to API. Received: {status}")
             self.logger.debug("Successfully sent chunk starting from index %s", i)
 
     def __http_post(self, data: list[dict]) -> int:
