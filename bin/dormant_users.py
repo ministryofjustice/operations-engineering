@@ -35,22 +35,9 @@ MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "laa-service-account",
     "mojanalytics",
     "laaserviceaccount",
-    "dhan1513",
-    "wcoljus",
-    "paulmcqueen",
-    "junaid-kp",
-    "chandrasinghmoj",
-    "dankoleary",
 ]
 
 MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [
-    "jguildford",
-    "heidiharries1",
-    "paigewelham",
-    "adchester",
-    "gilad-ravitz",
-    "joggers7",
-    "jlane96work",
 ]
 
 
