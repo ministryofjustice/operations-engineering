@@ -1270,7 +1270,7 @@ class GithubService:
 
         total_minutes_used = self.calculate_total_minutes_used(organisations)
 
-        print(total_minutes_used)
+        print(f"Total minutes used: {total_minutes_used}")
 
         total_quota = 50000
 
