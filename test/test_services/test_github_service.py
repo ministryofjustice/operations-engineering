@@ -2091,7 +2091,15 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
-    def test_alert_on_low_quota_if_low(self, mock_get_all_organisations_in_enterprise, mock_calculate_total_minutes_used, mock_reset_alerting_threshold_if_first_day_of_month, mock_get_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
+    def test_alert_on_low_quota_if_low(
+        self,
+        mock_get_all_organisations_in_enterprise,
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
+    ):
         github_service = GithubService("", ORGANISATION_NAME)
 
         mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
@@ -2108,7 +2116,15 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
-    def test_alert_on_low_quota_if_not_low(self, mock_get_all_organisations_in_enterprise, mock_calculate_total_minutes_used, mock_reset_alerting_threshold_if_first_day_of_month, mock_get_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
+    def test_alert_on_low_quota_if_not_low(
+        self,
+        mock_get_all_organisations_in_enterprise,
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
+    ):
         github_service = GithubService("", ORGANISATION_NAME)
 
         mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
