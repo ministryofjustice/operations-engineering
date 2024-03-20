@@ -2,20 +2,24 @@ name: Fetch GitHub Joiner Metrics
 
 on:
   schedule:
-    - cron: '0 8 * * 5'
+    - cron: "0 8 * * 5"
   workflow_dispatch:
 
 jobs:
   fetch-github-joiner-metrics:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-python@v4
-          with:
-            python-version: "3.11"
-        - run: python3 -m pip install -r requirements.txt
-        - run: python3 -m bin.fetch_github_joiner_metrics
-          env:
-            ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
-            ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.fetch_github_joiner_metrics
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
