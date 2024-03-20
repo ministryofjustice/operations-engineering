@@ -1,4 +1,4 @@
 version = "v1"
 
 [[rules.ignore]]
-id = "AC_GITHUB_AC0002"
+id = "AC_GITHUB_0002"
