@@ -4,6 +4,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
+# flake8: noqa
 
 class OperationsEngineeringReportsService:
     """Communicate with the operations-engineering-reports API. This service is used to send reports
@@ -48,7 +49,7 @@ class OperationsEngineeringReportsService:
             if status != 200:
                 self.logger.error("Failed to send chunk starting from index %s. Received status: %s", i, status)
                 raise ValueError(f"Failed to send repository standards reports to API. Received: {status}")
-            self.logger.debug("Successfully sent chunk starting from index %s", i)  # noqa: E203
+            self.logger.debug("Successfully sent chunk starting from index %s", i)
 
     def __http_post(self, data: list[dict]) -> int:
         headers = {
