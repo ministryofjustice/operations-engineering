@@ -32,10 +32,10 @@ VALIDATE_ALL_CODEBASE: false
 LOG_LEVEL: INFO
 MARKDOWN_MARKDOWN_LINK_CHECK_ARGUMENTS: "-q"
 
-TERRAFORM_TERRASCAN_ARGUMENTS: "scan -d . -i terraform -v -p terrascan.yml"
+TERRAFORM_TERRASCAN_ARGUMENTS: "terrascan init && scan -d . -i terraform -v -p terrascan.yml"
 
 TERRAFORM_TFLINT_UNSECURED_ENV_VARIABLES:
-- GITHUB_TOKEN
+  - GITHUB_TOKEN
 
 PLUGINS:
   - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml
