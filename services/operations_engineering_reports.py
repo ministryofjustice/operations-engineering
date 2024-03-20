@@ -43,7 +43,7 @@ class OperationsEngineeringReportsService:
         #  Batched into groups of 100 due to database limitations
         self.logger.info("Sending %s repository standards reports to API.", len(reports))
         for i in range(0, len(reports), 100):
-            chunk = reports[i:i+100]
+            chunk = reports[i: i + 100]
             status = self.__http_post(chunk)
             if status != 200:
                 self.logger.error("Failed to send chunk starting from index %s. Received status: %s", i, status)
