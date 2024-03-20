@@ -16,6 +16,7 @@ ENABLE_LINTERS:
   - PYTHON_FLAKE8
   - PYTHON_BLACK
   - PYTHON_ISORT
+  - TERRAFORM_TERRASCAN
   - TERRAFORM_TERRAFORM_FMT
 
 DISABLE_ERRORS: false
@@ -29,6 +30,8 @@ GITHUB_COMMENT_REPORTER: true
 VALIDATE_ALL_CODEBASE: false
 LOG_LEVEL: INFO
 MARKDOWN_MARKDOWN_LINK_CHECK_ARGUMENTS: "-q"
+
+TERRAFORM_TERRASCAN_ARGUMENTS: "scan -d . -i terraform -v -p terrascan.yaml"
 
 PLUGINS:
   - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml
