@@ -28,7 +28,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.dormant_users ${{ github.event.inputs.organisation_name }} ${{ secrets.GH_BOT_PAT_TOKEN }} ${{ secrets.S3_BUCKET_NAME }} ${{ secrets.SLACK_BOT_TOKEN }} ${{ secrets.NOTIFY_PROD_API_KEY }} ${{ secrets.AUTH0_CLIENT_SECRET }} ${{ secrets.AUTH0_CLIENT_ID }} ${{ secrets.AUTH0_DOMAIN}} false false false true
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.dormant_users ${{ github.event.inputs.organisation_name }} ${{ secrets.GH_BOT_PAT_TOKEN }} ${{ secrets.S3_BUCKET_NAME }} ${{ secrets.SLACK_BOT_TOKEN }} ${{ secrets.NOTIFY_PROD_API_KEY }} ${{ secrets.AUTH0_CLIENT_SECRET }} ${{ secrets.AUTH0_CLIENT_ID }} ${{ secrets.AUTH0_DOMAIN}} false false false true
         env:
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}

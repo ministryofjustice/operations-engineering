@@ -1,9 +1,9 @@
 name: ♻️ Tests
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   pull_request:
-    branches: ['main']
+    branches: ["main"]
 
 jobs:
   run-unit-tests:
@@ -16,8 +16,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pipenv'
+          python-version: "3.11"
+          cache: "pipenv"
       - name: Install Pipenv
         run: pip install pipenv
       - name: Verify Pipfile.lock is in sync
