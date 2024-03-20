@@ -32,7 +32,7 @@ VALIDATE_ALL_CODEBASE: false
 LOG_LEVEL: INFO
 MARKDOWN_MARKDOWN_LINK_CHECK_ARGUMENTS: "-q"
 
-TERRAFORM_TERRASCAN_ARGUMENTS: "terrascan init && scan -d . -i terraform -v -p terrascan.yml"
+TERRAFORM_TERRASCAN_ARGUMENTS: "terrascan init && scan -d . -i terraform -v"
 
 TERRAFORM_TFLINT_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
