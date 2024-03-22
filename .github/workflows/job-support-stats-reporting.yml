@@ -1,0 +1,24 @@
+name: Support Stats Reporting
+
+on:
+  schedule:
+    - cron: "0 8 * * 5"
+  workflow_dispatch:
+
+jobs:
+  fetch-github-joiner-metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.support_stats_reporting.py
+        env:
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
