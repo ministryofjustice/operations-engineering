@@ -36,8 +36,7 @@ TERRAFORM_TFLINT_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
 
 TERRAFORM_TERRASCAN_ARGUMENTS: "scan -d . -i terraform -v"
-
-TERRAFORM_TERRASCAN_FILE_NAMES_REGEX: ["terraform/.*"]
+TERRAFORM_TERRASCAN_DISABLE_ERRORS_IF_LESS_THAN: 1
 
 PLUGINS:
   - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml
