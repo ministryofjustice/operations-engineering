@@ -18,7 +18,7 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python3 -m bin.support_stats_reporting.py
+      - run: pipenv run python3 -m bin.support_stats_reporting
         env:
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
