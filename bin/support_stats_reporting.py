@@ -44,7 +44,7 @@ def yday_total():
     # Count requests in column that matches yesterdays date
     yday_total = df[str_yesterday].sum()
 
-    return len(yday_total)
+    return yday_total
 
 def yday_breakdown():
 
