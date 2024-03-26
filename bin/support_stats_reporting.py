@@ -24,8 +24,8 @@ def str_yesterday():
 def yesterdays_support_requests_message():
     msg = (
         f"Good morning, \n\n"
-        f"Yesterday we received {str_yday_total} Support Requests \n\n"
-        f"Here's a breakdown of esterdays Support Requests: \n {yday_breakdown} \n"
+        f"Yesterday we received {yday_total} Support Requests \n\n"
+        f"Here's a breakdown of yesterdays Support Requests: \n {yday_breakdown} \n"
     )
 
     return msg
@@ -39,13 +39,12 @@ def df():
     # Set the index to Request Type column
     df.set_index(['Request Type'])
 
-def str_yday_total():
+def yday_total():
 
     # Count requests in column that matches yesterdays date
     yday_total = df[str_yesterday].sum()
-    str_yday_total = str(yday_total)
 
-    return str_yday_total
+    return yday_total
 
 def yday_breakdown():
 
