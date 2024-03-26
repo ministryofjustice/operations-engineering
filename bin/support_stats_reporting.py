@@ -14,12 +14,47 @@ def get_environment_variables() -> tuple:
     
     return slack_token
 
-def str_yesterday():
+def create_str_yesterday():
     today = date.today()
     yesterday = today - timedelta(days=1)
     str_yesterday = str(yesterday)
 
     return str_yesterday
+
+str_yesterday = create_str_yesterday()
+
+def create_df():
+
+    # Create dataframe from csv and set max rows
+    df = pd.read_csv('csv/support_requests_mar24.csv')
+    pd.options.display.max_rows = 9999
+
+    # Set the index to Request Type column
+    df.set_index(['Request Type'])
+
+    return df
+
+df = create_df()
+
+def create_yday_total():
+
+    # Count requests in column that matches yesterdays date
+    yday_total = df[str_yesterday].sum()
+
+    return yday_total
+
+yday_total = create_yday_total()
+
+def create_yday_breakdown():
+
+    # Create mask to remove NaN fields from 'str_yesterday' and return Request Types and amount
+    notna_msk = df[str_yesterday].notna()
+    cols = ['Request Type', str_yesterday]
+    yday_breakdown = df.loc[notna_msk, cols]
+
+    return yday_breakdown
+
+yday_breakdown = create_yday_breakdown()
 
 def yesterdays_support_requests_message():
     msg = (
@@ -29,31 +64,6 @@ def yesterdays_support_requests_message():
     )
 
     return msg
-
-def df():
-
-    # Create dataframe from csv and set max rows
-    df = pd.read_csv('csv/support_requests_mar24.csv')
-    pd.options.display.max_rows = 9999
-
-    # Set the index to Request Type column
-    df.set_index(['Request Type'])
-
-def yday_total():
-
-    # Count requests in column that matches yesterdays date
-    yday_total = df[str_yesterday].sum()
-
-    return yday_total
-
-def yday_breakdown():
-
-    # Create mask to remove NaN fields from 'str_yesterday' and return Request Types and amount
-    notna_msk = df[str_yesterday].notna()
-    cols = ['Request Type', str_yesterday]
-    yday_breakdown = df.loc[notna_msk, cols]
-
-    return yday_breakdown
 
 def main():
 
