@@ -97,7 +97,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Please review the detailed scan results and take necessary actions.\n\n<https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>\n\n<https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/dependency-alerts.html|Runbook for Responding to Dependency Alerts\n\n*Issue Created:* <${{ steps.issue-creator.outputs.url }}|View Issue>"
+                    "text": "Please review the detailed scan results and take necessary actions.\n\n<https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>\n\n<https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/dependency-alerts.html|Runbook for Responding to Dependency Alerts>\n\n*Issue Created:* <${{ steps.issue-creator.outputs.url }}|View Issue>"
                   }
                 }
               ]
