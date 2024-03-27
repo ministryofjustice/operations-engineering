@@ -1,7 +1,7 @@
 import os
+from datetime import date, timedelta
 import pandas as pd
 
-from datetime import date, timedelta
 from services.slack_service import SlackService
 from config.constants import SR_SLACK_CHANNEL
 
@@ -18,6 +18,7 @@ def create_df():
 
 df = create_df()
 
+
 def create_str_yesterday():
     today = date.today()
     yesterday = today - timedelta(days=1)
@@ -27,6 +28,7 @@ def create_str_yesterday():
 
 str_yesterday = create_str_yesterday()
 
+
 def create_yday_total():
 
     yday_total = df[str_yesterday].sum()
@@ -34,6 +36,7 @@ def create_yday_total():
     return yday_total
 
 yday_total = create_yday_total()
+
 
 def create_yday_breakdown():
 
@@ -46,6 +49,7 @@ def create_yday_breakdown():
 
 yday_breakdown = create_yday_breakdown()
 
+
 def get_environment_variables() -> tuple:
     slack_token = os.getenv("ADMIN_SLACK_TOKEN")
     if not slack_token:
@@ -53,6 +57,7 @@ def get_environment_variables() -> tuple:
             "The env variable ADMIN_SLACK_TOKEN is empty or missing")
     
     return slack_token
+
 
 def yesterdays_support_requests_message():
     msg = (
@@ -62,6 +67,7 @@ def yesterdays_support_requests_message():
     )
 
     return msg
+
 
 def main():
 
