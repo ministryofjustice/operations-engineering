@@ -10,7 +10,7 @@ df = pd.read_csv('csv/support_requests_mar24.csv')
 pd.options.display.max_rows = 9999
 
 # Set the index to Request Type column
-df.set_index(['Request Type'])
+#df.set_index(['Request Type'])
 
 today = date.today()
 yesterday = today - timedelta(days=1)
