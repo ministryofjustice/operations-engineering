@@ -60,7 +60,7 @@ def get_environment_variables() -> tuple:
     if not slack_token:
         raise ValueError(
             "The env variable ADMIN_SLACK_TOKEN is empty or missing")
-    
+
     return slack_token
 
 
