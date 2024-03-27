@@ -5,6 +5,7 @@ import pandas as pd
 from services.slack_service import SlackService
 from config.constants import SR_SLACK_CHANNEL
 
+
 def create_df():
 
     # Create dataframe from csv and set max rows
@@ -16,6 +17,7 @@ def create_df():
 
     return df
 
+
 df = create_df()
 
 
@@ -26,6 +28,7 @@ def create_str_yesterday():
 
     return str_yesterday
 
+
 str_yesterday = create_str_yesterday()
 
 
@@ -34,6 +37,7 @@ def create_yday_total():
     yday_total = df[str_yesterday].sum()
 
     return yday_total
+
 
 yday_total = create_yday_total()
 
@@ -46,6 +50,7 @@ def create_yday_breakdown():
     yday_breakdown = df.loc[notna_msk, cols]
 
     return yday_breakdown
+
 
 yday_breakdown = create_yday_breakdown()
 
@@ -77,6 +82,7 @@ def main():
     slack_service.send_message_to_plaintext_channel_name(
         yesterdays_support_requests_message(), SR_SLACK_CHANNEL
     )
+
 
 if __name__ == "__main__":
     main()
