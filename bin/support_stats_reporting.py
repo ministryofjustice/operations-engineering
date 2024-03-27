@@ -5,6 +5,13 @@ from datetime import date, timedelta
 from services.slack_service import SlackService
 from config.constants import SR_SLACK_CHANNEL
 
+# Create dataframe from csv and set max rows
+df = pd.read_csv('csv/support_requests_mar24.csv')
+pd.options.display.max_rows = 9999
+
+# Set the index to Request Type column
+df.set_index(['Request Type'])
+
 
 def get_environment_variables() -> tuple:
     slack_token = os.getenv("ADMIN_SLACK_TOKEN")
@@ -22,19 +29,6 @@ def create_str_yesterday():
     return str_yesterday
 
 str_yesterday = create_str_yesterday()
-
-def create_df():
-
-    # Create dataframe from csv and set max rows
-    df = pd.read_csv('csv/support_requests_mar24.csv')
-    pd.options.display.max_rows = 9999
-
-    # Set the index to Request Type column
-    df.set_index(['Request Type'])
-
-    return df
-
-df = create_df()
 
 def create_yday_total():
 
