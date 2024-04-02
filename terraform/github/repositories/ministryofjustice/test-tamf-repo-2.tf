@@ -6,6 +6,6 @@ module "test_tamf_repo_2" {
   description = "Test repo to test new module input team_access"
   topics      = ["operations-engineering"]
   team_access = {
-    maintain = [data.github_team.operations_engineering.id]
+    maintain = [var.operations_engineering_team_id]
   }
 }
