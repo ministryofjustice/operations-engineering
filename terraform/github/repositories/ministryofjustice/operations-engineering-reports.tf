@@ -8,7 +8,7 @@ module "operations-engineering-reports" {
   topics       = ["operations-engineering", "flask", "reporting"]
 
   team_access = {
-    admin = [data.github_team.operations_engineering.id]
+    admin = [var.operations_engineering_team_id]
   }
   variables = {
     DEVELOPMENT_ECR_REGION     = var.ECR_REGION

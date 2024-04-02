@@ -8,6 +8,6 @@ module "terraform-aws-mtasts" {
   topics      = ["operations-engineering"]
 
   team_access = {
-    admin = [data.github_team.operations_engineering.id]
+    admin = [var.operations_engineering_team_id]
   }
 }
