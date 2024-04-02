@@ -5,8 +5,8 @@ moved {
 }
 
 moved {
-  from = module.test-tamf-repo-test-org
-  to   = module.ministryofjustice-test.module.test-tamf-repo-test-org
+  from = module.test_tamf_repo_test_org
+  to   = module.ministryofjustice-test.module.test_tamf_repo_test_org
 }
 
 #Prod repos
@@ -141,6 +141,6 @@ moved {
 }
 
 moved {
-  from = module.test_tamf_repo-2
-  to   = module.ministryofjustice.module.test_tamf_repo-2
+  from = module.test_tamf_repo_2
+  to   = module.ministryofjustice.module.test_tamf_repo_2
 }
