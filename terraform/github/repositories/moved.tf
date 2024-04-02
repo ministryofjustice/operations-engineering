@@ -141,6 +141,6 @@ moved {
 }
 
 moved {
-  from = module.test-tamf-repo-2
-  to   = module.ministryofjustice.module.test-tamf-repo-2
+  from = module.test_tamf_repo-2
+  to   = module.ministryofjustice.module.test_tamf_repo-2
 }
