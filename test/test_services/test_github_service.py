@@ -1432,14 +1432,7 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 @patch("github.Github.__new__")
 class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
     def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
-        mock_users = [
-            {
-                "login": "user1"
-            },
-            {
-                "login": "user2"
-            }
-        ]
+        mock_users = [{"login": "user1"}, {"login": "user2"}]
 
         mock_github_client_core_api.return_value.get_organization().get_members.return_value = mock_users
 
