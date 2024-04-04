@@ -3,12 +3,12 @@ from time import sleep
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from config.logging_config import logging
 from services.github_service import GithubService
 from services.s3_service import S3Service
 from services.slack_service import SlackService
 from services.notify_service import NotifyService
 from services.auth0_service import Auth0Service
+from config.logging_config import logging
 from config.constants import (
     MINISTRY_OF_JUSTICE,
     MOJ_ANALYTICAL_SERVICES,
@@ -35,22 +35,9 @@ MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "laa-service-account",
     "mojanalytics",
     "laaserviceaccount",
-    "dhan1513",
-    "wcoljus",
-    "paulmcqueen",
-    "junaid-kp",
-    "chandrasinghmoj",
-    "dankoleary",
 ]
 
 MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [
-    "jguildford",
-    "heidiharries1",
-    "paigewelham",
-    "adchester",
-    "gilad-ravitz",
-    "joggers7",
-    "jlane96work",
 ]
 
 

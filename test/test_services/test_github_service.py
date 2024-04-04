@@ -12,18 +12,20 @@ from github.GitCommit import GitCommit
 from github.Issue import Issue
 from github.NamedUser import NamedUser
 from github.Repository import Repository
+from github.Organization import Organization
 from github.Team import Team
+from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
 
 from services.github_service import (
     GithubService, retries_github_rate_limit_exception_at_next_reset_once)
 
+# pylint: disable=E1101
+
 ORGANISATION_NAME = "moj-analytical-services"
 ENTERPRISE_NAME = "ministry-of-justice-uk"
 USER_ACCESS_REMOVED_ISSUE_TITLE = "User access removed, access is now via a team"
 TEST_REPOSITORY = "moj-analytical-services/test_repository"
-
-# pylint: disable=W0212
 
 
 class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
@@ -295,7 +297,7 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
         github_service.close_expired_issues("test")
         github_service.github_client_core_api.get_repo.assert_has_calls(
             [call(), call(f"{ORGANISATION_NAME}/test"), call().get_issues()])
-        github_service.github_client_core_api.get_repo().get_issues.assert_has_calls(
+        github_service.github_client_core_api.get_repo("mock_full_name_or_id").get_issues.assert_has_calls(
             [call()])
 
     def test_sets_issues_to_closed_when_criteria_met(self, mock_github_client_core_api):
@@ -353,7 +355,7 @@ class TestGithubServiceCloseExpiredIssues(unittest.TestCase):
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 class TestGithubServiceCreateAnAccessRemovedIssueForUserInRepository(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.create_an_access_removed_issue_for_user_in_repository(
             "test_user", "test_repository")
@@ -377,7 +379,7 @@ class TestGithubServiceCreateAnAccessRemovedIssueForUserInRepository(unittest.Te
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 class TestGithubServiceRemoveUserFromRepository(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.remove_user_from_repository(
             "test_user", "test_repository")
@@ -517,7 +519,7 @@ class TestGithubServiceAddAllUsersToTeam(unittest.TestCase):
         mock_team.add_membership.assert_not_called()
 
     def test_throws_exception_when_client_throws_exception(self, mock_github_client_core_api,
-                                                           mock_github_client_gql_api):
+                                                           _mock_github_client_gql_api):
         mock_github_client_core_api.return_value.get_organization = MagicMock(
             side_effect=ConnectionError)
         github_service = GithubService("", ORGANISATION_NAME)
@@ -655,7 +657,7 @@ class TestGithubServiceAmendTeamPermissionsForRepository(unittest.TestCase):
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetTeamIdFromTeamName(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_gql_client):
+    def test_calls_downstream_services(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_team_id_from_team_name("test_team_name")
         github_service.github_client_gql_api.assert_has_calls([
@@ -861,7 +863,7 @@ class TestGithubServiceGetRepositoryTeams(unittest.TestCase):
             "", ORGANISATION_NAME).get_repository_teams("some-repo")
         self.assertEqual(2, len(response))
 
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repository_teams("test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls(
@@ -894,7 +896,7 @@ class TestGithubServiceGetRepositoryCollaborators(unittest.TestCase):
             "", ORGANISATION_NAME).get_repository_collaborators("some-repo")
         self.assertEqual(2, len(response))
 
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repository_collaborators("test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls([
@@ -932,7 +934,7 @@ class TestGithubServiceGetRepositoryDirectUsers(unittest.TestCase):
             "", ORGANISATION_NAME).get_repository_direct_users("some-repo")
         self.assertEqual(2, len(response))
 
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repository_direct_users("test_repository")
         github_service.github_client_core_api.get_repo.assert_has_calls([
@@ -970,7 +972,7 @@ class TestGithubServiceGetATeamUsernames(unittest.TestCase):
             "", ORGANISATION_NAME).get_a_team_usernames("some-team")
         self.assertEqual(2, len(response))
 
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_a_team_usernames("some-team")
         github_service.github_client_core_api.get_organization.assert_has_calls([
@@ -999,13 +1001,13 @@ class TestGithubServiceGetATeamUsernames(unittest.TestCase):
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_gql_client):
+    def test_calls_downstream_services(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_paginated_list_of_repositories_per_type(
             "public", "after_cursor")
         github_service.github_client_gql_api.execute.assert_called_once()
 
-    def test_throws_value_error_when_page_size_greater_than_limit(self, mock_gql_client):
+    def test_throws_value_error_when_page_size_greater_than_limit(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         self.assertRaises(
             ValueError, github_service.get_paginated_list_of_repositories_per_type, "public", "test_after_cursor", 101)
@@ -1015,13 +1017,13 @@ class TestGithubServiceGetPaginatedListOfRepositoriesPerType(unittest.TestCase):
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetPaginatedListOfRepositoriesPerTopic(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_gql_client):
+    def test_calls_downstream_services(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_paginated_list_of_repositories_per_topic(
             "standards-compliant", "after_cursor")
         github_service.github_client_gql_api.execute.assert_called_once()
 
-    def test_throws_value_error_when_page_size_greater_than_limit(self, mock_gql_client):
+    def test_throws_value_error_when_page_size_greater_than_limit(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         self.assertRaises(
             ValueError, github_service.get_paginated_list_of_repositories_per_topic, "standards-compliant", "test_after_cursor", 101)
@@ -1294,7 +1296,7 @@ class TestGithubServiceFetchAllRepositories(unittest.TestCase):
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 class TestGithubServiceCloseRepositoryOpenIssuesWithTag(unittest.TestCase):
-    def test_calls_downstream_services_when_no_issues_to_close(self, mock_github_client_core_api):
+    def test_calls_downstream_services_when_no_issues_to_close(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.close_repository_open_issues_with_tag(
             "test_repository", "test-tag")
@@ -1426,10 +1428,24 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
+    def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
+        mock_users = [{"login": "user1"}, {"login": "user2"}]
+
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = mock_users
+
+        response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
+
+        self.assertEqual(["user1", "user2"], response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_gql_client):
+    def test_calls_downstream_services(self, _mock_gql_client):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_user_org_email_address("test_team_name")
         github_service.github_client_gql_api.assert_has_calls([
@@ -1457,7 +1473,7 @@ class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 class TestGithubServiceGetOrgMembersLoginNames(unittest.TestCase):
-    def test_calls_downstream_services(self, mock_github_client_core_api):
+    def test_calls_downstream_services(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_org_members_login_names()
         github_service.github_client_core_api.get_organization.assert_has_calls(
@@ -1589,7 +1605,7 @@ class TestGithubServiceRemoveUserFromGitHub(unittest.TestCase):
 
 
 class MockGithubIssue(MagicMock):
-    def __init__(self, the_id, number, title, assignees, label):
+    def __init__(self, the_id, number, title, assignees, _label):
         mock_label = MagicMock(name="test_support_label")
         super().__init__()
         self.id = the_id
@@ -1634,12 +1650,12 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
     def setUp(self) -> None:
         self.team = Mock()
+        self.commit = Mock()
         self.team.name = "team1"
         self.team.id = 1
 
         self.user1 = Mock()
         self.user1.login = "user1"
-        self.user1.comm
         self.user2 = Mock()
         self.user2.login = "user2"
 
@@ -1655,7 +1671,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.inactivity_months = 18
 
-    def test_identify_inactive_users_in_a_team(self, mock_github_client_core_api):
+    def test_identify_inactive_users_in_a_team(self, _mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
         github_service._get_repositories_managed_by_team = Mock(
@@ -1669,7 +1685,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
         self.assertEqual(2, len(inactive_users))
         self.assertEqual("user1", inactive_users[0].login)
 
-    def test_identify_no_inactive_users_in_a_team(self, mock_github_client_core_api):
+    def test_identify_no_inactive_users_in_a_team(self, _mock_github_client_core_api):
         self.commit = Mock()
         self.commit.commit.author.date = datetime.now()
         self.repository1.get_commits.return_value = [self.commit]
@@ -1685,7 +1701,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(0, len(inactive_users))
 
-    def test_identify_inactive_users(self, mock_github_client_core_api):
+    def test_identify_inactive_users(self, _mock_github_client_core_api):
 
         github_service = GithubService("", ORGANISATION_NAME)
 
@@ -1718,7 +1734,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(1, len(result))
 
-    def test_user_is_inactive(self, mock_github_client_core_api):
+    def test_user_is_inactive(self, _mock_github_client_core_api):
 
         self.commit = Mock()
         self.commit.commit.author.date = datetime.now(
@@ -1733,7 +1749,7 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 
         self.assertEqual(True, result)
 
-    def test_user_is_active(self, mock_github_client_core_api):
+    def test_user_is_active(self, _mock_github_client_core_api):
 
         self.commit = Mock()
         self.commit.commit.author.date = datetime.now()
@@ -1938,7 +1954,7 @@ class TestGithubServiceUpdateTeamRepositoryPermission(unittest.TestCase):
 @patch("services.github_service.Github")
 class TestNewOwnerDetected(unittest.TestCase):
 
-    def test_flag_owner_permission_changes(self, mock_github_client_core_api):
+    def test_flag_owner_permission_changes(self, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         mock_audit_log = [
             {'action': 'org.add_member', 'createdAt': '2023-12-06T10:32:07.832Z', 'actorLogin': 'testAdmin',
@@ -1956,7 +1972,7 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[0]['permission'], 'ADMIN')
         self.assertEqual(result[0]['userLogin'], 'janedoe')
 
-    def test_audit_log_member_changes(self, mock_github_client_gql):
+    def test_audit_log_member_changes(self, _mock_github_client_gql):
         github_service = GithubService("", ORGANISATION_NAME)
         return_value = {
             "organization": {
@@ -1982,18 +1998,17 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['action'], 'org.add_member')
         self.assertEqual(result[0]['permission'], 'READ')
-        
-        
-    def test_check_for_audit_log_new_members(self, mock_github_client_gql):
+
+    def test_check_for_audit_log_new_members(self, _mock_github_client_gql):
         github_service = GithubService("", ORGANISATION_NAME)
         return_value = {
             "organization": {
                 "auditLog": {
                     "edges": [
                         {"node": {"action": "org.add_member", "createdAt": "2023-12-06T10:32:07.832Z",
-                                "actorLogin": "user1", "userLogin": "new_member1"}},
+                                            "actorLogin": "user1", "userLogin": "new_member1"}},
                         {"node": {"action": "org.add_member", "createdAt": "2023-12-07T11:32:07.832Z",
-                                "actorLogin": "user2", "userLogin": "new_member2"}}
+                                            "actorLogin": "user2", "userLogin": "new_member2"}}
                     ],
                     "pageInfo": {
                         "endCursor": None,
@@ -2011,10 +2026,129 @@ class TestNewOwnerDetected(unittest.TestCase):
         self.assertEqual(result[0]['action'], 'org.add_member')
         self.assertEqual(result[0]['actorLogin'], 'user1')
         self.assertEqual(result[0]['userLogin'], 'new_member1')
-        
+
         self.assertEqual(result[1]['action'], 'org.add_member')
         self.assertEqual(result[1]['actorLogin'], 'user2')
         self.assertEqual(result[1]['userLogin'], 'new_member2')
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+@patch("requests.sessions.Session.__new__")
+class TestGHAMinutesQuotaOperations(unittest.TestCase):
+
+    def test_get_all_organisations_in_enterprise(self, _mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_user().get_orgs.return_value = [
+            Mock(Organization, login="org1"),
+            Mock(Organization, login="org2"),
+        ]
+
+        response = GithubService("", ORGANISATION_NAME).get_all_organisations_in_enterprise()
+
+        self.assertEqual(["org1", "org2"], response)
+
+    def test_get_gha_minutes_used_for_organisation(self, mock_github_client_rest_api, _mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.get_gha_minutes_used_for_organisation("org1")
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+            ]
+        )
+
+    def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, _mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_rest_api = mock_github_client_rest_api
+        github_service.modify_gha_minutes_quota_threshold(80)
+        mock_github_client_rest_api.assert_has_calls(
+            [
+                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD', '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+            ]
+        )
+
+    def test_get_gha_minutes_quota_threshold(self, _mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
+
+        response = GithubService("", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
+
+        self.assertEqual(70, response)
+
+    @freeze_time("2021-02-01")
+    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
+    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.reset_alerting_threshold_if_first_day_of_month()
+
+        mock_modify_gha_minutes_quota_threshold.assert_called_once_with(70)
+
+    @freeze_time("2021-02-22")
+    @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
+    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        github_service.reset_alerting_threshold_if_first_day_of_month()
+
+        assert not mock_modify_gha_minutes_quota_threshold.called
+
+    @patch.object(GithubService, "get_gha_minutes_used_for_organisation")
+    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, _mock_github_client_rest_api, _mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_gha_minutes_used_for_organisation.return_value = {"total_minutes_used": 10}
+
+        self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
+
+    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    def test_alert_on_low_quota_if_low(
+        self,
+        mock_get_all_organisations_in_enterprise,
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
+    ):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_calculate_total_minutes_used.return_value = 37500
+        mock_get_gha_minutes_quota_threshold.return_value = 70
+
+        result = github_service.check_if_gha_minutes_quota_is_low()
+
+        mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
+        self.assertEqual(result['threshold'], 70)
+        self.assertEqual(result['percentage_used'], 75)
+
+    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
+    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    def test_alert_on_low_quota_if_not_low(
+        self,
+        mock_get_all_organisations_in_enterprise,
+        mock_calculate_total_minutes_used,
+        mock_reset_alerting_threshold_if_first_day_of_month,
+        mock_get_gha_minutes_quota_threshold,
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
+    ):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_calculate_total_minutes_used.return_value = 5000
+        mock_get_gha_minutes_quota_threshold.return_value = 70
+
+        result = github_service.check_if_gha_minutes_quota_is_low()
+
+        mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
+        self.assertEqual(result, False)
 
 
 if __name__ == "__main__":

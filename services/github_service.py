@@ -1,6 +1,6 @@
 import json
 from calendar import timegm
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
@@ -11,12 +11,15 @@ from github import (Github, NamedUser, RateLimitExceededException,
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Repository import Repository
+from github.Organization import Organization
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
 from requests import Session
 
 from config.logging_config import logging
+
+# pylint: disable=E1136, E1135
 
 logging.getLogger("gql").setLevel(logging.WARNING)
 
@@ -41,8 +44,8 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
             logging.warning(
                 f"Caught {type(exception).__name__}, retrying calls when rate limit resets.")
             rate_limits = args[0].github_client_core_api.get_rate_limit()
-            rate_limit_to_use = rate_limits.core if type(
-                exception) is RateLimitExceededException else rate_limits.graphql
+            rate_limit_to_use = rate_limits.core if isinstance(
+                exception, RateLimitExceededException) else rate_limits.graphql
 
             reset_timestamp = timegm(rate_limit_to_use.reset.timetuple())
             now_timestamp = timegm(gmtime())
@@ -111,10 +114,9 @@ class GithubService:
                     f"Skipping repository: {repository.name}. Reason: Present in allow list")
                 return False
             return True
-        else:
-            logging.info(
-                f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-            return False
+        logging.info(
+            f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+        return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
@@ -265,6 +267,14 @@ class GithubService:
     def __get_all_users(self) -> list:
         logging.info("Getting all organization members")
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_users_of_multiple_organisations(self, organisations: list) -> list:
+        all_users = []
+        for org in organisations:
+            users = [user["login"] for user in self.github_client_core_api.get_organization(org).get_members() if user['login'] not in all_users]
+            all_users = all_users + users
+        return all_users
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
@@ -614,8 +624,8 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["isDisabled"] == True or repo["node"]["isArchived"] == True or repo["node"][
-                            "isLocked"] == True:
+                    if repo["node"]["isDisabled"] or repo["node"]["isArchived"] or repo["node"][
+                            "isLocked"]:
                         continue
                     repository_names.append(repo["node"]["name"])
 
@@ -644,7 +654,7 @@ class GithubService:
 
                 if data["search"]["repos"] is not None:
                     for repo in data["search"]["repos"]:
-                        if repo["repo"]["isDisabled"] == True or repo["repo"]["isLocked"] == True:
+                        if repo["repo"]["isDisabled"] or repo["repo"]["isLocked"]:
                             continue
                         repos.append(repo["repo"])
 
@@ -1066,16 +1076,16 @@ class GithubService:
 
         try:
             team = org.get_team_by_slug(team_name)
-        except UnknownObjectException:
+        except UnknownObjectException as exc:
             raise ValueError(
-                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'")
+                f"Team '{team_name}' does not exist in organization '{self.organisation_name}'") from exc
 
         for repo_name in repositories:
             try:
                 repo = org.get_repo(repo_name)
-            except UnknownObjectException:
+            except UnknownObjectException as exc:
                 raise ValueError(
-                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'")
+                    f"Repository '{repo_name}' does not exist in organization '{self.organisation_name}'") from exc
 
             logging.info(
                 f"Updating {team_name} team's permission to {permission} on {repo_name}")
@@ -1101,42 +1111,42 @@ class GithubService:
         logging.info(f"Getting audit log entries since {since_date}")
         today = datetime.now()
         query = """
-			query($organisation_name: String!, $since_date: String!, $cursor: String) {
-				organization(login: $organisation_name) {
-					auditLog(
-						first: 100
-						after: $cursor
-						query: $since_date
-					) {
-						edges{
-							node{
-								... on OrgAddMemberAuditEntry {
-									action
-									createdAt
-									actorLogin
-									operationType
-									permission
-									userLogin
-								}
-								... on OrgUpdateMemberAuditEntry {
-									action
-									createdAt
-									actorLogin
-									operationType
-									permission
-									permissionWas
-									userLogin
-								}
-							}
-						}
-						pageInfo {
-							endCursor
-							hasNextPage
-						}
-					}
-				}
-			}
-		"""
+            query($organisation_name: String!, $since_date: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $since_date
+                    ) {
+                        edges{
+                            node{
+                                ... on OrgAddMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    operationType
+                                    permission
+                                    userLogin
+                                }
+                                ... on OrgUpdateMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    operationType
+                                    permission
+                                    permissionWas
+                                    userLogin
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
         variable_values = {
             "organisation_name": self.organisation_name,
             "since_date": f"action:org.add_member  action:org.update_member  created:{since_date}..{today.strftime('%Y-%m-%d')}",
@@ -1206,3 +1216,78 @@ class GithubService:
                 break
 
         return new_members
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_all_organisations_in_enterprise(self) -> list[Organization]:
+        logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
+
+        return [org.login for org in self.github_client_core_api.get_user().get_orgs()] or []
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_gha_minutes_used_for_organisation(self, organization) -> int:
+        logging.info(f"Getting all github actions minutes used for organization {organization}")
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+
+        response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
+
+        return response.json()
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def modify_gha_minutes_quota_threshold(self, new_threshold):
+        logging.info(f"Changing the alerting threshold to {new_threshold}%")
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+
+        payload = {'value': str(new_threshold)}
+
+        self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_gha_minutes_quota_threshold(self):
+        actions_variable = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        return int(actions_variable.value)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def reset_alerting_threshold_if_first_day_of_month(self):
+        base_alerting_threshold = 70
+
+        if date.today().day == 1:
+            self.modify_gha_minutes_quota_threshold(base_alerting_threshold)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def calculate_total_minutes_used(self, organisations):
+        total = 0
+
+        for org in organisations:
+            billing_data = self.get_gha_minutes_used_for_organisation(org)
+            minutes_used = billing_data["total_minutes_used"]
+            total += minutes_used
+
+        return total
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def check_if_gha_minutes_quota_is_low(self):
+        organisations = self.get_all_organisations_in_enterprise()
+
+        total_minutes_used = self.calculate_total_minutes_used(organisations)
+
+        print(f"Total minutes used: {total_minutes_used}")
+
+        total_quota = 50000
+
+        percentage_used = (total_minutes_used / total_quota) * 100
+
+        self.reset_alerting_threshold_if_first_day_of_month()
+
+        threshold = self.get_gha_minutes_quota_threshold()
+
+        if percentage_used >= threshold:
+            return {'threshold': threshold, 'percentage_used': percentage_used}
+        return False

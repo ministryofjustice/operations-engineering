@@ -13,8 +13,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.report_on_repository_standards --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }} --api-key ${{ secrets.REPORTS_API_KEY }} --url https://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk --endpoint /api/v2/update-github-reports
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.report_on_repository_standards --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }} --api-key ${{ secrets.REPORTS_API_KEY }} --url https://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk --endpoint /api/v2/update-github-reports
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

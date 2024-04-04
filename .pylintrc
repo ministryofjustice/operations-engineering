@@ -274,10 +274,10 @@ exclude-too-few-public-methods=
 ignored-parents=
 
 # Maximum number of arguments for function / method.
-max-args=5
+max-args=10
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=10
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5
@@ -286,7 +286,7 @@ max-bool-expr=5
 max-branches=12
 
 # Maximum number of locals for function / method body.
-max-locals=15
+max-locals=20
 
 # Maximum number of parents for a class (see R0901).
 max-parents=7
@@ -419,7 +419,16 @@ disable=raw-checker-failed,
         missing-class-docstring,
         missing-module-docstring,
         missing-function-docstring,
-        line-too-long
+        line-too-long,
+        C0302,  # Too many lines in module
+        C2801,  # Unnecessarily calls dunder method
+        E0401,  # Failed to import package
+        R0801,  # Similar lines in two files
+        R0902,  # Too many instance attributes
+        R0903,  # Too few public methods
+        R0904,  # Too many public methods
+        W0212  # Access to a protected member (we do this for testing)
+
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

@@ -27,11 +27,13 @@ jobs:
       - name: CVE Description escaped extraction and print
         run: |
           SCAN_RESULTS=$(jq -r '.runs[0].tool.driver.rules | map(.help.text) | join("\\n")' trivy-results.sarif)
-          echo "CVE_CRITICAL=$(echo $SCAN_RESULTS | grep -o CRITICAL | wc -l)" >> $GITHUB_ENV
-          echo "CVE_HIGH=$(echo $SCAN_RESULTS | grep -o HIGH | wc -l)" >> $GITHUB_ENV
-          echo "CVE_MEDIUM=$(echo $SCAN_RESULTS | grep -o MEDIUM | wc -l)" >> $GITHUB_ENV
+          {
+            echo "CVE_CRITICAL=$(echo "$SCAN_RESULTS" | grep -o CRITICAL | wc -l)"
+            echo "CVE_HIGH=$(echo "$SCAN_RESULTS" | grep -o HIGH | wc -l)"
+            echo "CVE_MEDIUM=$(echo "$SCAN_RESULTS" | grep -o MEDIUM | wc -l)"
+          } >> "$GITHUB_ENV"
 
-          echo $SCAN_RESULTS
+          echo "$SCAN_RESULTS"
 
       - name: Create an Issue for Detected Vulnerabilities
         id: issue-creator
@@ -95,12 +97,12 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "Please review the detailed scan results and take necessary actions. <https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>\n\n*Issue Created:* <${{ steps.issue-creator.outputs.url }}|View Issue>"
+                    "text": "Please review the detailed scan results and take necessary actions.\n\n<https://github.com/${{ github.repository }}/security/code-scanning|View Details on GitHub>\n\n<https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/dependency-alerts.html|Runbook for Responding to Dependency Alerts>\n\n*Issue Created:* <${{ steps.issue-creator.outputs.url }}|View Issue>"
                   }
                 }
               ]
             }
-      
+
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

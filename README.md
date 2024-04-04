@@ -27,8 +27,36 @@ These are just a few examples of this repository's useful tools and features. Fo
 1. **Clone the Repo:** `git clone https://github.com/ministryofjustice/operations-engineering.git`
 2. **Install pre-commit:** `make local-setup`
 3. **Navigate to the Repo:** `cd operations-engineering`
-4. **Install Dependencies:** `pip install -r python/requirements.txt`
-5. **Run a script:** `python -m bin.dormant_users # for example`
+4. **Install Dependencies:** `pipenv install --dev`
+5. **Run a script:** `pipenv run python -m bin.dormant_users`
+
+## Pipenv
+
+### Basics
+
+```bash
+# Install pipenv via brew
+brew install pipenv
+# or via pip
+python3 -m pip install pipenv
+
+# Install all dependencies, including development dependencies
+pipenv install --dev
+
+# Run a script within the created virtual environment
+pipenv run tests
+# or as a command
+pipenv run coverage run python -m unittest
+
+# Get location of virtual environment (location may be needed to point your IDE to the right interpreter)
+pipenv --venv
+
+# Check for vulnerable packages
+pipenv check
+
+# Additional information on pipenv functionality
+pipenv --help
+```
 
 ## Naming Standards For Workflow Files
 
