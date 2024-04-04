@@ -1,4 +1,4 @@
-name: Alarm for Low Gandi Funds
+name: 🤖 Alarm for Low Gandi Funds
 
 on:
   schedule:
