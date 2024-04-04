@@ -1,8 +1,6 @@
 name: 🤖 Alarm for Low Gandi Funds
 
 on:
-  schedule:
-    - cron: "0 12 * * *"
   workflow_dispatch:
 
 jobs:
