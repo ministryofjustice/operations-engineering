@@ -1428,6 +1428,41 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
+    def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
+        mock_users = [
+            {
+                "login": "user1",
+                "id": 29397727,
+                "node_id": "MDQ6VXNlcjI5Mzk3NzIy",
+                "avatar_url": "https://avatars.githubusercontent.com/u/29397722?v=4",
+                "gravatar_id": "",
+                "url": "https://api.github.com/users/user1",
+                "html_url": "https://github.com/user1",
+                "followers_url": "https://api.github.com/users/user1/followers",
+                "following_url": "https://api.github.com/users/user1/following{/other_user}",
+                "gists_url": "https://api.github.com/users/user1/gists{/gist_id}",
+                "starred_url": "https://api.github.com/users/user1/starred{/owner}{/repo}",
+                "subscriptions_url": "https://api.github.com/users/user1/subscriptions",
+                "organizations_url": "https://api.github.com/users/user1/orgs",
+                "repos_url": "https://api.github.com/users/user1/repos",
+                "events_url": "https://api.github.com/users/user1/events{/privacy}",
+                "received_events_url": "https://api.github.com/users/user1/received_events",
+                "type": "User",
+                "site_admin": False
+            }
+        ]
+
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = mock_users
+
+        response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
+
+        self.assertEqual(mock_users + mock_users, response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
@@ -2135,36 +2170,6 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result, False)
-
-    def test_get_users_of_multiple_organisations(self, mock_github_client_rest_api, mock_github_client_core_api):
-        mock_users = [
-            {
-                "login": "user1",
-                "id": 29397727,
-                "node_id": "MDQ6VXNlcjI5Mzk3NzIy",
-                "avatar_url": "https://avatars.githubusercontent.com/u/29397722?v=4",
-                "gravatar_id": "",
-                "url": "https://api.github.com/users/user1",
-                "html_url": "https://github.com/user1",
-                "followers_url": "https://api.github.com/users/user1/followers",
-                "following_url": "https://api.github.com/users/user1/following{/other_user}",
-                "gists_url": "https://api.github.com/users/user1/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/user1/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/user1/subscriptions",
-                "organizations_url": "https://api.github.com/users/user1/orgs",
-                "repos_url": "https://api.github.com/users/user1/repos",
-                "events_url": "https://api.github.com/users/user1/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/user1/received_events",
-                "type": "User",
-                "site_admin": False
-            }
-        ]
-
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value = mock_users
-
-        response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
-
-        self.assertEqual(mock_users + mock_users, response)
 
 
 if __name__ == "__main__":
