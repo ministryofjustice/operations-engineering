@@ -1434,24 +1434,10 @@ class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
     def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
         mock_users = [
             {
-                "login": "user1",
-                "id": 29397727,
-                "node_id": "MDQ6VXNlcjI5Mzk3NzIy",
-                "avatar_url": "https://avatars.githubusercontent.com/u/29397722?v=4",
-                "gravatar_id": "",
-                "url": "https://api.github.com/users/user1",
-                "html_url": "https://github.com/user1",
-                "followers_url": "https://api.github.com/users/user1/followers",
-                "following_url": "https://api.github.com/users/user1/following{/other_user}",
-                "gists_url": "https://api.github.com/users/user1/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/user1/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/user1/subscriptions",
-                "organizations_url": "https://api.github.com/users/user1/orgs",
-                "repos_url": "https://api.github.com/users/user1/repos",
-                "events_url": "https://api.github.com/users/user1/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/user1/received_events",
-                "type": "User",
-                "site_admin": False
+                "login": "user1"
+            },
+            {
+                "login": "user2"
             }
         ]
 
@@ -1459,7 +1445,7 @@ class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
 
         response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
 
-        self.assertEqual(mock_users + mock_users, response)
+        self.assertEqual({ "org1": ["user1", "user2"], "org2": ["user1", "user2"] }, response)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)

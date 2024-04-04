@@ -270,10 +270,10 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_users_of_multiple_organisations(self, organisations: list) -> list:
-        combined_users = []
+        users = {}
         for org in organisations:
-            combined_users = combined_users + self.github_client_core_api.get_organization(org).get_members()
-        return combined_users
+            users[org] = [ user['login'] for user in self.github_client_core_api.get_organization(org).get_members() ]
+        return users
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
