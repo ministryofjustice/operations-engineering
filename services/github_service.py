@@ -270,9 +270,9 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_users_of_multiple_organisations(self, organisations: list) -> list:
-        users = {}
+        users = []
         for org in organisations:
-            users[org] = [user['login'] for user in self.github_client_core_api.get_organization(org).get_members()]
+            [users.append(user['login']) for user in self.github_client_core_api.get_organization(org).get_members() if user['login'] not in users]
         return users
 
     @retries_github_rate_limit_exception_at_next_reset_once

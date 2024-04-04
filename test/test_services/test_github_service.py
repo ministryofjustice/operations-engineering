@@ -1438,7 +1438,7 @@ class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
 
         response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
 
-        self.assertEqual({"org1": ["user1", "user2"], "org2": ["user1", "user2"]}, response)
+        self.assertEqual(["user1", "user2"], response)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
