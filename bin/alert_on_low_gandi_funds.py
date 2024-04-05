@@ -12,7 +12,8 @@ def low_gandi_funds_message(remaining_gandi_funds):
         f"Hi all, \n\n"
         f"This is an alert do inform you that Gandi funds are low. \n\n"
         f"*:warning: We currently have £{remaining_gandi_funds} left out of £{GANDI_FUND_THRESHOLD}*\n\n"
-        f"Please read [this runbook](https://runbooks.operations-engineering.service.justice.gov.uk/documentation/certificates/manual-ssl-certificate-processes.html#regenerating-certificates) for next steps.\n\n"
+        f"Please read the following runbook for next steps:\n"
+        f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/certificates/manual-ssl-certificate-processes.html#regenerating-certificates\n\n"
         f"Have a swell day, \n\n"
         "The GitHub Organisation Monitoring Bot"
     )
