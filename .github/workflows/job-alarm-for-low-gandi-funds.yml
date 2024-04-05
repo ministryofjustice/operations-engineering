@@ -25,7 +25,7 @@ jobs:
       - name: execute the low gandi funds script
         run: pipenv run python3 -m bin.alert_on_low_gandi_funds
         env:
-          GANDI_API_KEY: ${{ secrets.GANDI_API_KEY }}
+          GANDI_FUNDS_TOKEN: ${{ secrets.GANDI_FUNDS_TOKEN }}
           GANDI_ORG_ID: ${{ secrets.GANDI_ORG_ID }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
       - name: Report failure to Slack

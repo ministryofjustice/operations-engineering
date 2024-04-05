@@ -2,8 +2,8 @@ import requests
 
 
 class GandiService:
-    def __init__(self, api_key, url_extension) -> None:
-        self.headers = {'Authorization': f'ApiKey {api_key}'}
+    def __init__(self, token, url_extension) -> None:
+        self.headers = {'Authorization': f'Bearer {token}'}
         self.url = "https://api.gandi.net/" + url_extension
 
     def get_current_account_balance_from_org(self, org_id):
@@ -18,4 +18,3 @@ class GandiService:
         except TypeError as api_key_error:
             raise TypeError(
                 f"Gandi API key does not exist or is in the wrong format:\n {api_key_error}") from api_key_error
-
