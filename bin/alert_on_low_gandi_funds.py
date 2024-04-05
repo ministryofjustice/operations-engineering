@@ -20,10 +20,6 @@ def low_gandi_funds_message(remaining_gandi_funds):
     return msg
 
 
-def send_gandi_alert_to_slack(remaining_gandi_funds):
-    print(f'Sending alert to slack as funds are low: {remaining_gandi_funds}')
-
-
 def alert_on_low_gandi_funds():
     gandi_token = os.environ.get("GANDI_FUNDS_TOKEN")
     if gandi_token is None:
