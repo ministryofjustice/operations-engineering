@@ -4,14 +4,14 @@ from services.gandi_service import GandiService
 from services.slack_service import SlackService
 from config.constants import SLACK_CHANNEL
 
-GANDI_FUND_THRESHOLD = 5000
+GANDI_FUND_THRESHOLD = 500
 
 
 def low_gandi_funds_message(remaining_gandi_funds):
     msg = (
         f"Hi all, \n\n"
         f"This is an alert do inform you that Gandi funds are low. \n\n"
-        f"*We currently have £{remaining_gandi_funds} left out of £{GANDI_FUND_THRESHOLD}*\n"
+        f"*:warning: We currently have £{remaining_gandi_funds} left out of £{GANDI_FUND_THRESHOLD}*\n\n"
         f"Please seek to add more funds to the account as soon as possible.\n\n"
         f"Have a swell day, \n\n"
         "The GitHub Organisation Monitoring Bot"
