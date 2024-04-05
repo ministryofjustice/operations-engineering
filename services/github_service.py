@@ -1,6 +1,6 @@
 import json
 from calendar import timegm
-from datetime import datetime, timedelta, date
+from datetime import date, datetime, timedelta
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
@@ -10,8 +10,8 @@ from github import (Github, NamedUser, RateLimitExceededException,
                     UnknownObjectException)
 from github.Commit import Commit
 from github.Issue import Issue
-from github.Repository import Repository
 from github.Organization import Organization
+from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
@@ -881,6 +881,52 @@ class GithubService:
                 if last_active_date > three_months_ago_date:
                     active_users.append(user["username"].lower())
         return active_users
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def active_users_in_organisation_within_date(self, since_date: str, organisation: str) -> list:
+        logging.info(f"Getting audit log entries since {since_date}")
+        today = datetime.now()
+        query = """
+            query($organisation_name: String!, $since_date: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $since_date
+                    ) {
+                        edges{
+                            node{
+                                login
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
+        variable_values = {
+            "organisation_name": organisation,
+            "since_date": f"action:org.add_member  action:org.update_member  created:{since_date}..{today.strftime('%Y-%m-%d')}",
+            "cursor": None
+        }
+
+        all_entries = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            all_entries.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return all_entries
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_user_from_gitub(self, user: str):
