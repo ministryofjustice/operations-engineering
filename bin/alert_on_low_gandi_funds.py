@@ -30,6 +30,9 @@ def alert_on_low_gandi_funds():
         print("No SLACK_TOKEN environment variable set")
         sys.exit(1)
     organisation_id = os.environ.get("GANDI_ORG_ID")
+    if organisation_id is None:
+        print("No GANDI_ORG_ID environment variable set")
+        sys.exit(1)
     gandi_service = GandiService(gandi_token, "v5/billing/info/")
 
     remaining_gandi_funds = gandi_service.get_current_account_balance_from_org(organisation_id)
