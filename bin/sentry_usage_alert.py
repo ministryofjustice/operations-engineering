@@ -16,7 +16,7 @@ def get_environment_variables() -> tuple[str, str, int, float]:
         raise ValueError("The env variable SLACK_TOKEN is empty or missing")
 
     period_in_days = os.getenv("PERIOD_IN_DAYS") or 1
-    usage_threshold = os.getenv("USAGE_THRESHOLD") or 80
+    usage_threshold = os.getenv("USAGE_THRESHOLD") or 60
 
     return sentry_token, slack_token, int(period_in_days), round(int(usage_threshold) / 100, 2)
 
