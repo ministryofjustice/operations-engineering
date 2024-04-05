@@ -1,7 +1,7 @@
 import os
 from services.gandi_service import GandiService
 
-GANDI_FUND_THRESHOLD = 500
+GANDI_FUND_THRESHOLD = 5000
 
 
 def send_gandi_alert_to_slack(remaining_gandi_funds):
