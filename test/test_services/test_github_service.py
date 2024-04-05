@@ -1428,6 +1428,20 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
+    def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
+        mock_users = [{"login": "user1"}, {"login": "user2"}]
+
+        mock_github_client_core_api.return_value.get_organization().get_members.return_value = mock_users
+
+        response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
+
+        self.assertEqual(["user1", "user2"], response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):

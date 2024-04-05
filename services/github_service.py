@@ -269,6 +269,13 @@ class GithubService:
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_users_of_multiple_organisations(self, organisations: list) -> list:
+        all_users = []
+        for org in organisations:
+            all_users = all_users + [user["login"] for user in self.github_client_core_api.get_organization(org).get_members() if user['login'] not in all_users]
+        return all_users
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
         logging.info(f"Adding user {user.name} to team {team_id}")
         self.github_client_core_api.get_organization(
