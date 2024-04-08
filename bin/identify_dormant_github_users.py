@@ -43,6 +43,9 @@ def identify_dormant_github_users(self):
 
     dormant_users = identify_dormant_users(all_users, active_users)
 
+    for user in dormant_users:
+        print(user)
+
     # get list of all users from both organisations
     # get github and auth0 audit logs
     # identify users that don't appear in the logs
