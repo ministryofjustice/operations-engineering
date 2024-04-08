@@ -16,7 +16,7 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run  python -m bin.identify_dormant_github_users
+      - run: pipenv run  python -m bin.identify_dormant_github_users ${{ secrets.GH_BOT_PAT_TOKEN }} ${{ secrets.AUTH0_CLIENT_SECRET }} ${{ secrets.AUTH0_CLIENT_ID }} ${{ secrets.AUTH0_DOMAIN}}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
