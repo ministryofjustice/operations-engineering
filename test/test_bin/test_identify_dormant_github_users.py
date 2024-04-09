@@ -56,7 +56,7 @@ class TestIdentifyDormantGithubUsers(TestCase):
         mock_get_users_if_multiple_organisations,
         mock_get_audit_logs,
         mock_setup_environment,
-        mock_github_client_core_api
+        _mock_github_client_core_api
     ):
         mock_setup_environment.return_value = ("test_github_token", "test_client_secret", "test_client_id", "test_domain")
         mock_get_audit_logs.return_value = ["user1", "user2", "user3"]
