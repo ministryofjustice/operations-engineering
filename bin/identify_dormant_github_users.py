@@ -38,8 +38,6 @@ def get_usernames_from_csv(ignored_users: list) -> list:
     try:
         with open(CSV_FILE_NAME, mode='r', encoding='utf-8') as file:
             csv_reader = csv.reader(file)
-            # Skip the header if your CSV has one, uncomment the next line
-            # next(csv_reader, None)  # Uncomment if the CSV has a header
 
             for row in csv_reader:
                 username = row[2].strip()
