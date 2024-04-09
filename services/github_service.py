@@ -272,7 +272,8 @@ class GithubService:
     def get_users_of_multiple_organisations(self, organisations: list) -> list:
         all_users = []
         for org in organisations:
-            all_users = all_users + [user["login"] for user in self.github_client_core_api.get_organization(org).get_members() if user['login'] not in all_users]
+            all_users = all_users + [user["login"] for user in self.github_client_core_api.get_organization(
+                org).get_members() if user['login'] not in all_users]
         return all_users
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -856,6 +857,47 @@ class GithubService:
             self.organisation_name).get_members() or []
         return [member.login.lower() for member in members]
 
+    def get_all_inactive_users_in_enterprise_audit_log_since_date(self, since_date: str) -> list[str]:
+        logging.info(
+            f"Getting all active users in enterprise since {since_date}")
+        # all_users = self.get_users_of_multiple_organisations(
+        #     [self.organisation_name, "moj-analytical-services"])
+        all_active_users = self.active_users_in_enterprise_within_date(
+            since_date)
+
+        dedup = self.dedup_active_users(all_active_users)
+        for user in dedup:
+            print(user)
+
+        print(len(dedup))
+        return []
+
+    def dedup_active_users(self, users: list[str]) -> set[str]:
+        set_users = set()
+        for user in users:
+            for k, v in user.items():
+                if k == "actor":
+                    set_users.add(v)
+
+        return set_users
+
+    def active_users_in_enterprise_within_date(self, since_date: str) -> list[str]:
+        logging.info(f"Getting active users in enterprise since {since_date}")
+        response_okay = 200
+        url = f"https://api.github.com/enterprises/{self.enterprise_name}/audit-log?phrase=created:{since_date}..{datetime.now().strftime('%Y-%m-%d')}&per_page=100"
+        logging.info(f"using the url {url}")
+        response = self.github_client_rest_api.get(url, timeout=100)
+        if response.status_code != response_okay:
+            logging.error(
+                f"Failed to get active users in enterprise since {since_date} because {response.content}")
+            response.raise_for_status()
+        results = json.loads(response.content.decode("utf-8"))
+        while 'next' in response.links:
+            response = self.github_client_rest_api.get(
+                response.links['next']['url'], timeout=100)
+            results.extend(json.loads(response.content.decode("utf-8")))
+        return results
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_user_from_audit_log(self, username: str):
         logging.info("Getting User from Audit Log")
@@ -1214,7 +1256,8 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_for_audit_log_new_members(self, since_date: str) -> list:
-        logging.info(f"Getting audit log entries for new members since {since_date}")
+        logging.info(
+            f"Getting audit log entries for new members since {since_date}")
         today = datetime.now()
         query = """
             query($organisation_name: String!, $since_date: String!, $cursor: String) {
@@ -1264,20 +1307,23 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
-        logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
+        logging.info(
+            f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
 
         return [org.login for org in self.github_client_core_api.get_user().get_orgs()] or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_used_for_organisation(self, organization) -> int:
-        logging.info(f"Getting all github actions minutes used for organization {organization}")
+        logging.info(
+            f"Getting all github actions minutes used for organization {organization}")
 
         headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
+        response = self.github_client_rest_api.get(
+            f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
 
         return response.json()
 
@@ -1292,11 +1338,13 @@ class GithubService:
 
         payload = {'value': str(new_threshold)}
 
-        self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
+        self.github_client_rest_api.patch(
+            "https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_quota_threshold(self):
-        actions_variable = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        actions_variable = self.github_client_core_api.get_repo(
+            'ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
         return int(actions_variable.value)
 
     @retries_github_rate_limit_exception_at_next_reset_once
