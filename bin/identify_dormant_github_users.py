@@ -5,7 +5,7 @@ import sys
 DORMANT_USER_THRESHOLD = 90
 
 
-def setup_environment() -> tuple[str, str]:
+def setup_environment() -> tuple[str, str, str, str]:
     github_token = sys.argv[0]
     auth0_client_secret = sys.argv[1]
     auth0_client_id = sys.argv[2]
