@@ -4,7 +4,7 @@ from io import StringIO
 from unittest.mock import patch
 
 import boto3
-from moto import mock_s3
+from moto import mock_aws
 
 from bin.identify_dormant_github_users import (BOT_USERS_DEEMED_ACCEPTABLE,
                                                download_file_from_s3,
@@ -13,13 +13,13 @@ from bin.identify_dormant_github_users import (BOT_USERS_DEEMED_ACCEPTABLE,
 
 class TestDormantGitHubUsers(unittest.TestCase):
 
-    @mock_s3
+    @mock_aws
     def setUp(self):
         self.bucket = "operations-engineering-dormant-users"
         self.filename = "dormant.csv"
         self.content = """email,username,login\nuser1@example.com,user1,user1\nuser2@example.com,ci-hmcts,user2"""
 
-        conn = boto3.resource('s3', region_name="eu-west-1")
+        conn = boto3.resource('s3', region_name="us-east-1")
         conn.create_bucket(Bucket=self.bucket)
         conn.Bucket(self.bucket).put_object(
             Key=self.filename, Body=self.content)
