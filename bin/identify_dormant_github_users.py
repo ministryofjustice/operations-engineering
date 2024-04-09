@@ -31,7 +31,7 @@ def identify_dormant_users(github_users: list[str], audit_logs: list[str]) -> li
     return [ user for user in github_users if user not in audit_logs ]
 
 
-def identify_dormant_github_users(self):
+def identify_dormant_github_users():
     github_token, auth0_client_secret, auth0_client_id, auth0_domain = setup_environment()
 
     github = GithubService(github_token, "ministryofjustice")

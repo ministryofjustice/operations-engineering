@@ -26,7 +26,7 @@ class TestIdentifyDormantGithubUsers(TestCase):
     @patch("requests.sessions.Session.__new__")
     @patch.object(GithubService, "get_audit_log_active_users")
     @patch.object(Auth0Service, "get_active_users")
-    def test_get_audit_logs(self, mock_auth0_users, mock_github_users, mock_github_client_rest_api, _mock_github_client_core_api):
+    def test_get_audit_logs(self, mock_auth0_users, mock_github_users, mock_github_client_rest_api, mock_github_client_core_api):
         mock_auth0_users.return_value = [
             {
                 "test_key": "test_value",
@@ -52,5 +52,33 @@ class TestIdentifyDormantGithubUsers(TestCase):
     def test_identify_dormant_users(self):
         self.assertEqual(identify_dormant_users(["user1", "user2", "user3"], ["user1", "user2"]), ["user3"])
 
-    # def test_identify_dormant_github_users(self):
-    #     self.assertEqual(setup_environment(), ('github_token', 'auth0_token'))
+    @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+    @patch("gql.Client.__new__", new=MagicMock)
+    @patch("github.Github.__new__")
+    @patch("requests.sessions.Session.__new__")
+    @patch("bin.identify_dormant_github_users.setup_environment")
+    @patch("bin.identify_dormant_github_users.get_audit_logs")
+    @patch.object(GithubService, "get_users_of_multiple_organisations")
+    @patch("bin.identify_dormant_github_users.identify_dormant_users")
+    def test_identify_dormant_github_users(
+        self, 
+        mock_identify_dormant_users, 
+        mock_get_users_if_multiple_organisations, 
+        mock_get_audit_logs, 
+        mock_setup_environment,
+        mock_github_client_rest_api, 
+        mock_github_client_core_api
+    ):
+        mock_setup_environment.return_value = ("test_github_token", "test_client_secret","test_client_id","test_domain")
+        mock_get_audit_logs.return_value = ["user1", "user2", "user3"]
+        mock_get_users_if_multiple_organisations.return_value = ["user1", "user2", "user3", "user4"]
+        mock_identify_dormant_users.return_value = ["user4"]
+
+        identify_dormant_github_users()
+
+        mock_setup_environment.assert_called_once()
+        mock_get_audit_logs.assert_called_once()
+        mock_get_users_if_multiple_organisations.assert_called_once_with(["ministryofjustice", "moj-analytical-services"])
+        mock_identify_dormant_users.assert_called_once_with(["user1", "user2", "user3", "user4"], ["user1", "user2", "user3"])
+
+        
