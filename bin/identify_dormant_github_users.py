@@ -1,6 +1,6 @@
 from services.github_service import GithubService
 from services.auth0_service import Auth0Service
-import sys
+import sys, os
 
 DORMANT_USER_THRESHOLD = 90
 
@@ -31,19 +31,24 @@ def identify_dormant_users(github_users: list[str], audit_logs: list[str]) -> li
     return [ user for user in github_users if user not in audit_logs ]
 
 
-def identify_dormant_github_users(self):
-    github_token, auth0_client_secret, auth0_client_id, auth0_domain = setup_environment()
+def identify_dormant_github_users():
+    github_token = os.getenv("GH_ADMIN_TOKEN")
+    this = os.getenv("this")
+
+    print(f'This: {this}')
 
     github = GithubService(github_token, "ministryofjustice")
-    auth0_service = Auth0Service(auth0_client_secret, auth0_client_id, auth0_domain, "client_credentials")
+    # auth0_service = Auth0Service(auth0_client_secret, auth0_client_id, auth0_domain, "client_credentials")
 
-    active_users = self.get_audit_logs(github, auth0_service)
+    # active_users = get_audit_logs(github, auth0_service)
 
-    all_users = github.get_users_of_multiple_organisations(["ministryofjustice", "moj-analytical-services"])
+    # all_users = github.get_users_of_multiple_organisations(["ministryofjustice", "moj-analytical-services"])
 
-    dormant_users = identify_dormant_users(all_users, active_users)
+    # dormant_users = identify_dormant_users(all_users, active_users)
 
-    for user in dormant_users:
+    all_users = github.check_for_audit_for_all_members()
+
+    for user in all_users:
         print(user)
 
     # get list of all users from both organisations

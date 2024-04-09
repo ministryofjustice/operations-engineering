@@ -1336,3 +1336,42 @@ class GithubService:
         if percentage_used >= threshold:
             return {'threshold': threshold, 'percentage_used': percentage_used}
         return False
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def check_for_audit_for_all_members(self) -> list:
+        query = """
+            query($organisation_name: String!) {
+                organization(login: $organisation_name) {
+                    auditLog(first: 100, query: "action:*") {
+                        edges {
+                            node {
+                                ... on AuditEntry {
+                                    action
+                                    actor {
+                                        ... on User {
+                                            login
+                                        }
+                                    }
+                                    createdAt
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
+        variable_values = {
+            "organisation_name": self.organisation_name,
+        }
+
+        new_members = []
+        data = self.github_client_gql_api.execute(
+            gql(query), variable_values=variable_values)
+        new_members.extend(
+            [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+
+        return new_members
