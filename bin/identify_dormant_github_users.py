@@ -37,7 +37,7 @@ def identify_dormant_github_users(self):
     github = GithubService(github_token, "ministryofjustice")
     auth0_service = Auth0Service(auth0_client_secret, auth0_client_id, auth0_domain, "client_credentials")
 
-    active_users = self.get_audit_logs(github, auth0_service)
+    active_users = get_audit_logs(github, auth0_service)
 
     all_users = github.get_users_of_multiple_organisations(["ministryofjustice", "moj-analytical-services"])
 
