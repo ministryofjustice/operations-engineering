@@ -19,7 +19,7 @@ def setup_environment() -> tuple[str, str]:
 def get_audit_logs(github: GithubService, auth0_service: Auth0Service) -> list[str]:
 
     active_github_users = github.get_audit_log_active_users()
-    active_auth0_users = auth0_service.get_active_users()
+    active_auth0_users =[ user["user_id"] for user in auth0_service.get_active_users() ]
 
     active_users = list(set(active_github_users).union(set(active_auth0_users)))
 
