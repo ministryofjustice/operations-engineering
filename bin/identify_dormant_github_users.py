@@ -6,7 +6,6 @@ DORMANT_USER_THRESHOLD = 90
 
 
 def setup_environment() -> tuple[str, str]:
-    
     github_token = sys.argv[0]
     auth0_client_secret = sys.argv[1]
     auth0_client_id = sys.argv[2]
@@ -17,14 +16,14 @@ def setup_environment() -> tuple[str, str]:
 
 def get_audit_logs(auth0_service: Auth0Service) -> list[str]:
 
-    active_users =[ user["user_id"] for user in auth0_service.get_active_users() ]
+    active_users = [user["user_id"] for user in auth0_service.get_active_users()]
 
     return active_users
 
 
 def identify_dormant_users(github_users: list[str], audit_logs: list[str]) -> list[str]:
 
-    return [ user for user in github_users if user not in audit_logs ]
+    return [user for user in github_users if user not in audit_logs]
 
 
 def identify_dormant_github_users():
