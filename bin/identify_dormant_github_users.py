@@ -33,9 +33,6 @@ def identify_dormant_users(github_users: list[str], audit_logs: list[str]) -> li
 
 def identify_dormant_github_users():
     github_token = os.getenv("GH_ADMIN_TOKEN")
-    this = os.getenv("this")
-
-    print(f'This: {this}')
 
     github = GithubService(github_token, "ministryofjustice")
     # auth0_service = Auth0Service(auth0_client_secret, auth0_client_id, auth0_domain, "client_credentials")
