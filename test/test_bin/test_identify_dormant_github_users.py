@@ -46,7 +46,6 @@ class TestIdentifyDormantGithubUsers(TestCase):
     @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
     @patch("gql.Client.__new__", new=MagicMock)
     @patch("github.Github.__new__")
-    @patch("requests.sessions.Session.__new__")
     @patch("bin.identify_dormant_github_users.setup_environment")
     @patch("bin.identify_dormant_github_users.get_audit_logs")
     @patch.object(GithubService, "get_users_of_multiple_organisations")
@@ -57,7 +56,6 @@ class TestIdentifyDormantGithubUsers(TestCase):
         mock_get_users_if_multiple_organisations,
         mock_get_audit_logs,
         mock_setup_environment,
-        mock_github_client_rest_api,
         mock_github_client_core_api
     ):
         mock_setup_environment.return_value = ("test_github_token", "test_client_secret", "test_client_id", "test_domain")
