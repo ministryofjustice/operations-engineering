@@ -1,0 +1,21 @@
+name: 🧪 Get Audit Log Users
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-for-audit-log-users:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.identify_dormant_github_users.py
+        env:
+          GH_ADMIN_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
