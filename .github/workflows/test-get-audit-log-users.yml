@@ -16,6 +16,6 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python3 -m bin.identify_dormant_github_users.py
+      - run: pipenv run python3 -m bin.identify_dormant_github_users
         env:
           GH_ADMIN_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
