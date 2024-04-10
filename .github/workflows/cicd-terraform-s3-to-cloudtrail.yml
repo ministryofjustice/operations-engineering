@@ -54,7 +54,7 @@ jobs:
     
     - name: Build lambdas
       id: build-lambdas
-      run: openssl -version && make all
+      run: openssl --version && make all
 
     # - name: Terraform Format Check
     #   id: fmt-check
