@@ -60,7 +60,7 @@ def get_usernames_from_csv_ignoring_bots(bot_list: list) -> list:
                 usernames.append(username)
 
     except Exception as e:
-        print(f"Error reading from file {CSV_FILE_NAME}: {e}")
+        logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
 
     return [username for username in usernames if username not in bot_list]
 
