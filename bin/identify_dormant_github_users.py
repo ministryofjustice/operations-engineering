@@ -88,12 +88,6 @@ def get_dormant_users_from_github_csv():
 
 
 def dormant_users_according_to_github(github_service: GithubService, dormant_from: datetime) -> set[str]:
-    token = os.environ.get('GH_ADMIN_TOKEN')
-    if token is None:
-        raise ValueError("GH_ADMIN_TOKEN is not set")
-
-    github_service = GithubService(token, ORGANISATION)
-
     usernames_from_csv = get_dormant_users_from_github_csv()
     dormant_users = github_service.check_dormant_users_audit_activity_since_date(
         usernames_from_csv, dormant_from)
