@@ -1574,16 +1574,19 @@ class TestDormantUser(unittest.TestCase):
             'user1', datetime.now() - timedelta(days=30))
         self.assertTrue(result)
 
-    @patch('requests.Session.get')
-    def test_enterprise_audit_activity_for_user_success(self, mock_get):
-        # Mock `Session().get` to return a response with status code 200 and some JSON content
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = [{"key": "value"}]
-        mock_get.return_value = mock_response
-        github_service = GithubService("", ORGANISATION_NAME)
-        result = github_service.enterprise_audit_activity_for_user('user1')
-        self.assertEqual(result, [{"key": "value"}])
+    @patch("requests.sessions.Session.__new__", return_value=MagicMock())
+    def test_calls_downstream_services(self, mock_github_client_rest_api):
+        github_service = GithubService("", ORGANISATION_NAME, enterprise_name=ENTERPRISE_NAME)
+
+        mock_get = MagicMock()
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.content = b'"some-user"'
+        github_service.github_client_rest_api.get = mock_get
+
+        github_service.enterprise_audit_activity_for_user("some-user")
+
+        expected_url = f"https://api.github.com/enterprises/{ENTERPRISE_NAME}/audit-log?phrase=actor%3Asome-user"
+        mock_get.assert_called_once_with(expected_url, timeout=10)
 
     @patch('requests.get')
     def test_enterprise_audit_activity_for_user_failure(self, mock_get):
