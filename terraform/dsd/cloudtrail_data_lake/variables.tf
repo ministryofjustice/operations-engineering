@@ -12,7 +12,7 @@ variable "create_github_auditlog_s3bucket" {
 
 variable "cloudtrail_lake_channel_arn" {
   type        = string
-  description = "channel arn that you setup from CloudTrail Lake integration for GitHub Audit Log"
+  description = "channel ARN that you setup from CloudTrail Lake integration for GitHub Audit Log"
   default     = "arn:aws:cloudtrail:eu-west-2:880656497252:channel/408043b5-2c04-438e-93d0-76e02ba38582"
 }
 
