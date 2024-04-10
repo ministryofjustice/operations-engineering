@@ -864,7 +864,8 @@ class GithubService:
         response = self.github_client_rest_api.get(url, timeout=10)
         if response.status_code == response_okay:
             return json.loads(response.content.decode("utf-8"))
-        return 0
+        raise ValueError(
+            f"Failed to get audit activity for user {username}. Response status code: {response.status_code}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_user_from_audit_log(self, username: str):
@@ -889,23 +890,27 @@ class GithubService:
                 last_active_date = datetime.fromtimestamp(
                     audit_log_data[0]["@timestamp"] / 1000.0)
                 if last_active_date > three_months_ago_date:
-                    active_users.append(user["username"].lower())
+                    active_users.append(user)
         return active_users
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def check_dormant_users_activity_since_date(self, users: list, since_date: datetime) -> list:
-        dormant_users = []
-        for user in users:
-            audit_activity = self.enterprise_audit_activity_for_user(user)
-            # No data means the user has no activity in the audit log
-            if len(audit_activity) > 0:
-                last_active_date = datetime.fromtimestamp(
-                    audit_activity[0]["@timestamp"] / 1000.0)
-                if last_active_date < since_date:
-                    logging.info(
-                        f"User {user} last active date: {last_active_date}, adding to dormant users list")
-                    dormant_users.append(user)
-        return dormant_users
+    def check_dormant_users_audit_activity_since_date(self, users: list, since_date: datetime) -> list:
+        return [user for user in users if self.is_user_dormant_since_date(user, since_date)]
+
+    def is_user_dormant_since_date(self, user: str, since_date: datetime) -> bool:
+        audit_activity = self.enterprise_audit_activity_for_user(user)
+        if audit_activity:
+            last_active_date = datetime.fromtimestamp(
+                audit_activity[0]["@timestamp"] / 1000.0)
+            if last_active_date < since_date:
+                logging.info(
+                    f"User {user} last active date: {last_active_date}, adding to dormant users list")
+                return True
+        else:
+            logging.info(
+                f"User {user} has no audit activity, adding to dormant users list")
+            return True
+        return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_user_from_gitub(self, user: str):
