@@ -19,5 +19,5 @@ variable "cloudtrail_lake_channel_arn" {
 variable "github_audit_allow_list" {
   type        = string
   description = "Comma delimited list of GitHub Audit Event to be allowed for ingestion to CloudTrail Open Audit"
-  default     = "repo.*,org.*,enterprise.*,business.*,integration.*,git.*,secret_scanning.*,team.*,two_factor_authentication.*,user.*"
+  default     = ".*"
 }
