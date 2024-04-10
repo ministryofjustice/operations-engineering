@@ -1,12 +1,16 @@
 import unittest
 from datetime import datetime, timedelta
-from unittest.mock import mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 from botocore.exceptions import ClientError, NoCredentialsError
 
 from bin.identify_dormant_github_users import (
-    calculate_date_by_integer, download_github_dormant_users_csv_from_s3,
-    get_usernames_from_csv_ignoring_bots)
+    calculate_date_by_integer, dormant_users_according_to_github,
+    dormant_users_not_in_auth0_audit_log,
+    download_github_dormant_users_csv_from_s3,
+    get_usernames_from_csv_ignoring_bots, setup_services)
+from services.auth0_service import Auth0Service
+from services.github_service import GithubService
 
 
 class TestDormantGitHubUsers(unittest.TestCase):
@@ -65,41 +69,54 @@ class TestDormantGitHubUsers(unittest.TestCase):
         with self.assertRaises(ClientError):
             download_github_dormant_users_csv_from_s3()
 
-    @patch('os.environ.get')
-    def test_dormant_users_according_to_github_all_active(self, mock_env_get):
-        # Fill in test implementation
-        pass
+    @patch.object(GithubService, "__new__")
+    @patch('bin.identify_dormant_github_users.get_dormant_users_from_github_csv')
+    def test_dormant_users_according_to_github_all_active(self, mock_get_dormant_users_from_github_csv, mock_github_service):
+        # Mock `get_dormant_users_from_github_csv` to return a list of users
+        mock_get_dormant_users_from_github_csv.return_value = [
+            'user1', 'user2']
+        # Mock `github_service` to return an empty set
+        mock_github_service.check_dormant_users_audit_activity_since_date.return_value = set()
+        result = dormant_users_according_to_github(
+            mock_github_service, datetime.now() - timedelta(days=30))
+        self.assertEqual(result, set())
 
-    @patch('os.environ.get')
-    def test_dormant_users_according_to_github_all_dormant(self, mock_env_get):
-        # Fill in test implementation
-        pass
-
-    @patch('os.environ.get')
-    def test_dormant_users_according_to_github_missing_token(self, mock_env_get):
-        # Mock `os.environ.get` to return `None` for `GH_ADMIN_TOKEN`
-        mock_env_get.side_effect = lambda k: None if k == 'GH_ADMIN_TOKEN' else 'dummy_value'
-        # Fill in test implementation
+    @patch.object(GithubService, "__new__")
+    @patch('bin.identify_dormant_github_users.get_dormant_users_from_github_csv')
+    def test_dormant_users_according_to_github_all_dormant(self, mock_get_dormant_users_from_github_csv, mock_github_service):
+        # Mock `get_dormant_users_from_github_csv` to return a list of users
+        mock_get_dormant_users_from_github_csv.return_value = [
+            'user1', 'user2']
+        # Mock `github_service` to return a set of users
+        mock_github_service.check_dormant_users_audit_activity_since_date.return_value = {
+            'user1', 'user2'}
+        result = dormant_users_according_to_github(
+            mock_github_service, datetime.now() - timedelta(days=30))
+        self.assertEqual(result, {'user1', 'user2'})
 
     def test_dormant_users_not_in_auth0_audit_log_all_present(self):
-        # Fill in test implementation
-        pass
+        # Mock `auth0_service` to return a set of users
+        mock_auth0_service = MagicMock(spec=Auth0Service)
+        mock_auth0_service.get_active_usernames.return_value = {
+            'user1', 'user2'}
+        result = dormant_users_not_in_auth0_audit_log(
+            mock_auth0_service, {'user1', 'user2'})
+        self.assertEqual(result, set())
 
     def test_dormant_users_not_in_auth0_audit_log_all_absent(self):
-        # Fill in test implementation
-        pass
-
-    @patch('os.environ.get')
-    def test_setup_services_success(self, mock_env_get):
-        # Fill in test implementation
-        pass
+        # Mock `auth0_service` to return an empty set
+        mock_auth0_service = MagicMock(spec=Auth0Service)
+        mock_auth0_service.get_active_usernames.return_value = set()
+        result = dormant_users_not_in_auth0_audit_log(
+            mock_auth0_service, {'user1', 'user2'})
+        self.assertEqual(result, {'user1', 'user2'})
 
     @patch('os.environ.get')
     def test_setup_services_missing_gh_admin_token(self, mock_env_get):
         # Mock `os.environ.get` to return `None` for `GH_ADMIN_TOKEN`
         mock_env_get.side_effect = lambda k: None if k == 'GH_ADMIN_TOKEN' else 'dummy_value'
-        # Fill in test implementation
-        pass
+        with self.assertRaises(ValueError):
+            setup_services()
 
 
 if __name__ == '__main__':
