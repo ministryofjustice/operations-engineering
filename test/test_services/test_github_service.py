@@ -11,8 +11,8 @@ from github.Commit import Commit
 from github.GitCommit import GitCommit
 from github.Issue import Issue
 from github.NamedUser import NamedUser
-from github.Repository import Repository
 from github.Organization import Organization
+from github.Repository import Repository
 from github.Team import Team
 from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
@@ -1434,9 +1434,11 @@ class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
     def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
         mock_users = [{"login": "user1"}, {"login": "user2"}]
 
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value = mock_users
+        mock_github_client_core_api.return_value.get_organization(
+        ).get_members.return_value = mock_users
 
-        response = GithubService("", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
+        response = GithubService(
+            "", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
 
         self.assertEqual(["user1", "user2"], response)
 
@@ -1528,6 +1530,68 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
         github_service.github_client_rest_api = mock_github_client_rest_api
         response = github_service._get_user_from_audit_log("some-user")
         self.assertEqual(0, response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestDormantUser(unittest.TestCase):
+    @patch.object(GithubService, 'is_user_dormant_since_date')
+    def test_check_dormant_users_audit_activity_since_date(self, mock_is_user_dormant_since_date):
+        # Set `is_user_dormant_since_date` to return `True` only for 'user2'
+        mock_is_user_dormant_since_date.side_effect = lambda user, since_date: user == 'user2'
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.check_dormant_users_audit_activity_since_date(
+            ['user1', 'user2'], datetime.now() - timedelta(days=30))
+        self.assertEqual(result, ['user2'])
+
+    @patch.object(GithubService, 'enterprise_audit_activity_for_user')
+    def test_is_user_dormant_since_date(self, mock_enterprise_audit_activity_for_user):
+        # Set `enterprise_audit_activity_for_user` to return audit activity
+        mock_enterprise_audit_activity_for_user.return_value = [
+            {"@timestamp": (datetime.now() - timedelta(days=40)).timestamp() * 1000.0}]
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.is_user_dormant_since_date(
+            'user1', datetime.now() - timedelta(days=30))
+        self.assertTrue(result)
+
+    @patch.object(GithubService, 'enterprise_audit_activity_for_user')
+    def test_is_user_not_dormant_since_date(self, mock_enterprise_audit_activity_for_user):
+        # Set `enterprise_audit_activity_for_user` to return audit activity
+        mock_enterprise_audit_activity_for_user.return_value = [
+            {"@timestamp": (datetime.now() - timedelta(days=20)).timestamp() * 1000.0}]
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.is_user_dormant_since_date(
+            'user1', datetime.now() - timedelta(days=30))
+        self.assertFalse(result)
+
+    @patch.object(GithubService, 'enterprise_audit_activity_for_user')
+    def test_is_user_dormant_no_audit_activity(self, mock_enterprise_audit_activity_for_user):
+        # Set `enterprise_audit_activity_for_user` to return `None`
+        mock_enterprise_audit_activity_for_user.return_value = None
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.is_user_dormant_since_date(
+            'user1', datetime.now() - timedelta(days=30))
+        self.assertTrue(result)
+
+    @patch('requests.Session.get')
+    def test_enterprise_audit_activity_for_user_success(self, mock_get):
+        # Mock `Session().get` to return a response with status code 200 and some JSON content
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = [{"key": "value"}]
+        mock_get.return_value = mock_response
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.enterprise_audit_activity_for_user('user1')
+        self.assertEqual(result, [{"key": "value"}])
+
+    @patch('requests.get')
+    def test_enterprise_audit_activity_for_user_failure(self, mock_get):
+        # Mock `requests.get` to return a response with status code 404
+        mock_get.return_value.status_code = 404
+        github_service = GithubService("", ORGANISATION_NAME)
+        with self.assertRaises(ValueError):
+            github_service.enterprise_audit_activity_for_user('user1')
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -2044,7 +2108,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
             Mock(Organization, login="org2"),
         ]
 
-        response = GithubService("", ORGANISATION_NAME).get_all_organisations_in_enterprise()
+        response = GithubService(
+            "", ORGANISATION_NAME).get_all_organisations_in_enterprise()
 
         self.assertEqual(["org1", "org2"], response)
 
@@ -2054,7 +2119,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         github_service.get_gha_minutes_used_for_organisation("org1")
         mock_github_client_rest_api.assert_has_calls(
             [
-                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={
+                         'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             ]
         )
 
@@ -2064,14 +2130,17 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         github_service.modify_gha_minutes_quota_threshold(80)
         mock_github_client_rest_api.assert_has_calls(
             [
-                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD', '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD',
+                           '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             ]
         )
 
     def test_get_gha_minutes_quota_threshold(self, _mock_github_client_rest_api, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(
+            Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
 
-        response = GithubService("", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
+        response = GithubService(
+            "", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
 
         self.assertEqual(70, response)
 
@@ -2097,9 +2166,11 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, _mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_gha_minutes_used_for_organisation.return_value = {"total_minutes_used": 10}
+        mock_get_gha_minutes_used_for_organisation.return_value = {
+            "total_minutes_used": 10}
 
-        self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
+        self.assertEqual(
+            github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
 
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
@@ -2116,7 +2187,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_get_all_organisations_in_enterprise.return_value = [
+            "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 37500
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
@@ -2141,7 +2213,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_get_all_organisations_in_enterprise.return_value = [
+            "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 5000
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
