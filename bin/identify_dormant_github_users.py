@@ -6,8 +6,10 @@ from datetime import datetime, timedelta
 import boto3
 from botocore.exceptions import NoCredentialsError
 
+from services.auth0_service import Auth0Service
 from services.github_service import GithubService
 
+AUTH0_DOMAIN = "operations-engineering.eu.auth0.com"
 NUMBER_OF_DAYS_CONSIDERED_DORMANT = 90
 CSV_FILE_NAME = "dormant.csv"
 ORGANISATION = "ministryofjustice"
@@ -40,7 +42,7 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger(__name__)
 
 
-def _calculate_date(in_last_days: int) -> datetime:
+def calculate_date_by_integer(in_last_days: int) -> datetime:
     current_date = datetime.now()
     date = current_date - timedelta(days=in_last_days)
     timestamp_format = "%Y-%m-%d"
@@ -63,7 +65,8 @@ def get_usernames_from_csv_ignoring_bots(bot_list: list) -> list:
     return [username for username in usernames if username not in bot_list]
 
 
-def download_github_dormant_users_csv_from_s3(s3):
+def download_github_dormant_users_csv_from_s3():
+    s3 = boto3.client('s3')
     try:
         s3.download_file(BUCKET_NAME, CSV_FILE_NAME, CSV_FILE_NAME)
         logger.info("File %s downloaded successfully.", CSV_FILE_NAME)
@@ -73,29 +76,71 @@ def download_github_dormant_users_csv_from_s3(s3):
     except Exception as e:
         logger.error("Error downloading file: %s", e)
 
+    if not os.path.isfile(CSV_FILE_NAME):
+        raise FileNotFoundError(
+            f"File {CSV_FILE_NAME} not found in the current directory.")
 
-def setup_environment_variables() -> str:
-    github_token = os.environ.get('GH_ADMIN_TOKEN')
-    if github_token is None:
-        raise ValueError("GITHUB_TOKEN is not set")
-    return github_token
+
+def get_dormant_users_from_github_csv():
+    """A manual csv file is downloaded and placed in an s3 bucket at intervals. This function downloads the csv file from the s3 bucket and reads the usernames from the file."""
+    download_github_dormant_users_csv_from_s3()
+    return get_usernames_from_csv_ignoring_bots(ALLOWED_BOT_USERS)
+
+
+def dormant_users_according_to_github(github_service: GithubService, dormant_from: datetime) -> set[str]:
+    token = os.environ.get('GH_ADMIN_TOKEN')
+    if token is None:
+        raise ValueError("GH_ADMIN_TOKEN is not set")
+
+    github_service = GithubService(token, ORGANISATION)
+
+    usernames_from_csv = get_dormant_users_from_github_csv()
+    dormant_users = github_service.check_dormant_users_audit_activity_since_date(
+        usernames_from_csv, dormant_from)
+    logging.info("Number of dormant users according to Github: %s",
+                 len(dormant_users))
+
+    return dormant_users
+
+
+def dormant_users_not_in_auth0_audit_log(auth0_service: Auth0Service, dormant_users: set[str]) -> set[str]:
+    active_users_in_auth0 = auth0_service.get_active_usernames()
+
+    dormant_users_not_in_audit_log = [
+        user for user in dormant_users if user not in active_users_in_auth0]
+
+    return set(dormant_users_not_in_audit_log)
+
+
+def setup_services() -> tuple[GithubService, Auth0Service]:
+    token = os.environ.get('GH_ADMIN_TOKEN')
+    if token is None:
+        raise ValueError("GH_ADMIN_TOKEN is not set")
+
+    github_service = GithubService(token, ORGANISATION)
+
+    auth0_secret_token = os.environ.get('AUTH0_CLIENT_SECRET')
+    auth0_id_token = os.environ.get('AUTH0_CLIENT_ID')
+    if auth0_secret_token is None or auth0_id_token is None:
+        raise ValueError("AUTH0_SECRET_TOKEN or AUTH0_ID_TOKEN is not set")
+
+    auth0_service = Auth0Service(
+        auth0_secret_token, auth0_id_token, AUTH0_DOMAIN
+    )
+
+    return github_service, auth0_service
 
 
 def identify_dormant_github_users():
-    github_token = setup_environment_variables()
-    github_service = GithubService(github_token, ORGANISATION)
+    since_date = calculate_date_by_integer(NUMBER_OF_DAYS_CONSIDERED_DORMANT)
+    github_service, auth0_service = setup_services()
 
-    download_github_dormant_users_csv_from_s3(boto3.client('s3'))
-    dormant_users = get_usernames_from_csv_ignoring_bots(
-        ALLOWED_BOT_USERS)
-
-    dormant_users_not_in_audit_log = github_service.check_dormant_users_activity_since_date(
-        dormant_users, _calculate_date(NUMBER_OF_DAYS_CONSIDERED_DORMANT))
-    for user in dormant_users_not_in_audit_log:
-        print(user)
-
-    logging.info(
-        [user for user in dormant_users if user not in dormant_users_not_in_audit_log])
+    dormant_users = dormant_users_according_to_github(
+        github_service, since_date)
+    dormant_users_not_in_auth0 = dormant_users_not_in_auth0_audit_log(
+        auth0_service, dormant_users)
+    logging.info("Dormant users checked and ready to be removed: %s",
+                 dormant_users_not_in_auth0)
 
 
 if __name__ == "__main__":
