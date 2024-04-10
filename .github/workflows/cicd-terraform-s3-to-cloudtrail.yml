@@ -51,10 +51,6 @@ jobs:
         repo-token-user-login: 'github-actions[bot]'
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-dsd-iam.yml?query=event%3Apush+branch%3Amain
-    
-    # - name: Build lambdas
-    #   id: build-lambdas
-    #   run: make all
 
     - name: Terraform Format Check
       id: fmt-check
@@ -97,7 +93,7 @@ jobs:
           ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
           ```
   
-    # - name: Terraform Apply
-    #   # if: github.ref == 'refs/heads/main'
-    #   id: apply
-    #   run: terraform apply -input=false -no-color -auto-approve
+    - name: Terraform Apply
+      # if: github.ref == 'refs/heads/main'
+      id: apply
+      run: terraform apply -input=false -no-color -auto-approve
