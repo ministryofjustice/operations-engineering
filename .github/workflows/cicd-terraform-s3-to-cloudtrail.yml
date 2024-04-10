@@ -52,9 +52,9 @@ jobs:
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-dsd-iam.yml?query=event%3Apush+branch%3Amain
     
-    - name: Build lambdas
-      id: build-lambdas
-      run: make all
+    # - name: Build lambdas
+    #   id: build-lambdas
+    #   run: make all
 
     - name: Terraform Format Check
       id: fmt-check
@@ -63,6 +63,10 @@ jobs:
     - name: Terraform Init
       id: init
       run: ls -latr; terraform init -input=false -no-color
+
+    - name: Build Lambdas
+      id: build-lambdas
+      run: cd .terraform/modules/github-cloudtrail-auditlog && make all
 
     - name: Terraform Validate
       id: validate
