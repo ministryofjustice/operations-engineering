@@ -1,7 +1,7 @@
 variable "github_auditlog_s3bucket" {
   type        = string
   description = "Source S3 bucket of GitHub Audit Log, enter existing or specify new bucket name"
-  default     = "arn:aws:s3:::test-github-enterprise-audit"
+  default     = "test-github-enterprise-audit"
 }
 
 variable "create_github_auditlog_s3bucket" {
