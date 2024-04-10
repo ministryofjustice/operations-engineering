@@ -52,6 +52,10 @@ jobs:
         message: |
           Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-dsd-iam.yml?query=event%3Apush+branch%3Amain
     
+    - name: Build lambdas
+      id: build-lambdas
+      run: make all
+
     - name: Terraform Format Check
       id: fmt-check
       run: terraform fmt -check
