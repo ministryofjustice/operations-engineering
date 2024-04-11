@@ -1,12 +1,10 @@
 import time
 from datetime import datetime, timedelta
+
 import requests
 
+from config.constants import RESPONSE_NO_CONTENT, RESPONSE_OKAY
 from config.logging_config import logging
-from config.constants import (
-    RESPONSE_OKAY,
-    RESPONSE_NO_CONTENT
-)
 
 
 class Auth0Service:
@@ -218,3 +216,6 @@ class Auth0Service:
 
     def get_active_users_usernames(self) -> list[str]:
         return [user["nickname"].lower() for user in self.get_active_users()]
+
+    def get_active_case_sensitive_usernames(self) -> list[str]:
+        return [user["nickname"] for user in self.get_active_users()]
