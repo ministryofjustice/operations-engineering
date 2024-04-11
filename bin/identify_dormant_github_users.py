@@ -82,7 +82,7 @@ def download_github_dormant_users_csv_from_s3():
 
 
 def get_dormant_users_from_github_csv():
-    """A manual csv file is downloaded and placed in an s3 bucket at intervals. This function downloads the csv file from the s3 bucket and reads the usernames from the file."""
+    """An enterprise user must download the 'dormant.csv' file from the Github audit log and upload it to the 'operations-engineering-dormant-users' s3 bucket. This function will download the file from the s3 bucket and return a list of usernames from the csv file."""
     download_github_dormant_users_csv_from_s3()
     return get_usernames_from_csv_ignoring_bots(ALLOWED_BOT_USERS)
 
