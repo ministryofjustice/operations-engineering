@@ -1575,8 +1575,9 @@ class TestDormantUser(unittest.TestCase):
         self.assertTrue(result)
 
     @patch("requests.sessions.Session.__new__", return_value=MagicMock())
-    def test_calls_downstream_services(self, mock_github_client_rest_api):
-        github_service = GithubService("", ORGANISATION_NAME, enterprise_name=ENTERPRISE_NAME)
+    def test_enterprise_audit_log_is_checked(self):
+        github_service = GithubService(
+            "", ORGANISATION_NAME, enterprise_name=ENTERPRISE_NAME)
 
         mock_get = MagicMock()
         mock_get.return_value.status_code = 200
