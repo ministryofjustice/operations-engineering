@@ -217,7 +217,5 @@ class Auth0Service:
     def get_active_users_usernames(self) -> list[str]:
         return [user["nickname"].lower() for user in self.get_active_users()]
 
-    # I don't want to remove the above method until we deem the previous dormant user process obsolete.
-    # This method, while not perfect, will return the same list but with the keep the GitHub username case.
-    def get_active_usernames(self) -> list[str]:
+    def get_active_case_sensitive_usernames(self) -> list[str]:
         return [user["nickname"] for user in self.get_active_users()]

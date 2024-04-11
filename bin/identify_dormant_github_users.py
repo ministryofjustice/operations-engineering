@@ -98,7 +98,7 @@ def dormant_users_according_to_github(github_service: GithubService, dormant_fro
 
 
 def dormant_users_not_in_auth0_audit_log(auth0_service: Auth0Service, dormant_users: set[str]) -> set[str]:
-    active_users_in_auth0 = auth0_service.get_active_usernames()
+    active_users_in_auth0 = auth0_service.get_active_case_sensitive_usernames()
 
     dormant_users_not_in_audit_log = [
         user for user in dormant_users if user not in active_users_in_auth0]
