@@ -1574,7 +1574,6 @@ class TestDormantUser(unittest.TestCase):
             'user1', datetime.now() - timedelta(days=30))
         self.assertTrue(result)
 
-    @patch("requests.sessions.Session.__new__", return_value=MagicMock())
     def test_enterprise_audit_log_is_checked(self):
         github_service = GithubService(
             "", ORGANISATION_NAME, enterprise_name=ENTERPRISE_NAME)
