@@ -890,7 +890,7 @@ class GithubService:
                 last_active_date = datetime.fromtimestamp(
                     audit_log_data[0]["@timestamp"] / 1000.0)
                 if last_active_date > three_months_ago_date:
-                    active_users.append(user)
+                    active_users.append(user["username"].lower())
         return active_users
 
     @retries_github_rate_limit_exception_at_next_reset_once
