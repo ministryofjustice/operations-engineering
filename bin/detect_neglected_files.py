@@ -14,10 +14,10 @@ def detect_neglected_files():
     if github_token is None:
         print("No GITHUB_TOKEN environment variable set")
         sys.exit(1)
-    slack_token = os.environ.get("ADMIN_SLACK_TOKEN")
-    if slack_token is None:
-        print("No SLACK_TOKEN environment variable set")
-        sys.exit(1)
+    # slack_token = os.environ.get("ADMIN_SLACK_TOKEN")
+    # if slack_token is None:
+    #     print("No SLACK_TOKEN environment variable set")
+    #     sys.exit(1)
 
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
     # slack_service = SlackService(slack_token)
