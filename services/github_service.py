@@ -1654,6 +1654,4 @@ class GithubService:
 
         formatted_date = datetime.fromisoformat(last_reviewed_date.strip("Z"))
 
-        print(formatted_date)
-
-        print(formatted_date < datetime.now() - timedelta(days=30 * 7))
+        print(formatted_date < datetime.now() - timedelta(days=30 * 6))
