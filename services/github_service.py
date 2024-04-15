@@ -1637,4 +1637,5 @@ class GithubService:
         commits = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/operations-engineering"
         ).get_commits("bin/add_users_all_org_members_github_team.py")
-        print(commits)
+        for commit in commits:
+            print(commit)
