@@ -1648,6 +1648,6 @@ class GithubService:
             headers=headers,
         )
 
-        latest_commit = json.loads(response)
+        latest_commit = response.json()
 
         print(latest_commit[0]["commit"]["comitter"]["date"])
