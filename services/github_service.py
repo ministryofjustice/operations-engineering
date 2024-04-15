@@ -1650,4 +1650,10 @@ class GithubService:
 
         latest_commit = response.json()
 
-        print(latest_commit[0]["commit"]["committer"]["date"])
+        last_reviewed_date = latest_commit[0]["commit"]["committer"]["date"]
+
+        formatted_date = datetime.fromisoformat(last_reviewed_date.strip("Z"))
+
+        print(formatted_date)
+
+        print(formatted_date < datetime.now() - timedelta(days=30 * 5))
