@@ -3,7 +3,7 @@ name: Alarm for neglected files
 on:
   pull_request:
 
-env:
+# env:
 #   ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
 #   GH_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
 
