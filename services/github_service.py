@@ -1634,8 +1634,18 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def detect_neglected_files(self):
-        commits = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/operations-engineering"
-        ).get_commits("bin/add_users_all_org_members_github_team.py")
-        for commit in commits:
-            print(commit)
+        logging.info(
+            f"Getting latest commit for file bin/add_users_all_org_members_github_team.py"
+        )
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+        response = self.github_client_rest_api.get(
+            f"https://api.github.com/repos/{self.organisation_name}/operations-engineering/commits?path=bin/add_users_all_org_members_github_team.py&page=1&per_page=1",
+            headers=headers,
+        )
+
+        print(response[0]["commit"]["comitter"]["date"])
