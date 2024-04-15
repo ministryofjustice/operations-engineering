@@ -1656,4 +1656,4 @@ class GithubService:
 
         print(formatted_date)
 
-        print(formatted_date < datetime.now() - timedelta(days=30 * 5))
+        print(formatted_date < datetime.now() - timedelta(days=30 * 7))
