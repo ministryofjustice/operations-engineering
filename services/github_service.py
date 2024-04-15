@@ -1638,7 +1638,7 @@ class GithubService:
             self.github_client_core_api.get_repo(
                 f"{self.organisation_name}/ministryofjustice"
             )
-            .get_commits(path="bin/add_users_all_org_members_github_team.py")[0]
-            .commit.committer.date
+            .get_contents("bin/add_users_all_org_members_github_team.py")
+            .last_modified
         )
         print(last_reviewed_date)
