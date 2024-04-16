@@ -1634,6 +1634,15 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def detect_neglected_files(self):
+        scripts = [
+            script["name"]
+            for script in self.github_client_core_api.get_repo(
+                f"{self.organisation_name}/operations-engineering"
+            ).get_dir_contents("bin")
+        ]
+
+        print(scripts)
+
         logging.info(
             f"Getting latest commit for file bin/add_users_all_org_members_github_team.py"
         )
