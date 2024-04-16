@@ -1668,7 +1668,7 @@ class GithubService:
         paths_to_review = []
 
         for path in paths:
-            if self.check_if_file_neglected(self.get_latest_commit_date_for_file(self, repo, path)):
+            if self.check_if_file_neglected(self.get_latest_commit_date_for_file(repo, path)):
                 paths_to_review.append(path)
 
         return paths_to_review
