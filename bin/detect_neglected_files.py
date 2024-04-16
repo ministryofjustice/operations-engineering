@@ -27,7 +27,7 @@ def detect_neglected_files():
     paths_to_review = github_service.detect_neglected_files_in_multiple_directories(repo, ["bin"])
 
     if len(paths_to_review) > 1:
-        slack_service.send_message_to_plaintext_channel_name(construct_neglected_files_slack_message(paths_to_review, "ministryofjustice", repo), SLACK_CHANNEL)
+        # slack_service.send_message_to_plaintext_channel_name(construct_neglected_files_slack_message(paths_to_review, "ministryofjustice", repo), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
