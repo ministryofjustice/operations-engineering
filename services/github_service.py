@@ -99,6 +99,11 @@ class GithubService:
         return [repository for repository in repositories if not (repository.archived or repository.fork)]
 
     def __is_repo_ready_for_archiving(self, repository, last_active_cutoff_date, allow_list: list[str]) -> bool:
+        if repository.name in allow_list:
+            logging.debug(
+                f"Skipping repository: {repository.name}. Reason: Present in allow list")
+            return False
+
         latest_commit_position = 0
         commit: Commit = None
         try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
@@ -108,15 +113,12 @@ class GithubService:
                 f"Manually check repository: {repository.name}. Reason: No commits in repository")
             return False
 
-        if (commit.commit.author.date).replace(tzinfo=None) < (last_active_cutoff_date).replace(tzinfo=None):
-            if repository.name in allow_list:
-                logging.debug(
-                    f"Skipping repository: {repository.name}. Reason: Present in allow list")
-                return False
-            return True
-        logging.debug(
-            f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-        return False
+        if (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
+            logging.debug(
+                f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+            return False
+
+        return True
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
