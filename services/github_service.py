@@ -1634,12 +1634,10 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def detect_neglected_files(self):
-        scripts = [content_file.path for content_file in self.github_client_core_api.get_repo(f"{self.organisation_name}/operations-engineering").get_dir_contents("bin")]
-
-        print(scripts)
+        bin_scripts = [content_file.path for content_file in self.github_client_core_api.get_repo(f"{self.organisation_name}/operations-engineering").get_dir_contents("bin")]
 
         logging.info(
-            f"Getting latest commit for file bin/add_users_all_org_members_github_team.py"
+            f"Getting latest commit for files in the bin directory"
         )
 
         headers = {
@@ -1647,15 +1645,21 @@ class GithubService:
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
-        response = self.github_client_rest_api.get(
-            f"https://api.github.com/repos/{self.organisation_name}/operations-engineering/commits?path=bin/add_users_all_org_members_github_team.py&page=1&per_page=1",
-            headers=headers,
-        )
+        scripts_to_review = []
 
-        latest_commit = response.json()
+        for script in bin_scripts:
+            response = self.github_client_rest_api.get(
+                f"https://api.github.com/repos/{self.organisation_name}/operations-engineering/commits?path={script}&page=1&per_page=1",
+                headers=headers,
+            )
 
-        last_reviewed_date = latest_commit[0]["commit"]["committer"]["date"]
+            latest_commit = response.json()
 
-        formatted_date = datetime.fromisoformat(last_reviewed_date.strip("Z"))
+            last_reviewed_date = latest_commit[0]["commit"]["committer"]["date"]
 
-        print(formatted_date < datetime.now() - timedelta(days=30 * 6))
+            formatted_date = datetime.fromisoformat(last_reviewed_date.strip("Z"))
+
+            if formatted_date < datetime.now() - timedelta(days=30 * 5):
+                scripts_to_review.append(script)
+
+        print(scripts_to_review)
