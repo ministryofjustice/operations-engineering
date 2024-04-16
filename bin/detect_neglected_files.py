@@ -5,8 +5,17 @@ from services.slack_service import SlackService
 from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 
-def construct_neglected_files_slack_message(paths_to_review: str, repo: str):
-    return f"The following paths in the {repo} repository are due for review:\n\n" + "\n".join(paths_to_review)
+def construct_neglected_files_slack_blocks(paths_to_review: str, organisation: str, repo: str):
+    urlified_paths = [f"https://github.com/{organisation}/{repo}/tree/main/" + path for path in paths_to_review]
+    return [
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": f"The following paths in the {repo} repository are due for review:\n\n" + "\n".join(urlified_paths)
+                    }
+                }
+            ]
 
 
 def detect_neglected_files():
@@ -27,7 +36,7 @@ def detect_neglected_files():
     paths_to_review = github_service.detect_neglected_files_in_multiple_directories(repo, ["bin"])
 
     if len(paths_to_review) > 1:
-        slack_service.send_message_to_plaintext_channel_name(construct_neglected_files_slack_message(paths_to_review, repo), SLACK_CHANNEL)
+        slack_service._send_alert_to_operations_engineering(construct_neglected_files_slack_blocks(paths_to_review, "ministryofjustice", repo))
 
 
 if __name__ == "__main__":
