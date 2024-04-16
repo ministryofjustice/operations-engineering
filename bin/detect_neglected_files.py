@@ -6,17 +6,16 @@ from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 
 def construct_neglected_files_slack_blocks(paths_to_review: str, organisation: str, repo: str):
-    urlified_paths = [f"https://github.com/{organisation}/{repo}/blob/main/" + path for path in paths_to_review]
+    formatted_paths = [f"[{path}](https://github.com/{organisation}/{repo}/blob/main/{path})" for path in paths_to_review]
     return [
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"The following paths in the {repo} repository are due for review:\n\n" + "\n".join(urlified_paths)
+                        "text": f"The following paths in the {repo} repository are due for review:\n\n" + "\n".join(formatted_paths)
                     }
                 }
             ]
-
 
 def detect_neglected_files():
     github_token = os.environ.get("GH_TOKEN")
