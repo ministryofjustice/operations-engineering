@@ -1365,8 +1365,10 @@ class GithubService:
 
         paths_to_review = []
 
+        allow_list = ["__init__.py"]
+
         for path in paths:
-            if self.check_if_file_neglected(self.get_latest_commit_date_for_file(repo, path)):
+            if self.check_if_file_neglected(self.get_latest_commit_date_for_file(repo, path)) and path.split("/").pop() not in allow_list:
                 paths_to_review.append(path)
 
         return paths_to_review

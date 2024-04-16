@@ -1,11 +1,13 @@
 name: Alarm for neglected files
 
 on:
+  schedule:
+    - cron: "8 0 1 * *"
   pull_request:
 
 env:
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+    SLACK_TOKEN: ${{ secrets.LONELY_CODE_BOT_SLACK_TOKEN }}
 
 jobs:
   detect-neglected-files:
