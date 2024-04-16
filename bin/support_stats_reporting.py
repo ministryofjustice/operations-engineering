@@ -6,53 +6,41 @@ from services.slack_service import SlackService
 from config.constants import SR_SLACK_CHANNEL
 
 
-def create_df():
+def create_dataframe():
 
     # Create dataframe from csv and set max rows
-    create_df = pd.read_csv('csv/support_requests_mar24.csv')
+    dataframe = pd.read_csv('csv/data-all.csv')
     pd.options.display.max_rows = 9999
 
     # Set the index to Request Type column
-    create_df.set_index(['Request Type'])
+    dataframe.set_index(['Request Type'])
 
-    return create_df
-
-
-df = create_df()
+    return dataframe
 
 
-def create_str_yesterday():
+def yesterdays_date():
     today = date.today()
     yesterday = today - timedelta(days=1)
-    create_str_yesterday = str(yesterday)
+    str_yesterday = str(yesterday)
 
-    return create_str_yesterday
-
-
-str_yesterday = create_str_yesterday()
+    return str_yesterday
 
 
-def create_yday_total():
+def yesterdays_requests_total(yesterdays_date):
 
-    create_yday_total = df[str_yesterday].sum()
+    yesterdays_requests = create_dataframe[yesterdays_date].sum()
 
-    return create_yday_total
-
-
-yday_total = create_yday_total()
+    return yesterdays_requests
 
 
-def create_yday_breakdown():
+def yesterdays_requests_breakdown(yesterdays_date):
 
     # Create mask to remove NaN fields from 'str_yesterday' and return Request Types and amount
-    notna_msk = df[str_yesterday].notna()
-    cols = ['Request Type', str_yesterday]
-    create_yday_breakdown = df.loc[notna_msk, cols]
+    notna_msk = create_dataframe[yesterdays_date].notna()
+    cols = ['Request Type', yesterdays_date]
+    yesterdays_breakdown = create_dataframe.loc[notna_msk, cols]
 
-    return create_yday_breakdown
-
-
-yday_breakdown = create_yday_breakdown()
+    return yesterdays_breakdown
 
 
 def get_environment_variables() -> tuple:
@@ -64,11 +52,11 @@ def get_environment_variables() -> tuple:
     return slack_token
 
 
-def yesterdays_support_requests_message():
+def yesterdays_support_requests_message(yesterdays_requests_total, yesterdays_requests_breakdown):
     msg = (
         f"Good morning, \n\n"
-        f"Yesterday we received {yday_total} Support Requests \n\n"
-        f"Here's a breakdown of yesterdays Support Requests: \n {yday_breakdown} \n"
+        f"Yesterday we received {yesterdays_requests_total} Support Requests \n\n"
+        f"Here's a breakdown of yesterdays Support Requests: \n {yesterdays_requests_breakdown} \n"
     )
 
     return msg
@@ -78,9 +66,12 @@ def main():
 
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
+    yesterdays_date = yesterdays_date()
+
+    slack_message = yesterdays_support_requests_message(yesterdays_requests_total(yesterdays_date), yesterdays_requests_breakdown(yesterdays_date))
 
     slack_service.send_message_to_plaintext_channel_name(
-        yesterdays_support_requests_message(), SR_SLACK_CHANNEL
+        slack_message, SR_SLACK_CHANNEL
     )
 
 
