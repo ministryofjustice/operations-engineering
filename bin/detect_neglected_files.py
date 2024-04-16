@@ -22,7 +22,9 @@ def detect_neglected_files():
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
     # slack_service = SlackService(slack_token)
 
-    github_service.detect_neglected_files()
+    paths_to_review = github_service.detect_neglected_files_in_multiple_directories("operations-engineering", ["bin"])
+
+    print(paths_to_review)
 
 
 if __name__ == "__main__":

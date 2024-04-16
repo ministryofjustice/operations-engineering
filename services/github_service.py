@@ -1633,33 +1633,49 @@ class GithubService:
         return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def detect_neglected_files(self):
-        bin_scripts = [content_file.path for content_file in self.github_client_core_api.get_repo(f"{self.organisation_name}/operations-engineering").get_dir_contents("bin")]
+    def get_repo_contents(self, repo: str, path: str):
+        return [content_file.path for content_file in self.github_client_core_api.get_repo(repo).get_dir_contents(path)]
 
-        logging.info(
-            f"Getting latest commit for files in the bin directory"
-        )
-
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_latest_commit_date_for_file(self, repo: str, path: str):
         headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
-        scripts_to_review = []
-
-        for script in bin_scripts:
-            response = self.github_client_rest_api.get(
-                f"https://api.github.com/repos/{self.organisation_name}/operations-engineering/commits?path={script}&page=1&per_page=1",
+        response = self.github_client_rest_api.get(
+                f"https://api.github.com/repos/{self.organisation_name}/{repo}/commits?path={path}&page=1&per_page=1",
                 headers=headers,
             )
 
-            latest_commit = response.json()
+        latest_commit = response.json()
 
-            last_reviewed_date = latest_commit[0]["commit"]["committer"]["date"]
+        last_reviewed_date = latest_commit[0]["commit"]["committer"]["date"]
 
-            formatted_date = datetime.fromisoformat(last_reviewed_date.strip("Z"))
+        return datetime.fromisoformat(last_reviewed_date.strip("Z"))
 
-            if formatted_date < datetime.now() - timedelta(days=30 * 5):
-                scripts_to_review.append(script)
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def check_if_file_neglected(self, date: str):
+        neglected_months_threshold = 5
+        if date < datetime.now() - timedelta(days=30 * neglected_months_threshold): return True
 
-        print(scripts_to_review)
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def detect_neglected_files_in_directory(self, repo:str, dir: str):
+        paths = self.get_repo_contents(f"{self.organisation_name}/{repo}", dir)
+
+        logging.info(f"Getting latest commit for files in the {dir} directory")
+
+        paths_to_review = []
+
+        for path in paths:
+            if self.check_if_file_neglected(self.get_latest_commit_date_for_file(self, repo, path)):
+                paths_to_review.append(path)
+
+        return paths_to_review
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def detect_neglected_files_in_multiple_directories(self, repo:str, dirs: list[str]):
+        paths_to_review = []
+        for dir in dirs:
+            paths_to_review = paths_to_review + self.detect_neglected_files_in_directory(repo, dir)
+        return paths_to_review
