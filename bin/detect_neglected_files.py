@@ -6,7 +6,7 @@ from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 
 def construct_neglected_files_slack_message(paths_to_review: str, repo: str):
-    return f"The following paths in the {repo} repository are due for review:\n\n{"\\n".join(paths_to_review)}"
+    return f"The following paths in the {repo} repository are due for review:\n\n" + "\n".join(paths_to_review)
 
 
 def detect_neglected_files():
