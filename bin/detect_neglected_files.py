@@ -6,7 +6,7 @@ from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 
 def construct_neglected_files_slack_blocks(paths_to_review: str, organisation: str, repo: str):
-    urlified_paths = [f"https://github.com/{organisation}/{repo}/tree/main/" + path for path in paths_to_review]
+    urlified_paths = [f"https://github.com/{organisation}/{repo}/blob/main/" + path for path in paths_to_review]
     return [
                 {
                     "type": "section",
