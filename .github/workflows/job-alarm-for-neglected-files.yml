@@ -21,12 +21,12 @@ jobs:
           pip install pipenv
           pipenv install
       - run: pipenv run python3 -m bin.detect_neglected_files
-    #   - name: Report failure to Slack
-    #     if: always()
-    #     uses: ravsamhq/notify-slack-action@v2
-    #     with:
-    #       status: ${{ job.status }}
-    #       notify_when: "failure"
-    #       notification_title: "Failed to check for low GitHub actions minutes"
-    #     env:
-    #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      # - name: Report failure to Slack
+      #   if: always()
+      #   uses: ravsamhq/notify-slack-action@v2
+      #   with:
+      #     status: ${{ job.status }}
+      #     notify_when: "failure"
+      #     notification_title: "Failed to check for low GitHub actions minutes"
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
