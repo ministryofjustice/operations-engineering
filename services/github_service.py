@@ -6,8 +6,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, NamedUser, RateLimitExceededException,
-                    UnknownObjectException)
+from github import Github, NamedUser, RateLimitExceededException, UnknownObjectException
 from github.Commit import Commit
 from github.Issue import Issue
 from github.Organization import Organization
@@ -91,6 +90,7 @@ class GithubService:
     def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
         for repo in self.__get_repos_to_consider_for_archiving("all"):
             if self.__is_repo_ready_for_archiving(repo, last_active_cutoff_date, allow_list):
+                logging.info(f"Archiving repository: {repo.name}")
                 repo.edit(archived=True)
 
     def __get_repos_to_consider_for_archiving(self, repository_type: str) -> list[Repository]:
@@ -110,11 +110,11 @@ class GithubService:
 
         if (commit.commit.author.date).replace(tzinfo=None) < (last_active_cutoff_date).replace(tzinfo=None):
             if repository.name in allow_list:
-                logging.info(
+                logging.debug(
                     f"Skipping repository: {repository.name}. Reason: Present in allow list")
                 return False
             return True
-        logging.info(
+        logging.debug(
             f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
         return False
 
