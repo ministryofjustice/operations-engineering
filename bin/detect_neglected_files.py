@@ -7,7 +7,7 @@ from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 def construct_neglected_files_slack_message(paths_to_review: str, organisation: str, repo: str, template: str):
     hyperlinkified_paths = [f"<https://github.com/{organisation}/{repo}/blob/main/{path}|{path}>" for path in paths_to_review]
-    return f"The following paths in the <https://github.com/{organisation}/{repo}|{repo}> repository are due for review:\n\n" + "\n".join(hyperlinkified_paths) + f"\n\n Action: Review the files and determine if any changes need to be made. If changes need to be made, <https://github.com/{organisation}/{repo}/issues/new?template={template}|raise an issue>. If not changes need to be made..."
+    return f"The following paths in the <https://github.com/{organisation}/{repo}|{repo}> repository are due for review:\n\n" + "\n".join(hyperlinkified_paths) + f"\n\n Action: Review the files and determine if any changes need to be made. If changes need to be made, <https://github.com/{organisation}/{repo}/issues/new?template={template}|raise an issue>."
 
 def detect_neglected_files():
     github_token = os.environ.get("GH_TOKEN")
@@ -26,8 +26,8 @@ def detect_neglected_files():
 
     paths_to_review = github_service.detect_neglected_files_in_multiple_directories(repo, ["bin"])
 
-    # if len(paths_to_review) > 1:
-    #     slack_service.send_message_to_plaintext_channel_name(construct_neglected_files_slack_message(paths_to_review, "ministryofjustice", repo, "review-code-template.md"), SLACK_CHANNEL)
+    if len(paths_to_review) > 1:
+        slack_service.send_message_to_plaintext_channel_name(construct_neglected_files_slack_message(paths_to_review, "ministryofjustice", repo, "review-code-template.md"), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
