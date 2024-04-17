@@ -7,7 +7,6 @@ from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import Github, NamedUser, RateLimitExceededException, UnknownObjectException
-from github.Commit import Commit
 from github.Issue import Issue
 from github.Organization import Organization
 from github.Repository import Repository
@@ -99,25 +98,22 @@ class GithubService:
         return [repository for repository in repositories if not (repository.archived or repository.fork)]
 
     def __is_repo_ready_for_archiving(self, repository: Repository, last_active_cutoff_date: datetime, allow_list: list[str]) -> bool:
-        if repository.name in allow_list:
-            logging.debug(f"Skipping repository: {repository.name}. Reason: Present in allow list")
-            return False
-
         if (repository.created_at).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
             logging.debug(f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
             return False
 
-        latest_commit_position = 0
-        commit: Commit = None
-        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
-            commit = repository.get_commits()[latest_commit_position]
-        except Exception:
-            logging.info(f"Manually check repository: {repository.name}. Reason: No commits in repository")
+        if repository.name in allow_list:
+            logging.debug(f"Skipping repository: {repository.name}. Reason: Present in allow list")
             return False
 
-        if (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-            logging.debug(f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-            return False
+        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
+            latest_commit_position = 0
+            commit = repository.get_commits()[latest_commit_position]
+            if commit and (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
+                logging.debug(f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+                return False
+        except Exception:
+            logging.debug(f"Repository has no commits: {repository.name}")
 
         return True
 
