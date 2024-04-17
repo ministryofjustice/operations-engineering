@@ -4,8 +4,12 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, Mock, call, patch
 
 from freezegun import freeze_time
-from github import (Github, GithubException, RateLimitExceededException,
-                    UnknownObjectException)
+from github import (
+    Github,
+    GithubException,
+    RateLimitExceededException,
+    UnknownObjectException,
+)
 from github.Branch import Branch
 from github.Commit import Commit
 from github.GitCommit import GitCommit
@@ -18,7 +22,9 @@ from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
 
 from services.github_service import (
-    GithubService, retries_github_rate_limit_exception_at_next_reset_once)
+    GithubService,
+    retries_github_rate_limit_exception_at_next_reset_once,
+)
 
 # pylint: disable=E1101
 
@@ -123,15 +129,13 @@ class TestGithubServiceInit(unittest.TestCase):
 class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
 
     # Default for archiving a repository
-    def __get_repository(self, last_active_date, archived: bool = False,
-                         fork: bool = False,
-                         repo_name: str = None, has_commits: bool = True) -> Mock:
-        repository_to_consider_for_archiving = Mock(
-            Repository, archived=archived, fork=fork)
+    def __get_repository(self, last_active_date: datetime, created_at_date: datetime, archived: bool = False, fork: bool = False, repo_name: str = None, has_commits: bool = True) -> Mock:
+        repository_to_consider_for_archiving = Mock(Repository, archived=archived, fork=fork)
         repository_to_consider_for_archiving.name = repo_name
-        repository_to_consider_for_archiving.get_commits.return_value = [
-            Mock(Commit,
-                 commit=Mock(GitCommit, author=Mock(NamedUser, date=last_active_date)))] if has_commits else None
+        repository_to_consider_for_archiving.created_at = created_at_date
+        repository_to_consider_for_archiving.get_commits.return_value = (
+            [Mock(Commit, commit=Mock(GitCommit, author=Mock(NamedUser, date=last_active_date)))] if has_commits else None
+        )
         return repository_to_consider_for_archiving
 
     def setUp(self):
@@ -140,43 +144,47 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
         self.after_cutoff = self.last_active_cutoff_date + timedelta(days=1)
 
     def test_no_archive_when_repo_is_archived(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, archived=True)
+        repo = self.__get_repository(last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, archived=True)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_repo_is_forked(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, fork=True)
+        repo = self.__get_repository(last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, fork=True)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_recently_active(self, mock_github_client_core_api):
-        repo = self.__get_repository(last_active_date=self.after_cutoff)
+        repo = self.__get_repository(last_active_date=self.after_cutoff, created_at_date=self.after_cutoff)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
+        self.assertEqual(repo.edit.called, False)
+
+    def test_no_archive_when_recently_created(self, mock_github_client_core_api):
+        repo = self.__get_repository(last_active_date=self.after_cutoff, created_at_date=self.after_cutoff)
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            repo,
+            repo,
+            repo
+        ]
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_on_allow_list(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, repo_name="allow_me")
+        repo = self.__get_repository(last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, repo_name="allow_me")
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
@@ -187,21 +195,18 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_repo_has_no_commits_even_if_before_cutoff(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.before_cutoff, has_commits=False)
+        repo = self.__get_repository(last_active_date=self.before_cutoff, created_at_date=self.after_cutoff, has_commits=False)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
             repo
         ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
     def test_archives_inactive_repositories_not_on_allow_list(self, mock_github_client_core_api):
-        repo = self.__get_repository(self.before_cutoff)
-        repo_on_allow_list = self.__get_repository(
-            self.before_cutoff, repo_name="allow_this")
+        repo = self.__get_repository(self.before_cutoff, self.before_cutoff)
+        repo_on_allow_list = self.__get_repository(self.before_cutoff, self.before_cutoff, repo_name="allow_this")
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             Mock(Repository, archived=False, fork=True),
             repo,
@@ -214,8 +219,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo_on_allow_list,
         ]
 
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date,
-                                                                               ["allow_this"])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, ["allow_this"])
 
         repo.edit.assert_has_calls(
             [call(archived=True), call(archived=True)])

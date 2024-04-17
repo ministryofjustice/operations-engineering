@@ -98,10 +98,13 @@ class GithubService:
             self.github_client_core_api.get_organization(self.organisation_name).get_repos(type=repository_type))
         return [repository for repository in repositories if not (repository.archived or repository.fork)]
 
-    def __is_repo_ready_for_archiving(self, repository, last_active_cutoff_date, allow_list: list[str]) -> bool:
+    def __is_repo_ready_for_archiving(self, repository: Repository, last_active_cutoff_date: datetime, allow_list: list[str]) -> bool:
         if repository.name in allow_list:
-            logging.debug(
-                f"Skipping repository: {repository.name}. Reason: Present in allow list")
+            logging.debug(f"Skipping repository: {repository.name}. Reason: Present in allow list")
+            return False
+
+        if (repository.created_at).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
+            logging.debug(f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
             return False
 
         latest_commit_position = 0
@@ -109,13 +112,11 @@ class GithubService:
         try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
             commit = repository.get_commits()[latest_commit_position]
         except Exception:
-            logging.info(
-                f"Manually check repository: {repository.name}. Reason: No commits in repository")
+            logging.info(f"Manually check repository: {repository.name}. Reason: No commits in repository")
             return False
 
         if (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-            logging.debug(
-                f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+            logging.debug(f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
             return False
 
         return True
