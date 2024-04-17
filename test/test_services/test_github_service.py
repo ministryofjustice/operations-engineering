@@ -194,7 +194,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
                                                                                ["allow_me"])
         self.assertEqual(repo.edit.called, False)
 
-    def test_no_archive_when_repo_has_no_commits_even_if_before_cutoff(self, mock_github_client_core_api):
+    def test_no_archive_when_repo_has_no_commits_and_created_after_cutoff(self, mock_github_client_core_api):
         repo = self.__get_repository(last_active_date=self.before_cutoff, created_at_date=self.after_cutoff, has_commits=False)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
@@ -204,7 +204,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
         GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
-    def test_archives_inactive_repositories_not_on_allow_list(self, mock_github_client_core_api):
+    def test_archives_inactive_repositories(self, mock_github_client_core_api):
         repo = self.__get_repository(self.before_cutoff, self.before_cutoff)
         repo_on_allow_list = self.__get_repository(self.before_cutoff, self.before_cutoff, repo_name="allow_this")
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
