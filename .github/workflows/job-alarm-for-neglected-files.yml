@@ -1,0 +1,32 @@
+name: Alarm for neglected files
+
+on:
+  pull_request:
+
+env:
+#   ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+#   GH_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
+
+jobs:
+  detect-neglected-files:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.detect_neglected_files
+    #   - name: Report failure to Slack
+    #     if: always()
+    #     uses: ravsamhq/notify-slack-action@v2
+    #     with:
+    #       status: ${{ job.status }}
+    #       notify_when: "failure"
+    #       notification_title: "Failed to check for low GitHub actions minutes"
+    #     env:
+    #       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
