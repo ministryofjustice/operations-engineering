@@ -1,10 +1,12 @@
+import logging
 import time
 from datetime import datetime, timedelta
 
 import requests
 
-from config.constants import RESPONSE_NO_CONTENT, RESPONSE_OKAY
-from config.logging_config import logging
+RESPONSE_OKAY = 200
+RESPONSE_NO_CONTENT = 204
+logging.basicConfig(level=logging.INFO)
 
 
 class Auth0Service:
