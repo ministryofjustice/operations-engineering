@@ -1,13 +1,12 @@
 import unittest
-from unittest.mock import MagicMock, Mock, patch
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from unittest.mock import MagicMock, Mock, patch
+
 import requests
-from services.auth0_service import Auth0Service
-from config.constants import (
-    RESPONSE_OKAY,
-    RESPONSE_NO_CONTENT
-)
+from dateutil.relativedelta import relativedelta
+
+from services.auth0_service import (RESPONSE_NO_CONTENT, RESPONSE_OKAY,
+                                    Auth0Service)
 
 # pylint: disable=R0902, W0212
 
