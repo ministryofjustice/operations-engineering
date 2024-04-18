@@ -119,6 +119,14 @@ class Auth0Service:
         logging.debug(f"Deleting data at {endpoint}")
         return self._make_request('DELETE', endpoint)
 
+    def delete_inactive_users(self, days_inactive: int = 90) -> None:
+        self._delete_users(self.get_inactive_users(days_inactive))
+
+    def _delete_users(self, users: list[dict[str, any]]) -> None:
+        for user in users:
+            logging.debug("Deleting user %s", user['user_id'])
+            self.delete_user(user['user_id'])
+
     def delete_user(self, user_id: str) -> requests.Response:
         """Deletes a user from Auth0
 
