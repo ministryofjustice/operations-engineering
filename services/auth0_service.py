@@ -191,18 +191,27 @@ class Auth0Service:
             list[dict[str, any]]: List of users
         """
 
-        # List to hold inactive users
-        users2 = []
-        for user in self._get_users():
-            if user.get('last_login'):
-                last_login = datetime.strptime(
-                    user['last_login'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                if last_login < (datetime.utcnow() - timedelta(days=days_inactive)):
-                    users2.append(user)
-            else:
+        def is_user_inactive(user: dict) -> bool:
+            """Check if a user is inactive.
+
+            A user is considered inactive if they have never logged in or their last login was more than `days_inactive` days ago.
+
+            Args:
+                user (dict): The user to check.
+
+            Returns:
+                bool: True if the user is inactive, False otherwise.
+            """
+            last_login_str = user.get('last_login')
+            if last_login_str is None:
                 # User has never logged in
-                users2.append(user)
-        return users2
+                return True
+
+            last_login = datetime.strptime(
+                last_login_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+            return last_login < (datetime.utcnow() - timedelta(days=days_inactive))
+
+        return [user for user in self._get_users() if is_user_inactive(user)]
 
     def get_active_users(self, days_inactive: int = 90) -> list[dict[str, any]]:
         """Gets all users who have logged in for a given number of days
