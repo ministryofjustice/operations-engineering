@@ -1,32 +1,23 @@
 import os
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import Mock, patch
 
-from bin.auth0_delete_inactive_users import (delete_inactive_users,
-                                             get_auth0_client_details, main)
+from bin.auth0_delete_inactive_users import get_auth0_client_details, main
 
 
-@patch.dict(os.environ, {"AUTH0_CLIENT_SECRET": "secret", "AUTH0_CLIENT_ID": "id", "AUTH0_DOMAIN": "domain"})
-class TestAuth0DeleteInactiveUsers(unittest.TestCase):
-
-    @patch("services.auth0_service.Auth0Service")
-    def test_main_when_no_users(self, mock_auth0_service):
-        mock_auth0_service.get_inactive_users.return_value = []
-        delete_inactive_users(mock_auth0_service)
-        mock_auth0_service.delete_user.assert_not_called()
-
-    @patch("services.auth0_service.Auth0Service")
-    def test_main_when_users(self, mock_auth0_service):
-        mock_auth0_service.get_inactive_users.return_value = [
-            {"user_id": "some-user"}]
-        delete_inactive_users(mock_auth0_service)
-        mock_auth0_service.delete_user.assert_called_once_with("some-user")
-
-    @patch("bin.auth0_delete_inactive_users.Auth0Service", new=MagicMock)
-    @patch("bin.auth0_delete_inactive_users.delete_inactive_users")
-    def test_main(self, mock_delete_inactive_users):
+class TestMain(unittest.TestCase):
+    @patch('bin.auth0_delete_inactive_users.Auth0Service', return_value=Mock())
+    @patch('bin.auth0_delete_inactive_users.get_auth0_client_details', return_value=('secret', 'id', 'domain'))
+    def test_main(self, mock_get_auth0_client_details, mock_Auth0Service):
         main()
-        mock_delete_inactive_users.assert_called_once()
+        mock_get_auth0_client_details.assert_called_once()
+        mock_Auth0Service.assert_called_once_with(
+            client_secret='secret',
+            client_id='id',
+            domain='domain',
+            grant_type='client_credentials'
+        )
+        mock_Auth0Service.return_value.delete_inactive_users.assert_called_once()
 
 
 class TestGetAuth0ClientDetails(unittest.TestCase):

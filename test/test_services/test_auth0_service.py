@@ -200,6 +200,22 @@ class TestAuth0Service(unittest.TestCase):
         self.assertEqual(self.auth0.get_active_users_usernames(), [
                          "some-user-1", "some-user-2"])
 
+    @patch.object(Auth0Service, 'get_inactive_users', return_value=[{'user_id': '1'}, {'user_id': '2'}])
+    @patch.object(Auth0Service, '_delete_users')
+    def test_delete_inactive_users(self, mock_delete_users, mock_get_inactive_users):
+        service = self.auth0
+        service.delete_inactive_users(90)
+        mock_get_inactive_users.assert_called_once_with(90)
+        mock_delete_users.assert_called_once_with(
+            [{'user_id': '1'}, {'user_id': '2'}])
+
+    @patch.object(Auth0Service, 'delete_user')
+    def test__delete_users(self, mock_delete_user):
+        service = self.auth0
+        service._delete_users([{'user_id': '1'}, {'user_id': '2'}])
+        mock_delete_user.assert_any_call('1')
+        mock_delete_user.assert_any_call('2')
+
 
 if __name__ == "__main__":
     unittest.main()
