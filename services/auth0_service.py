@@ -40,7 +40,7 @@ class Auth0Service:
             requests.Response: Response object
         """
 
-        logging.debug(f"Making {method} request to {endpoint}")
+        logging.debug("Making %s request to %s", method, endpoint)
 
         # Create endpoint URL and headers using domain and access token
         url = f"https://{self.domain}/{endpoint}"
@@ -92,7 +92,7 @@ class Auth0Service:
             return response.json()['access_token']
 
         logging.error(
-            f"Failed to get access token from Auth0: {response.text}")
+            "Failed to get access token from Auth0: %s", response.text)
         raise Exception("Failed to get access token from Auth0")
 
     def _get(self, endpoint: str) -> requests.Response:
@@ -104,7 +104,7 @@ class Auth0Service:
         Returns:
             requests.Response: Response object
         """
-        logging.debug(f"Getting data from {endpoint}")
+        logging.debug("Getting data from %s", endpoint)
         return self._make_request('GET', endpoint)
 
     def _delete(self, endpoint: str) -> requests.Response:
@@ -116,7 +116,7 @@ class Auth0Service:
         Returns:
             requests.Response: Response object
         """
-        logging.debug(f"Deleting data at {endpoint}")
+        logging.debug("Deleting data from %s", endpoint)
         return self._make_request('DELETE', endpoint)
 
     def delete_inactive_users(self, days_inactive: int = 90) -> None:
@@ -139,9 +139,10 @@ class Auth0Service:
         response = self._delete(f'api/v2/users/{user_id}')
 
         if response.status_code == RESPONSE_NO_CONTENT:
-            logging.info(f"User {user_id} deleted")
+            logging.info("User %s deleted", user_id)
         else:
-            logging.error(f"Failed to delete user {user_id}: {response.text}")
+            logging.error("Failed to delete user %s: %s",
+                          user_id, response.text)
 
         time.sleep(1)
 
@@ -176,7 +177,7 @@ class Auth0Service:
                 page += 1
                 time.sleep(0.5)
             else:
-                logging.error(f"Error retrieving users: {response.text}")
+                logging.error("Failed to get users: %s", response.text)
                 break
 
         return all_users
