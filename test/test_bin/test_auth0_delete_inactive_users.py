@@ -8,16 +8,16 @@ from bin.auth0_delete_inactive_users import get_auth0_client_details, main
 class TestMain(unittest.TestCase):
     @patch('bin.auth0_delete_inactive_users.Auth0Service', return_value=Mock())
     @patch('bin.auth0_delete_inactive_users.get_auth0_client_details', return_value=('secret', 'id', 'domain'))
-    def test_main(self, mock_get_auth0_client_details, mock_Auth0Service):
+    def test_main(self, mock_get_auth0_client_details, mock_auth0_service):
         main()
         mock_get_auth0_client_details.assert_called_once()
-        mock_Auth0Service.assert_called_once_with(
+        mock_auth0_service.assert_called_once_with(
             client_secret='secret',
             client_id='id',
             domain='domain',
             grant_type='client_credentials'
         )
-        mock_Auth0Service.return_value.delete_inactive_users.assert_called_once()
+        mock_auth0_service.return_value.delete_inactive_users.assert_called_once()
 
 
 class TestGetAuth0ClientDetails(unittest.TestCase):
