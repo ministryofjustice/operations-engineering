@@ -30,15 +30,3 @@ resource "aws_iam_access_key" "user_key" {
 data "github_actions_public_key" "repo_key" {
   repository = "operations-engineering"
 }
-
-resource "github_actions_secret" "aws_access_key" {
-  repository      = "operations-engineering"
-  secret_name     = "AWS_ACCESS_KEY"
-  plaintext_value = aws_iam_access_key.user_key.id
-}
-
-resource "github_actions_secret" "aws_secret_key" {
-  repository      = "operations-engineering"
-  secret_name     = "AWS_SECRET_KEY"
-  plaintext_value = aws_iam_access_key.user_key.secret
-}
