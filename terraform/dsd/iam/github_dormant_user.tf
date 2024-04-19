@@ -19,12 +19,12 @@ resource "aws_iam_policy" "user_policy" {
 }
 
 resource "aws_iam_user_policy_attachment" "user_policy_attachment" {
-  user       = aws_iam_user.github_user.name
+  user       = aws_iam_user.github_dormant_user.name
   policy_arn = aws_iam_policy.user_policy.arn
 }
 
 resource "aws_iam_access_key" "user_key" {
-  user = aws_iam_user.github_user.name
+  user = aws_iam_user.github_dormant_user.name
 }
 
 data "github_actions_public_key" "repo_key" {
