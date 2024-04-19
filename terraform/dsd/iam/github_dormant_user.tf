@@ -1,44 +1,44 @@
 resource "aws_iam_user" "github_dormant_user" {
   name = "operations_engineering_github_dormant_user"
 }
-resource "aws_iam_access_key" "github_dormant_user_key" {
-  user = aws_iam_user.github_dormant_user.name
-}
 
-resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = "operations-engineering-dormant-users"
+resource "aws_iam_policy" "user_policy" {
+  name        = "DormantUserS3Access"
+  description = "Policy to grant S3 access to github_dormant_user"
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/${aws_iam_user.github_dormant_user.name}"
-        }
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:PutObjectVersionAcl",
-          "s3:GetObject"
-        ]
+        Action   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+        Effect   = "Allow",
         Resource = "arn:aws:s3:::operations-engineering-dormant-users/*"
-      }
+      },
     ]
   })
 }
 
-data "aws_iam_access_key" "github_dormant_user_key" {
-  user = aws_iam_user.github_dormant_user.name
+resource "aws_iam_user_policy_attachment" "user_policy_attachment" {
+  user       = aws_iam_user.github_user.name
+  policy_arn = aws_iam_policy.user_policy.arn
 }
 
-resource "github_actions_secret" "aws_access_key_id" {
-  repository      = "operations-engineering"
-  secret_name     = "DORMANT_USER_AWS_ACCESS_KEY_ID"
-  plaintext_value = data.aws_iam_access_key.github_dormant_user_key.id
+resource "aws_iam_access_key" "user_key" {
+  user = aws_iam_user.github_user.name
 }
 
-resource "github_actions_secret" "aws_secret_access_key" {
+data "github_actions_public_key" "repo_key" {
+  repository = "operations-engineering"
+}
+
+resource "github_actions_secret" "aws_access_key" {
   repository      = "operations-engineering"
-  secret_name     = "DORMANT_USER_AWS_SECRET_ACCESS_KEY"
-  plaintext_value = data.aws_iam_access_key.github_dormant_user_key.secret
+  secret_name     = "AWS_ACCESS_KEY"
+  plaintext_value = aws_iam_access_key.user_key.id
+}
+
+resource "github_actions_secret" "aws_secret_key" {
+  repository      = "operations-engineering"
+  secret_name     = "AWS_SECRET_KEY"
+  plaintext_value = aws_iam_access_key.user_key.secret
 }
