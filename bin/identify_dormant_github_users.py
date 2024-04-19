@@ -150,12 +150,12 @@ def message_to_slack_channel(list_of_dormant_users: set) -> str:
 
 def identify_dormant_github_users():
     since_date = calculate_date_by_integer(NUMBER_OF_DAYS_CONSIDERED_DORMANT)
-    github_service, auth0_service, slack_serivice = setup_services()
+    github_service, auth0_service, slack_service = setup_services()
 
     dormant_users = dormant_users_according_to_github(
         github_service, since_date)
 
-    slack_serivice.send_message_to_plaintext_channel_name(message_to_slack_channel(
+    slack_service.send_message_to_plaintext_channel_name(message_to_slack_channel(
         dormant_users_not_in_auth0_audit_log(auth0_service, dormant_users)), SLACK_CHANNEL)
 
 
