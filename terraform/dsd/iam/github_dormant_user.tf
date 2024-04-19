@@ -1,4 +1,6 @@
-
+resource "aws_iam_user" "github_dormant_user" {
+  name = "operations_engineering_github_dormant_user"
+}
 resource "aws_iam_access_key" "github_dormant_user_key" {
   user = aws_iam_user.github_dormant_user.name
 }
