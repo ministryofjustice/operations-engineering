@@ -8,7 +8,7 @@ from bin.identify_dormant_github_users import (
     calculate_date_by_integer, dormant_users_according_to_github,
     dormant_users_not_in_auth0_audit_log,
     download_github_dormant_users_csv_from_s3,
-    get_usernames_from_csv_ignoring_bots, setup_services)
+    get_usernames_from_csv_ignoring_bots_and_collaborators, setup_services)
 from services.auth0_service import Auth0Service
 from services.github_service import GithubService
 
@@ -42,16 +42,23 @@ class TestDormantGitHubUsers(unittest.TestCase):
     def test_get_usernames_from_csv_ignoring_bots_empty_csv(self):
         mock_file_content = ""
         with patch("builtins.open", mock_open(read_data=mock_file_content)):
-            result = get_usernames_from_csv_ignoring_bots(
+            result = get_usernames_from_csv_ignoring_bots_and_collaborators(
                 self.allowed_bot_users)
         self.assertEqual(result, [])
 
     def test_get_usernames_from_csv_ignoring_bots_only_bots(self):
         mock_file_content = "ci-hmcts\ncloud-platform-dummy-user\n"
         with patch("builtins.open", mock_open(read_data=mock_file_content)):
-            result = get_usernames_from_csv_ignoring_bots(
+            result = get_usernames_from_csv_ignoring_bots_and_collaborators(
                 self.allowed_bot_users)
         self.assertEqual(result, [])
+
+    @patch("builtins.open", new_callable=mock_open, read_data="created_at,id,login,role,last_logged_ip,2fa_enabled?,outside_collaborator\n2011-05-04 10:06:20 +0100,767430,joebloggs,user,165.225.16.122,true,false\n2012-06-19 10:02:40 +0100,1866734,jamesoutsidecollaborator,user,31.121.104.4,true,true")
+    def test_get_usernames_from_csv_ignoring_bots_and_collaborators(self, mock_file):
+        bot_list = ['bot1', 'bot2']
+        usernames = get_usernames_from_csv_ignoring_bots_and_collaborators(
+            bot_list)
+        self.assertEqual(usernames, ['joebloggs'])
 
     @patch('boto3.client')
     def test_download_github_dormant_users_csv_from_s3_no_credentials(self, mock_boto3_client):
