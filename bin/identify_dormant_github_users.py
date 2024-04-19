@@ -61,7 +61,7 @@ def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> li
                 if username not in bot_list and not is_collaborator:
                     usernames.append(username)
 
-    except Exception as e:
+    except FileNotFoundError as e:
         logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
 
     return usernames
