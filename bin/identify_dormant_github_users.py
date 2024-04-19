@@ -49,20 +49,22 @@ def calculate_date_by_integer(in_last_days: int) -> datetime:
     return datetime.strptime(date.strftime(timestamp_format), timestamp_format)
 
 
-def get_usernames_from_csv_ignoring_bots(bot_list: list) -> list:
+def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
     usernames = []
     try:
         with open(CSV_FILE_NAME, mode='r', encoding='utf-8') as file:
-            csv_reader = csv.reader(file)
+            csv_reader = csv.DictReader(file)
 
             for row in csv_reader:
-                username = row[2].strip()
-                usernames.append(username)
+                username = row['login'].strip()
+                is_collaborator = row['outside_collaborator'].lower() == 'true'
+                if username not in bot_list and not is_collaborator:
+                    usernames.append(username)
 
     except Exception as e:
         logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
 
-    return [username for username in usernames if username not in bot_list]
+    return usernames
 
 
 def download_github_dormant_users_csv_from_s3():
@@ -84,7 +86,7 @@ def download_github_dormant_users_csv_from_s3():
 def get_dormant_users_from_github_csv():
     """An enterprise user must download the 'dormant.csv' file from the Github audit log and upload it to the 'operations-engineering-dormant-users' s3 bucket. This function will download the file from the s3 bucket and return a list of usernames from the csv file."""
     download_github_dormant_users_csv_from_s3()
-    return get_usernames_from_csv_ignoring_bots(ALLOWED_BOT_USERS)
+    return get_usernames_from_csv_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
 
 
 def dormant_users_according_to_github(github_service: GithubService, dormant_from: datetime) -> set[str]:
