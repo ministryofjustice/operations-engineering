@@ -1,7 +1,8 @@
 name: 🤖 Generate PAT Token Report
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 5"
 
 jobs:
   pat-token-report:
