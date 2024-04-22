@@ -17,7 +17,7 @@ resource "aws_iam_policy" "github_dormant_user_policy" {
 resource "aws_iam_role" "github_dormant_user_role" {
   name = "github_dormant_user_role"
 
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy_document.json
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "role_policy_attachment" {

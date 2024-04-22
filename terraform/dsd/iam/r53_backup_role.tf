@@ -1,39 +1,6 @@
-locals {
-  oidc_provider = "token.actions.githubusercontent.com"
-}
-
-data "aws_iam_openid_connect_provider" "github" {
-  url = "https://${local.oidc_provider}"
-}
-
 resource "aws_iam_role" "r53_backup_role" {
   name               = "operations-engineering-r53-backup-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy_document.json
-}
-
-data "aws_iam_policy_document" "assume_role_policy_document" {
-  version = "2012-10-17"
-
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    principals {
-      type        = "Federated"
-      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
-    }
-    condition {
-      test     = "StringLike"
-      variable = "${local.oidc_provider}:sub"
-      values   = ["repo:ministryofjustice/operations-engineering:*"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "${local.oidc_provider}:aud"
-      values   = ["sts.amazonaws.com"]
-    }
-  }
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
 }
 
 data "aws_iam_policy_document" "r53_read_policy_document" {
