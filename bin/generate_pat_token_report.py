@@ -11,10 +11,10 @@ def get_environment_variables() -> tuple:
     if not slack_token:
         raise ValueError(
             "The env variable ADMIN_SLACK_TOKEN is empty or missing")
-    github_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    github_token = os.getenv("GH_APP_TOKEN")
     if not github_token:
         raise ValueError(
-            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
+            "The env variable GH_APP_TOKEN is empty or missing")
 
     return slack_token, github_token
 
