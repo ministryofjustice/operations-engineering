@@ -32,77 +32,77 @@ jobs:
       run:
         working-directory: "terraform/dsd/${{ matrix.path }}"
     steps:
-    - uses: actions/checkout@v4
-    - uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TERRAFORM_VERSION }}
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-    - name: Configure AWS Credentials for Infra Account
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
-        aws-region: eu-west-2
+      - name: Configure AWS Credentials for Infra Account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
+          aws-region: eu-west-2
 
-    - name: Setup DSD Profile
-      run: |
-        aws configure set region ${{ env.AWS_REGION }} --profile dsd_profile
-        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile dsd_profile
-        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_profile
-        aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_profile
+      - name: Setup DSD Profile
+        run: |
+          aws configure set region ${{ env.AWS_REGION }} --profile dsd_profile
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile dsd_profile
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_profile
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_profile
 
-    - name: Configure AWS Credentials for CP State Account
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
-        aws-region: eu-west-2
+      - name: Configure AWS Credentials for CP State Account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.R53_BACKUP_ROLE_ARN }}
+          aws-region: eu-west-2
 
-    - name: Post Link to Apply Pipeline
-      if: github.ref == 'refs/heads/main'
-      uses: mshick/add-pr-comment@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        repo-token-user-login: 'github-actions[bot]'
-        message: |
-          Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-dsd-iam.yml?query=event%3Apush+branch%3Amain
+      - name: Post Link to Apply Pipeline
+        if: github.ref == 'refs/heads/main'
+        uses: mshick/add-pr-comment@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-dsd-iam.yml?query=event%3Apush+branch%3Amain
 
-    - name: Terraform Format Check
-      id: fmt-check
-      run: terraform fmt -check
+      - name: Terraform Format Check
+        id: fmt-check
+        run: terraform fmt -check
 
-    - name: Terraform Init
-      id: init
-      run: ls -latr; terraform init -input=false -no-color
+      - name: Terraform Init
+        id: init
+        run: ls -latr; terraform init -input=false -no-color
 
-    - name: Terraform Validate
-      id: validate
-      run: terraform validate -no-color
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
 
-    - name: Terraform Plan
-      id: plan
-      run: terraform plan -input=false -no-color
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -input=false -no-color
 
-    - name: Delete Old Comments
-      uses: maheshrayas/action-pr-comment-delete@v3.0
-      with:
-        github_token: '${{ secrets.GITHUB_TOKEN }}'
-        org: ministryofjustice
-        repo: operations-engineering
-        user: 'github-actions[bot]'
-        issue: '${{github.event.number}}'
+      - name: Delete Old Comments
+        uses: maheshrayas/action-pr-comment-delete@v3.0
+        with:
+          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          org: ministryofjustice
+          repo: operations-engineering
+          user: 'github-actions[bot]'
+          issue: '${{github.event.number}}'
 
-    - name: Post Plan to GitHub PR
-      if: github.ref != 'refs/heads/main'
-      uses: mshick/add-pr-comment@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        repo-token-user-login: 'github-actions[bot]'
-        message: |
-          ## ${{ matrix.path }} plan
-          ```
-          ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
-          ```
+      - name: Post Plan to GitHub PR
+        if: github.ref != 'refs/heads/main'
+        uses: mshick/add-pr-comment@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          message: |
+            ## ${{ matrix.path }} plan
+            ```
+            ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+            ```
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main'
-      id: apply
-      run: terraform apply -input=false -no-color -auto-approve
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        id: apply
+        run: terraform apply -input=false -no-color -auto-approve
