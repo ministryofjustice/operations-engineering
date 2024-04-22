@@ -25,7 +25,7 @@ def main():
 
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
     # slack_service = SlackService(str(slack_token))
-    new_pat_tokens = github_service.get_new_pat_creation_events_for_organization(MINISTRY_OF_JUSTICE)
+    new_pat_tokens = github_service.get_new_pat_creation_events_for_organization()
 
     print(f'Number of PAT tokens found: {len(new_pat_tokens)}')
 
