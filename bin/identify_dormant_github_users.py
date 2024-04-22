@@ -8,7 +8,9 @@ from botocore.exceptions import NoCredentialsError
 
 from services.auth0_service import Auth0Service
 from services.github_service import GithubService
+from services.slack_service import SlackService
 
+SLACK_CHANNEL = "operations-engineering-alerts"
 AUTH0_DOMAIN = "operations-engineering.eu.auth0.com"
 NUMBER_OF_DAYS_CONSIDERED_DORMANT = 90
 CSV_FILE_NAME = "dormant.csv"
@@ -108,7 +110,7 @@ def dormant_users_not_in_auth0_audit_log(auth0_service: Auth0Service, dormant_us
     return set(dormant_users_not_in_audit_log)
 
 
-def setup_services() -> tuple[GithubService, Auth0Service]:
+def setup_services() -> tuple[GithubService, Auth0Service, SlackService]:
     token = os.environ.get('GH_ADMIN_TOKEN')
     if token is None:
         raise ValueError("GH_ADMIN_TOKEN is not set")
@@ -124,19 +126,37 @@ def setup_services() -> tuple[GithubService, Auth0Service]:
         auth0_secret_token, auth0_id_token, AUTH0_DOMAIN
     )
 
-    return github_service, auth0_service
+    slack_token = os.environ.get('ADMIN_SLACK_TOKEN')
+    if slack_token is None:
+        raise ValueError("ADMIN_SLACK_TOKEN is not set")
+
+    slack_service = SlackService(slack_token)
+
+    return github_service, auth0_service, slack_service
+
+
+def message_to_slack_channel(list_of_dormant_users: set) -> str:
+    msg = (
+        "Hi team 👋, \n\n"
+        f"The identify dormant GitHub users script has identified {len(list_of_dormant_users)} dormant users. \n\n"
+    )
+
+    # Add each dormant user on a new line
+    for user in list_of_dormant_users:
+        msg += f"{user}\n"
+
+    return msg
 
 
 def identify_dormant_github_users():
     since_date = calculate_date_by_integer(NUMBER_OF_DAYS_CONSIDERED_DORMANT)
-    github_service, auth0_service = setup_services()
+    github_service, auth0_service, slack_service = setup_services()
 
     dormant_users = dormant_users_according_to_github(
         github_service, since_date)
-    dormant_users_not_in_auth0 = dormant_users_not_in_auth0_audit_log(
-        auth0_service, dormant_users)
-    logging.info("Dormant users checked and ready to be removed: %s",
-                 dormant_users_not_in_auth0)
+
+    slack_service.send_message_to_plaintext_channel_name(message_to_slack_channel(
+        dormant_users_not_in_auth0_audit_log(auth0_service, dormant_users)), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
