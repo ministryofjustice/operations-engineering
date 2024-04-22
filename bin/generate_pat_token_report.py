@@ -1,6 +1,5 @@
 import os
-from datetime import datetime, timedelta
-from config.constants import MINISTRY_OF_JUSTICE, SLACK_CHANNEL, OPERATIONS_ENGINEERING_GITHUB_USERNAMES
+from config.constants import MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -18,28 +17,36 @@ def get_environment_variables() -> tuple:
 
     return slack_token, github_token
 
+def expired_tokens_message():
+    msg = (
+        "Hi team 👋, \n\n"
+        "Some expired PAT(s) have been detected. \n\n"
+        "Please review the current list here: \n"
+        "https://github.com/organizations/ministryofjustice/settings/personal-access-tokens/active \n\n"
+
+        "Have a swell day, \n\n"
+
+        "The GitHub PAT Bot"
+    )
+
+    return msg
+
+def count_expired_tokens(pat_tokens):
+    expired_count = 0
+    for token in pat_tokens:
+        if token['token_expired']:
+            expired_count += 1
+    return expired_count
 
 def main():
-    # audit_log_url = f"https://github.com/organizations/{MINISTRY_OF_JUSTICE}/settings/audit-log?q=action%3Aorg.add_member"
     slack_token, github_token = get_environment_variables()
 
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
-    # slack_service = SlackService(str(slack_token))
-    new_pat_tokens = github_service.get_new_pat_creation_events_for_organization()
+    slack_service = SlackService(str(slack_token))
+    pat_tokens = github_service.get_new_pat_creation_events_for_organization()
 
-    print(f'Number of PAT tokens found: {len(new_pat_tokens)}')
-
-    # if new_members:
-    #     for member in new_members:
-    #         individual_message = f"{member['userLogin']} added by {member['actorLogin']}.\n"
-    #         if member['actorLogin'] in OPERATIONS_ENGINEERING_GITHUB_USERNAMES:
-    #             new_members_added_by_oe += individual_message
-    #             total_members_added_by_oe += 1
-    #         else:
-    #             new_members_added_externally += individual_message
-    #     percentage = round((total_members_added_by_oe / len(new_members)) * 100)
-
-    #     slack_service.send_message_to_plaintext_channel_name(new_pat_token_created_message())
+    if count_expired_tokens(pat_tokens) > 0:
+        slack_service.send_message_to_plaintext_channel_name(expired_tokens_message(), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
