@@ -25,6 +25,4 @@ jobs:
       - run: pipenv run python3 -m bin.generate_pat_token_report
         env:
           GH_APP_TOKEN: ${{ steps.generate-token.outputs.token }}
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
