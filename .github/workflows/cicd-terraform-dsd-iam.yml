@@ -21,10 +21,9 @@ jobs:
     name: "Terraform DSD"
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       id-token: write
-      actions: write
     strategy:
       matrix:
         path:
