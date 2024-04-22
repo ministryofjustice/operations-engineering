@@ -2231,5 +2231,27 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         self.assertEqual(result, False)
 
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+@patch("requests.sessions.Session.__new__")
+class TestGithubServicePATRetrieval(unittest.TestCase):
+
+    @patch.object(GithubService, "get_new_pat_creation_events_for_organization")
+    def test_successful_pat_retrieval(self, mock_get_new_pat_creation_events, _mock_github_client_rest_api, _mock_github_client_core_api):
+        expected_response = [{
+            "id": 25381,
+            "token_expired": False,
+            "owner": {"login": "test_owner"}
+        }]
+        mock_get_new_pat_creation_events.return_value = expected_response
+
+        github_service = GithubService("test_token", "test_org")
+        result = github_service.get_new_pat_creation_events_for_organization()
+
+        self.assertEqual(result, expected_response)
+        mock_get_new_pat_creation_events.assert_called_once()
+
+
 if __name__ == "__main__":
     unittest.main()
