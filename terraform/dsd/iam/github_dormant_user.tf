@@ -27,6 +27,14 @@ resource "aws_iam_access_key" "user_key" {
   user = aws_iam_user.github_dormant_user.name
 }
 
-data "github_actions_public_key" "repo_key" {
-  repository = "operations-engineering"
+resource "github_actions_secret" "aws_access_key_id" {
+  repository      = "operations-engineering"
+  secret_name     = "AWS_ACCESS_KEY_ID"
+  plaintext_value = aws_iam_access_key.user_key.id
+}
+
+resource "github_actions_secret" "aws_secret_access_key" {
+  repository      = "operations-engineering"
+  secret_name     = "AWS_SECRET_ACCESS_KEY"
+  plaintext_value = aws_iam_access_key.user_key.secret
 }
