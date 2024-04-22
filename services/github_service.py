@@ -1325,3 +1325,25 @@ class GithubService:
         if percentage_used >= threshold:
             return {'threshold': threshold, 'percentage_used': percentage_used}
         return False
+
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_new_pat_creation_events_for_organization(self, organization) -> list:
+        logging.info(
+            f"Fetching new PAT creation events for organization {organization}")
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+
+        url = f"https://api.github.com/orgs/{organization}/audit-log?include=all&phrase=action:token.create"
+
+        response = self.github_client_rest_api.get(url, headers=headers)
+
+        if response.status_code == 200:
+            logging.info("Successfully retrieved PAT creation events.")
+            return response.json()
+        else:
+            logging.error(f"Failed to fetch PAT creation events: {response.status_code}")
+            return []
