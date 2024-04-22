@@ -46,7 +46,7 @@ resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
 
 resource "github_actions_secret" "aws_role_arn" {
   repository      = "operations-engineering"
-  secret_name     = "GITHUB_DORMANT_USER_AWS_ROLE_ARN"
+  secret_name     = "GH_DORMANT_USER_AWS_ROLE_ARN"
   plaintext_value = aws_iam_role.github_dormant_user_role.arn
 }
 resource "aws_iam_user_policy_attachment" "user_policy_attachment" {
