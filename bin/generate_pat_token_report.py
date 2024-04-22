@@ -41,11 +41,12 @@ def count_expired_tokens(pat_tokens):
     return expired_count
 
 
-def main():
+def generate_pat_token_report():
     slack_token, github_token = get_environment_variables()
 
     github_service = GithubService(str(github_token), MINISTRY_OF_JUSTICE)
     slack_service = SlackService(str(slack_token))
+
     pat_tokens = github_service.get_new_pat_creation_events_for_organization()
 
     if count_expired_tokens(pat_tokens) > 0:
@@ -53,4 +54,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    generate_pat_token_report()
