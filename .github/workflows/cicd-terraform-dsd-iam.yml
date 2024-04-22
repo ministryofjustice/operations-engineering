@@ -14,12 +14,13 @@ on:
 
 env:
   TERRAFORM_VERSION: "1.6.6"
-  TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   terraform:
     name: "Terraform DSD"
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
       pull-requests: write
