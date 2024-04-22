@@ -1326,7 +1326,6 @@ class GithubService:
             return {'threshold': threshold, 'percentage_used': percentage_used}
         return False
 
-
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_new_pat_creation_events_for_organization(self) -> list:
         logging.info(
@@ -1344,6 +1343,5 @@ class GithubService:
         if response.status_code == 200:
             logging.info("Successfully retrieved PAT list.")
             return response.json()
-        else:
-            logging.error(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
-            return []
+        logging.error(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
+        return []

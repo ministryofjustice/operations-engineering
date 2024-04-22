@@ -17,6 +17,7 @@ def get_environment_variables() -> tuple:
 
     return slack_token, github_token
 
+
 def expired_tokens_message():
     msg = (
         "Hi team 👋, \n\n"
@@ -31,12 +32,14 @@ def expired_tokens_message():
 
     return msg
 
+
 def count_expired_tokens(pat_tokens):
     expired_count = 0
     for token in pat_tokens:
         if token['token_expired']:
             expired_count += 1
     return expired_count
+
 
 def main():
     slack_token, github_token = get_environment_variables()
