@@ -2231,5 +2231,32 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         self.assertEqual(result, False)
 
 
+class TestGithubPATExpiry(unittest.TestCase):
+    @patch('requests.sessions.Session.get')
+    def test_successful_pat_retrieval(self, mock_get):
+        expected_response = [{
+            "id": 25381,
+            "token_expired": False,
+            "owner": {"login": "test_user"}
+        }]
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = expected_response
+        mock_get.return_value = mock_response
+
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.get_new_pat_creation_events_for_organization()
+
+        self.assertEqual(result, expected_response)
+        mock_get.assert_called_once_with(
+            'https://api.github.com/orgs/dummy_org/personal-access-tokens',
+            headers={
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+                'Authorization': 'Bearer test_token'
+            }
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
