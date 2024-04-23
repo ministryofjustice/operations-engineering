@@ -13,7 +13,7 @@ def create_dataframe():
     pd.options.display.max_rows = 9999
 
     # Set the index to Request Type column
-    dataframe.set_index(['Request Type'])
+    dataframe.set_index(['RequestType'])
 
     return dataframe
 
