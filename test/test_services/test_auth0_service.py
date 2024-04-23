@@ -1,13 +1,12 @@
 import unittest
-from unittest.mock import MagicMock, Mock, patch
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+from unittest.mock import MagicMock, Mock, patch
+
 import requests
-from services.auth0_service import Auth0Service
-from config.constants import (
-    RESPONSE_OKAY,
-    RESPONSE_NO_CONTENT
-)
+from dateutil.relativedelta import relativedelta
+
+from services.auth0_service import (RESPONSE_NO_CONTENT, RESPONSE_OKAY,
+                                    Auth0Service)
 
 # pylint: disable=R0902, W0212
 
@@ -200,6 +199,22 @@ class TestAuth0Service(unittest.TestCase):
             {"nickname": "some-user-1"}, {"nickname": "Some-useR-2"}]
         self.assertEqual(self.auth0.get_active_users_usernames(), [
                          "some-user-1", "some-user-2"])
+
+    @patch.object(Auth0Service, 'get_inactive_users', return_value=[{'user_id': '1'}, {'user_id': '2'}])
+    @patch.object(Auth0Service, '_delete_users')
+    def test_delete_inactive_users(self, mock_delete_users, mock_get_inactive_users):
+        service = self.auth0
+        service.delete_inactive_users(90)
+        mock_get_inactive_users.assert_called_once_with(90)
+        mock_delete_users.assert_called_once_with(
+            [{'user_id': '1'}, {'user_id': '2'}])
+
+    @patch.object(Auth0Service, 'delete_user')
+    def test__delete_users(self, mock_delete_user):
+        service = self.auth0
+        service._delete_users([{'user_id': '1'}, {'user_id': '2'}])
+        mock_delete_user.assert_any_call('1')
+        mock_delete_user.assert_any_call('2')
 
 
 if __name__ == "__main__":
