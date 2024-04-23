@@ -1,17 +1,15 @@
 import json
 from calendar import timegm
-from datetime import datetime, timedelta, date
+from datetime import date, datetime, timedelta
 from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, NamedUser, RateLimitExceededException,
-                    UnknownObjectException)
-from github.Commit import Commit
+from github import Github, NamedUser, RateLimitExceededException, UnknownObjectException
 from github.Issue import Issue
-from github.Repository import Repository
 from github.Organization import Organization
+from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
@@ -91,6 +89,7 @@ class GithubService:
     def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
         for repo in self.__get_repos_to_consider_for_archiving("all"):
             if self.__is_repo_ready_for_archiving(repo, last_active_cutoff_date, allow_list):
+                logging.info(f"Archiving repository: {repo.name}")
                 repo.edit(archived=True)
 
     def __get_repos_to_consider_for_archiving(self, repository_type: str) -> list[Repository]:
@@ -98,25 +97,25 @@ class GithubService:
             self.github_client_core_api.get_organization(self.organisation_name).get_repos(type=repository_type))
         return [repository for repository in repositories if not (repository.archived or repository.fork)]
 
-    def __is_repo_ready_for_archiving(self, repository, last_active_cutoff_date, allow_list: list[str]) -> bool:
-        latest_commit_position = 0
-        commit: Commit = None
-        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
-            commit = repository.get_commits()[latest_commit_position]
-        except Exception:
-            logging.info(
-                f"Manually check repository: {repository.name}. Reason: No commits in repository")
+    def __is_repo_ready_for_archiving(self, repository: Repository, last_active_cutoff_date: datetime, allow_list: list[str]) -> bool:
+        if (repository.created_at).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
+            logging.debug(f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
             return False
 
-        if (commit.commit.author.date).replace(tzinfo=None) < (last_active_cutoff_date).replace(tzinfo=None):
-            if repository.name in allow_list:
-                logging.info(
-                    f"Skipping repository: {repository.name}. Reason: Present in allow list")
+        if repository.name in allow_list:
+            logging.debug(f"Skipping repository: {repository.name}. Reason: Present in allow list")
+            return False
+
+        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
+            latest_commit_position = 0
+            commit = repository.get_commits()[latest_commit_position]
+            if commit and (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
+                logging.debug(f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
                 return False
-            return True
-        logging.info(
-            f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-        return False
+        except Exception:
+            logging.debug(f"Repository has no commits: {repository.name}")
+
+        return True
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
@@ -267,6 +266,14 @@ class GithubService:
     def __get_all_users(self) -> list:
         logging.info("Getting all organization members")
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_users_of_multiple_organisations(self, organisations: list) -> list:
+        all_users = []
+        for org in organisations:
+            all_users = all_users + [user["login"] for user in self.github_client_core_api.get_organization(
+                org).get_members() if user['login'] not in all_users]
+        return all_users
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
@@ -850,6 +857,16 @@ class GithubService:
         return [member.login.lower() for member in members]
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def enterprise_audit_activity_for_user(self, username: str):
+        response_okay = 200
+        url = f"https://api.github.com/enterprises/{self.enterprise_name}/audit-log?phrase=actor%3A{username}"
+        response = self.github_client_rest_api.get(url, timeout=10)
+        if response.status_code == response_okay:
+            return json.loads(response.content.decode("utf-8"))
+        raise ValueError(
+            f"Failed to get audit activity for user {username}. Response status code: {response.status_code}")
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def _get_user_from_audit_log(self, username: str):
         logging.info("Getting User from Audit Log")
         response_okay = 200
@@ -874,6 +891,25 @@ class GithubService:
                 if last_active_date > three_months_ago_date:
                     active_users.append(user["username"].lower())
         return active_users
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def check_dormant_users_audit_activity_since_date(self, users: list, since_date: datetime) -> list:
+        return [user for user in users if self.is_user_dormant_since_date(user, since_date)]
+
+    def is_user_dormant_since_date(self, user: str, since_date: datetime) -> bool:
+        audit_activity = self.enterprise_audit_activity_for_user(user)
+        if audit_activity:
+            last_active_date = datetime.fromtimestamp(
+                audit_activity[0]["@timestamp"] / 1000.0)
+            if last_active_date < since_date:
+                logging.info(
+                    f"User {user} last active date: {last_active_date}, adding to dormant users list")
+                return True
+        else:
+            logging.info(
+                f"User {user} has no audit activity, adding to dormant users list")
+            return True
+        return False
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_user_from_gitub(self, user: str):
@@ -1161,7 +1197,8 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_for_audit_log_new_members(self, since_date: str) -> list:
-        logging.info(f"Getting audit log entries for new members since {since_date}")
+        logging.info(
+            f"Getting audit log entries for new members since {since_date}")
         today = datetime.now()
         query = """
             query($organisation_name: String!, $since_date: String!, $cursor: String) {
@@ -1211,20 +1248,23 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_organisations_in_enterprise(self) -> list[Organization]:
-        logging.info(f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
+        logging.info(
+            f"Getting all organisations for enterprise {self.ENTERPRISE_NAME}")
 
         return [org.login for org in self.github_client_core_api.get_user().get_orgs()] or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_used_for_organisation(self, organization) -> int:
-        logging.info(f"Getting all github actions minutes used for organization {organization}")
+        logging.info(
+            f"Getting all github actions minutes used for organization {organization}")
 
         headers = {
             "Accept": "application/vnd.github+json",
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        response = self.github_client_rest_api.get(f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
+        response = self.github_client_rest_api.get(
+            f"https://api.github.com/orgs/{organization}/settings/billing/actions", headers=headers)
 
         return response.json()
 
@@ -1239,11 +1279,13 @@ class GithubService:
 
         payload = {'value': str(new_threshold)}
 
-        self.github_client_rest_api.patch("https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
+        self.github_client_rest_api.patch(
+            "https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_gha_minutes_quota_threshold(self):
-        actions_variable = self.github_client_core_api.get_repo('ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
+        actions_variable = self.github_client_core_api.get_repo(
+            'ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
         return int(actions_variable.value)
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -1283,3 +1325,23 @@ class GithubService:
         if percentage_used >= threshold:
             return {'threshold': threshold, 'percentage_used': percentage_used}
         return False
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_new_pat_creation_events_for_organization(self) -> list:
+        logging.info(
+            f"Fetching PATs for the {self.organisation_name} organisation...")
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+
+        url = f"https://api.github.com/orgs/{self.organisation_name}/personal-access-tokens"
+
+        response = self.github_client_rest_api.get(url, headers=headers)
+
+        if response.status_code == 200:
+            logging.info("Successfully retrieved PAT list.")
+            return response.json()
+        logging.error(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
+        return []

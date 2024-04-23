@@ -1,12 +1,12 @@
+import logging
 import time
 from datetime import datetime, timedelta
+
 import requests
 
-from config.logging_config import logging
-from config.constants import (
-    RESPONSE_OKAY,
-    RESPONSE_NO_CONTENT
-)
+RESPONSE_OKAY = 200
+RESPONSE_NO_CONTENT = 204
+logging.basicConfig(level=logging.INFO)
 
 
 class Auth0Service:
@@ -40,7 +40,7 @@ class Auth0Service:
             requests.Response: Response object
         """
 
-        logging.debug(f"Making {method} request to {endpoint}")
+        logging.debug("Making %s request to %s", method, endpoint)
 
         # Create endpoint URL and headers using domain and access token
         url = f"https://{self.domain}/{endpoint}"
@@ -92,7 +92,7 @@ class Auth0Service:
             return response.json()['access_token']
 
         logging.error(
-            f"Failed to get access token from Auth0: {response.text}")
+            "Failed to get access token from Auth0: %s", response.text)
         raise Exception("Failed to get access token from Auth0")
 
     def _get(self, endpoint: str) -> requests.Response:
@@ -104,7 +104,7 @@ class Auth0Service:
         Returns:
             requests.Response: Response object
         """
-        logging.debug(f"Getting data from {endpoint}")
+        logging.debug("Getting data from %s", endpoint)
         return self._make_request('GET', endpoint)
 
     def _delete(self, endpoint: str) -> requests.Response:
@@ -116,8 +116,16 @@ class Auth0Service:
         Returns:
             requests.Response: Response object
         """
-        logging.debug(f"Deleting data at {endpoint}")
+        logging.debug("Deleting data from %s", endpoint)
         return self._make_request('DELETE', endpoint)
+
+    def delete_inactive_users(self, days_inactive: int = 90) -> None:
+        self._delete_users(self.get_inactive_users(days_inactive))
+
+    def _delete_users(self, users: list[dict[str, any]]) -> None:
+        for user in users:
+            logging.debug("Deleting user %s", user['user_id'])
+            self.delete_user(user['user_id'])
 
     def delete_user(self, user_id: str) -> requests.Response:
         """Deletes a user from Auth0
@@ -131,9 +139,10 @@ class Auth0Service:
         response = self._delete(f'api/v2/users/{user_id}')
 
         if response.status_code == RESPONSE_NO_CONTENT:
-            logging.info(f"User {user_id} deleted")
+            logging.info("User %s deleted", user_id)
         else:
-            logging.error(f"Failed to delete user {user_id}: {response.text}")
+            logging.error("Failed to delete user %s: %s",
+                          user_id, response.text)
 
         time.sleep(1)
 
@@ -168,7 +177,7 @@ class Auth0Service:
                 page += 1
                 time.sleep(0.5)
             else:
-                logging.error(f"Error retrieving users: {response.text}")
+                logging.error("Failed to get users: %s", response.text)
                 break
 
         return all_users
@@ -183,18 +192,27 @@ class Auth0Service:
             list[dict[str, any]]: List of users
         """
 
-        # List to hold inactive users
-        users2 = []
-        for user in self._get_users():
-            if user.get('last_login'):
-                last_login = datetime.strptime(
-                    user['last_login'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                if last_login < (datetime.utcnow() - timedelta(days=days_inactive)):
-                    users2.append(user)
-            else:
+        def is_user_inactive(user: dict) -> bool:
+            """Check if a user is inactive.
+
+            A user is considered inactive if they have never logged in or their last login was more than `days_inactive` days ago.
+
+            Args:
+                user (dict): The user to check.
+
+            Returns:
+                bool: True if the user is inactive, False otherwise.
+            """
+            last_login_str = user.get('last_login')
+            if last_login_str is None:
                 # User has never logged in
-                users2.append(user)
-        return users2
+                return True
+
+            last_login = datetime.strptime(
+                last_login_str, '%Y-%m-%dT%H:%M:%S.%fZ')
+            return last_login < (datetime.utcnow() - timedelta(days=days_inactive))
+
+        return [user for user in self._get_users() if is_user_inactive(user)]
 
     def get_active_users(self, days_inactive: int = 90) -> list[dict[str, any]]:
         """Gets all users who have logged in for a given number of days
@@ -218,3 +236,6 @@ class Auth0Service:
 
     def get_active_users_usernames(self) -> list[str]:
         return [user["nickname"].lower() for user in self.get_active_users()]
+
+    def get_active_case_sensitive_usernames(self) -> list[str]:
+        return [user["nickname"] for user in self.get_active_users()]

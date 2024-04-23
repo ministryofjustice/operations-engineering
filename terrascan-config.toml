@@ -1,0 +1,5 @@
+# Scan and skip rules configuration
+[rules]
+    skip-rules = [
+        "AC_GITHUB_0002"
+    ]
