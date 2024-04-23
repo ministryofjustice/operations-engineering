@@ -27,7 +27,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.identify_dormant_github_users
         env:
-          GH_ADMIN_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          GH_ADMIN_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
           AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
