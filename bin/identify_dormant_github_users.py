@@ -31,7 +31,7 @@ ALLOWED_BOT_USERS = [
     "opg-use-an-lpa",
     "opg-weblate",
     "slack-moj",
-    "sonarqubebot",
+    "SonarQubeBot",
     "moj-operations-engineering-bot",
     "operations-engineering-servicenow",
     "laa-service-account",
