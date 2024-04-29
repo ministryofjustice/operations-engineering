@@ -1,12 +1,14 @@
 import csv
 import logging
 import os
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 import boto3
 from botocore.exceptions import NoCredentialsError
 
 from services.auth0_service import Auth0Service
+from services.dormant_github_user import DormantGitHubUser
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
@@ -42,6 +44,20 @@ ALLOWED_BOT_USERS = [
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class DormantUserEnvironment:
+    github_token: str = os.environ.get('GH_ADMIN_TOKEN', "")
+    auth0_secret_token: str = os.environ.get('AUTH0_CLIENT_SECRET', "")
+    auth0_id_token: str = os.environ.get('AUTH0_CLIENT_ID', "")
+    slack_token: str = os.environ.get('ADMIN_SLACK_TOKEN', "")
+
+    def __post_init__(self):
+        if not self.github_token:
+            raise ValueError("GH_ADMIN_TOKEN is not set")
+        if not self.auth0_secret_token or not self.auth0_id_token:
+            raise ValueError
 
 
 def calculate_date_by_integer(in_last_days: int) -> datetime:
@@ -85,54 +101,23 @@ def download_github_dormant_users_csv_from_s3():
             f"File {CSV_FILE_NAME} not found in the current directory.")
 
 
-def get_dormant_users_from_github_csv():
+def get_dormant_users_from_github_csv(github_service: GithubService, auth0_service: Auth0Service) -> list:
     """An enterprise user must download the 'dormant.csv' file from the Github audit log and upload it to the 'operations-engineering-dormant-users' s3 bucket. This function will download the file from the s3 bucket and return a list of usernames from the csv file."""
+    list_of_dormant_users = []
     download_github_dormant_users_csv_from_s3()
-    return get_usernames_from_csv_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
+    list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(
+        ALLOWED_BOT_USERS)
+
+    for user in list_of_non_bot_and_non_collaborators:
+        dormant_github_user = DormantGitHubUser(
+            github_service, auth0_service, user)
+        list_of_dormant_users.append(dormant_github_user)
+
+    return list_of_dormant_users
 
 
-def dormant_users_according_to_github(github_service: GithubService, dormant_from: datetime) -> set[str]:
-    usernames_from_csv = get_dormant_users_from_github_csv()
-    dormant_users = github_service.check_dormant_users_audit_activity_since_date(
-        usernames_from_csv, dormant_from)
-    logging.info("Number of dormant users according to Github: %s",
-                 len(dormant_users))
-
-    return dormant_users
-
-
-def dormant_users_not_in_auth0_audit_log(auth0_service: Auth0Service, dormant_users: set[str]) -> set[str]:
-    active_users_in_auth0 = auth0_service.get_active_case_sensitive_usernames()
-
-    dormant_users_not_in_audit_log = [
-        user for user in dormant_users if user not in active_users_in_auth0]
-
-    return set(dormant_users_not_in_audit_log)
-
-
-def setup_services() -> tuple[GithubService, Auth0Service, SlackService]:
-    token = os.environ.get('GH_ADMIN_TOKEN')
-    if token is None:
-        raise ValueError("GH_ADMIN_TOKEN is not set")
-
-    github_service = GithubService(token, ORGANISATION)
-
-    auth0_secret_token = os.environ.get('AUTH0_CLIENT_SECRET')
-    auth0_id_token = os.environ.get('AUTH0_CLIENT_ID')
-    if auth0_secret_token is None or auth0_id_token is None:
-        raise ValueError("AUTH0_SECRET_TOKEN or AUTH0_ID_TOKEN is not set")
-
-    auth0_service = Auth0Service(
-        auth0_secret_token, auth0_id_token, AUTH0_DOMAIN
-    )
-
-    slack_token = os.environ.get('ADMIN_SLACK_TOKEN')
-    if slack_token is None:
-        raise ValueError("ADMIN_SLACK_TOKEN is not set")
-
-    slack_service = SlackService(slack_token)
-
-    return github_service, auth0_service, slack_service
+def dormant_users_not_in_auth0_audit_log(auth0_service: Auth0Service, dormant_users: dict[str, any]) -> dict[str, any]:
+    return {key: value for key, value in dormant_users.items() if key not in auth0_service.get_active_case_sensitive_usernames()}
 
 
 def message_to_slack_channel(list_of_dormant_users: set) -> str:
@@ -149,14 +134,16 @@ def message_to_slack_channel(list_of_dormant_users: set) -> str:
 
 
 def identify_dormant_github_users():
-    since_date = calculate_date_by_integer(NUMBER_OF_DAYS_CONSIDERED_DORMANT)
-    github_service, auth0_service, slack_service = setup_services()
+    dormant_since_date = calculate_date_by_integer(
+        NUMBER_OF_DAYS_CONSIDERED_DORMANT)
+    env = DormantUserEnvironment()
 
-    dormant_users = dormant_users_according_to_github(
-        github_service, since_date)
+    github_service = GithubService(env.github_token, ORGANISATION)
+    auth0_service = Auth0Service(
+        env.auth0_secret_token, env.auth0_id_token, AUTH0_DOMAIN)
 
-    slack_service.send_message_to_plaintext_channel_name(message_to_slack_channel(
-        dormant_users_not_in_auth0_audit_log(auth0_service, dormant_users)), SLACK_CHANNEL)
+    list_of_dormant_users_from_csv = get_dormant_users_from_github_csv(
+        github_service, auth0_service)
 
 
 if __name__ == "__main__":
