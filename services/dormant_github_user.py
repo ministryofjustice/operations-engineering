@@ -1,28 +1,47 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from services.auth0_service import Auth0Service
+import boto3
+
 from services.github_service import GithubService
 
 
-class DormantGitHubUser():
-    def __init__(self, github_service: GithubService, auth0_service: Auth0Service, name: str):
+class DormantGitHubUser:
+    def __init__(self, github_service: GithubService, name: str, days_considered_dormant: int = 90):
         self.github_service = github_service
-        self.auth0_service = auth0_service
         self.name = name
-        self.email: str
-        self.last_auth0_activity: datetime | None
-        self.last_github_activity: datetime | None
+        self.threshold = datetime.now() - timedelta(days=days_considered_dormant)
+        self._email = None
+        self._last_github_activity = None
+        self._last_auth0_activity = None
 
-        self.get_email_address_from_github()
-        self.get_last_github_audit_log_activity()
-        self.get_last_auth0_audit_log_activity()
+    @property
+    def email(self):
+        if self._email is None:
+            self._email = self.github_service.get_user_org_email_address(
+                self.name)
+        return self._email
 
-    def get_email_address_from_github(self):
-        self.email = self.github_service.get_user_org_email_address(self.name)
+    @property
+    def last_github_activity(self):
+        if self._last_github_activity is None:
+            self._last_github_activity = self.github_service.get_last_audit_log_activity_date_for_user(
+                self.name)
+        return self._last_github_activity
 
-    def get_last_github_audit_log_activity(self):
-        self.last_auth0_activity = self.github_service.get_last_audit_log_activity(
-            self.name)
+    @property
+    def last_auth0_activity(self):
+        if self._last_auth0_activity is None:
+            self._last_auth0_activity = self.fetch_last_auth0_activity()
+        return self._last_auth0_activity
 
-    def get_last_auth0_audit_log_activity(self):
-        self.auth0_service.get_last_audit_log_activity(self.name)
+    def fetch_last_auth0_activity(self):
+        client = boto3.client('logs', region_name='eu-west-2')
+        response = client.filter_log_events(
+            logGroupName="/aws/events/LogsFromOperationsEngineeringAuth0",
+        )
+        events = response['events']
+        # Process events to find the latest activity
+        # Assume the last event is the latest activity for simplicity
+        if events:
+            return events[-1]['timestamp']
+        return None

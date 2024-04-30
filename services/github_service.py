@@ -6,7 +6,8 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import Github, NamedUser, RateLimitExceededException, UnknownObjectException
+from github import (Github, NamedUser, RateLimitExceededException,
+                    UnknownObjectException)
 from github.Issue import Issue
 from github.Organization import Organization
 from github.Repository import Repository
@@ -99,18 +100,21 @@ class GithubService:
 
     def __is_repo_ready_for_archiving(self, repository: Repository, last_active_cutoff_date: datetime, allow_list: list[str]) -> bool:
         if (repository.created_at).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-            logging.debug(f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
+            logging.debug(
+                f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
             return False
 
         if repository.name in allow_list:
-            logging.debug(f"Skipping repository: {repository.name}. Reason: Present in allow list")
+            logging.debug(
+                f"Skipping repository: {repository.name}. Reason: Present in allow list")
             return False
 
         try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
             latest_commit_position = 0
             commit = repository.get_commits()[latest_commit_position]
             if commit and (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-                logging.debug(f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
+                logging.debug(
+                    f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
                 return False
         except Exception:
             logging.debug(f"Repository has no commits: {repository.name}")
@@ -834,8 +838,7 @@ class GithubService:
                 f"Closing issue {issue.title} in repository {issue.repository} because it has tag {tag}")
             issue.edit(state="closed")
 
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_user_org_email_address(self, user_name) -> str | TypeError:
+    def get_user_org_email_address(self, user_name) -> str | None:
         logging.info(f"Getting user {user_name} email address")
         data = self.github_client_gql_api.execute(gql("""
             query($organisation_name: String!, $user_name: String!) {
@@ -847,7 +850,7 @@ class GithubService:
 
         if data["user"]["organizationVerifiedDomainEmails"]:
             return data["user"]["organizationVerifiedDomainEmails"][0]
-        return "-"
+        return None
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_org_members_login_names(self) -> list[str]:
@@ -856,7 +859,6 @@ class GithubService:
             self.organisation_name).get_members() or []
         return [member.login.lower() for member in members]
 
-    @retries_github_rate_limit_exception_at_next_reset_once
     def enterprise_audit_activity_for_user(self, username: str):
         response_okay = 200
         url = f"https://api.github.com/enterprises/{self.enterprise_name}/audit-log?phrase=actor%3A{username}"
@@ -891,6 +893,13 @@ class GithubService:
                 if last_active_date > three_months_ago_date:
                     active_users.append(user["username"].lower())
         return active_users
+
+    # Get the last audit log activity for a user and return the date, if the user can't be found return None
+    def get_last_audit_log_activity_date_for_user(self, username: str) -> datetime | None:
+        audit_activity = self.enterprise_audit_activity_for_user(username)
+        if audit_activity:
+            return datetime.fromtimestamp(audit_activity[0]["@timestamp"] / 1000.0)
+        return None
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_dormant_users_audit_activity_since_date(self, users: list, since_date: datetime) -> list:
@@ -1343,5 +1352,6 @@ class GithubService:
         if response.status_code == 200:
             logging.info("Successfully retrieved PAT list.")
             return response.json()
-        logging.error(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
+        logging.error(
+            f"Failed to fetch PAT list: {response.status_code}, error: {response}")
         return []
