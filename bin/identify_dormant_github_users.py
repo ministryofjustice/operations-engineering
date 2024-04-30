@@ -57,7 +57,8 @@ class DormantUserEnvironment:
         if not self.github_token:
             raise ValueError("GH_ADMIN_TOKEN is not set")
         if not self.auth0_secret_token or not self.auth0_id_token:
-            raise ValueError
+            raise ValueError(
+                "AUTH0_CLIENT_SECRET or AUTH0_CLIENT_ID is not set")
 
 
 def calculate_date_by_integer(in_last_days: int) -> datetime:
@@ -101,7 +102,7 @@ def download_github_dormant_users_csv_from_s3():
             f"File {CSV_FILE_NAME} not found in the current directory.")
 
 
-def get_dormant_users_from_github_csv(github_service: GithubService, auth0_service: Auth0Service) -> list:
+def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
     """An enterprise user must download the 'dormant.csv' file from the Github audit log and upload it to the 'operations-engineering-dormant-users' s3 bucket. This function will download the file from the s3 bucket and return a list of usernames from the csv file."""
     list_of_dormant_users = []
     download_github_dormant_users_csv_from_s3()
@@ -109,15 +110,9 @@ def get_dormant_users_from_github_csv(github_service: GithubService, auth0_servi
         ALLOWED_BOT_USERS)
 
     for user in list_of_non_bot_and_non_collaborators:
-        dormant_github_user = DormantGitHubUser(
-            github_service, auth0_service, user)
-        list_of_dormant_users.append(dormant_github_user)
+        list_of_dormant_users.append(DormantGitHubUser(github_service, user))
 
     return list_of_dormant_users
-
-
-def dormant_users_not_in_auth0_audit_log(auth0_service: Auth0Service, dormant_users: dict[str, any]) -> dict[str, any]:
-    return {key: value for key, value in dormant_users.items() if key not in auth0_service.get_active_case_sensitive_usernames()}
 
 
 def message_to_slack_channel(list_of_dormant_users: set) -> str:
@@ -138,12 +133,12 @@ def identify_dormant_github_users():
         NUMBER_OF_DAYS_CONSIDERED_DORMANT)
     env = DormantUserEnvironment()
 
-    github_service = GithubService(env.github_token, ORGANISATION)
-    auth0_service = Auth0Service(
-        env.auth0_secret_token, env.auth0_id_token, AUTH0_DOMAIN)
-
     list_of_dormant_users_from_csv = get_dormant_users_from_github_csv(
-        github_service, auth0_service)
+        GithubService(env.github_token, ORGANISATION))
+
+    for user in list_of_dormant_users_from_csv:
+        print("User:", user.name, "Last Auth0 Activity:",
+              user.email, "Last Github Activity:", user.last_github_activity, "Last Auth0 Activity:", user.last_auth0_activity)
 
 
 if __name__ == "__main__":
