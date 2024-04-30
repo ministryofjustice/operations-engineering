@@ -57,7 +57,8 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "airflow-sdt-extras",
     "airflow-sdt",
     "airflow-viper-to-external-ds",
-    "shinyGovstyle"
+    "shinyGovstyle",
+    "segmentation-data-creation"
 ]
 
 
