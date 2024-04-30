@@ -2,12 +2,10 @@ import csv
 import logging
 import os
 from dataclasses import dataclass
-from datetime import datetime, timedelta
 
 import boto3
 from botocore.exceptions import NoCredentialsError
 
-from services.auth0_service import Auth0Service
 from services.dormant_github_user import DormantGitHubUser
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -59,13 +57,6 @@ class DormantUserEnvironment:
         if not self.auth0_secret_token or not self.auth0_id_token:
             raise ValueError(
                 "AUTH0_CLIENT_SECRET or AUTH0_CLIENT_ID is not set")
-
-
-def calculate_date_by_integer(in_last_days: int) -> datetime:
-    current_date = datetime.now()
-    date = current_date - timedelta(days=in_last_days)
-    timestamp_format = "%Y-%m-%d"
-    return datetime.strptime(date.strftime(timestamp_format), timestamp_format)
 
 
 def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
@@ -129,16 +120,18 @@ def message_to_slack_channel(list_of_dormant_users: set) -> str:
 
 
 def identify_dormant_github_users():
-    dormant_since_date = calculate_date_by_integer(
-        NUMBER_OF_DAYS_CONSIDERED_DORMANT)
     env = DormantUserEnvironment()
 
     list_of_dormant_users_from_csv = get_dormant_users_from_github_csv(
         GithubService(env.github_token, ORGANISATION))
 
     for user in list_of_dormant_users_from_csv:
-        print("User:", user.name, "Last Auth0 Activity:",
-              user.email, "Last Github Activity:", user.last_github_activity, "Last Auth0 Activity:", user.last_auth0_activity)
+        if user.is_dormant:
+            print("DELETED User:", user.name, "Last Auth0 Activity:",
+                  user.email, "Last Github Activity:", user.last_github_activity, "Last Auth0 Activity:", user.last_auth0_activity)
+        else:
+            print("NOT DELETED User:", user.name, "Last Auth0 Activity:",
+                  user.email, "Last Github Activity:", user.last_github_activity, "Last Auth0 Activity:", user.last_auth0_activity)
 
 
 if __name__ == "__main__":
