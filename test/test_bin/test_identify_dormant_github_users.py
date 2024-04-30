@@ -11,21 +11,15 @@ from bin.identify_dormant_github_users import (
 class TestDormantUserEnvironment(unittest.TestCase):
     @patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': 'test_github_token',
-        'AUTH0_CLIENT_SECRET': 'test_auth0_secret',
-        'AUTH0_CLIENT_ID': 'test_auth0_id',
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
     def test_environment_variables_set(self):
         env = DormantUserEnvironment()
         self.assertEqual(env.github_token, 'test_github_token')
-        self.assertEqual(env.auth0_secret_token, 'test_auth0_secret')
-        self.assertEqual(env.auth0_id_token, 'test_auth0_id')
         self.assertEqual(env.slack_token, 'test_slack_token')
 
     @patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': '',
-        'AUTH0_CLIENT_SECRET': 'test_auth0_secret',
-        'AUTH0_CLIENT_ID': 'test_auth0_id',
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
     def test_missing_github_token(self):
@@ -35,27 +29,13 @@ class TestDormantUserEnvironment(unittest.TestCase):
 
     @patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': 'test_github_token',
-        'AUTH0_CLIENT_SECRET': '',
-        'AUTH0_CLIENT_ID': 'test_auth0_id',
-        'ADMIN_SLACK_TOKEN': 'test_slack_token'
+        'ADMIN_SLACK_TOKEN': ''
     })
-    def test_missing_auth0_secret(self):
+    def test_missing_slack_token(self):
         with self.assertRaises(ValueError) as context:
             DormantUserEnvironment()
         self.assertTrue(
-            "AUTH0_CLIENT_SECRET or AUTH0_CLIENT_ID is not set" in str(context.exception))
-
-    @patch.dict('os.environ', {
-        'GH_ADMIN_TOKEN': 'test_github_token',
-        'AUTH0_CLIENT_SECRET': 'test_auth0_secret',
-        'AUTH0_CLIENT_ID': '',
-        'ADMIN_SLACK_TOKEN': 'test_slack_token'
-    })
-    def test_missing_auth0_id(self):
-        with self.assertRaises(ValueError) as context:
-            DormantUserEnvironment()
-        self.assertTrue(
-            "AUTH0_CLIENT_SECRET or AUTH0_CLIENT_ID is not set" in str(context.exception))
+            "ADMIN_SLACK_TOKEN is not set" in str(context.exception))
 
 
 class TestDormantGitHubUsers(unittest.TestCase):
