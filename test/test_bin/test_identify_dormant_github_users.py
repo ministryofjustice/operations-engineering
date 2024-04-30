@@ -4,12 +4,14 @@ from unittest.mock import mock_open, patch
 from botocore.exceptions import ClientError, NoCredentialsError
 
 from bin.identify_dormant_github_users import (
-    DormantUserEnvironment, download_github_dormant_users_csv_from_s3,
+    ALLOWED_BOT_USERS, DormantUserEnvironment,
+    download_github_dormant_users_csv_from_s3,
+    get_dormant_users_from_github_csv,
     get_usernames_from_csv_ignoring_bots_and_collaborators)
 
 
 class TestDormantUserEnvironment(unittest.TestCase):
-    @patch.dict('os.environ', {
+    @ patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': 'test_github_token',
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
@@ -18,7 +20,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
         self.assertEqual(env.github_token, 'test_github_token')
         self.assertEqual(env.slack_token, 'test_slack_token')
 
-    @patch.dict('os.environ', {
+    @ patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': '',
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
@@ -27,7 +29,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
             DormantUserEnvironment()
         self.assertTrue("GH_ADMIN_TOKEN is not set" in str(context.exception))
 
-    @patch.dict('os.environ', {
+    @ patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': 'test_github_token',
         'ADMIN_SLACK_TOKEN': ''
     })
@@ -42,6 +44,23 @@ class TestDormantGitHubUsers(unittest.TestCase):
 
     def setUp(self):
         self.allowed_bot_users = ["bot1", "bot2"]
+
+    @patch('bin.identify_dormant_github_users.download_github_dormant_users_csv_from_s3')
+    @patch('bin.identify_dormant_github_users.get_usernames_from_csv_ignoring_bots_and_collaborators')
+    @patch('services.dormant_github_user_service.DormantGitHubUser')
+    @patch('services.github_service.GithubService')
+    def test_get_dormant_users_from_github_csv(self, mock_github_service, mock_dormant_github_user, mock_get_usernames, mock_download_csv):
+        mock_get_usernames.return_value = ['user1', 'user2', 'user3']
+
+        mock_dormant_github_user.side_effect = lambda github_service, user: MagicMock(
+            __str__=lambda: f'DormantGitHubUser({user})')
+        github_service = mock_github_service
+
+        result = get_dormant_users_from_github_csv(github_service)
+
+        self.assertEqual(len(result), 3)
+        mock_download_csv.assert_called_once()
+        mock_get_usernames.assert_called_once_with(ALLOWED_BOT_USERS)
 
     def test_get_usernames_from_csv_ignoring_bots_empty_csv(self):
         mock_file_content = ""
