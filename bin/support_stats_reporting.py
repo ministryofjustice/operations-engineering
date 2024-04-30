@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import date, timedelta
 import pandas as pd
 
@@ -17,28 +18,33 @@ def create_dataframe():
 
     return dataframe
 
-
+    
 def yesterdays_date():
     today = date.today()
-    yesterday = today - timedelta(days=1)
+    yesterday = today - timedelta(days=7)
     str_yesterday = str(yesterday)
 
     return str_yesterday
 
 
-def yesterdays_requests_total(yesterdays_date):
+def yesterdays_requests_total(dataframe, yesterdays_date):
 
-    yesterdays_requests = create_dataframe[yesterdays_date].sum()
+    # for index, row in dataframe.iterrows():
+    #     print(row['RequestType'], row['date'])
 
+    yesterdays_requests = dataframe['date'].value_counts()[yesterdays_date]
+    
     return yesterdays_requests
 
 
-def yesterdays_requests_breakdown(yesterdays_date):
+def yesterdays_requests_breakdown(dataframe, yesterdays_date):
 
-    # Create mask to remove NaN fields from 'str_yesterday' and return Request Types and amount
-    notna_msk = create_dataframe[yesterdays_date].notna()
+    yesterdays_requests = dataframe['date'][yesterdays_date]
+    print(yesterdays_requests)
+    sys.exit(0)
+
     cols = ['Request Type', yesterdays_date]
-    yesterdays_breakdown = create_dataframe.loc[notna_msk, cols]
+    yesterdays_breakdown = dataframe.loc[cols]
 
     return yesterdays_breakdown
 
@@ -66,9 +72,10 @@ def main():
 
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
-    yesterdays_date = yesterdays_date()
-
-    slack_message = yesterdays_support_requests_message(yesterdays_requests_total(yesterdays_date), yesterdays_requests_breakdown(yesterdays_date))
+    dataframe = create_dataframe()
+    y_date=yesterdays_date()
+    yesterdays_requests_total = yesterdays_requests_count
+    slack_message = yesterdays_support_requests_message(yesterdays_requests_total(y_date), yesterdays_requests_breakdown(y_date))
 
     slack_service.send_message_to_plaintext_channel_name(
         slack_message, SR_SLACK_CHANNEL
