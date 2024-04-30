@@ -46,17 +46,24 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DormantUserEnvironment:
-    github_token: str = os.environ.get('GH_ADMIN_TOKEN', "")
-    auth0_secret_token: str = os.environ.get('AUTH0_CLIENT_SECRET', "")
-    auth0_id_token: str = os.environ.get('AUTH0_CLIENT_ID', "")
-    slack_token: str = os.environ.get('ADMIN_SLACK_TOKEN', "")
+    github_token: str | None
+    auth0_secret_token: str | None
+    auth0_id_token: str | None
+    slack_token: str | None
 
-    def __post_init__(self):
+    def __init__(self):
+        self.github_token = os.environ.get('GH_ADMIN_TOKEN')
+        self.auth0_secret_token = os.environ.get('AUTH0_CLIENT_SECRET')
+        self.auth0_id_token = os.environ.get('AUTH0_CLIENT_ID')
+        self.slack_token = os.environ.get('ADMIN_SLACK_TOKEN')
+
         if not self.github_token:
-            raise ValueError("GH_ADMIN_TOKEN is not set")
+            raise ValueError("GH_ADMIN_TOKEN is not set or empty")
         if not self.auth0_secret_token or not self.auth0_id_token:
             raise ValueError(
-                "AUTH0_CLIENT_SECRET or AUTH0_CLIENT_ID is not set")
+                "AUTH0_CLIENT_SECRET or AUTH0_CLIENT_ID is not set or empty")
+        if not self.slack_token:
+            raise ValueError("ADMIN_SLACK_TOKEN is not set or empty")
 
 
 def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
