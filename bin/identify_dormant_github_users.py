@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import boto3
 from botocore.exceptions import NoCredentialsError
 
-from services.dormant_github_user import DormantGitHubUser
+from services.dormant_github_user_service import DormantGitHubUser
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
