@@ -73,7 +73,7 @@ def main():
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
     dataframe = create_dataframe()
-    y_date=yesterdays_date()
+    y_date = yesterdays_date()
     yesterdays_requests_total = yesterdays_requests_count
     slack_message = yesterdays_support_requests_message(yesterdays_requests_total(y_date), yesterdays_requests_breakdown(y_date))
 
