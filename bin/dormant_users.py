@@ -163,7 +163,7 @@ def run_step_one(
     if len(dormant_users) > 0:
         logging.info("These users are dormant:")
 
-        date_in_one_week = datetime.now() + relativedelta(weeks=+1)
+        date_in_one_week = datetime.now() + relativedelta(week=1)
 
         emailed_users = []
         for user in dormant_users:
