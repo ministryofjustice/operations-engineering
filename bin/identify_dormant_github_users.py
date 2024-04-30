@@ -106,15 +106,15 @@ def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
     return list_of_dormant_users
 
 
-def message_to_slack_channel(list_of_dormant_users: set) -> str:
+def message_to_slack_channel(list_of_dormant_users: list) -> str:
     msg = (
-        "Hi team 👋, \n\n"
-        f"The identify dormant GitHub users script has identified {len(list_of_dormant_users)} dormant users. \n\n"
+        "Hello 🤖, \n\n"
+        f"The identify dormant GitHub users script has identified {len(list_of_dormant_users)} dormant users. \n-----\n"
     )
 
     # Add each dormant user on a new line
     for user in list_of_dormant_users:
-        msg += f"{user}\n"
+        msg += f"{user.name} | Last Github Activity: {user.last_github_activity} | Last Auth0 Activity: {user.last_auth0_activity}\n"
 
     return msg
 
@@ -122,16 +122,14 @@ def message_to_slack_channel(list_of_dormant_users: set) -> str:
 def identify_dormant_github_users():
     env = DormantUserEnvironment()
 
-    list_of_dormant_users_from_csv = get_dormant_users_from_github_csv(
+    dormant_users_from_csv = get_dormant_users_from_github_csv(
         GithubService(env.github_token, ORGANISATION))
 
-    for user in list_of_dormant_users_from_csv:
-        if user.is_dormant:
-            print("DELETED User:", user.name, "Last Auth0 Activity:",
-                  user.email, "Last Github Activity:", user.last_github_activity, "Last Auth0 Activity:", user.last_auth0_activity)
-        else:
-            print("NOT DELETED User:", user.name, "Last Auth0 Activity:",
-                  user.email, "Last Github Activity:", user.last_github_activity, "Last Auth0 Activity:", user.last_auth0_activity)
+    dormant_users_accoding_to_github_and_auth0 = [
+        user for user in dormant_users_from_csv if user.is_dormant]
+
+    SlackService(env.slack_token).send_message_to_plaintext_channel_name(
+        message_to_slack_channel(dormant_users_accoding_to_github_and_auth0), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
