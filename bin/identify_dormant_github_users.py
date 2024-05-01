@@ -95,7 +95,12 @@ def download_github_dormant_users_csv_from_s3():
 
 def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
     """
-    This function depends on a preliminary manual process: a GitHub Enterprise user must first download the 'dormant.csv' file from the GitHub Enterprise dashboard and then upload it to the 'operations-engineering-dormant-users' S3 bucket. Once this setup is complete, this function will download the 'dormant.csv' file from the S3 bucket and extract a list of usernames from the file. This process ensures that the most current data regarding dormant users is used.
+    This function depends on a preliminary manual process: a GitHub Enterprise user 
+    must first download the 'dormant.csv' file from the GitHub Enterprise 
+    dashboard and then upload it to the 'operations-engineering-dormant-users' S3 bucket. 
+    Once this setup is complete, this function will download the 
+    'dormant.csv' file from the S3 bucket and extract a list of usernames from the file. 
+    This process ensures that the most current data regarding dormant users is used.
     """
     download_github_dormant_users_csv_from_s3()
     list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(
@@ -113,7 +118,6 @@ def message_to_slack_channel(list_of_dormant_users: list) -> str:
         f"The identify dormant GitHub users script has identified {len(list_of_dormant_users)} dormant users. \n-----\n"
     )
 
-    # Add each dormant user on a new line
     for user in list_of_dormant_users:
         msg += f"{user.name} | Last Github Activity: {user.last_github_activity} | Last Auth0 Activity: {user.last_auth0_activity}\n"
 
