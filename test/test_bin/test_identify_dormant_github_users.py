@@ -4,7 +4,7 @@ from unittest.mock import mock_open, patch
 from botocore.exceptions import ClientError, NoCredentialsError
 
 from bin.identify_dormant_github_users import (
-    ALLOWED_BOT_USERS, DormantUserEnvironment,
+    ALLOWED_BOT_USERS, DormantUserProcessEnvironment,
     download_github_dormant_users_csv_from_s3,
     get_dormant_users_from_github_csv,
     get_usernames_from_csv_ignoring_bots_and_collaborators)
@@ -16,7 +16,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
     def test_environment_variables_set(self):
-        env = DormantUserEnvironment()
+        env = DormantUserProcessEnvironment()
         self.assertEqual(env.github_token, 'test_github_token')
         self.assertEqual(env.slack_token, 'test_slack_token')
 
@@ -26,7 +26,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
     })
     def test_missing_github_token(self):
         with self.assertRaises(ValueError) as context:
-            DormantUserEnvironment()
+            DormantUserProcessEnvironment()
         self.assertTrue("GH_ADMIN_TOKEN is not set" in str(context.exception))
 
     @ patch.dict('os.environ', {
@@ -35,7 +35,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
     })
     def test_missing_slack_token(self):
         with self.assertRaises(ValueError) as context:
-            DormantUserEnvironment()
+            DormantUserProcessEnvironment()
         self.assertTrue(
             "ADMIN_SLACK_TOKEN is not set" in str(context.exception))
 

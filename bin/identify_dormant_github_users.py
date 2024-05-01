@@ -21,7 +21,7 @@ ALLOWED_BOT_USERS = [
     "ci-hmcts",
     "cloud-platform-dummy-user",
     "correspondence-tool-bot",
-    "form-builder-developers",
+    "form-builder-developers"
     "gecko-moj",
     "hmpps-pcs-tooling",
     "jenkins-moj",
@@ -45,14 +45,12 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class DormantUserEnvironment:
+class DormantUserProcessEnvironment:
     github_token: str | None
-    auth0_secret_token: str | None
     slack_token: str | None
 
     def __init__(self):
         self.github_token = os.environ.get('GH_ADMIN_TOKEN')
-        self.auth0_secret_token = os.environ.get('AUTH0_CLIENT_SECRET')
         self.slack_token = os.environ.get('ADMIN_SLACK_TOKEN')
 
         if not self.github_token:
@@ -97,13 +95,12 @@ def download_github_dormant_users_csv_from_s3():
 
 def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
     """An enterprise user must download the 'dormant.csv' file from the Github audit log and upload it to the 'operations-engineering-dormant-users' s3 bucket. This function will download the file from the s3 bucket and return a list of usernames from the csv file."""
-    list_of_dormant_users = []
     download_github_dormant_users_csv_from_s3()
     list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(
         ALLOWED_BOT_USERS)
 
-    for user in list_of_non_bot_and_non_collaborators:
-        list_of_dormant_users.append(DormantGitHubUser(github_service, user))
+    list_of_dormant_users = [DormantGitHubUser(
+        github_service, user) for user in list_of_non_bot_and_non_collaborators]
 
     return list_of_dormant_users
 
@@ -122,7 +119,7 @@ def message_to_slack_channel(list_of_dormant_users: list) -> str:
 
 
 def identify_dormant_github_users():
-    env = DormantUserEnvironment()
+    env = DormantUserProcessEnvironment()
 
     dormant_users_from_csv = get_dormant_users_from_github_csv(
         GithubService(env.github_token, ORGANISATION))
