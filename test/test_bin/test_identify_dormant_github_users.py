@@ -11,7 +11,7 @@ from bin.identify_dormant_github_users import (
 
 
 class TestDormantUserEnvironment(unittest.TestCase):
-    @ patch.dict('os.environ', {
+    @patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': 'test_github_token',
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
@@ -20,7 +20,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
         self.assertEqual(env.github_token, 'test_github_token')
         self.assertEqual(env.slack_token, 'test_slack_token')
 
-    @ patch.dict('os.environ', {
+    @patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': '',
         'ADMIN_SLACK_TOKEN': 'test_slack_token'
     })
@@ -29,7 +29,7 @@ class TestDormantUserEnvironment(unittest.TestCase):
             DormantUserProcessEnvironment()
         self.assertTrue("GH_ADMIN_TOKEN is not set" in str(context.exception))
 
-    @ patch.dict('os.environ', {
+    @patch.dict('os.environ', {
         'GH_ADMIN_TOKEN': 'test_github_token',
         'ADMIN_SLACK_TOKEN': ''
     })
@@ -104,3 +104,4 @@ class TestDormantGitHubUsers(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+   # Add additional tests as necessary for complete coverage
