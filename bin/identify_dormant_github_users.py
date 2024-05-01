@@ -21,7 +21,7 @@ ALLOWED_BOT_USERS = [
     "ci-hmcts",
     "cloud-platform-dummy-user",
     "correspondence-tool-bot",
-    "form-builder-developers"
+    "form-builder-developers",
     "gecko-moj",
     "hmpps-pcs-tooling",
     "jenkins-moj",
