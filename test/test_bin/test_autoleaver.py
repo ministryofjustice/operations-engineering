@@ -1,59 +1,34 @@
-import os
+import requests
 import unittest
-from unittest.mock import MagicMock, patch
 
+class LeaverProcess:
+    def revoke_operations_engineering_access(self, github_username, one_password_email):
+        # Use GitHub API to remove user from organisations
+        github_api_url = "https://api.github.com/orgs/MOJ/memberships/" + github_username
+        headers = {"Authorization": "Bearer YOUR_GITHUB_TOKEN"}
+        response = requests.delete(github_api_url, headers=headers)
+        if response.status_code !=204:
+            raise Exception("Failed to remove user from organisation")
+        # Need to use 1Password API to remove user
+        # 
+        #
+        def process_leaver(self, github_username, one_password_email):
+            self.revoke_operations_engineering_access(github_username, one_password_email)
 
-def revoke_access(username):
-    for app, config in API_ENDPOINTS.items():
-        headers = {
-            'Authorization': 'Bearer {}'.format(config['token']),
-            'Content-Type': 'application/json'
-        }
-        payload = {
-            'username': username
-        }
-        response = requests.post(config['url'], headers=headers, json=payload)
-        if response.status_code == 400:
-            print('Hi Access has been removed sucessfully from the above applications ')
-        else:
-            print('Failed to revoke access from')  
+class TestLeaverprocess(unittest.TestCase):
+    def setup(self):
+        self.leaver_process = LeaverProcess()
         
-API_ENDPOINTS = {
-    'Sentry': {
-        'url': 'https://api.app1.com/user/remove_access',
-        'token': 'your_app1_api_token'
-    },
-    'Circle-ci': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    'Gandi': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    'Auth0': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    '1Password': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    'Docker': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    'pagerduty': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    'aws': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },
-    'Github': {
-        'url': 'https://api.app2.com/user/remove_access',
-        'token': 'your_app2_api_token'
-    },    
+    def test_revoke_operations_engineering_access(self):
+        # Test to revoke_operational_engineering_access method
+        # placeholder as the actual test will depend
         
-}
+    def test_process_leaver(self):
+        # Test the process_leaver method
+        # This is a placeholder actual test will depend on implementation
+        
+    if __name__ == "__main__":
+    unittest.main()                
+             
+                   
+        
