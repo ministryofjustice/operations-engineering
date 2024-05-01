@@ -85,14 +85,14 @@ class TestDormantGitHubUsers(unittest.TestCase):
                 bot_list)
         self.assertEqual(usernames, ['joebloggs'])
 
-    @ patch('boto3.client')
+    @patch('boto3.client')
     def test_download_github_dormant_users_csv_from_s3_no_credentials(self, mock_boto3_client):
         # Mock boto3 client to raise NoCredentialsError
         mock_boto3_client.side_effect = NoCredentialsError
         with self.assertRaises(NoCredentialsError):
             download_github_dormant_users_csv_from_s3()
 
-    @ patch('boto3.client')
+    @patch('boto3.client')
     def test_download_github_dormant_users_csv_from_s3_file_not_found(self, mock_boto3_client):
         # Mock boto3 client to raise ClientError for a not found file
         error_response = {'Error': {'Code': '404', 'Message': 'Not Found'}}
