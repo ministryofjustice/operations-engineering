@@ -94,7 +94,9 @@ def download_github_dormant_users_csv_from_s3():
 
 
 def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
-    """An enterprise user must download the 'dormant.csv' file from the Github audit log and upload it to the 'operations-engineering-dormant-users' s3 bucket. This function will download the file from the s3 bucket and return a list of usernames from the csv file."""
+    """
+    This function depends on a preliminary manual process: a GitHub Enterprise user must first download the 'dormant.csv' file from the GitHub Enterprise dashboard and then upload it to the 'operations-engineering-dormant-users' S3 bucket. Once this setup is complete, this function will download the 'dormant.csv' file from the S3 bucket and extract a list of usernames from the file. This process ensures that the most current data regarding dormant users is used.
+    """
     download_github_dormant_users_csv_from_s3()
     list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(
         ALLOWED_BOT_USERS)
