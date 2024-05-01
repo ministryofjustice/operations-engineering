@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 from botocore.exceptions import ClientError, NoCredentialsError
 
@@ -104,4 +104,3 @@ class TestDormantGitHubUsers(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-   # Add additional tests as necessary for complete coverage
