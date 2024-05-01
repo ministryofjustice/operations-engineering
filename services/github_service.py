@@ -838,6 +838,7 @@ class GithubService:
                 f"Closing issue {issue.title} in repository {issue.repository} because it has tag {tag}")
             issue.edit(state="closed")
 
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_user_org_email_address(self, user_name) -> str | None:
         logging.info(f"Getting user {user_name} email address")
         data = self.github_client_gql_api.execute(gql("""
