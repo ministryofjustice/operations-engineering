@@ -1,7 +1,12 @@
 import requests
 import unittest
+from unittest.mock import patch
 
 class LeaverProcess:
+    def __init__(self,name):
+        self.name =name
+        self.headers = {'Authorization': 'token'}
+    
     def revoke_operations_engineering_access(self, github_username, one_password_email):
         # Use GitHub API to remove user from organisations
         github_api_url = "https://api.github.com/orgs/MOJ/memberships/" + github_username
@@ -14,6 +19,7 @@ class LeaverProcess:
         #
         def process_leaver(self, github_username, one_password_email):
             self.revoke_operations_engineering_access(github_username, one_password_email)
+   
 
 class TestLeaverprocess(unittest.TestCase):
     def setup(self):
@@ -22,13 +28,10 @@ class TestLeaverprocess(unittest.TestCase):
     def test_revoke_operations_engineering_access(self):
         # Test to revoke_operational_engineering_access method
         # placeholder as the actual test will depend
-        
+
     def test_process_leaver(self):
         # Test the process_leaver method
         # This is a placeholder actual test will depend on implementation
-        
+
     if __name__ == "__main__":
-    unittest.main()                
-             
-                   
-        
+    unittest.main()     
