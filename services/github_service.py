@@ -894,7 +894,6 @@ class GithubService:
                     active_users.append(user["username"].lower())
         return active_users
 
-    # Get the last audit log activity for a user and return the date, if the user can't be found return None
     def get_last_audit_log_activity_date_for_user(self, username: str) -> datetime | None:
         audit_activity = self.enterprise_audit_activity_for_user(username)
         if audit_activity:
