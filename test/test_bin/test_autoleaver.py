@@ -71,6 +71,14 @@ class LeaverProcess:
         except Exception as e:
             print(f"Revoking access from PagerDuty: {e}")
             return None
+    def process_leaver(name):
+        leaver = LeaverProcess(name)
+        github_status_code = leavers.revoke_github_access()
+        gandi_status_code = leavers.revoke_gandi_access()
+        osdatahub_status_code = leavers.revoke_osdatahub_access()
+        password_status_code = leavers.revoke_1password_access()
+        pagerduty_status_code = leavers.revoke_pagerdutyt_access()
+                              
 class TestLeaverprocess(unittest.TestCase):
     def setup(self):
         self.leaver_process = LeaverProcess()
