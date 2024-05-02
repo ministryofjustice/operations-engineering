@@ -31,7 +31,7 @@ def low_threshold_triggered_message(remaining_licences):
     return msg
 
 
-def alert_on_low_github_licences(threshold=20):
+def alert_on_low_github_licences(threshold):
     github_token = os.environ.get("ADMIN_GITHUB_TOKEN")
     if github_token is None:
         print("No GITHUB_TOKEN environment variable set")
@@ -55,4 +55,4 @@ def alert_on_low_github_licences(threshold=20):
 
 
 if __name__ == "__main__":
-    alert_on_low_github_licences(10)
+    alert_on_low_github_licences(20)
