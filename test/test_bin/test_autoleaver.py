@@ -1,95 +1,48 @@
+import os
 import requests
-import unittest
-from unittest.mock import patch
 
-class LeaverProcess:
-    def __init__(self,name):
-        self.name =name
-        self.headers = {'Authorization': 'github_token'}
+# Get the credentials from the environment variables
+leaver_username = os.gettenv("LEAVER_USERNAME")
+github_token = os.getenv("GITHUB_TOKEN")
+onepassword_token = os.getenv("ONEPASSWORD_TOKEN")
+gandi_api_key = os.getenv("GANDI_API_KEY")
+os_data_hub_api_key = os.getenv("OS_DATA_HUB_API_KEY")
+google_group_client_id = os.getenv("GOOGLE_GROUPS_CLIENT_ID")
+auth0_api_key = os.getenv("AUTH0_API_KEY")
+
+def remove_from_github():
+    headers ={"Authorization": f"Bearer {github_token}"}
+    response =requests.delete(f"https://api.github.com/org/ministryofjustice/members/{leavers_username}", headers=headers)
+    assert response.status_code ==204
+    response =requests.delete(f"https://api.github.com/orgs/moj-analytical-services/members/{leavers_username}", headers=headers)
+    assert response.status_code ==204
+    response =requests.delete(f"https://api.github.com/orgs/ministryofjustice-test/members/{leavers_username}", headers=headers)
+    assert response.status_code ==204
     
-    def revoke_github_access(self):
-        response = requests.delete(f"https://api.github.com/org/org/members/{self.name}", headers=self.headers)
-        return response.status_code
+def remove_from_1password():
+    headers = {"Authorization": f"Bearer {onepassword_token}"}
+    response = requests.delete(f"https://ministryofjustice.1password.eu/v1/users/{leavers_username}",headers=headers)
+    assert response.status_code == 204
     
-    def revoke_gandi_access(self):
-        api_key ='need to input api key'
-        user_email= self.name
-        
-        url = f"https://api.gandi.net/v5/organisation/{organisation_id}/members/{user_email}"
-        headers = {
-            'Authorization': f'Apikey {api_key}',
-            'content-Type': 'application/json'
-        }
-        try:
-            response = requests.delete(url, headers=headers)
-            return response.status_code
-        except Exception as e:
-            print(f"Revoking access from Gandi.net: {e}")
-            return None
-    def revoke_osdatahub_access(self):
-        api_key = 'need to input api key'
-        user_email= self.name
-        
-        url =f"https://api.osdatahub.os.uk/v0/users/{user-email}/revoke-access"
-        headers = {
-            'Authorization': f'Apikey {api_key}',
-            'content-Type': 'application/json'
-        }
-        try:
-            response = requests.delete(url, headers=headers)
-            return response.status_code
-        except Exception as e:
-            print(f"Revoking access from OS DataHub: {e}")
-            return None
-    def revoke_1password_access(self):
-        api_key = 'need to input api key'
-        user_email = self.name
-        
-        url=f"https://api.1.password.com/v1/users/{user_email}/revoke-access"
-        headers = {
-            'Authorization': f'ApiKey {api_key}',
-            'content-Type': 'application/json'
-        } 
-        try:
-            response = requests.post(url, headers=headers)
-            return response.status_code
-        except Exception as e:
-            print(f"Revoking access from 1 Password: {e}")
-            return None
-    def revoke_pagerduty_access(self):
-        api_key = 'need to input api key'
-        user_email = self.name
-        
-        url = f"https://api.1.pagerduty.com/users{user_email}/revoke-access"
-        headers ={
-            'Authorization': f'ApiKey {api_key}',
-            'content-Type': 'application/json'
-        }
-        try:
-            response =requests.post(url,headers=headers)
-            return response.statusd_code
-        except Exception as e:
-            print(f"Revoking access from PagerDuty: {e}")
-            return None
-    def process_leaver(name):
-        leaver = LeaverProcess(name)
-        github_status_code = leavers.revoke_github_access()
-        gandi_status_code = leavers.revoke_gandi_access()
-        osdatahub_status_code = leavers.revoke_osdatahub_access()
-        password_status_code = leavers.revoke_1password_access()
-        pagerduty_status_code = leavers.revoke_pagerdutyt_access()
-                              
-class TestLeaverprocess(unittest.TestCase):
-    def setup(self):
-        self.leaver_process = LeaverProcess()
-        
-    def test_revoke_operations_engineering_access(self):
-        # Test to revoke_operational_engineering_access method
-        # placeholder as the actual test will depend
+def remove_from_gandi():
+    headers = {"Authorization": f"Bearer {gandi_api_key}"}
+    response = requests.delete(f"https://api.gandi.net/v5/domai/users/{leaver_username}", headers=headers)
+    assert response.status_code == 204
+    
+def remove_from_os_data_hub():
+    headers = {"Authorization": f"Bearer {os_data_hub_api_key}"}
+    response = requests.delete(f"https://osdatahub.os.uk/api/v1/users/{leaver_username}",headers=headers)
+    assert response.status_code ==204
+    
+def remove_from_google_groups():
+    headers = {"Authorization": f"Bearer {google_group_client_id}"}
+    response = requests.delete(f"https://group.google.com/a/digital.justice.gov.uk/g/opertatioans-engineering/members/{leaver_username}", headers=headers)
+    assert response.status_code ==204
+    response =requests.delete(f"https://group.google.com/a/digital.justice.gov.uk/g/domain/members{leaver_username}", headers=headers)
+    assert response.status_code ==204
 
-    def test_process_leaver(self):
-        # Test the process_leaver method
-        # This is a placeholder actual test will depend on implementation
+def remove_from_auth0():
+    headers = {"Authorization": f"Bearer {auth0_api_key}"}
+    response = requests.delete(f"https://api_auth0_domain.auth0.com/api/v2/users/{leavers_username}",headers=headers)
+    assert response.status_code ==204                   
 
-    if __name__ == "__main__":
-    unittest.main()     
