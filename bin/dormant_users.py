@@ -33,6 +33,7 @@ MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "laa-service-account",
     "mojanalytics",
     "laaserviceaccount",
+    "analytical-platform-bot",
 ]
 
 MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [
