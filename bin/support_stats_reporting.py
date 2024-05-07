@@ -19,9 +19,9 @@ def create_dataframe():
     return dataframe
 
     
-def yesterdays_date():
+def yesterdays_date(str_yesterday):
     today = date.today()
-    yesterday = today - timedelta(days=7)
+    yesterday = today - timedelta(days=9)
     str_yesterday = str(yesterday)
 
     return str_yesterday
@@ -74,7 +74,7 @@ def main():
     slack_service = SlackService(str(slack_token))
     dataframe = create_dataframe()
     y_date = yesterdays_date()
-    yesterdays_requests_total = yesterdays_requests_count
+    yesterdays_requests_total = yesterdays_requests_count(y_date)
     slack_message = yesterdays_support_requests_message(yesterdays_requests_total(y_date), yesterdays_requests_breakdown(y_date))
 
     slack_service.send_message_to_plaintext_channel_name(
