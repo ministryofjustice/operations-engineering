@@ -1,0 +1,39 @@
+name: 🧑‍🔧 Operations Enginnering  Leavers Process
+
+on:
+  workflow_dispatch:
+    inputs:
+      organisation_name:
+        type: choice
+        description: Which Org?
+        required: true
+        options:
+          - ministryofjustice
+          - moj-analytical-services
+jobs:
+  build:
+  runs-on: ubuntu-latest
+
+  steps:
+  - uses: action/checkout@v2
+
+  - name: Set up python 3.11
+    uses: actions/setup-python@v2
+    with: 
+      python-version: 3.11
+
+  - name: Install dependencies
+    run: |
+     python -m pip install --upgrade pip
+     pip install request
+
+  - name: Run script
+    run: python test_autoleaver.py
+    env:
+       LEAVER_USERNAME: ${{ secret.LEAVER_USERNAME }}
+       GITHUB_TOKEN: ${{ secret. GITHUB_TOKEN }}
+       ONEPASSWORD_TOKEN: ${{ secret. ONEPASSWORD_TOKEN }}
+       GANDI_API_KEY: ${{secret.GANDI_API_KEY }}
+       OS_DATA_HUB_API_KEY: ${{ secret. OS_DATA_HUB_API_KEY  }}
+       GOGLE_GROUPS_CLIENT_ID: ${{ secret. GOOGLE_GROUP_CLIENT_ID }}
+       AUTH0_API_KEY: ${{ secret.AUTH0_API_KEY}}          
