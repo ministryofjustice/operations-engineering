@@ -1,4 +1,4 @@
-name: 🧑‍🔧 Operations Enginnering  Leavers Process
+name: 🧑‍🔧 Operations Enginnering Team  Leavers Process
 
 on:
   workflow_dispatch:
@@ -35,5 +35,4 @@ jobs:
        ONEPASSWORD_TOKEN: ${{ secret. ONEPASSWORD_TOKEN }}
        GANDI_API_KEY: ${{secret.GANDI_API_KEY }}
        OS_DATA_HUB_API_KEY: ${{ secret. OS_DATA_HUB_API_KEY  }}
-       GOGLE_GROUPS_CLIENT_ID: ${{ secret. GOOGLE_GROUP_CLIENT_ID }}
-       AUTH0_API_KEY: ${{ secret.AUTH0_API_KEY}}          
+             

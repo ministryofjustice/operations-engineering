@@ -7,8 +7,7 @@ github_token = os.getenv("INPUT_GITHUB_TOKEN")
 onepassword_token = os.getenv("INPUT_ONEPASSWORD_TOKEN")
 gandi_api_key = os.getenv("INPUT_GANDI_API_KEY")
 os_data_hub_api_key = os.getenv("INPUT_OS_DATA_HUB_API_KEY")
-google_group_client_id = os.getenv("INPUT_GOOGLE_GROUPS_CLIENT_ID")
-auth0_api_key = os.getenv("INPUT_AUTH0_API_KEY")
+
 
 def remove_from_github():
     headers ={"Authorization": f"Bearer {github_token}"}
@@ -29,27 +28,7 @@ def remove_from_github():
             print(f"Error Connecting {errc}")
         except requests.exceptions.Timeout as errt:
             print(f"Timeout Error: {errt}")   
-            
-def remove_from_google_groups():
-    headers = {"Authorization": f"Bearer {google_group_client_id}"}
-    urls = [
-          f"https://group.google.com/a/digital.justice.gov.uk/g/opertatioans-engineering/members/{leaver_username}",
-          f"https://group.google.com/a/digital.justice.gov.uk/g/domain/members{leaver_username}",
-    ]    
-    for url in urls:
-        try:
-            response = requests.delete(url, headers=headers)
-            response.raise_for_status()
-        except requests.exceptions.RequestsException as err:
-            print(f"Error: {err}")
-        except requests.exceptions.RequestsException as errh:
-            print(f"Http Error: {errh}")
-        except requests.exceptions.ConnectionError as errc:
-            print(f"Error Connectiong {errc}")
-        except requests.exceptions.Timeout as errt:
-            print(f"Timeout Error: {errt}")   
-                                
-    
+                                                
 def remove_from_1password():
     headers = {"Authorization": f"Bearer {onepassword_token}"}
     try:
@@ -91,25 +70,10 @@ def remove_from_os_data_hub():
         print(f"Error Connecting: {errc}")
     except requests.exceptions.Timeout as errt:
         print(f"Timeout Error: {errt}")    
-    
-    
-def remove_from_auth0():
-    headers = {"Authorization": f"Bearer {auth0_api_key}"}
-    try:
-        response = requests.delete(f"https://api_auth0_domain.auth0.com/api/v2/users/{leavers_username}",headers=headers)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as err:
-        print(f"Error: {err}")
-    except requests.exceptions.HTTPError as errh:
-        print(f"Http Error: {errh}")
-    except requests.exceptions.ConnectionError as errc:
-        print(f"Error Connecting: {errc}")
-    except requests.exceptions.Timeout as errt:
-        print(f"Timeout Error: {errt}")                         
+              
 if __name__ == "__main__":
     remove_from_github()
-    remove_from_google_groups()
     remove_from_gandi()
     remove_from_os_data_hub()
     remove_from_1password()
-    remove_from_auth0()
+    
