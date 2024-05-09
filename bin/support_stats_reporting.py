@@ -19,22 +19,17 @@ def create_dataframe():
     return dataframe
 
     
-def yesterdays_date(str_yesterday):
+def yesterdays_date():
     today = date.today()
-    yesterday = today - timedelta(days=9)
+    yesterday = today - timedelta(days=17)
     str_yesterday = str(yesterday)
 
     return str_yesterday
 
 
-def yesterdays_requests_total(dataframe, yesterdays_date):
+def number_of_support_requests_for_date(support_data, date_to_check):
 
-    # for index, row in dataframe.iterrows():
-    #     print(row['RequestType'], row['date'])
-
-    yesterdays_requests = dataframe['date'].value_counts()[yesterdays_date]
-    
-    return yesterdays_requests
+    return support_data['date'].value_counts()[date_to_check]
 
 
 def yesterdays_requests_breakdown(dataframe, yesterdays_date):
@@ -73,8 +68,9 @@ def main():
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
     dataframe = create_dataframe()
-    y_date = yesterdays_date()
-    yesterdays_requests_total = yesterdays_requests_count(y_date)
+    yesterdays_requests_total = number_of_support_requests_for_date(dataframe, yesterdays_date())
+    print(yesterdays_requests_total)
+    sys.exit(0)
     slack_message = yesterdays_support_requests_message(yesterdays_requests_total(y_date), yesterdays_requests_breakdown(y_date))
 
     slack_service.send_message_to_plaintext_channel_name(
