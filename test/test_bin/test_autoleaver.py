@@ -7,6 +7,9 @@ github_token = os.getenv("INPUT_GITHUB_TOKEN")
 onepassword_token = os.getenv("INPUT_ONEPASSWORD_TOKEN")
 gandi_api_key = os.getenv("INPUT_GANDI_API_KEY")
 os_data_hub_api_key = os.getenv("INPUT_OS_DATA_HUB_API_KEY")
+docker_api_token = os.getenv("INPUT_DOCKER_API_TOKEN")
+sentry_api_token = os.getenv("INPUT_SENTRY_API_TOKEN")
+
 
 
 def remove_from_github():
@@ -69,11 +72,43 @@ def remove_from_os_data_hub():
     except requests.exceptions.ConnectionError as errc:
         print(f"Error Connecting: {errc}")
     except requests.exceptions.Timeout as errt:
-        print(f"Timeout Error: {errt}")    
+        print(f"Timeout Error: {errt}")   
+        
+def remove_from_docker():
+    headers = {"Authorization": f"Bearer {docker_api_token}"}
+    try:
+        response = requests.delete(f"https://docker.com/api/v1/user/{leavers_username}",headers=headers)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as err:
+        print(f"Error: {err}")
+    except requests.exceptions.HTTPError as errh:
+        print(f"Http Error: {errh}") 
+    except requests.exceptions.ConnectionError as errc:
+        print(f"Error Connecting: {errc}")
+    except requests.exceptions.Timeout as errt:
+        print(f"Timeout Error: {errt}")
+
+def remove_from_sentry():
+    headers = {"Authorization": f"Bearer {sentry_api_token}"}
+    try:
+        response = requests.delete(f"https://sentry.com/api/0/organizations/myorg/members/{leavers_username}", headers=headers)
+        response.raise_for_status() 
+    except requests.exceptions.RequestsExceptions as err:
+        print(f"Error: {err}")
+    except requests.exceptions.HTTPError as errh:
+        print(f"Http Error: {errh}")
+    except requests.exceptions.ConnectionError as errc:
+        print(f"Error Connecting: {errc}")
+    except requests.exceptions.Timeout as errt:
+        print(f"Timeout Error: {errt}") 
+                             
+                            
               
 if __name__ == "__main__":
     remove_from_github()
     remove_from_gandi()
     remove_from_os_data_hub()
     remove_from_1password()
+    remove_from_docker()
+    
     
