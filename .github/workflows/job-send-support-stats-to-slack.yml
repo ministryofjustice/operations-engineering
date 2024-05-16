@@ -1,12 +1,12 @@
-name: Support Stats Reporting
+name: 🧪 Send Support Stats to Slack
 
 on:
-  schedule:
-    - cron: "0 8 * * 5"
   workflow_dispatch:
-
+  push:  
+    paths:  
+      - 'data/support_stats/support_stats.csv'  
 jobs:
-  support-stats-reporting:
+  send-support-stats-to-slack:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
