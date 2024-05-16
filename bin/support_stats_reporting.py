@@ -53,13 +53,10 @@ def get_environment_variables() -> tuple:
 
 
 def get_dict_of_requests_and_volume(requests: list[SupportRequest]) -> dict[SupportRequest, int]:
-    dict_of_requests = dict()
+    dict_of_requests = {}
  
     for request in requests:
-        if request.request_action in dict_of_requests.keys():
-            dict_of_requests[request.request_action] += 1
-        else:
-            dict_of_requests[request.request_action] = 1
+        dict_of_requests[request.request_action] += 1
     
     return dict_of_requests
 
