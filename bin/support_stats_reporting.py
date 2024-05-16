@@ -74,8 +74,9 @@ def yesterdays_support_requests_message(yesterdays_support_requests: list[Suppor
     yesterdays_support_requests = list(dict.fromkeys(yesterdays_support_requests))
     for request in yesterdays_support_requests:
         number_of_requests = dict_of_requests_and_volume[request.request_action]
-        msg += f"Type: {request.request_type} | Action: {request.request_action} | Number of requests: {number_of_requests}\n"
+        msg += f"--\n*Type:* {request.request_type}\n*Action:* {request.request_action}\n*Number of requests:* {number_of_requests}\n"
     
+    print(msg)
     return msg
 
 
@@ -107,12 +108,13 @@ def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) 
 
 def main():
 
-    slack_token = get_environment_variables()
-    slack_service = SlackService(str(slack_token))
+    # slack_token = get_environment_variables()
+    # slack_service = SlackService(str(slack_token))
     FILEPATH = 'csv/data-all.csv'
     list_of_support_requests = get_support_requests_from_csv(FILEPATH)
     yesterdays_requests = get_yesterdays_support_requests(list_of_support_requests)
     slack_message = yesterdays_support_requests_message(yesterdays_requests)
+    
     slack_service.send_message_to_plaintext_channel_name(
         slack_message, SR_SLACK_CHANNEL
     )
