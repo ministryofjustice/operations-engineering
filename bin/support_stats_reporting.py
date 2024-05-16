@@ -108,13 +108,13 @@ def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) 
 
 def main():
 
-    # slack_token = get_environment_variables()
-    # slack_service = SlackService(str(slack_token))
+    slack_token = get_environment_variables()
+    slack_service = SlackService(str(slack_token))
     FILEPATH = 'csv/data-all.csv'
     list_of_support_requests = get_support_requests_from_csv(FILEPATH)
     yesterdays_requests = get_yesterdays_support_requests(list_of_support_requests)
     slack_message = yesterdays_support_requests_message(yesterdays_requests)
-    
+
     slack_service.send_message_to_plaintext_channel_name(
         slack_message, SR_SLACK_CHANNEL
     )
