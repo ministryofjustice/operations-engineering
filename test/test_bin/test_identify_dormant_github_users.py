@@ -4,40 +4,9 @@ from unittest.mock import MagicMock, mock_open, patch
 from botocore.exceptions import ClientError, NoCredentialsError
 
 from bin.identify_dormant_github_users import (
-    ALLOWED_BOT_USERS, DormantUserProcessEnvironment,
-    download_github_dormant_users_csv_from_s3,
+    ALLOWED_BOT_USERS, download_github_dormant_users_csv_from_s3,
     get_dormant_users_from_github_csv,
     get_usernames_from_csv_ignoring_bots_and_collaborators)
-
-
-class TestDormantUserEnvironment(unittest.TestCase):
-    @patch.dict('os.environ', {
-        'GH_ADMIN_TOKEN': 'test_github_token',
-        'ADMIN_SLACK_TOKEN': 'test_slack_token'
-    })
-    def test_environment_variables_set(self):
-        env = DormantUserProcessEnvironment()
-        self.assertEqual(env.github_token, 'test_github_token')
-        self.assertEqual(env.slack_token, 'test_slack_token')
-
-    @patch.dict('os.environ', {
-        'GH_ADMIN_TOKEN': '',
-        'ADMIN_SLACK_TOKEN': 'test_slack_token'
-    })
-    def test_missing_github_token(self):
-        with self.assertRaises(ValueError) as context:
-            DormantUserProcessEnvironment()
-        self.assertTrue("GH_ADMIN_TOKEN is not set" in str(context.exception))
-
-    @patch.dict('os.environ', {
-        'GH_ADMIN_TOKEN': 'test_github_token',
-        'ADMIN_SLACK_TOKEN': ''
-    })
-    def test_missing_slack_token(self):
-        with self.assertRaises(ValueError) as context:
-            DormantUserProcessEnvironment()
-        self.assertTrue(
-            "ADMIN_SLACK_TOKEN is not set" in str(context.exception))
 
 
 class TestDormantGitHubUsers(unittest.TestCase):

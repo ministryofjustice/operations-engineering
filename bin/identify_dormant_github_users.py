@@ -1,7 +1,6 @@
 import csv
 import logging
 import os
-from dataclasses import dataclass
 
 import boto3
 from botocore.exceptions import NoCredentialsError
@@ -9,6 +8,7 @@ from botocore.exceptions import NoCredentialsError
 from services.dormant_github_user_service import DormantGitHubUser
 from services.github_service import GithubService
 from services.slack_service import SlackService
+from utils.environment import EnvironmentVariables
 
 SLACK_CHANNEL = "operations-engineering-alerts"
 AUTH0_DOMAIN = "operations-engineering.eu.auth0.com"
@@ -42,21 +42,6 @@ ALLOWED_BOT_USERS = [
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class DormantUserProcessEnvironment:
-    github_token: str | None
-    slack_token: str | None
-
-    def __init__(self):
-        self.github_token = os.environ.get('GH_ADMIN_TOKEN')
-        self.slack_token = os.environ.get('ADMIN_SLACK_TOKEN')
-
-        if not self.github_token:
-            raise ValueError("GH_ADMIN_TOKEN is not set or empty")
-        if not self.slack_token:
-            raise ValueError("ADMIN_SLACK_TOKEN is not set or empty")
 
 
 def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
@@ -121,16 +106,25 @@ def message_to_slack_channel(list_of_dormant_users: list) -> str:
 
 
 def identify_dormant_github_users():
-    env = DormantUserProcessEnvironment()
+    env = None
+    try:
+        env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
+    except EnvironmentError as e:
+        logger.critical("Error: %s", e)
+        return
 
     dormant_users_from_csv = get_dormant_users_from_github_csv(
-        GithubService(env.github_token, ORGANISATION))
+        GithubService(env.get('GH_ADMIN_TOKEN'), ORGANISATION)
+    )
 
     dormant_users_accoding_to_github_and_auth0 = [
-        user for user in dormant_users_from_csv if user.is_dormant]
+        user for user in dormant_users_from_csv if user.is_dormant
+    ]
 
-    SlackService(env.slack_token).send_message_to_plaintext_channel_name(
-        message_to_slack_channel(dormant_users_accoding_to_github_and_auth0), SLACK_CHANNEL)
+    SlackService(env.get('ADMIN_SLACK_TOKEN')).send_message_to_plaintext_channel_name(
+        message_to_slack_channel(
+            dormant_users_accoding_to_github_and_auth0), SLACK_CHANNEL
+    )
 
 
 if __name__ == "__main__":
