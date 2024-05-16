@@ -85,7 +85,7 @@ def get_support_requests_from_csv(filepath:str) ->list[SupportRequest]:
 
 
 def get_list_of_support_requests(data) -> list[SupportRequest]:
-        list_of_support_requests = list()
+        list_of_support_requests = []
         for _, row in data.iterrows():
             list_of_support_requests.append(SupportRequest(row['Type'], row['Action'], row['Date']))
         
@@ -94,7 +94,7 @@ def get_list_of_support_requests(data) -> list[SupportRequest]:
             
 def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) -> list[SupportRequest]:
     yesterday = yesterdays_date()
-    list_of_yesterdays_support_requests = list()
+    list_of_yesterdays_support_requests = []
     for request in all_support_requests:
         if request.request_date == yesterday:
             list_of_yesterdays_support_requests.append(request)
