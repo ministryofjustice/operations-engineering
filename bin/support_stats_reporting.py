@@ -78,13 +78,13 @@ def yesterdays_support_requests_message(yesterdays_support_requests: list[Suppor
 
 def get_support_requests_from_csv(filepath:str) ->list[SupportRequest]:
     if exists(filepath):
-        return list_of_support_requests(create_dataframe_from_csv(filepath))
+        return get_list_of_support_requests(create_dataframe_from_csv(filepath))
     raise FileExistsError(
         f"File path {filepath} does not exist."
     )
 
 
-def list_of_support_requests(data) -> list[SupportRequest]:
+def get_list_of_support_requests(data) -> list[SupportRequest]:
         list_of_support_requests = list()
         for _, row in data.iterrows():
             list_of_support_requests.append(SupportRequest(row['Type'], row['Action'], row['Date']))
