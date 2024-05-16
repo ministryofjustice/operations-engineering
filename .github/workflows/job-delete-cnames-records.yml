@@ -26,8 +26,4 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python -m bin.delete_cnames
-        env:
-          HOSTED_ZONE_1: ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }}
-          HOSTED_ZONE_2: ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}
-          LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
+      - run: pipenv run python -m bin.delete_cnames ${{ secrets.ROUTE53_HOSTEDZONE_ID_1 }} ${{ secrets.ROUTE53_HOSTEDZONE_ID_2 }}

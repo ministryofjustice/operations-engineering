@@ -1,14 +1,14 @@
-import os
+import sys
 import json
 import boto3
 
 
-def create_delete_cname_record(cname):
-    """Create a delete cname record
+def create_delete_cname_request(cname):
+    """Create a delete cname change request
     Args:
         cname (string): The cname record from AWS.
     Returns:
-        (dict): a completed delete cname record
+        (dict): a completed delete cname request
     """
     return {
         "Action": "DELETE",
@@ -23,13 +23,11 @@ def create_delete_cname_record(cname):
 
 def get_cname_records_to_delete(route53_client, hosted_zone_id):
     """Find which cname records can be deleted
-
     Args:
         route53_client (BaseClient)
         hosted_zone_id (string): The id of the hosted zone
-
     Returns:
-        list[cname_record]: a list of delete cname records to be deleted
+        list[cname_record]: a list of cname records eligible for deletion
     """
     records_to_delete = []
     next_record_name = "a"
@@ -48,7 +46,7 @@ def get_cname_records_to_delete(route53_client, hosted_zone_id):
                 "comodoca" in record_set["ResourceRecords"][0]["Value"] or
                 "sectigo" in record_set["ResourceRecords"][0]["Value"]
             ):
-                delete_record = create_delete_cname_record(record_set)
+                delete_record = create_delete_cname_request(record_set)
                 records_to_delete.append(delete_record)
 
         if response["IsTruncated"]:
@@ -60,8 +58,7 @@ def get_cname_records_to_delete(route53_client, hosted_zone_id):
 
 
 def delete_cname_records(route53_client, records_to_delete, hosted_zone_id):
-    """Delete selected cname records from the AWS Route53 host zone
-
+    """Delete selected cname records from the AWS Route53 hosted zone
     Args:
         route53_client (BaseClient)
         records_to_delete (list[dict]) the list of cname records to delete
@@ -77,28 +74,19 @@ def delete_cname_records(route53_client, records_to_delete, hosted_zone_id):
             print(json.dumps(records_to_delete, indent=2))
 
 
-def get_hosted_zone_id(zone_name):
-    hosted_zone_id = os.getenv(zone_name)
-    if not hosted_zone_id:
-        raise ValueError(f"The env variable {zone_name} is empty or missing")
-    return hosted_zone_id
-
-
 def main():
     print("Start")
 
+    if len(sys.argv) < 1:
+        raise ValueError(f"Please specify hosted zones as CLI arguments")
+
     route53_client = boto3.client("route53")
 
-    host_zone_id_1 = get_hosted_zone_id("HOSTED_ZONE_1")
-    host_zone_id_2 = get_hosted_zone_id("HOSTED_ZONE_2")
+    hosted_zones = sys.argv
 
-    records_to_delete = get_cname_records_to_delete(
-        route53_client, host_zone_id_1)
-    delete_cname_records(route53_client, records_to_delete, host_zone_id_1)
-
-    records_to_delete = get_cname_records_to_delete(
-        route53_client, host_zone_id_2)
-    delete_cname_records(route53_client, records_to_delete, host_zone_id_2)
+    for zone in hosted_zones:
+        records_to_delete = get_cname_records_to_delete(route53_client, zone)
+        delete_cname_records(route53_client, records_to_delete, zone)
 
     print("Finished")
 
