@@ -1,27 +1,47 @@
 import os
 import sys
+from dataclasses import dataclass
 from datetime import date, timedelta
+from os.path import exists
+
 import pandas as pd
 
-from services.slack_service import SlackService
 from config.constants import SR_SLACK_CHANNEL
+from services.slack_service import SlackService
 
 
-def create_dataframe():
+@dataclass
+class SupportRequest:
+    request_type: str
+    request_action: str
+    request_date: str
 
-    # Create dataframe from csv and set max rows
-    dataframe = pd.read_csv('csv/data-all.csv')
+    def __init__(self, request_type: str, request_action: str, request_date: str):
+        self.request_type = request_type
+        self.request_action = request_action
+        self.request_date = request_date
+
+
+def create_dataframe_from_csv(filename:str):
+
+    dataframe = pd.read_csv(filename)
     pd.options.display.max_rows = 9999
 
-    # Set the index to Request Type column
-    dataframe.set_index(['RequestType'])
+    dataframe.set_index('Type')
 
+
+
+    # for index, row in dataframe.iterrows():
+         
+    #     print(row['Type'],row['Date'])
+
+    #print(dataframe.set_index('Type'))
     return dataframe
 
     
 def yesterdays_date():
     today = date.today()
-    yesterday = today - timedelta(days=17)
+    yesterday = today - timedelta(days=1)
     str_yesterday = str(yesterday)
 
     return str_yesterday
@@ -29,12 +49,12 @@ def yesterdays_date():
 
 def number_of_support_requests_for_date(support_data, date_to_check):
 
-    return support_data['date'].value_counts()[date_to_check]
+    return support_data['Date'].value_counts()[date_to_check]
 
 
 def yesterdays_requests_breakdown(dataframe, yesterdays_date):
 
-    yesterdays_requests = dataframe['date'][yesterdays_date]
+    yesterdays_requests = dataframe['Date'][yesterdays_date]
     print(yesterdays_requests)
     sys.exit(0)
 
@@ -52,26 +72,68 @@ def get_environment_variables() -> tuple:
 
     return slack_token
 
+def get_dict_of_requests_and_volume(requests: list[SupportRequest]) -> dict[SupportRequest, int]:
+    dict_of_requests = dict()
+    # For each request in requests. If a key (the name of an action) already exists, then bump the value by 1. else, create key.
+    # return dict
+    for request in requests:
+        if request.request_action in dict_of_requests.keys():
+            dict_of_requests[request.request_action] += 1
+        else:
+            dict_of_requests[request.request_action] = 1
 
-def yesterdays_support_requests_message(yesterdays_requests_total, yesterdays_requests_breakdown):
+    print(dict_of_requests)    
+    return dict_of_requests
+
+
+def yesterdays_support_requests_message(yesterdays_support_requests: list[SupportRequest]):
+    dict_of_requests_and_volume = get_dict_of_requests_and_volume(yesterdays_support_requests)
     msg = (
         f"Good morning, \n\n"
-        f"Yesterday we received {yesterdays_requests_total} Support Requests \n\n"
+        f"Yesterday we received {len(yesterdays_support_requests)} Support Requests \n\n"
         f"Here's a breakdown of yesterdays Support Requests: \n {yesterdays_requests_breakdown} \n"
     )
 
+    for request in yesterdays_support_requests:
+        msg += f"Support request type: {request.request_type} | Action: {request.request_action} | Number of requests: {request}\n"
+
     return msg
+
+def get_support_requests_from_csv(filepath:str) ->list[SupportRequest]:
+    if exists(filepath):
+        return list_of_support_requests(create_dataframe_from_csv(filepath))
+    raise FileExistsError(
+        f"File path {filepath} does not exist."
+    )
+
+def list_of_support_requests(data) -> list[SupportRequest]:
+        list_of_support_requests = list()
+        for _, row in data.iterrows():
+            list_of_support_requests.append(SupportRequest(row['Type'], row['Action'], row['Date']))
+        
+        return list_of_support_requests
+            
+def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) -> list[SupportRequest]:
+    yesterday = yesterdays_date()
+    list_of_yesterdays_support_requests = list()
+    for request in all_support_requests:
+        if request.request_date == yesterday:
+            list_of_yesterdays_support_requests.append(request)
+        
+    return list_of_yesterdays_support_requests
+
 
 
 def main():
 
-    slack_token = get_environment_variables()
-    slack_service = SlackService(str(slack_token))
-    dataframe = create_dataframe()
-    yesterdays_requests_total = number_of_support_requests_for_date(dataframe, yesterdays_date())
-    print(yesterdays_requests_total)
+    #slack_token = get_environment_variables()
+    #slack_service = SlackService(str(slack_token))
+    FILEPATH = 'csv/data-all.csv'
+    list_of_support_requests = get_support_requests_from_csv(FILEPATH)
+    yesterdays_requests = get_yesterdays_support_requests(list_of_support_requests)
+
+    slack_message = yesterdays_support_requests_message(yesterdays_requests)
     sys.exit(0)
-    slack_message = yesterdays_support_requests_message(yesterdays_requests_total(y_date), yesterdays_requests_breakdown(y_date))
 
     slack_service.send_message_to_plaintext_channel_name(
         slack_message, SR_SLACK_CHANNEL
