@@ -70,7 +70,7 @@ def download_github_dormant_users_csv_from_s3():
     except NoCredentialsError:
         logger.error(
             "Credentials not available, please check your AWS credentials.")
-    except Exception as e:
+    except FileNotFoundError as e:
         logger.error("Error downloading file: %s", e)
 
     if not os.path.isfile(CSV_FILE_NAME):
