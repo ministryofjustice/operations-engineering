@@ -21,6 +21,8 @@ class SupportRequest:
         self.request_action = request_action
         self.request_date = request_date
 
+    def __hash__(self):
+        return hash(self.request_action)
 
 def create_dataframe_from_csv(filename:str):
 
@@ -29,13 +31,6 @@ def create_dataframe_from_csv(filename:str):
 
     dataframe.set_index('Type')
 
-
-
-    # for index, row in dataframe.iterrows():
-         
-    #     print(row['Type'],row['Date'])
-
-    #print(dataframe.set_index('Type'))
     return dataframe
 
     
@@ -47,23 +42,6 @@ def yesterdays_date():
     return str_yesterday
 
 
-def number_of_support_requests_for_date(support_data, date_to_check):
-
-    return support_data['Date'].value_counts()[date_to_check]
-
-
-def yesterdays_requests_breakdown(dataframe, yesterdays_date):
-
-    yesterdays_requests = dataframe['Date'][yesterdays_date]
-    print(yesterdays_requests)
-    sys.exit(0)
-
-    cols = ['Request Type', yesterdays_date]
-    yesterdays_breakdown = dataframe.loc[cols]
-
-    return yesterdays_breakdown
-
-
 def get_environment_variables() -> tuple:
     slack_token = os.getenv("ADMIN_SLACK_TOKEN")
     if not slack_token:
@@ -72,32 +50,33 @@ def get_environment_variables() -> tuple:
 
     return slack_token
 
+
 def get_dict_of_requests_and_volume(requests: list[SupportRequest]) -> dict[SupportRequest, int]:
     dict_of_requests = dict()
-    # For each request in requests. If a key (the name of an action) already exists, then bump the value by 1. else, create key.
-    # return dict
+ 
     for request in requests:
         if request.request_action in dict_of_requests.keys():
             dict_of_requests[request.request_action] += 1
         else:
             dict_of_requests[request.request_action] = 1
-
-    print(dict_of_requests)    
+    
     return dict_of_requests
 
 
 def yesterdays_support_requests_message(yesterdays_support_requests: list[SupportRequest]):
     dict_of_requests_and_volume = get_dict_of_requests_and_volume(yesterdays_support_requests)
+    
     msg = (
         f"Good morning, \n\n"
-        f"Yesterday we received {len(yesterdays_support_requests)} Support Requests \n\n"
-        f"Here's a breakdown of yesterdays Support Requests: \n {yesterdays_requests_breakdown} \n"
+        f"Yesterday we received {len(yesterdays_support_requests)} Support Requests: \n\n"
     )
-
+    yesterdays_support_requests = list(dict.fromkeys(yesterdays_support_requests))
     for request in yesterdays_support_requests:
-        msg += f"Support request type: {request.request_type} | Action: {request.request_action} | Number of requests: {request}\n"
-
+        number_of_requests = dict_of_requests_and_volume[request.request_action]
+        msg += f"Type: {request.request_type} | Action: {request.request_action} | Number of requests: {number_of_requests}\n"
+    
     return msg
+
 
 def get_support_requests_from_csv(filepath:str) ->list[SupportRequest]:
     if exists(filepath):
@@ -126,8 +105,8 @@ def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) 
 
 def main():
 
-    #slack_token = get_environment_variables()
-    #slack_service = SlackService(str(slack_token))
+    slack_token = get_environment_variables()
+    slack_service = SlackService(str(slack_token))
     FILEPATH = 'csv/data-all.csv'
     list_of_support_requests = get_support_requests_from_csv(FILEPATH)
     yesterdays_requests = get_yesterdays_support_requests(list_of_support_requests)
