@@ -23,6 +23,7 @@ class SupportRequest:
 
     def __hash__(self):
         return hash(self.request_action)
+    
 
 def create_dataframe_from_csv(filename:str):
 
@@ -85,12 +86,14 @@ def get_support_requests_from_csv(filepath:str) ->list[SupportRequest]:
         f"File path {filepath} does not exist."
     )
 
+
 def list_of_support_requests(data) -> list[SupportRequest]:
         list_of_support_requests = list()
         for _, row in data.iterrows():
             list_of_support_requests.append(SupportRequest(row['Type'], row['Action'], row['Date']))
         
         return list_of_support_requests
+
             
 def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) -> list[SupportRequest]:
     yesterday = yesterdays_date()
@@ -102,7 +105,6 @@ def get_yesterdays_support_requests(all_support_requests: list[SupportRequest]) 
     return list_of_yesterdays_support_requests
 
 
-
 def main():
 
     slack_token = get_environment_variables()
@@ -110,10 +112,7 @@ def main():
     FILEPATH = 'csv/data-all.csv'
     list_of_support_requests = get_support_requests_from_csv(FILEPATH)
     yesterdays_requests = get_yesterdays_support_requests(list_of_support_requests)
-
     slack_message = yesterdays_support_requests_message(yesterdays_requests)
-    sys.exit(0)
-
     slack_service.send_message_to_plaintext_channel_name(
         slack_message, SR_SLACK_CHANNEL
     )
