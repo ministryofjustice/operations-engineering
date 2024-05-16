@@ -8,7 +8,6 @@ on:
 jobs:
   delete-cnames:
     runs-on: ubuntu-latest
-    # These permissions are required to use AWS OIDC federate roles
     permissions:
       id-token: write
       contents: read
