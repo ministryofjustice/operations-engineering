@@ -106,8 +106,8 @@ def main():
 
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
-    FILEPATH = 'data/support_stats/support_stats.csv'
-    all_support_requests = get_support_requests_from_csv(FILEPATH)
+    FILE_PATH = 'data/support_stats/support_stats.csv'
+    all_support_requests = get_support_requests_from_csv(FILE_PATH)
     yesterdays_requests = get_yesterdays_support_requests(all_support_requests)
     slack_message = yesterdays_support_requests_message(yesterdays_requests)
 
