@@ -10,7 +10,7 @@ from services.sentry_service import UsageStats
 
 class SlackService:
     OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID = "C033QBE511V"
-    OPS_ENG_SR_TEST_CHANNEL_ID = "C065RCW59MK"
+    OPERATIONS_ENGINEERING_TEAM_CHANNEL_ID = "CPVD6398C"
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
     SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/sentryio/respond-to-sentry-usage-alert"
 
