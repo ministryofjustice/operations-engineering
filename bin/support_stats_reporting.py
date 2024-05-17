@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from os.path import exists
 
 import pandas as pd
+from collections import defaultdict
 
 from config.constants import SR_SLACK_CHANNEL
 from services.slack_service import SlackService
@@ -53,7 +54,7 @@ def get_environment_variables() -> tuple:
 def get_dict_of_requests_and_volume(
     requests: list[SupportRequest],
 ) -> dict[SupportRequest, int]:
-    dict_of_requests = {}
+    dict_of_requests = defaultdict(int)
 
     for request in requests:
         dict_of_requests[request.request_action] += 1
@@ -107,7 +108,6 @@ def get_yesterdays_support_requests(
 
 
 def main():
-
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
     file_path = "data/support_stats/support_stats.csv"
