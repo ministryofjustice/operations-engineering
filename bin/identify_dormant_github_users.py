@@ -106,12 +106,7 @@ def message_to_slack_channel(list_of_dormant_users: list) -> str:
 
 
 def identify_dormant_github_users():
-    env = None
-    try:
-        env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
-    except EnvironmentError as e:
-        logger.critical("Error: %s", e)
-        return
+    env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
 
     dormant_users_from_csv = get_dormant_users_from_github_csv(
         GithubService(env.get('GH_ADMIN_TOKEN'), ORGANISATION)
