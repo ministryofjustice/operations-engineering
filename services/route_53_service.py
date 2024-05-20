@@ -53,7 +53,7 @@ class Route53Service:
 
         return json.dumps(exported_records, indent=4)
 
-    def create_delete_cname_request(cname):
+    def create_delete_cname_request(self, cname):
         return {
             "Action": "DELETE",
             "ResourceRecordSet": {
