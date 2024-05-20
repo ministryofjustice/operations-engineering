@@ -52,3 +52,57 @@ class Route53Service:
             exported_records[zone['id']] = {'name': zone['name'], 'records': records}
 
         return json.dumps(exported_records, indent=4)
+
+    def create_delete_cname_request(cname):
+        return {
+            "Action": "DELETE",
+            "ResourceRecordSet": {
+                "Name": cname["Name"],
+                "Type": "CNAME",
+                "TTL": cname["TTL"],
+                "ResourceRecords": [{"Value": cname["ResourceRecords"][0]["Value"]}],
+            },
+        }
+
+
+    def get_cname_records_to_delete(self, hosted_zone_id):
+        records_to_delete = []
+        next_record_name = "a"
+        next_record_type = "CNAME"
+
+        while True:
+            response = self.client.list_resource_record_sets(
+                HostedZoneId=hosted_zone_id,
+                StartRecordName=next_record_name,
+                StartRecordType=next_record_type,
+                MaxItems="300",
+            )
+
+            for record_set in response["ResourceRecordSets"]:
+                if record_set["Type"] == "CNAME" and (
+                    "comodoca" in record_set["ResourceRecords"][0]["Value"] or
+                    "sectigo" in record_set["ResourceRecords"][0]["Value"]
+                ):
+                    delete_record = self.create_delete_cname_request(record_set)
+                    records_to_delete.append(delete_record)
+
+            if response["IsTruncated"]:
+                next_record_name = response["NextRecordName"]
+            else:
+                break
+
+        return records_to_delete
+
+    def delete_cname_records(self, hosted_zone_id):
+        records_to_delete = self.get_cname_records_to_delete(hosted_zone_id)
+
+        if len(records_to_delete) != 0:
+            response = self.client.change_resource_record_sets(
+                ChangeBatch={"Changes": records_to_delete},
+                HostedZoneId=hosted_zone_id,
+            )
+            if response["ResponseMetadata"]["HTTPStatusCode"] == 200:
+                print("Deleted records:")
+                print(json.dumps(records_to_delete, indent=2))
+        else:
+            print('No cname records to delete')
