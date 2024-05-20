@@ -1,5 +1,4 @@
 import os
-import sys
 from dataclasses import dataclass
 from datetime import date, timedelta
 from os.path import exists
@@ -117,8 +116,8 @@ def get_yesterdays_support_requests(
 
 
 def main():
-    # slack_token = get_environment_variables()
-    # slack_service = SlackService(str(slack_token))
+    slack_token = get_environment_variables()
+    slack_service = SlackService(str(slack_token))
     file_path = "data/support_stats/support_stats.csv"
     all_support_requests = get_support_requests_from_csv(file_path)
     yesterdays_requests = get_yesterdays_support_requests(all_support_requests)
@@ -126,9 +125,9 @@ def main():
 
     print(slack_message)
 
-    # #slack_service.send_message_to_plaintext_channel_name(
-    #     slack_message, SR_SLACK_CHANNEL
-    # )
+    slack_service.send_message_to_plaintext_channel_name(
+        slack_message, SR_SLACK_CHANNEL
+    )
 
 
 if __name__ == "__main__":
