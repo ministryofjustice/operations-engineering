@@ -1,4 +1,5 @@
 import os
+import sys
 from dataclasses import dataclass
 from datetime import date, timedelta
 from os.path import exists
@@ -35,12 +36,21 @@ def create_dataframe_from_csv(filename: str):
     return dataframe
 
 
-def yesterdays_date():
+def previous_working_day():
     today = date.today()
-    yesterday = today - timedelta(days=1)
-    str_yesterday = str(yesterday)
 
-    return str_yesterday
+    diff = 1
+    if today.weekday() == 0:
+        diff = 3
+    elif today.weekday() == 6:
+        diff = 2
+    else:
+        diff = 1
+
+    last_working_day = today - timedelta(days=diff)
+    str_last_working_day = str(last_working_day)
+
+    return str_last_working_day
 
 
 def get_environment_variables() -> tuple:
@@ -67,10 +77,9 @@ def craft_message_to_slack(yesterdays_support_requests: list[SupportRequest]):
         yesterdays_support_requests
     )
 
-    msg = (
-        f"Good morning, \n\n"
-        f"Yesterday we received {len(yesterdays_support_requests)} Support Requests: \n\n"
-    )
+    previous_support_day = previous_working_day()
+
+    msg = f"On {previous_support_day} we received {len(yesterdays_support_requests)} Support Requests: \n\n"
     yesterdays_support_requests = list(dict.fromkeys(yesterdays_support_requests))
     for request in yesterdays_support_requests:
         number_of_requests = dict_of_requests_and_volume[request.request_action]
@@ -98,7 +107,7 @@ def get_list_of_support_requests(data) -> list[SupportRequest]:
 def get_yesterdays_support_requests(
     all_support_requests: list[SupportRequest],
 ) -> list[SupportRequest]:
-    yesterday = yesterdays_date()
+    yesterday = previous_working_day()  # yesterdays_date()
     list_of_yesterdays_support_requests = []
     for request in all_support_requests:
         if request.request_date == yesterday:
@@ -108,16 +117,18 @@ def get_yesterdays_support_requests(
 
 
 def main():
-    slack_token = get_environment_variables()
-    slack_service = SlackService(str(slack_token))
+    # slack_token = get_environment_variables()
+    # slack_service = SlackService(str(slack_token))
     file_path = "data/support_stats/support_stats.csv"
     all_support_requests = get_support_requests_from_csv(file_path)
     yesterdays_requests = get_yesterdays_support_requests(all_support_requests)
     slack_message = craft_message_to_slack(yesterdays_requests)
 
-    slack_service.send_message_to_plaintext_channel_name(
-        slack_message, SR_SLACK_CHANNEL
-    )
+    print(slack_message)
+
+    # #slack_service.send_message_to_plaintext_channel_name(
+    #     slack_message, SR_SLACK_CHANNEL
+    # )
 
 
 if __name__ == "__main__":
