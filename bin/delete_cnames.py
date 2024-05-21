@@ -1,12 +1,12 @@
-from services.route_53_service import Route53Service
 import sys
+from services.route_53_service import Route53Service
 
 
 def main():
     print("Start")
 
     if len(sys.argv) < 1:
-        raise ValueError(f"Please specify hosted zones as CLI arguments")
+        raise ValueError("Please specify hosted zones as CLI arguments")
 
     route53_service = Route53Service()
 

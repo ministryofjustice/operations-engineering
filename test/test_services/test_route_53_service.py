@@ -214,8 +214,7 @@ class TestRoute53Service(unittest.TestCase):
 
         self.assertEqual(list(filter(lambda record_set: True if record_set["Type"] == "CNAME" else False,
             self.route_53_service.client.list_resource_record_sets(HostedZoneId=zone['HostedZone']['Id'])["ResourceRecordSets"]
-            )), [])
-
+        )), [])
 
 
 if __name__ == "__main__":

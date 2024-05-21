@@ -17,5 +17,6 @@ class TestDeleteCNames(unittest.TestCase):
             delete_cnames.main()
             mock_delete_cname_records.assert_has_calls([call("id1"), call("id2")])
 
+
 if __name__ == "__main__":
     unittest.main()

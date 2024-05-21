@@ -64,7 +64,6 @@ class Route53Service:
             },
         }
 
-
     def get_cname_records_to_delete(self, hosted_zone_id):
         records_to_delete = []
         next_record_name = "a"
