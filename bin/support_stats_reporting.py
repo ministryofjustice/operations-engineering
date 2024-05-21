@@ -41,8 +41,6 @@ def previous_working_day():
     diff = 1
     if today.weekday() == 0:
         diff = 3
-    elif today.weekday() == 6:
-        diff = 2
     else:
         diff = 1
 
