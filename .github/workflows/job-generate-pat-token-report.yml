@@ -1,0 +1,29 @@
+name: 🤖 Generate PAT Token Report
+
+on:
+  schedule:
+    - cron: "0 8 * * 5"
+
+jobs:
+  pat-token-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate a token to access Operations Engineering PAT App
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.OPERATIONS_ENGINEERING_PAT_APP_ID }}
+          private-key: ${{ secrets.OE_PAT_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.generate_pat_token_report
+        env:
+          GH_APP_TOKEN: ${{ steps.generate-token.outputs.token }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}

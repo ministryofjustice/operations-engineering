@@ -2,8 +2,9 @@ import os
 import csv
 import json
 import tempfile
+from datetime import datetime
 import unittest
-from unittest.mock import call, patch, mock_open
+from unittest.mock import MagicMock, call, patch, mock_open
 from freezegun import freeze_time
 from services.s3_service import S3Service
 from config.constants import NO_ACTIVITY
@@ -69,6 +70,15 @@ class TestS3Service(unittest.TestCase):
             self.s3_service.save_emailed_users_file(["some-user"])
         mock_upload_file.assert_called_once_with(
             self.s3_service.emailed_users_file_name, self.s3_service.emailed_users_file_path)
+
+    @patch('services.s3_service.boto3.Session')
+    def test_save_r53_backup_file(self, mock_session):
+        mock_client = MagicMock()
+        mock_session.return_value.client = mock_client
+
+        self.s3_service.save_r53_backup_file()
+
+        mock_client.assert_has_calls([call().upload_file('hosted_zones.json', 'test-bucket', f"{datetime.now().strftime('%Y-%m-%d')}-hosted_zones.json")])
 
     @patch.object(S3Service, "_download_file")
     @patch.object(json, "load")

@@ -13,8 +13,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.unowned_repositories ministryofjustice "${ADMIN_GITHUB_TOKEN}" "${ADMIN_SLACK_TOKEN}"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.unowned_repositories ministryofjustice "${ADMIN_GITHUB_TOKEN}" "${ADMIN_SLACK_TOKEN}"
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -27,4 +31,3 @@ jobs:
           notification_title: "Failed to report on unowned_repositories"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-

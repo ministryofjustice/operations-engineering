@@ -10,6 +10,7 @@ from services.sentry_service import UsageStats
 
 class SlackService:
     OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID = "C033QBE511V"
+    OPERATIONS_ENGINEERING_TEAM_CHANNEL_ID = "CPVD6398C"
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
     SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/sentryio/respond-to-sentry-usage-alert"
 
@@ -35,7 +36,8 @@ class SlackService:
             response = self.slack_client.chat_postMessage(
                 channel=channel_id, text=message)
             if not response['ok']:
-                logging.error("Error sending message to channel %s: %s", channel_name, response['error'])
+                logging.error("Error sending message to channel %s: %s",
+                              channel_name, response['error'])
             else:
                 logging.info("Message sent to channel %s", channel_name)
 
@@ -57,8 +59,8 @@ class SlackService:
         return channel_id
 
     def send_usage_alert_to_operations_engineering(
-                self, period_in_days: int, usage_stats: UsageStats, usage_threshold: float, category: str
-            ):
+        self, period_in_days: int, usage_stats: UsageStats, usage_threshold: float, category: str
+    ):
         category_lower = category.lower()
         category_capitalised = category.capitalize()
         self.slack_client.chat_postMessage(
@@ -137,8 +139,8 @@ class SlackService:
         )
 
     def send_remove_users_from_github_alert_to_operations_engineering(
-                self, number_of_users: int, organisation_name: str
-            ):
+        self, number_of_users: int, organisation_name: str
+    ):
         self.slack_client.chat_postMessage(
             channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
             mrkdown=True,
@@ -158,8 +160,8 @@ class SlackService:
         )
 
     def send_undelivered_email_alert_to_operations_engineering(
-                self, email_addresses: list, organisation_name: str
-            ):
+        self, email_addresses: list, organisation_name: str
+    ):
         self.slack_client.chat_postMessage(
             channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
             mrkdown=True,
@@ -266,7 +268,8 @@ class SlackService:
                     if not cursor:
                         break
                 else:
-                    logging.error("Error fetching user data: %s}", response['error'])
+                    logging.error("Error fetching user data: %s}",
+                                  response['error'])
                     break
                 time.sleep(delay_seconds)
         except Exception as e:

@@ -11,8 +11,8 @@ from github.Commit import Commit
 from github.GitCommit import GitCommit
 from github.Issue import Issue
 from github.NamedUser import NamedUser
-from github.Repository import Repository
 from github.Organization import Organization
+from github.Repository import Repository
 from github.Team import Team
 from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
@@ -123,15 +123,15 @@ class TestGithubServiceInit(unittest.TestCase):
 class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
 
     # Default for archiving a repository
-    def __get_repository(self, last_active_date, archived: bool = False,
-                         fork: bool = False,
-                         repo_name: str = None, has_commits: bool = True) -> Mock:
+    def __get_repository(self, last_active_date: datetime, created_at_date: datetime, archived: bool = False, fork: bool = False, repo_name: str = None, has_commits: bool = True) -> Mock:
         repository_to_consider_for_archiving = Mock(
             Repository, archived=archived, fork=fork)
         repository_to_consider_for_archiving.name = repo_name
-        repository_to_consider_for_archiving.get_commits.return_value = [
-            Mock(Commit,
-                 commit=Mock(GitCommit, author=Mock(NamedUser, date=last_active_date)))] if has_commits else None
+        repository_to_consider_for_archiving.created_at = created_at_date
+        repository_to_consider_for_archiving.get_commits.return_value = (
+            [Mock(Commit, commit=Mock(GitCommit, author=Mock(
+                NamedUser, date=last_active_date)))] if has_commits else None
+        )
         return repository_to_consider_for_archiving
 
     def setUp(self):
@@ -141,7 +141,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
 
     def test_no_archive_when_repo_is_archived(self, mock_github_client_core_api):
         repo = self.__get_repository(
-            last_active_date=self.after_cutoff, archived=True)
+            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, archived=True)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
@@ -153,7 +153,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
 
     def test_no_archive_when_repo_is_forked(self, mock_github_client_core_api):
         repo = self.__get_repository(
-            last_active_date=self.after_cutoff, fork=True)
+            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, fork=True)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
@@ -164,7 +164,20 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
         self.assertEqual(repo.edit.called, False)
 
     def test_no_archive_when_recently_active(self, mock_github_client_core_api):
-        repo = self.__get_repository(last_active_date=self.after_cutoff)
+        repo = self.__get_repository(
+            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff)
+        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
+            repo,
+            repo,
+            repo
+        ]
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
+            self.last_active_cutoff_date, [])
+        self.assertEqual(repo.edit.called, False)
+
+    def test_no_archive_when_recently_created(self, mock_github_client_core_api):
+        repo = self.__get_repository(
+            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
@@ -176,7 +189,7 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
 
     def test_no_archive_when_on_allow_list(self, mock_github_client_core_api):
         repo = self.__get_repository(
-            last_active_date=self.after_cutoff, repo_name="allow_me")
+            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, repo_name="allow_me")
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
@@ -186,9 +199,9 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
                                                                                ["allow_me"])
         self.assertEqual(repo.edit.called, False)
 
-    def test_no_archive_when_repo_has_no_commits_even_if_before_cutoff(self, mock_github_client_core_api):
+    def test_no_archive_when_repo_has_no_commits_and_created_after_cutoff(self, mock_github_client_core_api):
         repo = self.__get_repository(
-            last_active_date=self.before_cutoff, has_commits=False)
+            last_active_date=self.before_cutoff, created_at_date=self.after_cutoff, has_commits=False)
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             repo,
             repo,
@@ -198,10 +211,10 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             self.last_active_cutoff_date, [])
         self.assertEqual(repo.edit.called, False)
 
-    def test_archives_inactive_repositories_not_on_allow_list(self, mock_github_client_core_api):
-        repo = self.__get_repository(self.before_cutoff)
+    def test_archives_inactive_repositories(self, mock_github_client_core_api):
+        repo = self.__get_repository(self.before_cutoff, self.before_cutoff)
         repo_on_allow_list = self.__get_repository(
-            self.before_cutoff, repo_name="allow_this")
+            self.before_cutoff, self.before_cutoff, repo_name="allow_this")
         mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
             Mock(Repository, archived=False, fork=True),
             repo,
@@ -214,8 +227,8 @@ class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
             repo_on_allow_list,
         ]
 
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date,
-                                                                               ["allow_this"])
+        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
+            self.last_active_cutoff_date, ["allow_this"])
 
         repo.edit.assert_has_calls(
             [call(archived=True), call(archived=True)])
@@ -1428,6 +1441,22 @@ class TestGithubServiceGetMemberList(unittest.TestCase):
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetUsersOfMultipleOrgs(unittest.TestCase):
+    def test_get_users_of_multiple_organisations(self, mock_github_client_core_api):
+        mock_users = [{"login": "user1"}, {"login": "user2"}]
+
+        mock_github_client_core_api.return_value.get_organization(
+        ).get_members.return_value = mock_users
+
+        response = GithubService(
+            "", ORGANISATION_NAME).get_users_of_multiple_organisations(["org1", "org2"])
+
+        self.assertEqual(["user1", "user2"], response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__")
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
@@ -1452,7 +1481,7 @@ class TestGithubServiceGetUserOrgEmailAddress(unittest.TestCase):
             "user": {"organizationVerifiedDomainEmails": []}}
         github_service = GithubService("", ORGANISATION_NAME)
         response = github_service.get_user_org_email_address("test_team_name")
-        self.assertEqual(response, "-")
+        self.assertEqual(response, None)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -1514,6 +1543,71 @@ class TestGithubServiceGetUserFromAuditLog(unittest.TestCase):
         github_service.github_client_rest_api = mock_github_client_rest_api
         response = github_service._get_user_from_audit_log("some-user")
         self.assertEqual(0, response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestDormantUser(unittest.TestCase):
+    @patch.object(GithubService, 'is_user_dormant_since_date')
+    def test_check_dormant_users_audit_activity_since_date(self, mock_is_user_dormant_since_date):
+        # Set `is_user_dormant_since_date` to return `True` only for 'user2'
+        mock_is_user_dormant_since_date.side_effect = lambda user, since_date: user == 'user2'
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.check_dormant_users_audit_activity_since_date(
+            ['user1', 'user2'], datetime.now() - timedelta(days=30))
+        self.assertEqual(result, ['user2'])
+
+    @patch.object(GithubService, 'enterprise_audit_activity_for_user')
+    def test_is_user_dormant_since_date(self, mock_enterprise_audit_activity_for_user):
+        # Set `enterprise_audit_activity_for_user` to return audit activity
+        mock_enterprise_audit_activity_for_user.return_value = [
+            {"@timestamp": (datetime.now() - timedelta(days=40)).timestamp() * 1000.0}]
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.is_user_dormant_since_date(
+            'user1', datetime.now() - timedelta(days=30))
+        self.assertTrue(result)
+
+    @patch.object(GithubService, 'enterprise_audit_activity_for_user')
+    def test_is_user_not_dormant_since_date(self, mock_enterprise_audit_activity_for_user):
+        # Set `enterprise_audit_activity_for_user` to return audit activity
+        mock_enterprise_audit_activity_for_user.return_value = [
+            {"@timestamp": (datetime.now() - timedelta(days=20)).timestamp() * 1000.0}]
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.is_user_dormant_since_date(
+            'user1', datetime.now() - timedelta(days=30))
+        self.assertFalse(result)
+
+    @patch.object(GithubService, 'enterprise_audit_activity_for_user')
+    def test_is_user_dormant_no_audit_activity(self, mock_enterprise_audit_activity_for_user):
+        # Set `enterprise_audit_activity_for_user` to return `None`
+        mock_enterprise_audit_activity_for_user.return_value = None
+        github_service = GithubService("", ORGANISATION_NAME)
+        result = github_service.is_user_dormant_since_date(
+            'user1', datetime.now() - timedelta(days=30))
+        self.assertTrue(result)
+
+    def test_enterprise_audit_log_is_checked(self):
+        github_service = GithubService(
+            "", ORGANISATION_NAME, enterprise_name=ENTERPRISE_NAME)
+
+        mock_get = MagicMock()
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.content = b'"some-user"'
+        github_service.github_client_rest_api.get = mock_get
+
+        github_service.enterprise_audit_activity_for_user("some-user")
+
+        expected_url = f"https://api.github.com/enterprises/{ENTERPRISE_NAME}/audit-log?phrase=actor%3Asome-user"
+        mock_get.assert_called_once_with(expected_url, timeout=10)
+
+    @patch('requests.get')
+    def test_enterprise_audit_activity_for_user_failure(self, mock_get):
+        # Mock `requests.get` to return a response with status code 404
+        mock_get.return_value.status_code = 404
+        github_service = GithubService("", ORGANISATION_NAME)
+        with self.assertRaises(ValueError):
+            github_service.enterprise_audit_activity_for_user('user1')
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -2030,7 +2124,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
             Mock(Organization, login="org2"),
         ]
 
-        response = GithubService("", ORGANISATION_NAME).get_all_organisations_in_enterprise()
+        response = GithubService(
+            "", ORGANISATION_NAME).get_all_organisations_in_enterprise()
 
         self.assertEqual(["org1", "org2"], response)
 
@@ -2040,7 +2135,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         github_service.get_gha_minutes_used_for_organisation("org1")
         mock_github_client_rest_api.assert_has_calls(
             [
-                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                call.get('https://api.github.com/orgs/org1/settings/billing/actions', headers={
+                         'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             ]
         )
 
@@ -2050,14 +2146,17 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         github_service.modify_gha_minutes_quota_threshold(80)
         mock_github_client_rest_api.assert_has_calls(
             [
-                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD', '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+                call.patch('https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD',
+                           '{"value": "80"}', headers={'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             ]
         )
 
     def test_get_gha_minutes_quota_threshold(self, _mock_github_client_rest_api, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(
+            Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
 
-        response = GithubService("", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
+        response = GithubService(
+            "", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
 
         self.assertEqual(70, response)
 
@@ -2083,9 +2182,11 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, _mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_gha_minutes_used_for_organisation.return_value = {"total_minutes_used": 10}
+        mock_get_gha_minutes_used_for_organisation.return_value = {
+            "total_minutes_used": 10}
 
-        self.assertEqual(github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
+        self.assertEqual(
+            github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
 
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
@@ -2102,7 +2203,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_get_all_organisations_in_enterprise.return_value = [
+            "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 37500
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
@@ -2127,7 +2229,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_all_organisations_in_enterprise.return_value = ["org1", "org2"]
+        mock_get_all_organisations_in_enterprise.return_value = [
+            "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 5000
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
@@ -2135,6 +2238,28 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result, False)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+@patch("requests.sessions.Session.__new__")
+class TestGithubServicePATRetrieval(unittest.TestCase):
+
+    @patch.object(GithubService, "get_new_pat_creation_events_for_organization")
+    def test_successful_pat_retrieval(self, mock_get_new_pat_creation_events, _mock_github_client_rest_api, _mock_github_client_core_api):
+        expected_response = [{
+            "id": 25381,
+            "token_expired": False,
+            "owner": {"login": "test_owner"}
+        }]
+        mock_get_new_pat_creation_events.return_value = expected_response
+
+        github_service = GithubService("test_token", "test_org")
+        result = github_service.get_new_pat_creation_events_for_organization()
+
+        self.assertEqual(result, expected_response)
+        mock_get_new_pat_creation_events.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -12,8 +12,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python3 -m pip install -r requirements.txt
-      - run: python3 -m bin.auth0_delete_inactive_users
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.auth0_delete_inactive_users
         env:
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}
           AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}

@@ -1,19 +1,17 @@
 import sys
-from time import sleep
 from datetime import datetime
+from time import sleep
+
 from dateutil.relativedelta import relativedelta
 
+from config.constants import (MINISTRY_OF_JUSTICE, MISSING_EMAIL_ADDRESS,
+                              MOJ_ANALYTICAL_SERVICES)
+from config.logging_config import logging
+from services.auth0_service import Auth0Service
 from services.github_service import GithubService
+from services.notify_service import NotifyService
 from services.s3_service import S3Service
 from services.slack_service import SlackService
-from services.notify_service import NotifyService
-from services.auth0_service import Auth0Service
-from config.logging_config import logging
-from config.constants import (
-    MINISTRY_OF_JUSTICE,
-    MOJ_ANALYTICAL_SERVICES,
-    MISSING_EMAIL_ADDRESS,
-)
 
 MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "ci-hmcts",
@@ -35,6 +33,8 @@ MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "laa-service-account",
     "mojanalytics",
     "laaserviceaccount",
+    "analytical-platform-bot",
+    "hmppsdigitalserviceaccount",
 ]
 
 MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [

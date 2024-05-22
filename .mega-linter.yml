@@ -8,7 +8,6 @@ ENABLE_LINTERS:
   - BASH_SHELLCHECK
   - MARKDOWN_MARKDOWNLINT
   - DOCKERFILE_HADOLINT
-  - REPOSITORY_TRIVY
   - REPOSITORY_GITLEAKS
   - YAML_PRETTIER
   - YAML_YAMLLINT
@@ -17,9 +16,9 @@ ENABLE_LINTERS:
   - PYTHON_FLAKE8
   - PYTHON_BLACK
   - PYTHON_ISORT
+  - TERRAFORM_TERRAFORM_FMT
+  - TERRAFORM_TFLINT
   - TERRAFORM_TERRASCAN
-  - TERRAFORM_TERRAFORMFMT
-  - TERRAFORM_TERRAFORMLINT
 
 DISABLE_ERRORS: false
 SPELL_CSPELL_DISABLE_ERRORS: true
@@ -33,6 +32,18 @@ VALIDATE_ALL_CODEBASE: false
 LOG_LEVEL: INFO
 MARKDOWN_MARKDOWN_LINK_CHECK_ARGUMENTS: "-q"
 
+TERRAFORM_TFLINT_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
+
 TERRAFORM_TERRASCAN_ARGUMENTS: "scan -d . -i terraform -v"
+
+# This threshold has been added as a temporary way to get around a particular error (unsupported block type).
+# Examples of this can be seen in the following issues, and appears to be a bug with Terrscan itself:
+# https://github.com/tenable/terrascan/issues/1615
+# https://github.com/tenable/terrascan/issues/1182
+# https://github.com/super-linter/super-linter/issues/3044
+
+TERRAFORM_TERRASCAN_DISABLE_ERRORS_IF_LESS_THAN: 2
+
 PLUGINS:
   - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml

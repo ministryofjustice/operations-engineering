@@ -16,6 +16,6 @@ htmlcov
 
 ministryofjustice_first_email_list.json
 moj-analytical-services_first_email_list.json
-export-ministryofjustice.json
+export-*
 export-moj-analytical-services.json
 dormant.csv
