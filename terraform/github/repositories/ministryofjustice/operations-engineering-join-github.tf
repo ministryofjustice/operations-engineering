@@ -4,7 +4,7 @@ module "operations-engineering-join-github" {
 
   name         = "operations-engineering-join-github"
   description  = "An application to augment the process of joining a Ministry of Justice GitHub Organisation"
-  homepage_url = "https://join-github-dev.cloud-platform.service.justice.gov.uk/"
+  homepage_url = "https://dev.join-github.service.justice.gov.uk/"
   topics       = ["operations-engineering"]
 
   team_access = {
