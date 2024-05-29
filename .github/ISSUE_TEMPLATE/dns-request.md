@@ -1,12 +1,5 @@
----
 name: Operations Engineering justice.gov.uk Subdomain Request
-about: Create a Ticket Request a New DNS Record
-title: ""
-labels: ["dns-request", "add-subdomain-request"]
-assignees: ""
----
-
-name: DNS Request
+title: "[DNS] <title>"
 description: Template request for adding a new justice.gov.uk subdomain.
 labels: dns-request, add-subdomain-request
 body:
