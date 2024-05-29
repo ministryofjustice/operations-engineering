@@ -1,7 +1,7 @@
 name: Operations Engineering justice.gov.uk Subdomain Request
 title: "[DNS] <title>"
 description: Template request for adding a new justice.gov.uk subdomain.
-labels: dns-request, add-subdomain-request
+labels: ["dns-request", "add-subdomain-request"]
 body:
 
 - type: input
