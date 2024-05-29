@@ -1,0 +1,40 @@
+name: 🧪 Alert on New DNS Request
+
+on:
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+
+jobs:
+  alert-on-new-dns-request:
+    if: github.event.label.name == 'dns-request'
+    name: Notify Operations Engineering when new DNS request is raised
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Python Setup
+        uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
+        with:
+          python-version: '3.11'
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - name: Execute the new DNS request script
+        run: pipenv run python3 -m bin.alert_on_new_dns_request
+        env:
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure'
+          notification_title: 'Failed GitHub Action Run'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
