@@ -11,3 +11,12 @@ jobs:
         steps:
             - name: Import Excel Workbook
               run: curl -L -o DNS_Request_Form.xlsx "https://justiceuk-my.sharepoint.com/:x:/g/personal/lev_gorbunov_justice_gov_uk/EZHx882yal5LvlkLrTDNwicBsOeNcRLoBr7cWVUozdo_YQ"
+            - uses: actions/setup-python@v5
+              with:
+                python-version: "3.11"
+                cache: "pipenv"
+            - name: Install Pipenv
+              run: |
+                pip install pipenv
+                pipenv install
+            - run: pipenv run python -m bin.print_excel_workbook
