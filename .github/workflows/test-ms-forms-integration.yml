@@ -21,4 +21,4 @@ jobs:
                 pip install pipenv
                 pipenv install
             - name: Extract and print Excel Workbook
-              run: pipenv run python -m bin.print_excel_workbook
+              run: ls && pipenv run python -m bin.print_excel_workbook
