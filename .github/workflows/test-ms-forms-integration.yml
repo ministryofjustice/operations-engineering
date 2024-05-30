@@ -10,4 +10,4 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Import Excel Workbook
-              run: curl -L -o DNS_Request_Form.xlsx "https://justiceuk-my.sharepoint.com/:x:/r/personal/lev_gorbunov_justice_gov_uk/_layouts/15/Doc.aspx?sourcedoc=%7BCDF3F191-6AB2-4B5E-BE59-0BAD30CDC227%7D&file=DNS%20Request%20Form.xlsx&action=edit&mobileredirect=true&wdMsFormsCorrelationId=76830321-cc25-4975-b463-9ec0823667fc"
+              run: curl -L -o DNS_Request_Form.xlsx "https://justiceuk-my.sharepoint.com/:x:/g/personal/lev_gorbunov_justice_gov_uk/EZHx882yal5LvlkLrTDNwicBsOeNcRLoBr7cWVUozdo_YQ"
