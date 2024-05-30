@@ -2,7 +2,7 @@ import pandas as pd
 
 def print_excel_contents(excel_file):
     try:
-        excel_data = pd.read_excel(excel_file)
+        excel_data = pd.read_excel(excel_file, engine='openpyxl')
     except Exception as e:
         print(f"Error reading the Excel file: {e}")
         return
