@@ -9,6 +9,7 @@ jobs:
     extract-data:
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v4
             - name: Import Excel Workbook
               run: curl -L -o DNS_Request_Form.xlsx "https://justiceuk-my.sharepoint.com/:x:/g/personal/lev_gorbunov_justice_gov_uk/EZHx882yal5LvlkLrTDNwicBsOeNcRLoBr7cWVUozdo_YQ"
             - uses: actions/setup-python@v5
@@ -19,4 +20,5 @@ jobs:
               run: |
                 pip install pipenv
                 pipenv install
-            - run: pipenv run python -m bin.print_excel_workbook
+            - name: Extract and print Excel Workbook
+              run: pipenv run python -m bin.print_excel_workbook
