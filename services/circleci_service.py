@@ -11,7 +11,6 @@ class CircleciService:
         }
 
     def get_circleci_pipelines_for_repository(self, repo):
-        print(f"\n\n PEPPER - Retrieving CircleCI pipelines for repo: {repo} \n\n")
         url = f"https://circleci.com/api/v2/project/github/{self.github_org}/{repo}/pipeline"
         response = requests.get(url, headers=self.headers, timeout=60)
         if response.status_code != 200:
@@ -20,7 +19,6 @@ class CircleciService:
         return response.json().get("items", [])
 
     def get_pipeline_configurations_from_pipeline_id(self, pipeline_id):
-        print(f"\n\n PEPPER - Retrieving pipeline config for pipeline: {pipeline_id} \n\n")
         url = self.base_url + f"pipeline/{pipeline_id}/config"
         headers = self.headers
         response = requests.get(url, headers=headers, timeout=60)
@@ -61,12 +59,8 @@ class CircleciService:
                 return []
 
             response_json = response.json()
-            print(f"\n\n PEPPER - Full response: {response_json}")
-
             contexts.extend(context["name"] for context in response_json.get("items", []))
-
             next_page = response_json.get("next_page_token")
-            print(f"\n\n PEPPER - Next page token: {next_page}")
 
             if not next_page:
                 break
