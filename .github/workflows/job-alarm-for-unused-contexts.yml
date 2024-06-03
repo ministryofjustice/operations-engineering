@@ -23,6 +23,7 @@ jobs:
           ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
           ADMIN_CIRCLECI_TOKEN: ${{ secrets.ADMIN_CIRCLECI_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          CIRCLE_CI_OWNER_ID: ${{ secrets.CIRCLE_CI_OWNER_ID }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
