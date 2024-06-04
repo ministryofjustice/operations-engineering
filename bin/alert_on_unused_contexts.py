@@ -32,11 +32,17 @@ def get_environment_variables() -> tuple:
     return slack_token, github_token, circleci_token
 
 
-def get_all_pipelines_for_all_repositories(repo_list, circle_ci_service):
+def get_all_pipeline_ids_for_all_repositories(repo_list, circle_ci_service):
+    all_pipeline_ids = []
+
     for repo in repo_list:
-        print("PEPPER - Fetching pipelines for repo...")
-        full_pipeline_list = circle_ci_service.get_circleci_pipelines_for_repository(repo)
-    return full_pipeline_list
+        print(f"Fetching pipelines for repo: {repo}")
+        pipelines = circle_ci_service.get_circleci_pipelines_for_repository(repo)
+
+        for pipeline in pipelines:
+            all_pipeline_ids.append(pipeline["id"])
+
+    return all_pipeline_ids
 
 
 def main():
@@ -50,14 +56,13 @@ def main():
 
     print("All repositories have been gathered.")
 
-    full_pipeline_list = get_all_pipelines_for_all_repositories(full_repository_list, circle_ci_service)
+    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(full_repository_list, circle_ci_service)
 
     print("All pipelines have been gathered.")
 
     try:
-        for pipeline in full_pipeline_list:
-            pipeline_id = pipeline["id"]
-            full_configuration_list = circle_ci_service.get_pipeline_configurations_from_pipeline_id(pipeline_id)
+        for pipeline in full_pipeline_id_list:
+            full_configuration_list = circle_ci_service.get_pipeline_configurations_from_pipeline_id(pipeline)
             if full_configuration_list:
                 compiled_config = full_configuration_list.get("compiled", "")
                 compiled_setup_config = full_configuration_list.get("compiled-setup-config", "")
