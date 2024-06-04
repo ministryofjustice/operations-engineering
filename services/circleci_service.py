@@ -53,7 +53,7 @@ class CircleciService:
         next_page = None
 
         while True:
-            response = requests.get(url, headers=headers, params={'page-token': next_page} if next_page else {})
+            response = requests.get(url, headers=headers, params={'page-token': next_page} if next_page else {}, timeout=60)
             if response.status_code != 200:
                 print(f"Whoopsie! Error listing contexts: {response.text}")
                 return []
