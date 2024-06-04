@@ -51,15 +51,12 @@ def main():
 
     all_used_contexts = set()
 
-    full_repository_list = github_service.get_org_repo_names()
     full_circle_ci_repository_list = github_service.check_circleci_config_in_repos()
-    print("PEPPER - Finished processing repository information.")
-    print(f"PEPPER - Length of full repo list: {len(full_repository_list)}, and just CCI: {len(full_circle_ci_repository_list)}")
-    first_100_repos = full_circle_ci_repository_list[:50]
+    print(f"PEPPER - Length of full repo list: {len(full_circle_ci_repository_list)}")
 
     print("All repositories have been gathered.")
 
-    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(first_100_repos, circle_ci_service)
+    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(full_circle_ci_repository_list, circle_ci_service)
 
     print("All pipelines have been gathered.")
 
@@ -81,6 +78,8 @@ def main():
         print("\n\n PEPPER - Unused context names:")
         for context in unused_contexts:
             print(f"Context name: {context}")
+
+        print(f"Total unused contexts: {len(unused_contexts)}")
     except Exception as e:
         print(f"Error gathering contexts: {e}")
 
