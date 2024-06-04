@@ -688,7 +688,7 @@ class GithubService:
                 }
             }
         }
-        """), variables_values={
+        """), variable_values={
             "organisation_name": self.organisation_name,
             "page_size": page_size,
             "after_cursor": after_cursor
