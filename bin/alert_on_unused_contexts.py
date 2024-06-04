@@ -53,6 +53,7 @@ def main():
 
     full_repository_list = github_service.get_org_repo_names()
     full_circle_ci_repository_list = github_service.check_circleci_config_in_repos()
+    print("PEPPER - Finished processing repository information.")
     print(f"PEPPER - Length of full repo list: {len(full_repository_list)}, and just CCI: {len(full_circle_ci_repository_list)}")
     first_100_repos = full_circle_ci_repository_list[:50]
 

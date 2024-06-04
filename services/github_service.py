@@ -667,7 +667,7 @@ class GithubService:
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
 
-        query = gql("""
+        return self.github_client_gql_api.execute(gql("""
         query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
             organization(login: $organisation_name) {
                 repositories(first: $page_size, after: $after_cursor) {
@@ -688,13 +688,11 @@ class GithubService:
                 }
             }
         }
-        """)
-        variables = {
+        """), variables_values={
             "organisation_name": self.organisation_name,
             "page_size": page_size,
             "after_cursor": after_cursor
-        }
-        return self.github_client_gql_api.execute(query, variable_values=variables)
+        })
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
