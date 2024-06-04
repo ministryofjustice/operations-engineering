@@ -1,7 +1,18 @@
 import sys
+import os
+import pandas as pd
 from gql import gql
 from config.logging_config import logging
 from services.github_service import GithubService
+
+
+def get_environment_variables() -> str:
+    github_token = os.getenv("ADMIN_GITHUB_TOKEN")
+    if not github_token:
+        raise ValueError(
+            "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
+
+    return github_token
 
 
 def repository_query(after_cursor=None, repo_name=None) -> gql:
@@ -52,12 +63,12 @@ def fetch_repository_data(repository_name, github_service: GithubService) -> tup
         repository_name (string): Is the repository within the organisation to check
     Returns:
         list: A list of the repository user names
-        is_repository_locked: Lock status of the repository
+        is_repository_open: Status of the repository
     """
     has_next_page = True
     after_cursor = None
     collaborators_list = []
-    is_repository_locked = False
+    is_repository_open = True
 
     while has_next_page:
         query = repository_query(after_cursor, repository_name)
@@ -77,9 +88,9 @@ def fetch_repository_data(repository_name, github_service: GithubService) -> tup
             or data["repository"]["isArchived"]
             or data["repository"]["isLocked"]
         ):
-            is_repository_locked = True
+            is_repository_open = False
 
-    return collaborators_list, is_repository_locked
+    return collaborators_list, is_repository_open
 
 
 class Repository:
@@ -87,12 +98,12 @@ class Repository:
 
     name: str
     collaborators: list
-    is_repository_locked: bool
+    is_repository_open: bool
 
     def __init__(self, x, y, z):
         self.name = x
         self.collaborators = y
-        self.is_repository_locked = z
+        self.is_repository_open = z
 
 
 def fetch_repository_names(github_service: GithubService) -> list:
@@ -117,47 +128,59 @@ def fetch_repositories(github_service: GithubService) -> list:
     """
     repositories_list = []
     for repository_name in fetch_repository_names(github_service):
-        collaborators_list, is_repository_locked = fetch_repository_data(
+        collaborators_list, is_repository_open = fetch_repository_data(
             repository_name, github_service
         )
         repositories_list.append(
             Repository(repository_name, collaborators_list,
-                       is_repository_locked)
+                       is_repository_open)
         )
 
     return repositories_list
 
 
-def remove_collaborator(collaborator, github_service: GithubService):
-    """Remove the collaborator from the organisation
-    Args:
-        collaborator (collaborator): The collaborator object
+# def remove_collaborator(collaborator, github_service: GithubService):
+#     """Remove the collaborator from the organisation
+#     Args:
+#         collaborator (collaborator): The collaborator object
+#     """
+#     logging.info(f"Remove user from organisation: {collaborator.login}")
+#     org = github_service.github_client_core_api.get_organization(
+#         "ministryofjustice")
+#     org.remove_outside_collaborator(collaborator)
+
+
+def extract_stale_outside_collaborators(
+        repo_status_collaborator_list: list[dict]
+    ) -> list[str]:
     """
-    logging.info(f"Remove user from organisation: {collaborator.login}")
-    org = github_service.github_client_core_api.get_organization(
-        "ministryofjustice")
-    org.remove_outside_collaborator(collaborator)
+    A function to extract a list of stale collaborators (those not associated with
+    any open repositories) from the repository status and outside collaborator list
+    of dictionaries.
+    """
+    df = (
+        pd.DataFrame(data = repo_status_collaborator_list)
+        .explode("outside_collaborators")
+        .groupby("outside_collaborators", as_index=False).sum("is_repository_open")
+        .rename(columns={"is_repository_open": "open_repository_count"})
+    )
+    stale_collaborators = df[df.open_repository_count == 0].outside_collaborators.to_list()
+    return stale_collaborators
 
 
 def run(github_service: GithubService):
     repositories = fetch_repositories(github_service)
-    org = github_service.github_client_core_api.get_organization(
-        "ministryofjustice")
-    # for each collaborator, check if all their repositories are locked
-    for outside_collaborator in org.get_outside_collaborators():
-        collaborators_repo_list = []
-        for repository in repositories:
-            if outside_collaborator.login in repository.collaborators:
-                collaborators_repo_list.append(repository.is_repository_locked)
-        an_open_repo = False
-        if an_open_repo not in collaborators_repo_list:
-            # all repositories are locked so remove the collaborator
-            remove_collaborator(outside_collaborator, github_service)
+    print(repositories)
+    stale_outside_collaborators = extract_stale_outside_collaborators(repositories)
+    print(stale_outside_collaborators)
+    # for collaborator in stale_outside_collaborators:
+    #     remove_collaborator(collaborator, github_service)
 
 
 def main():
-    oauth_token = sys.argv[1]
-    github_service = GithubService(oauth_token, "ministryofjustice")
+    github_token = get_environment_variables()
+    github_service = GithubService(github_token, "ministryofjustice")
+
     run(github_service)
 
 

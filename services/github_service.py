@@ -377,6 +377,44 @@ class GithubService:
                                "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_unlocked_repos_and_outside_collaborators(
+        self, after_cursor: str | None, page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE
+    ) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated list of org unlocked and unarchived repositories and outside collaborators. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        return self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $organisation_name) {
+                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                        nodes {
+                            name
+                            isDisabled
+                            isArchived
+                            isLocked
+                            collaborators(first: 10, affiliation: OUTSIDE){
+                                edges {
+                                    node {
+                                        login
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
+                               "after_cursor": after_cursor})
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
                                                     page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
@@ -614,6 +652,7 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_org_repo_names(self) -> list[str]:
         """A wrapper function to run a GraphQL query to get a list of the organisation repository names
+        (open repositories only).
 
         Returns:
             list: A list of the organisation repository names
@@ -635,6 +674,31 @@ class GithubService:
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
         return repository_names
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_org_unlocked_repo_outside_collaborators(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a list of the organisation unlocked and
+        unarchived repository names, their status and their outside collaborators.
+
+        Returns:
+            list: A list of the organisation repositories with status and outside collaborators.
+        """
+        has_next_page = True
+        after_cursor = None
+        unlocked_repository_data = []
+        while has_next_page:
+            data = self.get_paginated_list_of_unlocked_repos_and_outside_collaborators(
+                after_cursor, 100)
+
+            if data["organization"]["repositories"]["nodes"] is not None:
+                for repo in data["organization"]["repositories"]["nodes"]:
+                    if repo["isDisabled"]:
+                        continue
+                    unlocked_repository_data.append(repo)
+
+            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+        return unlocked_repository_data
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
