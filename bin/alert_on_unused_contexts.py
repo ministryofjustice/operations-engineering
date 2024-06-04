@@ -53,10 +53,11 @@ def main():
     all_used_contexts = set()
 
     full_repository_list = github_service.get_org_repo_names()
+    first_10_repos = full_repository_list[:10]
 
     print("All repositories have been gathered.")
 
-    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(full_repository_list, circle_ci_service)
+    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(first_10_repos, circle_ci_service)
 
     print("All pipelines have been gathered.")
 
@@ -68,7 +69,7 @@ def main():
                 compiled_setup_config = full_configuration_list.get("compiled-setup-config", "")
                 all_configurations_for_pipeline = [compiled_config, compiled_setup_config]
                 for configuration in all_configurations_for_pipeline:
-                    print("\n\n PEPPER - Configuration had been found!")
+                    print("\n\n PEPPER - Configuration has been found!")
                     configuration_data = yaml.safe_load(configuration)
                     contexts_in_configuration = circle_ci_service.find_all_contexts_from_configuration(configuration_data)
                     all_used_contexts.update(contexts_in_configuration)

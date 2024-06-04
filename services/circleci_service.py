@@ -16,7 +16,10 @@ class CircleciService:
         if response.status_code != 200:
             print(f"Error getting pipelines for {repo}: {response.text}")
             return []
-        return response.json().get("items", [])
+        pipelines = response.json().get("items", [])
+
+        print(f"{len(pipelines)} pipelines found for repo: {repo}")
+        return pipelines
 
     def get_pipeline_configurations_from_pipeline_id(self, pipeline_id):
         url = self.base_url + f"pipeline/{pipeline_id}/config"
@@ -25,7 +28,9 @@ class CircleciService:
         if response.status_code != 200:
             print(f"Error getting pipeline config {pipeline_id}: {response.text}")
             return {}
-        return response.json()
+        configurations = response.json()
+        print(f"{len(configurations)} configurations found for pipeline")
+        return configurations
 
     def find_all_contexts_from_configuration(self, configuration):
         contexts = []
