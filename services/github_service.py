@@ -638,14 +638,34 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_circleci_config_in_repos(self) -> list[str]:
-        """Check if each repository in the organization has a CircleCI configuration file
+        """Check if each repository in the list has a CircleCI configuration file using GraphQL.
+
+        Args:
+            repo_list (list): A list of repository names.
 
         Returns:
-            list: A list of repository names that have a CircleCI configuration file
+            list: A list of repository names that have a CircleCI configuration file.
         """
         has_next_page = True
         after_cursor = None
         repos_with_circleci_config = []
+
+        while has_next_page:
+            data = self.get_paginated_circleci_config_check(after_cursor, 100)
+
+            if data["organization"]["repositories"]["edges"] is not None:
+                for repo in data["organization"]["repositories"]["edges"]:
+                    if repo["node"]["object"] is not None:
+                        repos_with_circleci_config.append(repo["node"]["name"])
+
+            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+        return repos_with_circleci_config
+
+    def get_paginated_circleci_config_check(self, after_cursor: str | None, page_size: int) -> dict[str, Any]:
+        logging.info(f"Checking CircleCI config in repos. Page size {page_size}, after cursor {bool(after_cursor)}")
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
 
         query = gql("""
         query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
@@ -669,24 +689,12 @@ class GithubService:
             }
         }
         """)
-
-        while has_next_page:
-            variables = {
-                "organisation_name": self.organisation_name,
-                "page_size": self.GITHUB_GQL_DEFAULT_PAGE_SIZE,
-                "after_cursor": after_cursor
-            }
-            data = self.github_client_gql_api.execute(query, variable_values=variables)
-
-            if data["organization"]["repositories"]["edges"] is not None:
-                for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["object"] is not None:
-                        repos_with_circleci_config.append(repo["node"]["name"])
-
-            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
-            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
-
-        return repos_with_circleci_config
+        variables = {
+            "organisation_name": self.organisation_name,
+            "page_size": page_size,
+            "after_cursor": after_cursor
+        }
+        return self.github_client_gql_api.execute(query, variable_values=variables)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
