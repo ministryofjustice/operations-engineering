@@ -53,11 +53,11 @@ def main():
     all_used_contexts = set()
 
     full_repository_list = github_service.get_org_repo_names()
-    first_10_repos = full_repository_list[:10]
+    first_100_repos = full_repository_list[:100]
 
     print("All repositories have been gathered.")
 
-    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(first_10_repos, circle_ci_service)
+    full_pipeline_id_list = get_all_pipeline_ids_for_all_repositories(first_100_repos, circle_ci_service)
 
     print("All pipelines have been gathered.")
 
