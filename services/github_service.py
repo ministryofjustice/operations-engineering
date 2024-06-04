@@ -637,6 +637,58 @@ class GithubService:
         return repository_names
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def check_circleci_config_in_repos(self) -> list[str]:
+        """Check if each repository in the organization has a CircleCI configuration file
+
+        Returns:
+            list: A list of repository names that have a CircleCI configuration file
+        """
+        has_next_page = True
+        after_cursor = None
+        repos_with_circleci_config = []
+
+        query = gql("""
+        query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+            organization(login: $organisation_name) {
+                repositories(first: $page_size, after: $after_cursor) {
+                    pageInfo {
+                        endCursor
+                        hasNextPage
+                    }
+                    edges {
+                        node {
+                            name
+                            object(expression: "HEAD:.circleci/config.yml") {
+                                ... on Blob {
+                                    id
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        """)
+
+        while has_next_page:
+            variables = {
+                "organisation_name": self.organisation_name,
+                "page_size": self.GITHUB_GQL_DEFAULT_PAGE_SIZE,
+                "after_cursor": after_cursor
+            }
+            data = self.github_client_gql_api.execute(query, variable_values=variables)
+
+            if data["organization"]["repositories"]["edges"] is not None:
+                for repo in data["organization"]["repositories"]["edges"]:
+                    if repo["node"]["object"] is not None:
+                        repos_with_circleci_config.append(repo["node"]["name"])
+
+            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+
+        return repos_with_circleci_config
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
         """A wrapper function to run a GraphQL query to get the list of repositories in the organisation
 

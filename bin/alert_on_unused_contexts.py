@@ -1,5 +1,4 @@
 import os
-import time
 
 import yaml
 
@@ -53,7 +52,9 @@ def main():
     all_used_contexts = set()
 
     full_repository_list = github_service.get_org_repo_names()
-    first_100_repos = full_repository_list[:100]
+    full_circle_ci_repository_list = github_service.check_circleci_config_in_repos()
+    print(f"PEPPER - Length of full repo list: {len(full_repository_list)}, and just CCI: {len(full_circle_ci_repository_list)}")
+    first_100_repos = full_circle_ci_repository_list[:50]
 
     print("All repositories have been gathered.")
 
