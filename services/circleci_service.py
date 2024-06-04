@@ -29,7 +29,6 @@ class CircleciService:
             print(f"Error getting pipeline config {pipeline_id}: {response.text}")
             return {}
         configurations = response.json()
-        print(f"{len(configurations)} configurations found for pipeline")
         return configurations
 
     def find_all_contexts_from_configuration(self, configuration):

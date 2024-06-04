@@ -69,7 +69,6 @@ def main():
                 compiled_setup_config = full_configuration_list.get("compiled-setup-config", "")
                 all_configurations_for_pipeline = [compiled_config, compiled_setup_config]
                 for configuration in all_configurations_for_pipeline:
-                    print("\n\n PEPPER - Configuration has been found!")
                     configuration_data = yaml.safe_load(configuration)
                     contexts_in_configuration = circle_ci_service.find_all_contexts_from_configuration(configuration_data)
                     all_used_contexts.update(contexts_in_configuration)
