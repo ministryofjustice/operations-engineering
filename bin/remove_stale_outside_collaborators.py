@@ -30,7 +30,7 @@ def get_environment_variables() -> str:
 # line 701 TestGithubServiceGetPaginatedListOfUnlockedUnarchivedReposAndOutsideCollaborators
 # test for TestGithubServiceGetStaleOutsideCollaborators line 1268 in test_github_service
 # Add remove outside collaborator function to github service - or is this usng the
-
+# test for remove_outside_collaboraotr, does it just accept string of coolab name?
 
 def main():
     github_token = get_environment_variables()
@@ -41,6 +41,8 @@ def main():
     print(f"Number of Stale Outside Collaborators to remove: {len(stale_outside_collaborators)}")
 
     # Remove the stale outside collaborators
+    # for stale_outside_collaborator in stale_outside_collaborators:
+    #     github.remove_outside_collaborator_from_org(stale_outside_collaborator)
 
     return stale_outside_collaborators
 
