@@ -1,45 +1,6 @@
-import pandas as pd
-import sys
 import os
-from gql import gql
-from config.logging_config import logging
 from services.github_service import GithubService
 
-
-repo_status_outside_collab_stub = [
-    {"name": "r1", "is_repository_open": False, "outside_collaborators":["c1", "c2"]},
-    {"name": "r2", "is_repository_open": False, "outside_collaborators":["c2", "c3"]},
-    {"name": "r3", "is_repository_open": True, "outside_collaborators":["c1", "c3"]},
-    {"name": "r4", "is_repository_open": False, "outside_collaborators":["c2", "c4"]},
-    {"name": "r5", "is_repository_open": True, "outside_collaborators":["c1"]},
-]
-
-
-def extract_stale_outside_collaborators(
-        repo_status_collaborator_list: list[dict]
-    ) -> list[str]:
-    """
-    A function to extract a list of stale collaborators (those not associated with
-    any open repositories) from the repository status and outside collaborator list
-    of dictionaries.
-    """
-    df = (
-        pd.DataFrame(data = repo_status_collaborator_list)
-        .explode("outside_collaborators")
-        .groupby("outside_collaborators", as_index=False).sum("is_repository_open")
-        .rename(columns={"is_repository_open": "open_repository_count"})
-    )
-    stale_collaborators = df[df.open_repository_count == 0].outside_collaborators.to_list()
-    return stale_collaborators
-
-# stale_collaborators = extract_stale_outside_collaborators(
-#     repo_status_outside_collab_stub
-# )
-
-# print(stale_collaborators)
-
-# oauth_token = sys.argv[1]
-# github_service = GithubService(oauth_token, "ministryofjustice")
 
 def get_environment_variables() -> str:
     github_token = os.getenv("ADMIN_GITHUB_TOKEN")
@@ -49,27 +10,39 @@ def get_environment_variables() -> str:
 
     return github_token
 
-# def main():
-#     github_token = get_environment_variables()
-#     github = GithubService(github_token, "ministryofjustice")
+# Function to remove the identified stale outside collaborators - also to go in github service
+# def remove_collaborator(collaborator, github_service: GithubService):
+#     """Remove the collaborator from the organisation
+#     Args:
+#         collaborator (collaborator): The collaborator object
+#     """
+#     logging.info(f"Remove user from organisation: {collaborator.login}")
+#     org = github_service.github_client_core_api.get_organization(
+#         "ministryofjustice")
+#     org.remove_outside_collaborator(collaborator)
 
-#     data = github.get_paginated_list_of_repos_and_outside_collaborators(
-#         after_cursor=None
-#     )
-#     print(data)
-#     return data
+# ToDo
+# tests for github service functions and main
+# workflow update; remove on PR trigger
+# delete old scripts and workflow
+# names check over
+# update PR
+# line 701 TestGithubServiceGetPaginatedListOfUnlockedUnarchivedReposAndOutsideCollaborators
+# test for TestGithubServiceGetStaleOutsideCollaborators line 1268 in test_github_service
+# Add remove outside collaborator function to github service - or is this usng the
+
 
 def main():
     github_token = get_environment_variables()
     github = GithubService(github_token, "ministryofjustice")
 
-    # data = github.get_org_repo_names()
-    # print(data)
+    stale_outside_collaborators = github.get_stale_outside_collaborators()
+    print(f"Stale Outside Collaborators:\n{stale_outside_collaborators}")
+    print(f"Number of Stale Outside Collaborators to remove: {len(stale_outside_collaborators)}")
 
-    data = github.get_org_unlocked_repo_outside_collaborators()
-    print(data)
+    # Remove the stale outside collaborators
 
-    return data
+    return stale_outside_collaborators
 
 
 if __name__ == "__main__":

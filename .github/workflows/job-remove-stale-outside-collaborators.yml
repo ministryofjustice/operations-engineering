@@ -1,0 +1,32 @@
+name: 🤖 Remove Stale Outside Collaborators
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 4 1 * *"
+
+jobs:
+  remove-stale-outside-collaborators:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove stale outside collaborators
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python -m bin.remove_stale_outside_collaborators
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_BOT_TOKEN }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

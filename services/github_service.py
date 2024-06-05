@@ -377,11 +377,13 @@ class GithubService:
                                "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_unlocked_repos_and_outside_collaborators(
-        self, after_cursor: str | None, page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE
+    def get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
+        self,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
     ) -> dict[str, Any]:
         logging.info(
-            f"Getting paginated list of org unlocked and unarchived repositories and outside collaborators. Page size {page_size}, after cursor {bool(after_cursor)}"
+            f"Getting paginated list of org unlocked unarchived repositories and their first 100 outside collaborators. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
@@ -397,9 +399,7 @@ class GithubService:
                         nodes {
                             name
                             isDisabled
-                            isArchived
-                            isLocked
-                            collaborators(first: 10, affiliation: OUTSIDE){
+                            collaborators(first: 100, affiliation: OUTSIDE){
                                 edges {
                                     node {
                                         login
@@ -676,29 +676,42 @@ class GithubService:
         return repository_names
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_org_unlocked_repo_outside_collaborators(self) -> list[str]:
-        """A wrapper function to run a GraphQL query to get a list of the organisation unlocked and
-        unarchived repository names, their status and their outside collaborators.
+    def get_stale_outside_collaborators(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a list of the Stale Outside Collaborators
+        in the organisation. These are Outside Collaborators not affiliated with any open (not locked,
+        not archived nor disabled) repositories. The function collects the Active Outside Collaborators
+        (those affiliated with at least one open repository) and then subtracts these from the total
+        list of Outside Collaborators.
 
         Returns:
-            list: A list of the organisation repositories with status and outside collaborators.
+            list: A list of the organisation stale outside collaborators login names in lower case
         """
+
+        all_outside_collaborators = self.get_outside_collaborators_login_names()
+        if len(all_outside_collaborators) > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"The number of Outside Collaborators in the organisation exceeds the page size of {self.GITHUB_GQL_MAX_PAGE_SIZE}; this may cause some Active Outside Collaborators to be misclassified as Stale as the collaborators object is not paginated.")
+
         has_next_page = True
         after_cursor = None
-        unlocked_repository_data = []
+        active_outside_collaborators = []
         while has_next_page:
-            data = self.get_paginated_list_of_unlocked_repos_and_outside_collaborators(
-                after_cursor, 100)
-
+            data = self.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
+                after_cursor, self.GITHUB_GQL_MAX_PAGE_SIZE
+            )
             if data["organization"]["repositories"]["nodes"] is not None:
                 for repo in data["organization"]["repositories"]["nodes"]:
                     if repo["isDisabled"]:
                         continue
-                    unlocked_repository_data.append(repo)
-
+                    for collaborators in repo["collaborators"]["edges"]:
+                        if collaborators:
+                            active_outside_collaborators.append(collaborators["node"]["login"].lower())
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
-        return unlocked_repository_data
+
+        stale_outside_collaborators = set(all_outside_collaborators) - set(active_outside_collaborators)
+
+        return list(stale_outside_collaborators)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
