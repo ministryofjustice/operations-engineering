@@ -1,6 +1,11 @@
+import logging
 import os
+from github import GithubException
 from services.github_service import GithubService
 
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def get_environment_variables() -> str:
     github_token = os.getenv("ADMIN_GITHUB_TOKEN")
@@ -13,16 +18,23 @@ def get_environment_variables() -> str:
 def main():
     github_token = get_environment_variables()
     github = GithubService(github_token, "ministryofjustice")
+    org = github.organisation_name
 
     stale_outside_collaborators = github.get_stale_outside_collaborators()
-    print(f"Stale Outside Collaborators:\n{stale_outside_collaborators}")
-    print(f"Number of Stale Outside Collaborators to remove: {len(stale_outside_collaborators)}")
-
-    # need some logging - log who is being removed? Iis it ok to print this out to console?
     for stale_outside_collaborator in stale_outside_collaborators:
-        github.remove_outside_collaborator_from_org(stale_outside_collaborator)
-
-    return stale_outside_collaborators
+        try:
+            github.remove_outside_collaborator_from_org(stale_outside_collaborator)
+            logger.info(
+                "Removed Outside Collaborator %s from %s",
+                stale_outside_collaborator,
+                org
+            )
+        except GithubException:
+            logger.error(
+                "Failed to remove Outside Collaborator %s from %s",
+                stale_outside_collaborator,
+                org
+            )
 
 
 if __name__ == "__main__":

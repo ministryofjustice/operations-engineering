@@ -276,22 +276,6 @@ class TestGithubServiceGetOutsideCollaborators(unittest.TestCase):
         self.assertRaises(
             ConnectionError, github_service.get_outside_collaborators_login_names)
 
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGithubServiceRemoveOutsideCollaboratorFromOrg(unittest.TestCase):
-
-    def test_returns_login_names(self, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_organization().get_outside_collaborators.return_value = [
-            Mock(NamedUser, login="tom-smith"),
-            Mock(NamedUser, login="john.smith"),
-        ]
-        response = GithubService(
-            "", ORGANISATION_NAME).get_outside_collaborators_login_names()
-        self.assertEqual(["tom-smith", "john.smith"], response)
-
-
-
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
