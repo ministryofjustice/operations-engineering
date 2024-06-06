@@ -400,6 +400,9 @@ class GithubService:
                             name
                             isDisabled
                             collaborators(first: 100, affiliation: OUTSIDE){
+                               	pageInfo {
+                                    hasNextPage
+                                }
                                 edges {
                                     node {
                                         login
@@ -692,10 +695,10 @@ class GithubService:
             raise ValueError(
                 f"The number of Outside Collaborators in the organisation exceeds the page size of {self.GITHUB_GQL_MAX_PAGE_SIZE}; this may cause some Active Outside Collaborators to be misclassified as Stale as the collaborators object is not paginated.")
 
-        has_next_page = True
+        repo_has_next_page = True
         after_cursor = None
         active_outside_collaborators = []
-        while has_next_page:
+        while repo_has_next_page:
             data = self.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
                 after_cursor, self.GITHUB_GQL_MAX_PAGE_SIZE
             )
@@ -703,10 +706,17 @@ class GithubService:
                 for repo in data["organization"]["repositories"]["nodes"]:
                     if repo["isDisabled"]:
                         continue
+                    # The query only returns the first 100 Outside Collaborators on a repo, if there is a next page
+                    # it will not collect them. This is very unlikely to occur however the function output is
+                    # unreliable if it does so.
+                    if repo["collaborators"]["pageInfo"]["hasNextPage"]:
+                        raise ValueError(
+                            "Some Outside Collaborators omitted from calculation; cannot get reliable Stale Outside Collaborators list."
+                        )
                     for collaborators in repo["collaborators"]["edges"]:
                         if collaborators:
                             active_outside_collaborators.append(collaborators["node"]["login"].lower())
-            has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            repo_has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
         stale_outside_collaborators = set(all_outside_collaborators) - set(active_outside_collaborators)
