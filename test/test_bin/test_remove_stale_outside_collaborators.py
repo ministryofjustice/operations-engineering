@@ -1,34 +1,66 @@
 import os
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import call, patch, MagicMock
 from services.github_service import GithubService
+from github import GithubException
 
 from bin.remove_stale_outside_collaborators import(
     main,
     get_environment_variables
 )
 
-@patch("bin.remove_stale_outside_collaborators.GithubService", new=MagicMock)
-@patch("github.Github.__new__", new=MagicMock)
-# @patch("gql.Client.__new__", new=MagicMock)
-# @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+class TestGetEnvironmentVariables(unittest.TestCase):
+    @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
+    def test_returns_github_token(self):
+        github_token = get_environment_variables()
+        self.assertEqual(github_token, "token")
+
+    def test_raises_error_when_no_github_token(self):
+        self.assertRaises(
+            ValueError, get_environment_variables)
+
+
+@patch("services.github_service.GithubService.__new__")
 @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
 class TestRemoveStaleOutsideCollaboratorsMain(unittest.TestCase):
-    def setUp(self):
-        self.stale_outside_collaborators = [
+
+    def test_main_remove_expected_number_of_outside_collaborators(self, mock_github_service: MagicMock):
+        mock_github_service.return_value.organisation_name = "test_org"
+        mock_github_service.return_value.get_stale_outside_collaborators.return_value = [
             "stale_outside_collab_1", "stale_outside_collab_2"
         ]
-
-    def test_main_logs_info(self):
-        github = GithubService("", "test_org")
-        org = MagicMock()
-        org.return_value.organisation_name.return_value = "test_org"
-        # github.organisation_name = MagicMock(
-        #     return_value="test_org"
-        # )
-        github.get_stale_outside_collaborators = MagicMock(
-            return_value=self.stale_outside_collaborators
+        main()
+        mock_github_service.return_value.remove_outside_collaborator_from_org.assert_has_calls(
+            [call('stale_outside_collab_1'), call('stale_outside_collab_2')]
         )
 
+    def test_main_empty_stale_outside_collaborators(self, mock_github_service: MagicMock):
+        mock_github_service.return_value.organisation_name = "test_org"
+        mock_github_service.return_value.get_stale_outside_collaborators.return_value = []
         main()
-        self.assertLogs()
+        mock_github_service.return_value.remove_outside_collaborator_from_org.assert_not_called()
+
+
+    def test_main_continues_after_exception(self, mock_github_service: MagicMock):
+        mock_github_service.return_value.organisation_name = "test_org"
+        mock_github_service.return_value.get_stale_outside_collaborators.return_value = [
+            "stale_outside_collab_1", "stale_outside_collab_2"
+        ]
+        mock_github_service.return_value.remove_outside_collaborator_from_org.side_effect = GithubException(2)
+        main()
+        mock_github_service.return_value.remove_outside_collaborator_from_org.assert_has_calls(
+            [call('stale_outside_collab_1'), call('stale_outside_collab_2')]
+        )
+
+    def test_main_exits_on_other_error(self, mock_github_service: MagicMock):
+        mock_github_service.return_value.organisation_name = "test_org"
+        mock_github_service.return_value.get_stale_outside_collaborators.return_value = [
+            "stale_outside_collab_1", "stale_outside_collab_2"
+        ]
+        mock_github_service.return_value.remove_outside_collaborator_from_org.side_effect = ValueError()
+        try:
+            main()
+        except ValueError:
+            mock_github_service.return_value.remove_outside_collaborator_from_org.assert_has_calls(
+                [call('stale_outside_collab_1')]
+            )
