@@ -10,28 +10,6 @@ def get_environment_variables() -> str:
 
     return github_token
 
-# Function to remove the identified stale outside collaborators - also to go in github service
-# def remove_collaborator(collaborator, github_service: GithubService):
-#     """Remove the collaborator from the organisation
-#     Args:
-#         collaborator (collaborator): The collaborator object
-#     """
-#     logging.info(f"Remove user from organisation: {collaborator.login}")
-#     org = github_service.github_client_core_api.get_organization(
-#         "ministryofjustice")
-#     org.remove_outside_collaborator(collaborator)
-
-# ToDo
-# tests for github service functions and main
-# workflow update; remove on PR trigger
-# delete old scripts and workflow
-# names check over
-# update PR
-# line 701 TestGithubServiceGetPaginatedListOfUnlockedUnarchivedReposAndOutsideCollaborators
-# test for TestGithubServiceGetStaleOutsideCollaborators line 1268 in test_github_service
-# Add remove outside collaborator function to github service - or is this usng the
-# test for remove_outside_collaboraotr, does it just accept string of coolab name?
-
 def main():
     github_token = get_environment_variables()
     github = GithubService(github_token, "ministryofjustice")
@@ -40,9 +18,9 @@ def main():
     print(f"Stale Outside Collaborators:\n{stale_outside_collaborators}")
     print(f"Number of Stale Outside Collaborators to remove: {len(stale_outside_collaborators)}")
 
-    # Remove the stale outside collaborators
-    # for stale_outside_collaborator in stale_outside_collaborators:
-    #     github.remove_outside_collaborator_from_org(stale_outside_collaborator)
+    # need some logging - log who is being removed? Iis it ok to print this out to console?
+    for stale_outside_collaborator in stale_outside_collaborators:
+        github.remove_outside_collaborator_from_org(stale_outside_collaborator)
 
     return stale_outside_collaborators
 

@@ -1,8 +1,8 @@
 name: 🤖 Remove Stale Outside Collaborators
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "0 4 1 * *"
+  schedule:
+    - cron: "0 4 1 * *"
 
 jobs:
   remove-stale-outside-collaborators:

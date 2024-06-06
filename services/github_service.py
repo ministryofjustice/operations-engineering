@@ -691,10 +691,6 @@ class GithubService:
         """
 
         all_outside_collaborators = self.get_outside_collaborators_login_names()
-        if len(all_outside_collaborators) > self.GITHUB_GQL_MAX_PAGE_SIZE:
-            raise ValueError(
-                f"The number of Outside Collaborators in the organisation exceeds the page size of {self.GITHUB_GQL_MAX_PAGE_SIZE}; this may cause some Active Outside Collaborators to be misclassified as Stale as the collaborators object is not paginated.")
-
         repo_has_next_page = True
         after_cursor = None
         active_outside_collaborators = []
@@ -707,7 +703,7 @@ class GithubService:
                     if repo["isDisabled"]:
                         continue
                     # The query only returns the first 100 Outside Collaborators on a repo, if there is a next page
-                    # it will not collect them. This is very unlikely to occur however the function output is
+                    # it will not collect them. This is very unlikely to occur, however the function output is
                     # unreliable if it does so.
                     if repo["collaborators"]["pageInfo"]["hasNextPage"]:
                         raise ValueError(
@@ -1015,7 +1011,6 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_outside_collaborator_from_org(self, outside_collaborator: str):
-        # github_user = self.github_client_core_api.get_user(outside_collaborator)
         self.github_client_core_api.get_organization(
             self.organisation_name).remove_outside_collaborator(outside_collaborator)
 

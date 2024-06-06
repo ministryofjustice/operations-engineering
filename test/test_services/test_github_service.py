@@ -276,6 +276,22 @@ class TestGithubServiceGetOutsideCollaborators(unittest.TestCase):
         self.assertRaises(
             ConnectionError, github_service.get_outside_collaborators_login_names)
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceRemoveOutsideCollaboratorFromOrg(unittest.TestCase):
+
+    def test_returns_login_names(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_organization().get_outside_collaborators.return_value = [
+            Mock(NamedUser, login="tom-smith"),
+            Mock(NamedUser, login="john.smith"),
+        ]
+        response = GithubService(
+            "", ORGANISATION_NAME).get_outside_collaborators_login_names()
+        self.assertEqual(["tom-smith", "john.smith"], response)
+
+
+
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
@@ -1273,7 +1289,7 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
             "organization": {
                 "repositories": {
                     "pageInfo": {
-                        "endCursor": "test_end_cursor",
+                        "endCursor": "repo_1_end_cursor",
                         "hasNextPage": False
                     },
                     "nodes": [
@@ -1281,6 +1297,9 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
                             "name": "repository_1",
                             "isDisabled": False,
                             "collaborators": {
+                                "pageInfo": {
+                                    "hasNextPage": False
+                                },
                                 "edges": [
                                     {
                                         "node": {
@@ -1295,11 +1314,66 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
                                 ]
                             }
                         },
+                        {
+                            "name": "repository_2",
+                            "isDisabled": False,
+                            "collaborators": {
+                                "pageInfo": {
+                                    "hasNextPage": False
+                                },
+                                "edges": [
+                                    {
+                                        "node": {
+                                            "login": "outside_collab_3"
+                                        }
+                                    },
+                                ]
+                            }
+                        },
                     ]
                 }
             }
         }
+        self.all_outside_collaborators = [
+            "outside_collab_1", "outside_collab_2", "outside_collab_3", "outside_collab_4"
+        ]
 
+    def test_returns_correct_data(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators = MagicMock(
+            return_value=self.return_data
+        )
+        github_service.get_outside_collaborators_login_names = MagicMock(
+            return_value=self.all_outside_collaborators
+        )
+        stale_outside_collaborators = github_service.get_stale_outside_collaborators()
+        self.assertEqual(len(stale_outside_collaborators), 1)
+        self.assertEqual(stale_outside_collaborators, ["outside_collab_4"])
+
+    def test_counts_disabled_repo_outside_collaborators(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.return_data["organization"]["repositories"]["nodes"][1]["isDisabled"] = True
+        github_service.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators = MagicMock(
+            return_value=self.return_data
+        )
+        github_service.get_outside_collaborators_login_names = MagicMock(
+            return_value=self.all_outside_collaborators
+        )
+        stale_outside_collaborators = github_service.get_stale_outside_collaborators()
+        self.assertEqual(len(stale_outside_collaborators), 2)
+        self.assertEqual(set(stale_outside_collaborators), set(["outside_collab_3", "outside_collab_4"]))
+
+    def test_outside_collaborators_has_next_page_raises_error(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.return_data["organization"]["repositories"]["nodes"][1]["collaborators"]["pageInfo"]["hasNextPage"] = True
+        github_service.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators = MagicMock(
+            return_value=self.return_data
+        )
+        github_service.get_outside_collaborators_login_names = MagicMock(
+            return_value=self.all_outside_collaborators
+        )
+        with self.assertRaises(ValueError):
+            github_service.get_stale_outside_collaborators()
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
