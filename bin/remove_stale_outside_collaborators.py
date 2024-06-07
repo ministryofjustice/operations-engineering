@@ -14,28 +14,37 @@ def get_environment_variables() -> str:
         raise ValueError(
             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
-    return github_token
+    github_organization_name = os.getenv("GITHUB_ORGANIZATION_NAME")
+    if not github_organization_name:
+        raise ValueError(
+            "The env variable GITHUB_ORGANIZATION_NAME is empty or missing")
+
+    return github_token, github_organization_name
 
 
 def main():
-    github_token = get_environment_variables()
-    github = GithubService(github_token, "ministryofjustice")
-    org = github.organisation_name
-
+    github_token, github_organization_name = get_environment_variables()
+    github = GithubService(github_token, github_organization_name)
     stale_outside_collaborators = github.get_stale_outside_collaborators()
+
+    if not stale_outside_collaborators:
+        logger.info(
+            "No Stale Outside Collaborators detected."
+        )
+
     for stale_outside_collaborator in stale_outside_collaborators:
         try:
             github.remove_outside_collaborator_from_org(stale_outside_collaborator)
             logger.info(
                 "Removed Outside Collaborator %s from %s",
                 stale_outside_collaborator,
-                org
+                github_organization_name
             )
         except GithubException:
             logger.error(
                 "Failed to remove Outside Collaborator %s from %s",
                 stale_outside_collaborator,
-                org
+                github_organization_name
             )
 
 

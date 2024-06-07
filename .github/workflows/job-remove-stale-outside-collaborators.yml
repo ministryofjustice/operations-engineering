@@ -21,6 +21,7 @@ jobs:
       - run: pipenv run python -m bin.remove_stale_outside_collaborators
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_BOT_TOKEN }}
+          GITHUB_ORGANIZATION_NAME: ministryofjustice
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2

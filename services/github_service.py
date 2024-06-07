@@ -1011,10 +1011,11 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def remove_outside_collaborator_from_org(self, outside_collaborator: str):
+        github_user = self.github_client_core_api.get_user(outside_collaborator)
         self.github_client_core_api.get_organization(
             self.organisation_name
         ).remove_outside_collaborator(
-            outside_collaborator
+            github_user
         )
 
     def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str],
