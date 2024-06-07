@@ -6,7 +6,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, NamedUser, RateLimitExceededException,
+from github import (Github, GithubException, NamedUser, RateLimitExceededException,
                     UnknownObjectException)
 from github.Issue import Issue
 from github.Organization import Organization
@@ -116,7 +116,7 @@ class GithubService:
                 logging.debug(
                     f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
                 return False
-        except ArithmeticError:
+        except GithubException:
             logging.debug(f"Repository has no commits: {repository.name}")
 
         return True
@@ -1073,7 +1073,7 @@ class GithubService:
             # Get the user's commits in the repo
             try:
                 commits = repo.get_commits(author=user)
-            except Exception:
+            except GithubException:
                 logging.error(
                     f"An exception occurred while getting commits for user {user.login} in repo {repo.name}")
                 continue
@@ -1083,7 +1083,7 @@ class GithubService:
                 for commit in commits:
                     if commit.commit.author.date > cutoff_date:
                         return False  # User has been active in this repo, so not considered inactive
-            except Exception:
+            except GithubException:
                 logging.error(
                     f"An exception occurred while getting commit date for user {user.login} in repo {repo.name}")
                 continue
@@ -1113,7 +1113,7 @@ class GithubService:
             try:
                 team.remove_membership(user)
                 logging.info(f"Removed user {user.login} from team {team_id}")
-            except Exception:
+            except GithubException:
                 logging.error(
                     f"An exception occurred while removing user {user.login} from team {team_name}")
 
