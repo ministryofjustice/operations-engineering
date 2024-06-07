@@ -116,7 +116,7 @@ class GithubService:
                 logging.debug(
                     f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
                 return False
-        except Exception:
+        except ArithmeticError:
             logging.debug(f"Repository has no commits: {repository.name}")
 
         return True
