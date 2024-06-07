@@ -1,9 +1,7 @@
 import os
 import unittest
 from unittest.mock import call, patch, MagicMock
-from services.github_service import GithubService
 from github import GithubException
-
 from bin.remove_stale_outside_collaborators import(
     main,
     get_environment_variables
