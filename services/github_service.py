@@ -1073,7 +1073,7 @@ class GithubService:
             # Get the user's commits in the repo
             try:
                 commits = repo.get_commits(author=user)
-            except GithubException:
+            except Exception:
                 logging.error(
                     f"An exception occurred while getting commits for user {user.login} in repo {repo.name}")
                 continue
@@ -1083,7 +1083,7 @@ class GithubService:
                 for commit in commits:
                     if commit.commit.author.date > cutoff_date:
                         return False  # User has been active in this repo, so not considered inactive
-            except GithubException:
+            except Exception:
                 logging.error(
                     f"An exception occurred while getting commit date for user {user.login} in repo {repo.name}")
                 continue
@@ -1113,7 +1113,7 @@ class GithubService:
             try:
                 team.remove_membership(user)
                 logging.info(f"Removed user {user.login} from team {team_id}")
-            except GithubException:
+            except Exception:
                 logging.error(
                     f"An exception occurred while removing user {user.login} from team {team_name}")
 
