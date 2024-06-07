@@ -1359,6 +1359,7 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
         with self.assertRaises(ValueError):
             github_service.get_stale_outside_collaborators()
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)

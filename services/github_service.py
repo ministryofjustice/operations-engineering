@@ -400,7 +400,7 @@ class GithubService:
                             name
                             isDisabled
                             collaborators(first: 100, affiliation: OUTSIDE){
-                               	pageInfo {
+                                pageInfo {
                                     hasNextPage
                                 }
                                 edges {

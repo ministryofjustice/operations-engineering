@@ -2,10 +2,8 @@ import os
 import unittest
 from unittest.mock import call, patch, MagicMock
 from github import GithubException
-from bin.remove_stale_outside_collaborators import(
-    main,
-    get_environment_variables
-)
+from bin.remove_stale_outside_collaborators import main, get_environment_variables
+
 
 class TestGetEnvironmentVariables(unittest.TestCase):
     @patch.dict(os.environ, {"ADMIN_GITHUB_TOKEN": "token"})
@@ -37,7 +35,6 @@ class TestRemoveStaleOutsideCollaboratorsMain(unittest.TestCase):
         mock_github_service.return_value.get_stale_outside_collaborators.return_value = []
         main()
         mock_github_service.return_value.remove_outside_collaborator_from_org.assert_not_called()
-
 
     def test_main_continues_after_exception(self, mock_github_service: MagicMock):
         mock_github_service.return_value.organisation_name = "test_org"

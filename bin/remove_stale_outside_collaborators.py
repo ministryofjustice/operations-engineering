@@ -7,6 +7,7 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+
 def get_environment_variables() -> str:
     github_token = os.getenv("ADMIN_GITHUB_TOKEN")
     if not github_token:
@@ -14,6 +15,7 @@ def get_environment_variables() -> str:
             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
     return github_token
+
 
 def main():
     github_token = get_environment_variables()
