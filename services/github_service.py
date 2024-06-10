@@ -6,7 +6,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, NamedUser, RateLimitExceededException,
+from github import (Github, GithubException, NamedUser, RateLimitExceededException,
                     UnknownObjectException)
 from github.Issue import Issue
 from github.Organization import Organization
@@ -116,7 +116,7 @@ class GithubService:
                 logging.debug(
                     f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
                 return False
-        except Exception:
+        except GithubException:
             logging.debug(f"Repository has no commits: {repository.name}")
 
         return True
@@ -377,6 +377,47 @@ class GithubService:
                                "after_cursor": after_cursor})
 
     @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
+        self,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated list of org unlocked unarchived repositories and their first 100 outside collaborators. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        return self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $organisation_name) {
+                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                        nodes {
+                            name
+                            isDisabled
+                            collaborators(first: 100, affiliation: OUTSIDE){
+                                pageInfo {
+                                    hasNextPage
+                                }
+                                edges {
+                                    node {
+                                        login
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
+                               "after_cursor": after_cursor})
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_type(self, repo_type: str, after_cursor: str | None,
                                                     page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> dict[str, Any]:
         logging.info(
@@ -614,6 +655,7 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_org_repo_names(self) -> list[str]:
         """A wrapper function to run a GraphQL query to get a list of the organisation repository names
+        (open repositories only).
 
         Returns:
             list: A list of the organisation repository names
@@ -693,6 +735,46 @@ class GithubService:
             "page_size": page_size,
             "after_cursor": after_cursor
         })
+
+    def get_stale_outside_collaborators(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a list of the Stale Outside Collaborators
+        in the organisation. These are Outside Collaborators not affiliated with any open (not locked,
+        not archived nor disabled) repositories. The function collects the Active Outside Collaborators
+        (those affiliated with at least one open repository) and then subtracts these from the total
+        list of Outside Collaborators.
+
+        Returns:
+            list: A list of the organisation stale outside collaborators login names in lower case
+        """
+
+        all_outside_collaborators = self.get_outside_collaborators_login_names()
+        repo_has_next_page = True
+        after_cursor = None
+        active_outside_collaborators = []
+        while repo_has_next_page:
+            data = self.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
+                after_cursor, self.GITHUB_GQL_MAX_PAGE_SIZE
+            )
+            if data["organization"]["repositories"]["nodes"] is not None:
+                for repo in data["organization"]["repositories"]["nodes"]:
+                    if repo["isDisabled"]:
+                        continue
+                    # The query only returns the first 100 Outside Collaborators on a repo, if there is a next page
+                    # it will not collect them. This is very unlikely to occur, however the function output is
+                    # unreliable if it does so.
+                    if repo["collaborators"]["pageInfo"]["hasNextPage"]:
+                        raise ValueError(
+                            "Some Outside Collaborators omitted from calculation; cannot get reliable Stale Outside Collaborators list."
+                        )
+                    for collaborators in repo["collaborators"]["edges"]:
+                        if collaborators:
+                            active_outside_collaborators.append(collaborators["node"]["login"].lower())
+            repo_has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+
+        stale_outside_collaborators = set(all_outside_collaborators) - set(active_outside_collaborators)
+
+        return list(stale_outside_collaborators)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
@@ -983,6 +1065,15 @@ class GithubService:
         github_user = self.github_client_core_api.get_user(user)
         self.github_client_core_api.get_organization(
             self.organisation_name).remove_from_membership(github_user)
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def remove_outside_collaborator_from_org(self, outside_collaborator: str):
+        github_user = self.github_client_core_api.get_user(outside_collaborator)
+        self.github_client_core_api.get_organization(
+            self.organisation_name
+        ).remove_outside_collaborator(
+            github_user
+        )
 
     def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str],
                            inactivity_months: int) -> list[NamedUser.NamedUser]:

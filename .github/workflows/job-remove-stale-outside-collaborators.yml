@@ -1,15 +1,15 @@
-name: 🤖 Remove Collaborators Attached to Locked Repositories
+name: 🤖 Remove Stale Outside Collaborators
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 4 1 * *"
 
 jobs:
-  remove-locked-repo-collaborators:
+  remove-stale-outside-collaborators:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Remove collaborators attached to locked repositories
+      - name: Set up
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -18,7 +18,11 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python -m bin.remove_collaborator_locked_repos ${{ secrets.OPS_BOT_TOKEN }}
+      - name: Remove stale outside collaborators
+        run: pipenv run python -m bin.remove_stale_outside_collaborators
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_BOT_TOKEN }}
+          GITHUB_ORGANIZATION_NAME: ministryofjustice
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
