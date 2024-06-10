@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Remove stale outside collaborators
+      - name: Set up
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -18,7 +18,8 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python -m bin.remove_stale_outside_collaborators
+      - name: Remove stale outside collaborators
+        run: pipenv run python -m bin.remove_stale_outside_collaborators
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_BOT_TOKEN }}
           GITHUB_ORGANIZATION_NAME: ministryofjustice
