@@ -1175,6 +1175,108 @@ class TestGithubServiceGetTeamUserNames(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceCheckCircleCIConfigInRepos(unittest.TestCase):
+    def setUp(self):
+        self.return_data = {
+            "organization": {
+                "repositories": {
+                    "edges": [
+                        {
+                            "node": {
+                                "name": "test_repository",
+                                "object": {
+                                    "id": "test_id"
+                                }
+                            },
+                        },
+                    ],
+                    "pageInfo": {
+                        "hasNextPage": False,
+                        "endCursor": "test_end_cursor",
+                    },
+                }
+            }
+        }
+
+    def test_returns_correct_data(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_circleci_config_check = MagicMock(
+            return_value=self.return_data
+        )
+        repos = github_service.check_circleci_config_in_repos()
+        self.assertEqual(len(repos), 1)
+        self.assertEqual(repos[0], "test_repository")
+
+    def test_no_circleci_config(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.return_data["organization"]["repositories"]["edges"][0]["node"]["object"] = None
+        github_service.get_paginated_circleci_config_check = MagicMock(
+            return_value=self.return_data
+        )
+        repos = github_service.check_circleci_config_in_repos()
+        self.assertEqual(len(repos), 0)
+
+    def test_nothing_to_return(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.return_data["organization"]["repositories"]["edges"] = None
+        github_service.get_paginated_circleci_config_check = MagicMock(
+            return_value=self.return_data
+        )
+        repos = github_service.check_circleci_config_in_repos()
+        self.assertEqual(len(repos), 0)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetPaginatedCircleCIConfigCheck(unittest.TestCase):
+    def setUp(self):
+        self.return_data = {
+            "organization": {
+                "repositories": {
+                    "edges": [
+                        {
+                            "node": {
+                                "name": "test_repository",
+                                "object": {
+                                    "id": "test_id"
+                                }
+                            },
+                        },
+                    ],
+                    "pageInfo": {
+                        "hasNextPage": False,
+                        "endCursor": "test_end_cursor",
+                    },
+                }
+            }
+        }
+
+    def test_returns_correct_data(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_gql_api.execute = MagicMock(
+            return_value=self.return_data
+        )
+        result = github_service.get_paginated_circleci_config_check("test_cursor", 100)
+        self.assertEqual(result, self.return_data)
+
+    def test_page_size_too_large(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        with self.assertRaises(ValueError):
+            github_service.get_paginated_circleci_config_check("test_cursor", github_service.GITHUB_GQL_MAX_PAGE_SIZE + 1)
+
+    def test_returns_empty_data(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.github_client_gql_api.execute = MagicMock(
+            return_value={}
+        )
+        result = github_service.get_paginated_circleci_config_check("test_cursor", 100)
+        self.assertEqual(result, {})
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetOrgRepoNames(unittest.TestCase):
     def setUp(self):
         self.return_data = {
