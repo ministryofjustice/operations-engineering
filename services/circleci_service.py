@@ -11,7 +11,7 @@ class CircleciService:
         }
 
     def get_circleci_pipelines_for_repository(self, repo):
-        url = f"https://circleci.com/api/v2/project/github/{self.github_org}/{repo}/pipeline"
+        url = self.base_url + f"project/github/{self.github_org}/{repo}/pipeline"
         response = requests.get(url, headers=self.headers, timeout=60)
         if response.status_code != 200:
             print(f"Error getting pipelines for {repo}: {response.text}")
@@ -49,7 +49,6 @@ class CircleciService:
         return contexts
 
     def list_all_contexts(self):
-        print("PEPPER - Listing all contexts...")
         url = self.base_url + f"context?owner-id={self.owner_id}"
         headers = self.headers
 
