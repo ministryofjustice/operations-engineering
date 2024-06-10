@@ -158,6 +158,25 @@ class SlackService:
             ]
         )
 
+    def send_unused_circleci_context_alert_to_operations_engineering(self, number_of_contexts: int):
+        self.slack_client.chat_postMessage(
+            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+            mrkdown=True,
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": dedent(f"""
+                            *Unused CircleCI Contexts*
+                            A total of {number_of_contexts} unused CircleCI contexts have been detected.
+                            Please see the GH Action for more information: https://github.com/ministryofjustice/operations-engineering
+                        """).strip("\n")
+                    }
+                }
+            ]
+        )
+
     def send_undelivered_email_alert_to_operations_engineering(
         self, email_addresses: list, organisation_name: str
     ):
