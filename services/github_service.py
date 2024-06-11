@@ -695,9 +695,9 @@ class GithubService:
         while has_next_page:
             data = self.get_paginated_circleci_config_check(after_cursor, 100)
 
-            if data["organization"]["repositories"]["edges"] is not None:
+            if data["organization"]["repositories"]["edges"]:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["object"] is not None:
+                    if repo["node"]["object"]:
                         repos_with_circleci_config.append(repo["node"]["name"])
 
             has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
