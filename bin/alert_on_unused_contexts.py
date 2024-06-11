@@ -22,18 +22,18 @@ def get_environment_variables() -> tuple:
     if not circleci_token:
         raise ValueError(
             "The env variable ADMIN_CIRCLECI_TOKEN is empty or missing")
-    circle_owner_id = os.getenv("CIRCLE_CI_OWNER_ID")
-    if not circleci_token:
+    circleci_owner_id = os.getenv("CIRCLE_CI_OWNER_ID")
+    if not circleci_owner_id:
         raise ValueError(
             "The env variable CIRCLE_CI_OWNER_ID is empty or missing")
 
-    return slack_token, github_token, circleci_token, circle_owner_id
+    return slack_token, github_token, circleci_token, circleci_owner_id
 
 
 def main():
-    slack_token, github_token, circleci_token, circle_owner_id = get_environment_variables()
+    slack_token, github_token, circleci_token, circleci_owner_id = get_environment_variables()
     github_service = GithubService(github_token, GITHUB_ORG)
-    circle_ci_service = CircleciService(circleci_token, circle_owner_id, GITHUB_ORG)
+    circle_ci_service = CircleciService(circleci_token, circleci_owner_id, GITHUB_ORG)
     slack_service = SlackService(slack_token)
 
     full_circle_ci_repository_list = github_service.check_circleci_config_in_repos()
