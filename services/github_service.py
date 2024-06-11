@@ -188,16 +188,14 @@ class GithubService:
         return self.github_client_gql_api.execute(gql("""
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
-                    repositories(first: $page_size, after: $after_cursor) {
+                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
                         pageInfo {
                             endCursor
                             hasNextPage
                         }
                         edges {
                             node {
-                                isArchived
                                 isDisabled
-                                isLocked
                                 name
                             }
                         }
@@ -466,8 +464,7 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["isDisabled"] or repo["node"]["isArchived"] or repo["node"][
-                            "isLocked"]:
+                    if repo["node"]["isDisabled"]:
                         continue
                     repository_names.append(repo["node"]["name"])
 

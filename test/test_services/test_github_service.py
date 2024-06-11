@@ -684,8 +684,6 @@ class TestGithubServiceGetOrgRepoNames(unittest.TestCase):
                         {
                             "node": {
                                 "name": "test_repository",
-                                "isArchived": False,
-                                "isLocked": False,
                                 "isDisabled": False,
                             },
                         },
@@ -709,21 +707,6 @@ class TestGithubServiceGetOrgRepoNames(unittest.TestCase):
 
     def test_returns_invalid_repository_type(self):
         github_service = GithubService("", ORGANISATION_NAME)
-        self.return_data["organization"]["repositories"]["edges"][0]["node"]["isArchived"] = True
-        github_service.get_paginated_list_of_org_repository_names = MagicMock(
-            return_value=self.return_data
-        )
-        repos = github_service.get_org_repo_names()
-        self.assertEqual(len(repos), 0)
-        self.return_data["organization"]["repositories"]["edges"][0]["node"]["isArchived"] = False
-
-        self.return_data["organization"]["repositories"]["edges"][0]["node"]["isLocked"] = True
-        github_service.get_paginated_list_of_org_repository_names = MagicMock(
-            return_value=self.return_data
-        )
-        repos = github_service.get_org_repo_names()
-        self.assertEqual(len(repos), 0)
-        self.return_data["organization"]["repositories"]["edges"][0]["node"]["isLocked"] = False
 
         self.return_data["organization"]["repositories"]["edges"][0]["node"]["isDisabled"] = True
         github_service.get_paginated_list_of_org_repository_names = MagicMock(
