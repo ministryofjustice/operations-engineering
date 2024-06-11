@@ -1,4 +1,5 @@
 import requests
+import yaml
 
 
 class CircleciService:
@@ -69,3 +70,29 @@ class CircleciService:
                 break
 
         return contexts
+
+    def get_all_pipeline_ids_for_all_repositories(self, repo_list, circle_ci_service):
+        all_pipeline_ids = []
+
+        for repo in repo_list:
+            pipelines = circle_ci_service.get_circleci_pipelines_for_repository(repo)
+            for pipeline in pipelines:
+                all_pipeline_ids.append(pipeline["id"])
+
+        return all_pipeline_ids
+
+    def get_all_used_contexts(self, full_pipeline_id_list):
+        all_used_contexts = set()
+
+        for pipeline in full_pipeline_id_list:
+            full_configuration_list = self.get_pipeline_configurations_from_pipeline_id(pipeline)
+            if full_configuration_list:
+                compiled_config = full_configuration_list.get("compiled", "")
+                compiled_setup_config = full_configuration_list.get("compiled-setup-config", "")
+                all_configurations_for_pipeline = [compiled_config, compiled_setup_config]
+                for configuration in all_configurations_for_pipeline:
+                    configuration_data = yaml.safe_load(configuration)
+                    contexts_in_configuration = self.find_all_contexts_from_configuration(configuration_data)
+                    all_used_contexts.update(contexts_in_configuration)
+
+        return all_used_contexts
