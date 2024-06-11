@@ -1,14 +1,12 @@
 import json
 from calendar import timegm
 from datetime import date, datetime, timedelta
-from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, GithubException, NamedUser, RateLimitExceededException,
                     UnknownObjectException)
-from github.Issue import Issue
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql

@@ -1,6 +1,5 @@
 import unittest
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from unittest.mock import MagicMock, Mock, call, patch
 
 from freezegun import freeze_time
@@ -9,11 +8,9 @@ from github import (Github, GithubException, RateLimitExceededException,
 from github.Branch import Branch
 from github.Commit import Commit
 from github.GitCommit import GitCommit
-from github.Issue import Issue
 from github.NamedUser import NamedUser
 from github.Organization import Organization
 from github.Repository import Repository
-from github.Team import Team
 from github.Variable import Variable
 from gql.transport.exceptions import TransportQueryError
 
