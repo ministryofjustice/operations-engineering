@@ -1,14 +1,12 @@
 import json
 from calendar import timegm
 from datetime import date, datetime, timedelta
-from textwrap import dedent
 from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, GithubException, NamedUser, RateLimitExceededException,
                     UnknownObjectException)
-from github.Issue import Issue
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
@@ -129,133 +127,6 @@ class GithubService:
         return [outside_collaborator.login.lower() for outside_collaborator in outside_collaborators]
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def close_expired_issues(self, repository_name: str) -> None:
-        logging.info(f"Closing expired issues for {repository_name}")
-        issues = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_issues() or []
-        for issue in issues:
-            if self.__is_expired(issue):
-                issue.edit(state="closed")
-                logging.info(f"Closing issue in {repository_name}")
-
-    def __is_expired(self, issue: Issue) -> bool:
-        grace_period = issue.created_at + timedelta(days=45)
-        return (issue.title == self.USER_ACCESS_REMOVED_ISSUE_TITLE
-                and issue.state == "open"
-                and grace_period < datetime.now())
-
-    def assign_support_issues_to_self(self, repository_name, org_name, tag: str) -> list[any]:
-        """
-            Assigns issues with a specific tag to the user who created the issue.
-            This is used to assign support issues to the user who created the issue.
-
-            :param repository_name: The name of the repository to assign issues in.
-            :param org_name: The name of the organisation to assign issues in.
-            :param tag: The tag to search for.
-        """
-        name = f"{org_name}/{repository_name}"
-        support_issues = self.get_support_issues(name, tag)
-
-        try:
-            return self.assign_issues_to_self(support_issues, name)
-        except ValueError as error:
-            raise ValueError(
-                f"Failed to assign issues to self in {repository_name}") from error
-
-    @staticmethod
-    def assign_issues_to_self(issues: list[Issue], repository_name: str) -> list[any]:
-        for issue in issues:
-            issue.edit(assignees=[issue.user.login])
-            if len(issue.assignees) == 0:
-                raise ValueError(
-                    f"Failed to assign issue {issue.number} to {issue.user.login} in {repository_name}")
-
-        return issues
-
-    def get_support_issues(self, repository_name: str, tag: str) -> list[Issue]:
-        return [
-            issue
-            for issue in self.get_open_issues_from_repo(repository_name)
-            for label in issue.labels
-            if label.name == tag and len(issue.assignees) == 0
-        ]
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_open_issues_from_repo(self, repository_name: str) -> list[Issue]:
-        """
-        Args:
-            repository_name: Should be in the format of "organisation/repository"
-
-        Returns:
-            A list of open issues in the repository from the GitHub API.
-        """
-        required_state = "open"
-        repo = self.github_client_core_api.get_repo(repository_name)
-
-        return repo.get_issues(state=required_state) or []
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def create_an_access_removed_issue_for_user_in_repository(self, user_name: str, repository_name: str) -> None:
-        logging.info(
-            f"Creating an access removed issue for user {user_name} in repository {repository_name}")
-        self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository_name}").create_issue(
-            title=self.USER_ACCESS_REMOVED_ISSUE_TITLE,
-            assignee=user_name,
-            body=dedent(f"""
-        Hi there
-
-        The user {user_name} either had direct member access to the repository or had direct member access and access via a team.
-
-        Access is now only via a team.
-
-        If the user was already in a team, then their direct access to the repository has been removed.
-
-        If the user was not in a team, then the user will have been added to an automated generated team named repository-name-<read|write|maintain|admin>-team and their direct access to the repository has been removed.
-
-        The list of Org teams can be found at https://github.com/orgs/ministryofjustice/teams or https://github.com/orgs/moj-analytical-services/teams.
-
-        The user will have the same level of access to the repository via the team.
-
-        The first user added to a team is made a team maintainer, this enables that user to manage the users within the team.
-
-        Users with admin access are added to the admin team as a team maintainer.
-
-        If you have any questions, please contact us in [#ask-operations-engineering](https://mojdt.slack.com/archives/C01BUKJSZD4) on Slack.
-
-        This issue can be closed.
-        """).strip("\n")
-        )
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def remove_user_from_repository(self, user_name: str, repository_name: str) -> None:
-        logging.info(
-            f"Removing user {user_name} from repository {repository_name}")
-        self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").remove_from_collaborators(user_name)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_user_permission_for_repository(self, user_name: str, repository_name: str) -> str:
-        logging.info(
-            f"Getting permissions for user {user_name} from repository {repository_name}")
-        user = self.github_client_core_api.get_user(user_name)
-        return self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_collaborator_permission(user)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def remove_user_from_team(self, user_name: str, team_id: int) -> None:
-        logging.info(f"Removing user {user_name} from team {team_id}")
-        user = self.github_client_core_api.get_user(user_name)
-        self.github_client_core_api.get_organization(self.organisation_name).get_team(team_id).remove_membership(
-            user)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def add_user_to_team(self, user_name: str, team_id: int) -> None:
-        logging.info(f"Adding user {user_name} from team {team_id}")
-        user = self.github_client_core_api.get_user(user_name)
-        self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id).add_membership(user)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
     def add_all_users_to_team(self, team_name: str) -> None:
         logging.info(f"Adding all users to {team_name}")
         team_id = self.get_team_id_from_team_name(team_name)
@@ -270,14 +141,6 @@ class GithubService:
     def __get_all_users(self) -> list:
         logging.info("Getting all organization members")
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_users_of_multiple_organisations(self, organisations: list) -> list:
-        all_users = []
-        for org in organisations:
-            all_users = all_users + [user["login"] for user in self.github_client_core_api.get_organization(
-                org).get_members() if user['login'] not in all_users]
-        return all_users
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
@@ -296,40 +159,6 @@ class GithubService:
         logging.info(f"Getting all named users for team {team_id}")
         return self.github_client_core_api.get_organization(self.organisation_name).get_team(
             team_id).get_members() or []
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def create_new_team_with_repository(self, team_name: str, repository_name: str) -> None:
-        logging.info(
-            f"Creating team {team_name} for repository {repository_name}")
-        repo = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}")
-        self.github_client_core_api.get_organization(self.organisation_name).create_team(
-            team_name,
-            [repo],
-            "",
-            "closed",
-            "Automated generated team to grant users access to this repository",
-        )
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def team_exists(self, team_name) -> bool:
-        logging.info(f"Checking if team {team_name} exists")
-        github_teams = self.github_client_core_api.get_organization(
-            self.organisation_name).get_teams() or []
-        return any(github_team.name == team_name for github_team in github_teams)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def amend_team_permissions_for_repository(self, team_id: int, permission: str, repository_name: str) -> None:
-        logging.info(
-            f"Amending permissions for team {team_id} in repository {repository_name}")
-        if permission == "read":
-            permission = "pull"
-        elif permission == "write":
-            permission = "push"
-        repo = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}")
-        self.github_client_core_api.get_organization(self.organisation_name).get_team(
-            team_id).update_team_repository(repo, permission)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_team_id_from_team_name(self, team_name: str) -> int | TypeError:
@@ -357,16 +186,14 @@ class GithubService:
         return self.github_client_gql_api.execute(gql("""
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
-                    repositories(first: $page_size, after: $after_cursor) {
+                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
                         pageInfo {
                             endCursor
                             hasNextPage
                         }
                         edges {
                             node {
-                                isArchived
                                 isDisabled
-                                isLocked
                                 name
                             }
                         }
@@ -486,40 +313,6 @@ class GithubService:
                 }
             }
         """), variable_values={"the_query": the_query, "page_size": page_size, "after_cursor": after_cursor})
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_user_names_with_direct_access_to_repository(self, repository_name: str,
-                                                                          after_cursor: str | None,
-                                                                          page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE) -> \
-            dict[str, Any]:
-        logging.info(
-            f"Getting paginated list of user names with direct access to repository {repository_name}. Page size {page_size}, after cursor {bool(after_cursor)}"
-        )
-        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
-            raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $repository_name: String!, $page_size: Int!, $after_cursor: String) {
-                repository(name: $repository_name, owner: $organisation_name) {
-                    collaborators(first: $page_size, after:$after_cursor, affiliation: DIRECT) {
-                        edges {
-                            node {
-                                login
-                            }
-                        }
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                    }
-                }
-            }
-        """), variable_values={
-            "repository_name": repository_name,
-            "organisation_name": self.organisation_name,
-            "page_size": page_size,
-            "after_cursor": after_cursor
-        })
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_team_names(self, after_cursor: str | None,
@@ -669,8 +462,7 @@ class GithubService:
 
             if data["organization"]["repositories"]["edges"] is not None:
                 for repo in data["organization"]["repositories"]["edges"]:
-                    if repo["node"]["isDisabled"] or repo["node"]["isArchived"] or repo["node"][
-                            "isLocked"]:
+                    if repo["node"]["isDisabled"]:
                         continue
                     repository_names.append(repo["node"]["name"])
 
@@ -843,19 +635,6 @@ class GithubService:
         })
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def add_user_to_team_as_maintainer(self, user_name: str, team_id: int) -> None:
-        logging.info(f"Making user {user_name} a maintainer in team {team_id}")
-        user = self.github_client_core_api.get_user(user_name)
-        self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id).add_membership(user, "maintainer")
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_repository_teams(self, repository_name: str) -> list:
-        teams = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}").get_teams() or []
-        return teams
-
-    @retries_github_rate_limit_exception_at_next_reset_once
     def get_repository_direct_users(self, repository_name: str) -> list:
         users = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}").get_collaborators("direct") or []
@@ -866,12 +645,6 @@ class GithubService:
         users = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}").get_collaborators("outside") or []
         return [member.login.lower() for member in users]
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_a_team_usernames(self, team_name: str) -> list[str]:
-        members = self.github_client_core_api.get_organization(
-            self.organisation_name).get_team_by_slug(team_name).get_members() or []
-        return [member.login.lower() for member in members]
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def set_standards(self, repository_name: str):
@@ -959,24 +732,6 @@ class GithubService:
         variable_values = {"the_query": the_query, "page_size": page_size,
                            "after_cursor": after_cursor}
         return self.github_client_gql_api.execute(query, variable_values)
-
-    def close_repository_open_issues_with_tag(self, repository: str, tag: str) -> None:
-        logging.info(
-            f"Closing open issues in repository {repository} with tag {tag}")
-        open_issues = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repository}").get_issues(
-            state="open")
-
-        open_issues_with_tag = [
-            issue
-            for issue in open_issues
-            for label in issue.labels
-            if label.name == tag and issue.state == "open"
-        ]
-
-        for issue in open_issues_with_tag:
-            logging.info(
-                f"Closing issue {issue.title} in repository {issue.repository} because it has tag {tag}")
-            issue.edit(state="closed")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_user_org_email_address(self, user_name) -> str | None:
@@ -1147,33 +902,6 @@ class GithubService:
                 continue
 
         return True  # User is inactive in all given repositories
-
-    def remove_list_of_users_from_team(self, team_name: str, users: list[NamedUser.NamedUser]) -> None:
-        """
-        Removes a list of specified users from a given team within the organisation.
-
-            This method takes a team name and a list of GitHub user objects (NamedUser)
-            to be removed from the team. If any exception occurs during the removal process,
-            an error message is logged, but the method continues to attempt removal of
-            the other users in the list.
-
-            :param team_name: The name of the team from which the users will be removed.
-            :type team_name: str
-            :param users: A list of GitHub user objects (NamedUser) representing the users to be removed.
-            :type users: list[NamedUser.NamedUser]
-            :return: None
-        """
-        logging.info(f"Removing users {users} from team {team_name}")
-        team_id = self.get_team_id_from_team_name(team_name)
-        team = self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id)
-        for user in users:
-            try:
-                team.remove_membership(user)
-                logging.info(f"Removed user {user.login} from team {team_id}")
-            except Exception:
-                logging.error(
-                    f"An exception occurred while removing user {user.login} from team {team_name}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_paginated_organization_members_with_emails(self, after_cursor: str | None,
