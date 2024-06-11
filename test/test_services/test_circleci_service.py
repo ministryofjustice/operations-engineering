@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import yaml
 from services.circleci_service import CircleciService
 
 
@@ -114,6 +115,88 @@ class TestCircleciService(unittest.TestCase):
 
         contexts = self.service.list_all_contexts()
         self.assertEqual(contexts, [])
+
+    def test_get_all_pipeline_ids_for_all_repositories_success(self, _mock_get):
+        repo_list = ["repo1", "repo2"]
+        self.service.get_circleci_pipelines_for_repository = MagicMock()
+
+        self.service.get_circleci_pipelines_for_repository.side_effect = [
+            [{"id": "pipeline1"}, {"id": "pipeline2"}],
+            [{"id": "pipeline3"}]
+        ]
+
+        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list, self.service)
+        self.assertEqual(all_pipeline_ids, ["pipeline1", "pipeline2", "pipeline3"])
+
+        self.service.get_circleci_pipelines_for_repository.assert_any_call("repo1")
+        self.service.get_circleci_pipelines_for_repository.assert_any_call("repo2")
+
+    def test_get_all_pipeline_ids_for_all_repositories_empty_repo_list(self, _mock_get):
+        repo_list = []
+        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list, self.service)
+        self.assertEqual(all_pipeline_ids, [])
+
+    def test_get_all_pipeline_ids_for_all_repositories_with_errors(self, _mock_get):
+        repo_list = ["repo1", "repo2"]
+        self.service.get_circleci_pipelines_for_repository = MagicMock()
+
+        self.service.get_circleci_pipelines_for_repository.side_effect = [
+            [{"id": "pipeline1"}],
+            []
+        ]
+
+        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list, self.service)
+        self.assertEqual(all_pipeline_ids, ["pipeline1"])
+
+        self.service.get_circleci_pipelines_for_repository.assert_any_call("repo1")
+        self.service.get_circleci_pipelines_for_repository.assert_any_call("repo2")
+
+    def test_get_all_used_contexts_success(self, _mock_get):
+        pipeline_id_list = ["pipeline1", "pipeline2"]
+        self.service.get_pipeline_configurations_from_pipeline_id = MagicMock()
+        self.service.find_all_contexts_from_configuration = MagicMock()
+
+        self.service.get_pipeline_configurations_from_pipeline_id.side_effect = [
+            {"compiled": "compiled_config_data1", "compiled-setup-config": "compiled_setup_config_data1"},
+            {"compiled": "compiled_config_data2", "compiled-setup-config": "compiled_setup_config_data2"}
+        ]
+        self.service.find_all_contexts_from_configuration.side_effect = [
+            ["context1", "context2"],
+            [],
+            ["context3"],
+            []
+        ]
+
+        all_used_contexts = self.service.get_all_used_contexts(pipeline_id_list)
+        self.assertEqual(all_used_contexts, {"context1", "context2", "context3"})
+
+        self.service.get_pipeline_configurations_from_pipeline_id.assert_any_call("pipeline1")
+        self.service.get_pipeline_configurations_from_pipeline_id.assert_any_call("pipeline2")
+        self.service.find_all_contexts_from_configuration.assert_any_call(yaml.safe_load("compiled_config_data1"))
+        self.service.find_all_contexts_from_configuration.assert_any_call(yaml.safe_load("compiled_setup_config_data1"))
+        self.service.find_all_contexts_from_configuration.assert_any_call(yaml.safe_load("compiled_config_data2"))
+        self.service.find_all_contexts_from_configuration.assert_any_call(yaml.safe_load("compiled_setup_config_data2"))
+
+    def test_get_all_used_contexts_with_empty_configs(self, _mock_get):
+        pipeline_id_list = ["pipeline1", "pipeline2"]
+        self.service.get_pipeline_configurations_from_pipeline_id = MagicMock()
+        self.service.find_all_contexts_from_configuration = MagicMock()
+
+        self.service.get_pipeline_configurations_from_pipeline_id.side_effect = [
+            {"compiled": "compiled_config_data1", "compiled-setup-config": ""},
+            {}
+        ]
+        self.service.find_all_contexts_from_configuration.side_effect = [
+            ["context1", "context2"],
+            []
+        ]
+
+        all_used_contexts = self.service.get_all_used_contexts(pipeline_id_list)
+        self.assertEqual(all_used_contexts, {"context1", "context2"})
+
+        self.service.get_pipeline_configurations_from_pipeline_id.assert_any_call("pipeline1")
+        self.service.get_pipeline_configurations_from_pipeline_id.assert_any_call("pipeline2")
+        self.service.find_all_contexts_from_configuration.assert_any_call(yaml.safe_load("compiled_config_data1"))
 
 
 if __name__ == "__main__":
