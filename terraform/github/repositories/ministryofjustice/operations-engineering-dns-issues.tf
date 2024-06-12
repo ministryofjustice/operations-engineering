@@ -3,7 +3,7 @@ module "operations-engineering-dns-issues" {
   version = "0.0.7"
 
   name        = "operations-engineering-dns-issues"
-  description = "DNS change request issues related tp the DMS request app (https://github.com/ministryofjustice/operations-engineering-dns-form), whilst it is in development."
+  description = "DNS requests are captured here as GitHub Issues. It should remain internal due to the sensitive nature of the information."
   topics      = ["operations-engineering", "dns"]
   visibility  = "internal"
 
