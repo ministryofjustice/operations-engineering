@@ -1,6 +1,6 @@
 module "operations-engineering-devcontainer" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.7"
+  version = "1.0.0"
 
   name        = "operations-engineering-devcontainer"
   description = ""

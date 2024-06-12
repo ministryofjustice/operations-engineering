@@ -1,6 +1,6 @@
 module "operations-engineering-dns-spike" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.7"
+  version = "1.0.0"
 
   name        = "operations-engineering-dns-spike"
   description = "DNS spike for the operations engineering team"
