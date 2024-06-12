@@ -1,6 +1,6 @@
 module "terraform-template-poc" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.7"
+  version = var.module_version
 
   name        = "terraform-template-poc"
   type        = "template"

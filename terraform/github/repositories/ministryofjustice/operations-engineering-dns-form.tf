@@ -1,6 +1,6 @@
 module "operations-engineering-dns-form" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.7"
+  version = var.module_version
 
   name        = "operations-engineering-dns-form"
   description = "A web form that captures the requirements for a DNS change"
@@ -10,4 +10,3 @@ module "operations-engineering-dns-form" {
     admin = [var.operations_engineering_team_id]
   }
 }
-
