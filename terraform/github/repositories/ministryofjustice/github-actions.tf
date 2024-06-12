@@ -1,6 +1,6 @@
 module "github-actions" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name        = "github-actions"
   description = "A github action which will run code formatters against PRs, and commit any resulting changes"

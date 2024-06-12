@@ -1,6 +1,6 @@
 module "terraform-github-repository" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name            = "terraform-github-repository"
   description     = "A Terraform module for GitHub repositories in the Ministry of Justice"

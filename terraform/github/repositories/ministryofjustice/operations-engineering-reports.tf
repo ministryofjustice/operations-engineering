@@ -1,6 +1,6 @@
 module "operations-engineering-reports" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name         = "operations-engineering-reports"
   description  = "Web application to receive JSON data and display data in reports using HTML."

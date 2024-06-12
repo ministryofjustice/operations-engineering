@@ -1,6 +1,6 @@
 module "operations-engineering-join-github" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name         = "operations-engineering-join-github"
   description  = "An application to augment the process of joining a Ministry of Justice GitHub Organisation"

@@ -1,6 +1,6 @@
 module "tech-docs-github-pages-publisher" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name         = "tech-docs-github-pages-publisher"
   description  = "Docker image to publish MoJ documentation repositories as github pages sites"

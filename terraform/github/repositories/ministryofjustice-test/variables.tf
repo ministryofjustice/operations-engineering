@@ -7,7 +7,3 @@ variable "test_team_access_team_id" {
   description = "test-team-access team id"
   type        = string
 }
-
-variable "module_version" {
-  type = string
-}

@@ -1,6 +1,6 @@
 module "operations-engineering-metadata-poc" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name        = "operations-engineering-metadata-poc"
   description = "PoC For Cross Identification Between MoJ Services"

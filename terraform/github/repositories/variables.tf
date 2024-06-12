@@ -15,9 +15,3 @@ variable "ECR_REGISTRY" {
   description = "Registry of ECR repositories"
   default     = "754256621582.dkr.ecr.eu-west-2.amazonaws.com"
 }
-
-variable "module_version" {
-  type        = string
-  description = "Version of github repository Terraform module"
-  default     = "1.0.0"
-}

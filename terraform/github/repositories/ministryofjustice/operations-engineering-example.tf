@@ -1,6 +1,6 @@
 module "operations-engineering-example" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name         = "operations-engineering-example"
   description  = "Example application to showcase how to deploy code"

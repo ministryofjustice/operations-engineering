@@ -6,10 +6,6 @@ variable "ECR_REGISTRY" {
   type = string
 }
 
-variable "module_version" {
-  type = string
-}
-
 variable "operations_engineering_team_id" {
   description = "operations-engineering team id"
   type        = string

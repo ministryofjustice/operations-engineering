@@ -1,6 +1,6 @@
 module "operations-engineering-kpi-dashboard-poc" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name        = "operations-engineering-kpi-dashboard-poc"
   description = "A POC for displaying KPI metrics of processes and services"

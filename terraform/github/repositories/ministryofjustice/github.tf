@@ -1,6 +1,6 @@
 module "github" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name        = ".github"
   description = "Default organisational policies for the Ministry of Justice"

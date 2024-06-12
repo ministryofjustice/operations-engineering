@@ -1,6 +1,6 @@
 module "cloud-platform-maintenance-pages" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name        = "cloud-platform-maintenance-pages"
   description = "Web application to serve gov.uk maintenance pages for multiple domains"

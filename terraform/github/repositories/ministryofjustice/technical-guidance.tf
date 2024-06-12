@@ -1,6 +1,6 @@
 module "technical-guidance" {
   source  = "ministryofjustice/repository/github"
-  version = var.module_version
+  version = "1.0.0"
 
   name         = "technical-guidance"
   description  = "How we build and operate products at the Ministry of Justice."
