@@ -1,6 +1,6 @@
 module "operations-engineering-dns-issues" {
   source  = "ministryofjustice/repository/github"
-  version = "1.0.0"
+  version = "1.0.1"
 
   name        = "operations-engineering-dns-issues"
   description = "DNS change request issues related tp the DMS request app (https://github.com/ministryofjustice/operations-engineering-dns-form), whilst it is in development."

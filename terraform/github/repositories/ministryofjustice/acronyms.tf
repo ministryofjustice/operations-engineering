@@ -1,6 +1,6 @@
 module "acronyms" {
   source  = "ministryofjustice/repository/github"
-  version = "1.0.0"
+  version = "1.0.1"
 
   name         = "acronyms"
   description  = "List of abbreviations used within the MoJ, and their definitions"
