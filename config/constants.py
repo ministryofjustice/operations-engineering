@@ -5,10 +5,9 @@ MISSING_EMAIL_ADDRESS = "-"
 NO_ACTIVITY = "no activity"
 ENTERPRISE = "ministry-of-justice-uk"
 SLACK_CHANNEL = "operations-engineering-alerts"
-SR_SLACK_CHANNEL = 'operations-engineering-team'
+SR_SLACK_CHANNEL = "operations-engineering-team"
 OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
     "SteveMarshall",
-    "jakemulley",
     "andyrogers1973",
     "jasonBirchall",
     "tamsinforbes",
@@ -16,8 +15,6 @@ OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
     "connormaglynn",
     "PepperMoJ",
     "levgorbunov1",
-    "NickWalt01",
-    "ben-al",
     "vijaykannan21",
-    "moj-operations-engineering-bot"
+    "moj-operations-engineering-bot",
 ]
