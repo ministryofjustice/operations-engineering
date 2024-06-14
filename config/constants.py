@@ -18,5 +18,6 @@ OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
     "levgorbunov1",
     "NickWalt01",
     "ben-al",
-    "vijaykannan21"
+    "vijaykannan21",
+    "moj-operations-engineering-bot"
 ]
