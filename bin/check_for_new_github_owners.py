@@ -1,7 +1,7 @@
 import os
 from datetime import datetime, timedelta
-from config.constants import MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 
+from config.constants import MINISTRY_OF_JUSTICE, SLACK_CHANNEL
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
@@ -20,12 +20,8 @@ def new_owner_detected_message(new_owner, date_added, added_by, org, audit_log_u
         f"*New owner:* {new_owner}\n"
         f"*Date added:* {date_added}\n"
         f"*By who:* {added_by}\n\n"
-
         f"Please review the audit log for more details: {audit_log_url}\n\n"
-
-
         f"Thanks, \n\n"
-
         "The GitHub Organisation Monitoring Bot"
     )
 
@@ -47,9 +43,13 @@ def check_for_new_organisation_owners(in_last_days: int):
     if changes:
         for change in changes:
             message = new_owner_detected_message(
-                change["userLogin"], change["createdAt"], change["actorLogin"], MINISTRY_OF_JUSTICE, audit_log_url)
-            slack.send_message_to_plaintext_channel_name(
-                message, SLACK_CHANNEL)
+                change["userLogin"],
+                change["createdAt"],
+                change["actorLogin"],
+                MINISTRY_OF_JUSTICE,
+                audit_log_url,
+            )
+            slack.send_message_to_plaintext_channel_name(message, SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
