@@ -125,7 +125,7 @@ class TestCircleciService(unittest.TestCase):
             [{"id": "pipeline3"}]
         ]
 
-        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list, self.service)
+        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list)
         self.assertEqual(all_pipeline_ids, ["pipeline1", "pipeline2", "pipeline3"])
 
         self.service.get_circleci_pipelines_for_repository.assert_any_call("repo1")
@@ -133,7 +133,7 @@ class TestCircleciService(unittest.TestCase):
 
     def test_get_all_pipeline_ids_for_all_repositories_empty_repo_list(self, _mock_get):
         repo_list = []
-        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list, self.service)
+        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list)
         self.assertEqual(all_pipeline_ids, [])
 
     def test_get_all_pipeline_ids_for_all_repositories_with_errors(self, _mock_get):
@@ -145,7 +145,7 @@ class TestCircleciService(unittest.TestCase):
             []
         ]
 
-        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list, self.service)
+        all_pipeline_ids = self.service.get_all_pipeline_ids_for_all_repositories(repo_list)
         self.assertEqual(all_pipeline_ids, ["pipeline1"])
 
         self.service.get_circleci_pipelines_for_repository.assert_any_call("repo1")

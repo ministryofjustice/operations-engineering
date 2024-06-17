@@ -71,11 +71,11 @@ class CircleciService:
 
         return contexts
 
-    def get_all_pipeline_ids_for_all_repositories(self, repo_list, circle_ci_service):
+    def get_all_pipeline_ids_for_all_repositories(self, repo_list):
         all_pipeline_ids = []
 
         for repo in repo_list:
-            pipelines = circle_ci_service.get_circleci_pipelines_for_repository(repo)
+            pipelines = self.get_circleci_pipelines_for_repository(repo)
             for pipeline in pipelines:
                 all_pipeline_ids.append(pipeline["id"])
 

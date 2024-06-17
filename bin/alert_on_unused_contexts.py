@@ -37,7 +37,7 @@ def main():
     slack_service = SlackService(slack_token)
 
     full_circle_ci_repository_list = github_service.check_circleci_config_in_repos()
-    full_pipeline_id_list = circle_ci_service.get_all_pipeline_ids_for_all_repositories(full_circle_ci_repository_list, circle_ci_service)
+    full_pipeline_id_list = circle_ci_service.get_all_pipeline_ids_for_all_repositories(full_circle_ci_repository_list)
 
     used_contexts = circle_ci_service.get_all_used_contexts(full_pipeline_id_list)
 
