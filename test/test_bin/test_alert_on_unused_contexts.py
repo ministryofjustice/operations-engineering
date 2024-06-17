@@ -36,7 +36,7 @@ class TestMainScript(unittest.TestCase):
         main()
 
         mock_github_instance.check_circleci_config_in_repos.assert_called_once()
-        mock_circleci_instance.get_all_pipeline_ids_for_all_repositories.assert_called_once_with(self.repo_list, mock_circleci_instance)
+        mock_circleci_instance.get_all_pipeline_ids_for_all_repositories.assert_called_once_with(self.repo_list)
         mock_circleci_instance.get_all_used_contexts.assert_called_once_with(self.pipeline_ids)
         mock_circleci_instance.list_all_contexts.assert_called_once()
         mock_slack_instance.send_unused_circleci_context_alert_to_operations_engineering.assert_called_once_with(1)
