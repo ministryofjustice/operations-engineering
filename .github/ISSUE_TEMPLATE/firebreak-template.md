@@ -2,7 +2,8 @@
 name: Firebreak Story Template
 about: Create new Firebreak story
 title: 'FIREBREAK:'
-labels: 'Firebreak'
+labels: Firebreak
+assignees: ''
 
 ---
 
