@@ -1,27 +1,4 @@
-import boto3
 from botocore.exceptions import NoCredentialsError
-
-# Usage:
-#   Fill in AWS creds
-#   Run the script
-#   Action output
-
-# Improvements:
-#   Look up domains dynamically
-#   Add this to actions somewhere
-
-# Auth
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
-AWS_SESSION_TOKEN = ""
-
-s3 = boto3.client('s3',
-                  aws_access_key_id=AWS_ACCESS_KEY_ID,
-                  aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                  aws_session_token=AWS_SESSION_TOKEN)
-
-BASE_URL = "https://s3.amazonaws.com/880656497252."
-SUFFIX = ".well-known/mta-sts.txt"
 
 # Keep this updated with all MTA-STS domains
 domains = ["ccrc.gov.uk",
@@ -53,25 +30,15 @@ domains = ["ccrc.gov.uk",
            "yjbservicespp.yjb.gov.uk",
            "youthjusticepp.yjb.gov.uk"]
 
-failed_domains = []
-
-# Check MTA STS is configured
-for domain in domains:
-    bucket_name = f"880656497252.{domain}"
-
-    try:
-        response = s3.get_object(Bucket=bucket_name, Key=SUFFIX)
-        sts_content = response['Body'].read().decode('utf-8')
-        has_enforce = any(line.startswith("mode: enforce")
-                          for line in sts_content.split('\n'))
-
-        if not has_enforce:
-            failed_domains.append(f"{domain} (No 'mode: enforce')")
-    except NoCredentialsError:
-        failed_domains.append(f"{domain} (AWS credentials not found)")
-    except Exception as e:
-        failed_domains.append(f"{domain} (Exception: {e}")
-
-# Failed domains
-for domain in failed_domains:
-    print(domain)
+def main ():
+    # Initialize the S3Service Client
+    s3_client = S3Service("880656497252", "ministryofjustice")
+    # List to hold domains that do not enforce MTA-STS
+    failed_domains = []
+    # Itertate over the list of domains
+    for domain in domains:
+        if not s3_client.is_well_known_mta_sts_enforced(domain):
+            print(f"{domain} (No 'mode: enforce')")
+            failed_domains.append(domain)
+ if __name__ == "__main__":
+        main()           
