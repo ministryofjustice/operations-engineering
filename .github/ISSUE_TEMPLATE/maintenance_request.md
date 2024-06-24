@@ -1,9 +1,10 @@
 ---
 name: Operations Engineering Maintenance Request
 about: Create a ticket for the Maintenance App
-title: ""
-labels: "Maintenance Pages"
-assignees: ""
+title: ''
+labels: Maintenance Pages
+assignees: ''
+
 ---
 
 ## Maintenance Pages Request
