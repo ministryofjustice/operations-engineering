@@ -1,9 +1,10 @@
-import os
 import csv
 import json
+import os
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import boto3
+from dateutil.relativedelta import relativedelta
+
 from config.constants import NO_ACTIVITY
 
 
@@ -99,3 +100,10 @@ class S3Service:
 
     def _delete_file(self, object_name: str):
         self.client.delete_object(Bucket=self.bucket_name, Key=object_name)
+        
+    def is_well_known_mta_sts_enforce(self, domain: str) -> bool:
+        suffix = ".well-known/mta-sts.txt"
+        bucket_name = f"880656497252.{domain}"
+        response = self.client.get_object(Bucket=bucket_name, key=suffix)
+        sts_content = response['Body'].read().decode('uft-8')
+        return any(line.startswitch("mode: enforce") for line in sts_content.split('\n'))
