@@ -12,9 +12,11 @@ resource "aws_iam_policy" "octodns_policy" {
       {
         Effect = "Allow"
         Action = [
-          "route53:ListHostedZones",
-          "route53:GetHostedZone",
           "route53:ChangeResourceRecordSets",
+          "route53:CreateHostedZone",
+          "route53:ListHealthChecks",
+          "route53:ListHostedZones",
+          "route53:ListHostedZonesByName",
           "route53:ListResourceRecordSets"
         ]
         Resource = "*"
