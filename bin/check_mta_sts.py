@@ -1,3 +1,4 @@
+from services.s3_service import S3Service
 from botocore.exceptions import NoCredentialsError
 
 # Keep this updated with all MTA-STS domains
