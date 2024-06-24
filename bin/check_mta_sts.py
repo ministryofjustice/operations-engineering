@@ -1,29 +1,4 @@
-import boto3
-from botocore.exceptions import NoCredentialsError
-
-# Usage:
-#   Fill in AWS creds
-#   Run the script
-#   Action output
-
-# Improvements:
-#   Look up domains dynamically
-#   Add this to actions somewhere
-
-# AWS credentials
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
-AWS_SESSION_TOKEN = ""
-
-# Create a boto3 client for s3
-s3 = boto3.client('s3',
-                  aws_access_key_id=AWS_ACCESS_KEY_ID,
-                  aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                  aws_session_token=AWS_SESSION_TOKEN)
-
-# The base URL for the S3 buckets and other objects key
-BASE_URL = "https://s3.amazonaws.com/880656497252."
-SUFFIX = ".well-known/mta-sts.txt"
+from services.s3_service import S3Service
 
 # The List of Domains to check
 domains = ["ccrc.gov.uk",
@@ -55,31 +30,17 @@ domains = ["ccrc.gov.uk",
            "yjbservicespp.yjb.gov.uk",
            "youthjusticepp.yjb.gov.uk"]
 
-# A list to store the domains that failed to check
-failed_domains = []
 
-# Check both domains MTA STS 
-for domain in domains:
-    # Bucket Name
-    bucket_name = f"880656497252.{domain}"
+def main():
+    s3_client = S3Service("880656497252", "ministryofjustice")
+    failed_domains = []
+    for domain in domains:
+        if not s3_client.is_well_known_mta_sts_enforced(domain):
+            print(f"{domain} (No 'mode: enforce')")
+            failed_domains.append(domain)
 
-    try:
-        # Try to get object from the bucket
-        response = s3.get_object(Bucket=bucket_name, Key=SUFFIX)
-        # Read the object content and check if it contains "mode enforce"
-        sts_content = response['Body'].read().decode('utf-8')
-        has_enforce = any(line.startswith("mode: enforce")
-                          for line in sts_content.split('\n'))
-        # If "mode: enforce is not found, and the domain to the failed_domains list"
-        if not has_enforce:
-            failed_domains.append(f"{domain} (No 'mode: enforce')")
-    except NoCredentialsError:
-        # If AWS credentials are not found, add the domain to the failed_domain list
-        failed_domains.append(f"{domain} (AWS credentials not found)")
-    except Exception as e:
-        # if any other error occurs, add the domain to the failed_domain list
-        failed_domains.append(f"{domain} (Exception: {e}")
+    # Send message to slack?
 
-# Display Failed domains
-for domain in failed_domains:
-    print(domain)
+
+if __name__ == "__main__":
+    main()

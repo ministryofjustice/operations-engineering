@@ -1,9 +1,11 @@
-import os
 import csv
 import json
+import os
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
+
 import boto3
+from dateutil.relativedelta import relativedelta
+
 from config.constants import NO_ACTIVITY
 
 
@@ -30,7 +32,8 @@ class S3Service:
     def save_r53_backup_file(self):
         session = boto3.Session(profile_name='cp_r53_backup_profile')
         client = session.client('s3')
-        client.upload_file("hosted_zones.json", self.bucket_name, f"{datetime.now().strftime('%Y-%m-%d')}-hosted_zones.json")
+        client.upload_file("hosted_zones.json", self.bucket_name,
+                           f"{datetime.now().strftime('%Y-%m-%d')}-hosted_zones.json")
 
     def get_users_have_emailed(self):
         self._download_file(
@@ -99,3 +102,11 @@ class S3Service:
 
     def _delete_file(self, object_name: str):
         self.client.delete_object(Bucket=self.bucket_name, Key=object_name)
+
+    def is_well_known_mta_sts_enforced(self, domain: str) -> bool:
+        suffix = ".well-known/mta-sts.txt"
+        bucket_name = f"880656497252.{domain}"
+
+        response = self.client.get_object(Bucket=bucket_name, Key=suffix)
+        sts_content = response['Body'].read().decode('utf-8')
+        return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
