@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import boto3
 from botocore.exceptions import NoCredentialsError
 from moto import mock_s3
