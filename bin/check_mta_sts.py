@@ -31,15 +31,17 @@ domains = ["ccrc.gov.uk",
            "yjbservicespp.yjb.gov.uk",
            "youthjusticepp.yjb.gov.uk"]
 
+
 def main ():
     # Initialize the S3Service Client
     s3_client = S3Service("880656497252", "ministryofjustice")
     # List to hold domains that do not enforce MTA-STS
     failed_domains = []
+    
     # Itertate over the list of domains
     for domain in domains:
         if not s3_client.is_well_known_mta_sts_enforced(domain):
             print(f"{domain} (No 'mode: enforce')")
             failed_domains.append(domain)
- if __name__ == "__main__":
+if __name__ == "__main__":
         main()           
