@@ -5,8 +5,13 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, GithubException, NamedUser, RateLimitExceededException,
-                    UnknownObjectException)
+from github import (
+    Github,
+    GithubException,
+    NamedUser,
+    RateLimitExceededException,
+    UnknownObjectException,
+)
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
@@ -1232,3 +1237,50 @@ class GithubService:
         logging.error(
             f"Failed to fetch PAT list: {response.status_code}, error: {response}")
         return []
+    
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def __get_teams_with_access(self, repository: Repository) -> tuple[list[str], list[str], list[str], list[str]]:
+            logging.info(f"Processing Repository: [ {repository.name} ]")
+            teams_with_admin_access = []
+            teams_with_admin_access_parents = []
+            teams_with_any_access = []
+            teams_with_any_access_parents = []
+            for team in list(repository.get_teams()):
+                logging.info(f"Processing Team: [ {team.name} ]")
+                permissions = team.get_repo_permission(repository)
+                team_parent = team.parent
+                if permissions and permissions.admin:
+                    teams_with_admin_access.append(team.name)
+                    if team_parent is not None:
+                        teams_with_admin_access_parents.append(team_parent.name)
+                if permissions and (permissions.admin or permissions.maintain or permissions.push or permissions.pull or permissions.triage):
+                    teams_with_any_access.append(team.name)
+                    if team_parent:
+                        teams_with_any_access_parents.append(team_parent.name)
+            return teams_with_admin_access, teams_with_admin_access_parents, teams_with_any_access, teams_with_any_access_parents
+            
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_all_repositories(self, limit: int) -> list[dict]:
+        response = []
+        repositories = list(self.github_client_core_api.get_organization(self.organisation_name).get_repos(type="public"))
+        repositories_to_check = [repository for repository in repositories if not (repository.archived or repository.fork)]
+        logging.info(f"Total Repositories: [ {len(repositories_to_check)} ]")
+        counter = 0
+        for repo in repositories_to_check:
+            if counter >= limit:
+                logging.info("Limit Reached, exiting early")
+                break
+            teams_with_admin_access, teams_with_admin_access_parents, teams_with_any_access, teams_with_any_access_parents = self.__get_teams_with_access(repo)
+            response.append(
+                {
+                    "name": repo.name,
+                    "github_teams_with_admin_access": teams_with_admin_access,
+                    "github_teams_with_admin_access_parents": teams_with_admin_access_parents,
+                    "github_teams_with_any_access": teams_with_any_access,
+                    "github_teams_with_any_access_parents": teams_with_any_access_parents,
+                },
+            )
+            counter += 1
+        return response
