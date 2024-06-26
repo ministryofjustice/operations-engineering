@@ -1,7 +1,7 @@
 import json
 import os
 
-from bin.print_github_repository_owners_repos import repositories
+# from bin.print_github_repository_owners_repos import repositories
 from services.github_service import GithubService
 
 
@@ -20,9 +20,9 @@ def convert_to_percentage(partial: int, total: int) -> str:
 
 
 def main():
-    # github_token, repository_limit = get_environment_variables()
-    # github_service = GithubService(github_token, "ministryofjustice")
-    # repositories = github_service.get_all_repositories(limit=repository_limit)
+    github_token, repository_limit = get_environment_variables()
+    github_service = GithubService(github_token, "ministryofjustice")
+    repositories = github_service.get_all_repositories(limit=repository_limit)
 
     unownedRepos = []
     reposWithMultipleOwners = []
@@ -36,53 +36,42 @@ def main():
 
     for repository in repositories:
         ownersFound = 0
-        if (
-            repository["name"].startswith("hmpps-")
-            or "HMPPS Developers" in repository["github_teams_with_any_access"]
-            or "HMPPS Developers" in repository["github_teams_with_any_access_parents"]
-            or "Digital Studio Sheffield" in repository["github_teams_with_any_access"]
-            or "Digital Studio Sheffield" in repository["github_teams_with_any_access_parents"]
-            or "MaP Developers" in repository["github_teams_with_any_access"]
-            or "MaP Developers" in repository["github_teams_with_any_access_parents"]
-        ):
+        if "HMPPS Developers" in repository["github_teams_with_admin_access"] or "HMPPS Developers" in repository["github_teams_with_admin_access_parents"]:
             hmppsRepos.append(repository)
             ownersFound += 1
 
         if (
-            repository["name"].startswith("laa-")
-            or "LAA Technical Architects" in repository["github_teams_with_any_access"]
-            or "LAA Technical Architects" in repository["github_teams_with_any_access_parents"]
-            or "LAA Developers" in repository["github_teams_with_any_access"]
-            or "LAA Developers" in repository["github_teams_with_any_access_parents"]
-            or "LAA Crime Apps team" in repository["github_teams_with_any_access"]
-            or "LAA Crime Apps team" in repository["github_teams_with_any_access_parents"]
-            or "LAA Crime Apply" in repository["github_teams_with_any_access"]
-            or "LAA Crime Apply" in repository["github_teams_with_any_access_parents"]
-            or "laa-eligibility-platform" in repository["github_teams_with_any_access"]
-            or "laa-eligibility-platform" in repository["github_teams_with_any_access_parents"]
-            or "LAA Get Access" in repository["github_teams_with_any_access"]
-            or "LAA Get Access" in repository["github_teams_with_any_access_parents"]
+            "LAA Technical Architects" in repository["github_teams_with_admin_access"]
+            or "LAA Technical Architects" in repository["github_teams_with_admin_access_parents"]
+            or "LAA Developers" in repository["github_teams_with_admin_access"]
+            or "LAA Developers" in repository["github_teams_with_admin_access_parents"]
+            or "LAA Crime Apps team" in repository["github_teams_with_admin_access"]
+            or "LAA Crime Apps team" in repository["github_teams_with_admin_access_parents"]
+            or "LAA Crime Apply" in repository["github_teams_with_admin_access"]
+            or "LAA Crime Apply" in repository["github_teams_with_admin_access_parents"]
+            or "laa-eligibility-platform" in repository["github_teams_with_admin_access"]
+            or "laa-eligibility-platform" in repository["github_teams_with_admin_access_parents"]
+            or "LAA Get Access" in repository["github_teams_with_admin_access"]
+            or "LAA Get Access" in repository["github_teams_with_admin_access_parents"]
+            or "LAA Payments and Billing" in repository["github_teams_with_admin_access"]
+            or "LAA Payments and Billing" in repository["github_teams_with_admin_access_parents"]
         ):
             laaRepos.append(repository)
             ownersFound += 1
 
-        if (
-            repository["name"].startswith("opg-")
-            or "OPG" in repository["github_teams_with_any_access"]
-            or "OPG" in repository["github_teams_with_any_access_parents"]
-        ):
+        if "OPG" in repository["github_teams_with_admin_access"] or "OPG" in repository["github_teams_with_admin_access_parents"]:
             opgRepos.append(repository)
             ownersFound += 1
 
-        if repository["name"].startswith("cica-") or "CICA" in repository["github_teams_with_admin_access"]:
+        if "CICA" in repository["github_teams_with_admin_access"] or "CICA" in repository["github_teams_with_admin_access_parents"]:
             cicaRepos.append(repository)
             ownersFound += 1
 
         if (
-            "Central Digital Product Team" in repository["github_teams_with_any_access"]
-            or "Central Digital Product Team" in repository["github_teams_with_any_access_parents"]
-            or "tactical-products" in repository["github_teams_with_any_access"]
-            or "tactical-products" in repository["github_teams_with_any_access_parents"]
+            "Central Digital Product Team" in repository["github_teams_with_admin_access"]
+            or "Central Digital Product Team" in repository["github_teams_with_admin_access_parents"]
+            or "tactical-products" in repository["github_teams_with_admin_access"]
+            or "tactical-products" in repository["github_teams_with_admin_access_parents"]
         ):
             centralDigitalRepos.append(repository)
             ownersFound += 1

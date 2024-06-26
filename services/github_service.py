@@ -10,6 +10,7 @@ from github import (
     GithubException,
     NamedUser,
     RateLimitExceededException,
+    Team,
     UnknownObjectException,
 )
 from github.Organization import Organization
@@ -1238,6 +1239,24 @@ class GithubService:
             f"Failed to fetch PAT list: {response.status_code}, error: {response}")
         return []
     
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def __get_all_parents_team_names_of_team(self, team: Team) -> list[str]:
+        parents = []
+
+        team_has_parent = True
+        team_to_check = team
+
+        while team_has_parent:
+            if team_to_check is None or team_to_check.parent is None:
+                team_has_parent = False
+            else:
+                parents.append(team_to_check.parent.name)
+                team_to_check = team_to_check.parent
+    
+        return parents
+                
+
+
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_teams_with_access(self, repository: Repository) -> tuple[list[str], list[str], list[str], list[str]]:
@@ -1249,15 +1268,13 @@ class GithubService:
             for team in list(repository.get_teams()):
                 logging.info(f"Processing Team: [ {team.name} ]")
                 permissions = team.get_repo_permission(repository)
-                team_parent = team.parent
+                team_parents = self.__get_all_parents_team_names_of_team(team)
                 if permissions and permissions.admin:
                     teams_with_admin_access.append(team.name)
-                    if team_parent is not None:
-                        teams_with_admin_access_parents.append(team_parent.name)
+                    teams_with_admin_access_parents.extend(team_parents)
                 if permissions and (permissions.admin or permissions.maintain or permissions.push or permissions.pull or permissions.triage):
                     teams_with_any_access.append(team.name)
-                    if team_parent:
-                        teams_with_any_access_parents.append(team_parent.name)
+                    teams_with_any_access_parents.extend(team_parents)
             return teams_with_admin_access, teams_with_admin_access_parents, teams_with_any_access, teams_with_any_access_parents
             
 
