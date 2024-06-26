@@ -1,7 +1,7 @@
 import json
 import os
 
-# from bin.print_github_repository_owners_repos import repositories
+from bin.print_github_repository_owners_repos import repositories
 from services.github_service import GithubService
 
 
@@ -20,17 +20,19 @@ def convert_to_percentage(partial: int, total: int) -> str:
 
 
 def main():
-    github_token, repository_limit = get_environment_variables()
-    github_service = GithubService(github_token, "ministryofjustice")
-    repositories = github_service.get_all_repositories(limit=repository_limit)
+    # github_token, repository_limit = get_environment_variables()
+    # github_service = GithubService(github_token, "ministryofjustice")
+    # repositories = github_service.get_all_repositories(limit=repository_limit)
 
     unownedRepos = []
     reposWithMultipleOwners = []
     hmppsRepos = []
     laaRepos = []
     opgRepos = []
+    cicaRepos = []
     centralDigitalRepos = []
     platformsAndArchitectureRepos = []
+    techServicesRepos = []
 
     for repository in repositories:
         ownersFound = 0
@@ -40,6 +42,8 @@ def main():
             or "HMPPS Developers" in repository["github_teams_with_any_access_parents"]
             or "Digital Studio Sheffield" in repository["github_teams_with_any_access"]
             or "Digital Studio Sheffield" in repository["github_teams_with_any_access_parents"]
+            or "MaP Developers" in repository["github_teams_with_any_access"]
+            or "MaP Developers" in repository["github_teams_with_any_access_parents"]
         ):
             hmppsRepos.append(repository)
             ownersFound += 1
@@ -50,6 +54,14 @@ def main():
             or "LAA Technical Architects" in repository["github_teams_with_any_access_parents"]
             or "LAA Developers" in repository["github_teams_with_any_access"]
             or "LAA Developers" in repository["github_teams_with_any_access_parents"]
+            or "LAA Crime Apps team" in repository["github_teams_with_any_access"]
+            or "LAA Crime Apps team" in repository["github_teams_with_any_access_parents"]
+            or "LAA Crime Apply" in repository["github_teams_with_any_access"]
+            or "LAA Crime Apply" in repository["github_teams_with_any_access_parents"]
+            or "laa-eligibility-platform" in repository["github_teams_with_any_access"]
+            or "laa-eligibility-platform" in repository["github_teams_with_any_access_parents"]
+            or "LAA Get Access" in repository["github_teams_with_any_access"]
+            or "LAA Get Access" in repository["github_teams_with_any_access_parents"]
         ):
             laaRepos.append(repository)
             ownersFound += 1
@@ -62,6 +74,10 @@ def main():
             opgRepos.append(repository)
             ownersFound += 1
 
+        if repository["name"].startswith("cica-") or "CICA" in repository["github_teams_with_admin_access"]:
+            cicaRepos.append(repository)
+            ownersFound += 1
+
         if (
             "Central Digital Product Team" in repository["github_teams_with_any_access"]
             or "Central Digital Product Team" in repository["github_teams_with_any_access_parents"]
@@ -72,19 +88,26 @@ def main():
             ownersFound += 1
 
         if (
-            repository["name"].startswith("modernisation-platform")
-            or "modernisation-platform" in repository["github_teams_with_admin_access"]
-            or repository["name"].startswith("cloud-platform")
-            or repository["name"].startswith("operations-engineering")
+            "modernisation-platform" in repository["github_teams_with_admin_access"]
             or "operations-engineering" in repository["github_teams_with_admin_access"]
-            or repository["name"].startswith("analytics-platform")
-            or repository["name"].startswith("analytical-platform")
             or "analytical-platform" in repository["github_teams_with_admin_access"]
-            or repository["name"].startswith("data-platform")
-            or repository["name"].startswith("observability-platform")
             or "observability-platform" in repository["github_teams_with_admin_access"]
+            or "Form Builder" in repository["github_teams_with_admin_access"]
+            or "Hale platform" in repository["github_teams_with_admin_access"]
+            or "JOTW Content Devs" in repository["github_teams_with_admin_access"]
+            or "data-engineering" in repository["github_teams_with_admin_access"]
+            or "WebOps" in repository["github_teams_with_admin_access"]
+            or "analytics-hq" in repository["github_teams_with_admin_access"]
+            or "data-catalogue" in repository["github_teams_with_admin_access"]
+            or "data-platform" in repository["github_teams_with_admin_access"]
+            or "data-and-analytics-engineering" in repository["github_teams_with_admin_access"]
+            or "aws-root-account-admin-team" in repository["github_teams_with_admin_access"]
         ):
             platformsAndArchitectureRepos.append(repository)
+            ownersFound += 1
+
+        if "nvvs-devops-admins" in repository["github_teams_with_admin_access"] or "moj-official-techops" in repository["github_teams_with_admin_access"]:
+            techServicesRepos.append(repository)
             ownersFound += 1
 
         if ownersFound == 0:
@@ -97,8 +120,10 @@ def main():
     hmppsRepoCount = len(hmppsRepos)
     laaRepoCount = len(laaRepos)
     opgRepoCount = len(opgRepos)
+    cicaRepoCount = len(cicaRepos)
     centralDigitalRepoCount = len(centralDigitalRepos)
     platformsAndArchitectureRepoCount = len(platformsAndArchitectureRepos)
+    techServicesRepoCount = len(techServicesRepos)
     reposWithMultipleOwnersCount = len(reposWithMultipleOwners)
     totalRepositories = len(repositories)
     totalFound = totalRepositories - unownedRepoCount
@@ -112,6 +137,7 @@ def main():
                     "hmppsRepoCount": hmppsRepoCount,
                     "laaRepoCount": laaRepoCount,
                     "opgRepoCount": opgRepoCount,
+                    "cicaRepoCount": cicaRepoCount,
                     "centralDigitalRepoCount": centralDigitalRepoCount,
                     "platformsAndArchitectureRepoCount": platformsAndArchitectureRepoCount,
                     "unownedRepoCount": unownedRepoCount,
@@ -122,8 +148,10 @@ def main():
                     "hmppsRepoCount": convert_to_percentage(hmppsRepoCount, totalRepositories),
                     "laaRepoCount": convert_to_percentage(laaRepoCount, totalRepositories),
                     "opgRepoCount": convert_to_percentage(opgRepoCount, totalRepositories),
+                    "cicaRepoCount": convert_to_percentage(cicaRepoCount, totalRepositories),
                     "centralDigitalRepoCount": convert_to_percentage(centralDigitalRepoCount, totalRepositories),
                     "platformsAndArchitectureRepoCount": convert_to_percentage(platformsAndArchitectureRepoCount, totalRepositories),
+                    "techServicesRepoCount": convert_to_percentage(techServicesRepoCount, totalRepositories),
                     "unownedRepoCount": convert_to_percentage(unownedRepoCount, totalRepositories),
                     "totalReposWithFoundOwners": convert_to_percentage(totalFound, totalRepositories),
                     "reposWithMultipleOwnersCount": convert_to_percentage(reposWithMultipleOwnersCount, totalRepositories),
@@ -132,8 +160,10 @@ def main():
                     "hmpps": hmppsRepos,
                     "laa": laaRepos,
                     "opg": opgRepos,
+                    "cica": cicaRepos,
                     "centralDigital": centralDigitalRepos,
                     "platformsAndArchitecture": platformsAndArchitectureRepos,
+                    "techServices": techServicesRepos,
                     "all": repositories,
                     "unownedRepos": unownedRepos,
                     "reposWithMultipleOwners": reposWithMultipleOwners,
