@@ -40,7 +40,7 @@ def main ():
     
     # Itertate over the list of domains
     for domain in domains:
-        if not s3_client.is_well_known_mta_sts_enforced(domain):
+        if not s3_client.is_well_known_mta_sts_enforce(domain):
             print(f"{domain} (No 'mode: enforce')")
             failed_domains.append(domain)
 if __name__ == "__main__":
