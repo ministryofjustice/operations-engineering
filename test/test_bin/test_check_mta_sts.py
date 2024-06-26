@@ -2,18 +2,19 @@ import unittest
 from unittest.mock import patch
 import boto3
 from botocore.exceptions import NoCredentialsError
-from moto import mock_s3
+from moto import mock_aws
 
 # Import the module containing the original code
-from bin.check_mta_sts import SUFFIX, domains, failed_domains, s3
+from bin.check_mta_sts import SUFFIX, domains, S3Service
 
 
 class TestMTASTSChecker(unittest.TestCase):
 
     def setUp(self):
         # Clear the failed_domains list before each test
-        failed_domains.clear()
-    @mock_s3
+        self.s3_service = S3Service("880656497252", "ministryofjustice")
+        self.failed_domains = []
+    @mock_aws
     def test_successful_retrieval_with_enforce(self):
         """Test successful retrieval of MTA-STS configuration with 'mode: enforce'."""
         s3_client = boto3.client("s3")
@@ -28,19 +29,19 @@ class TestMTASTSChecker(unittest.TestCase):
         for domain in domains:
             bucket_name = f"880656497252.{domain}"
             try:
-                response = s3.get_object(Bucket=bucket_name, Key=SUFFIX)
+                response = self.s3_service.s3_client.get_object(Bucket=bucket_name, Key=SUFFIX)
                 sts_content = response["Body"].read().decode("utf-8")
                 has_enforce = any(
                     line.startswith("mode: enforce") for line in sts_content.split("\n")
                 )
                 if not has_enforce:
-                    failed_domains.append(f"{domain} (No 'mode: enforce')")
+                    self.failed_domains.append(f"{domain} (No 'mode: enforce')")
             except NoCredentialsError:
-                failed_domains.append(f"{domain} (AWS credentials not found)")
+                self.failed_domains.append(f"{domain} (AWS credentials not found)")
             except Exception as e:
-                failed_domains.append(f"{domain} (Exception: {e})")
-        self.assertEqual(len(failed_domains), 0)
-    @mock_s3
+                self.failed_domains.append(f"{domain} (Exception: {e})")
+        self.assertEqual(len(self.failed_domains), 0)
+    @mock_aws
     def test_successful_retrieval_without_enforce(self):
         """Test successful retrieval of MTA-STS configuration without 'mode: enforce'."""
         s3_client = boto3.client("s3")
@@ -55,20 +56,22 @@ class TestMTASTSChecker(unittest.TestCase):
         for domain in domains:
             bucket_name = f"880656497252.{domain}"
             try:
-                response = s3.get_object(Bucket=bucket_name, Key=SUFFIX)
+                response = self.s3_service.s3_client.get_object(Bucket=bucket_name, Key=SUFFIX)
                 sts_content = response["Body"].read().decode("utf-8")
                 has_enforce = any(
                     line.startswith("mode: enforce") for line in sts_content.split("\n")
                 )
                 if not has_enforce:
-                    failed_domains.append(f"{domain} (No 'mode: enforce')")
+                    self.failed_domains.append(f"{domain} (No 'mode: enforce')")
             except NoCredentialsError:
-                failed_domains.append(f"{domain} (AWS credentials not found)")
+                self.failed_domains.append(f"{domain} (AWS credentials not found)")
             except Exception as e:
-                failed_domains.append(f"{domain} (Exception: {e})")
-        self.assertGreater(len(failed_domains), 0)
-        self.assertIn(" (No 'mode: enforce')", failed_domains[0])
-    @mock_s3
+                self.failed_domains.append(f"{domain} (Exception: {e})")
+                
+        self.assertGreater(len(self.failed_domains), 0)
+        self.assertIn(" (No 'mode: enforce')", self.failed_domains[0])
+        
+    @mock_aws
     def test_no_credentials(self):
         """Test handling of missing AWS credentials."""
         s3_client = boto3.client(
@@ -85,19 +88,20 @@ class TestMTASTSChecker(unittest.TestCase):
         for domain in domains:
             bucket_name = f"880656497252.{domain}"
             try:
-                response = s3.get_object(Bucket=bucket_name, Key=SUFFIX)
+                response = self.s3_service.s3_client.get_object(Bucket=bucket_name, Key=SUFFIX)
                 sts_content = response["Body"].read().decode("utf-8")
                 has_enforce = any(
                     line.startswith("mode: enforce") for line in sts_content.split("\n")
                 )
                 if not has_enforce:
-                    failed_domains.append(f"{domain} (No 'mode: enforce')")
+                    self.failed_domains.append(f"{domain} (No 'mode: enforce')")
             except NoCredentialsError:
-                failed_domains.append(f"{domain} (AWS credentials not found)")
+                self.failed_domains.append(f"{domain} (AWS credentials not found)")
             except Exception as e:
-                failed_domains.append(f"{domain} (Exception: {e})")
-        self.assertGreater(len(failed_domains), 0)
-        self.assertIn(" (AWS credentials not found)", failed_domains[0])
+                self.failed_domains.append(f"{domain} (Exception: {e})")
+                
+        self.assertGreater(len(self.failed_domains), 0)
+        self.assertIn(" (AWS credentials not found)", self.failed_domains[0])
 
 
 if __name__ == "__main__":

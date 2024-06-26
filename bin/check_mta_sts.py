@@ -31,6 +31,9 @@ domains = ["ccrc.gov.uk",
            "yjbservicespp.yjb.gov.uk",
            "youthjusticepp.yjb.gov.uk"]
 
+# Define the suffix variable
+SUFFIX = ".well-known/mta-sts.txt"
+
 
 def main ():
     # Initialize the S3Service Client
