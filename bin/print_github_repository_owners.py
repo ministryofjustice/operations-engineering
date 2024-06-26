@@ -1,7 +1,7 @@
 import json
 import os
 
-# from bin.print_github_repository_owners_repos import repositories
+from bin.print_github_repository_owners_repos import repositories
 from services.github_service import GithubService
 
 
@@ -19,10 +19,20 @@ def convert_to_percentage(partial: int, total: int) -> str:
     return f"{round((partial / total) * 100)}%"
 
 
+def contains_one_or_more(values: list[str], list_to_check: list[str]) -> bool:
+    found = False
+
+    for value in values:
+        if value in list_to_check:
+            found = True
+
+    return found
+
+
 def main():
-    github_token, repository_limit = get_environment_variables()
-    github_service = GithubService(github_token, "ministryofjustice")
-    repositories = github_service.get_all_repositories(limit=repository_limit)
+    # github_token, repository_limit = get_environment_variables()
+    # github_service = GithubService(github_token, "ministryofjustice")
+    # repositories = github_service.get_all_repositories(limit=repository_limit)
 
     unownedRepos = []
     reposWithMultipleOwners = []
@@ -36,66 +46,108 @@ def main():
 
     for repository in repositories:
         ownersFound = 0
-        if "HMPPS Developers" in repository["github_teams_with_admin_access"] or "HMPPS Developers" in repository["github_teams_with_admin_access_parents"]:
+        if (
+            # HMPPS Digital
+            "HMPPS Developers" in repository["github_teams_with_any_access"]
+            or "HMPPS Developers" in repository["github_teams_with_any_access_parents"]
+            # Fuzzy Matches 👇
+            or repository["name"].startswith("hmpps-")
+        ):
             hmppsRepos.append(repository)
             ownersFound += 1
 
         if (
-            "LAA Technical Architects" in repository["github_teams_with_admin_access"]
-            or "LAA Technical Architects" in repository["github_teams_with_admin_access_parents"]
-            or "LAA Developers" in repository["github_teams_with_admin_access"]
-            or "LAA Developers" in repository["github_teams_with_admin_access_parents"]
-            or "LAA Crime Apps team" in repository["github_teams_with_admin_access"]
-            or "LAA Crime Apps team" in repository["github_teams_with_admin_access_parents"]
-            or "LAA Crime Apply" in repository["github_teams_with_admin_access"]
-            or "LAA Crime Apply" in repository["github_teams_with_admin_access_parents"]
-            or "laa-eligibility-platform" in repository["github_teams_with_admin_access"]
-            or "laa-eligibility-platform" in repository["github_teams_with_admin_access_parents"]
-            or "LAA Get Access" in repository["github_teams_with_admin_access"]
-            or "LAA Get Access" in repository["github_teams_with_admin_access_parents"]
-            or "LAA Payments and Billing" in repository["github_teams_with_admin_access"]
-            or "LAA Payments and Billing" in repository["github_teams_with_admin_access_parents"]
+            # LAA Digital
+            "LAA Technical Architects" in repository["github_teams_with_any_access"]
+            or "LAA Technical Architects" in repository["github_teams_with_any_access_parents"]
+            or "LAA Developers" in repository["github_teams_with_any_access"]
+            or "LAA Developers" in repository["github_teams_with_any_access_parents"]
+            or "LAA Crime Apps team" in repository["github_teams_with_any_access"]
+            or "LAA Crime Apps team" in repository["github_teams_with_any_access_parents"]
+            or "LAA Crime Apply" in repository["github_teams_with_any_access"]
+            or "LAA Crime Apply" in repository["github_teams_with_any_access_parents"]
+            or "laa-eligibility-platform" in repository["github_teams_with_any_access"]
+            or "laa-eligibility-platform" in repository["github_teams_with_any_access_parents"]
+            or "LAA Get Access" in repository["github_teams_with_any_access"]
+            or "LAA Get Access" in repository["github_teams_with_any_access_parents"]
+            or "LAA Payments and Billing" in repository["github_teams_with_any_access"]
+            or "LAA Payments and Billing" in repository["github_teams_with_any_access_parents"]
+            # Fuzzy Matches 👇
+            or repository["name"].startswith("laa-")
         ):
             laaRepos.append(repository)
             ownersFound += 1
 
-        if "OPG" in repository["github_teams_with_admin_access"] or "OPG" in repository["github_teams_with_admin_access_parents"]:
+        if (
+            # OPG Digital
+            "OPG" in repository["github_teams_with_any_access"]
+            or "OPG" in repository["github_teams_with_any_access_parents"]
+            # Fuzzy Matches 👇
+            or repository["name"].startswith("opg-")
+        ):
             opgRepos.append(repository)
             ownersFound += 1
 
-        if "CICA" in repository["github_teams_with_admin_access"] or "CICA" in repository["github_teams_with_admin_access_parents"]:
+        if (
+            # CICA Digital
+            "CICA" in repository["github_teams_with_any_access"]
+            or "CICA" in repository["github_teams_with_any_access_parents"]
+            # Fuzzy Matches 👇
+            or repository["name"].startswith("cica-")
+        ):
             cicaRepos.append(repository)
             ownersFound += 1
 
         if (
-            "Central Digital Product Team" in repository["github_teams_with_admin_access"]
-            or "Central Digital Product Team" in repository["github_teams_with_admin_access_parents"]
-            or "tactical-products" in repository["github_teams_with_admin_access"]
-            or "tactical-products" in repository["github_teams_with_admin_access_parents"]
+            # Central Digital
+            "Central Digital Product Team" in repository["github_teams_with_any_access"]
+            or "Central Digital Product Team" in repository["github_teams_with_any_access_parents"]
+            or "tactical-products" in repository["github_teams_with_any_access"]
+            or "tactical-products" in repository["github_teams_with_any_access_parents"]
         ):
             centralDigitalRepos.append(repository)
             ownersFound += 1
 
         if (
-            "modernisation-platform" in repository["github_teams_with_admin_access"]
-            or "operations-engineering" in repository["github_teams_with_admin_access"]
-            or "analytical-platform" in repository["github_teams_with_admin_access"]
-            or "observability-platform" in repository["github_teams_with_admin_access"]
-            or "Form Builder" in repository["github_teams_with_admin_access"]
-            or "Hale platform" in repository["github_teams_with_admin_access"]
-            or "JOTW Content Devs" in repository["github_teams_with_admin_access"]
-            or "data-engineering" in repository["github_teams_with_admin_access"]
-            or "WebOps" in repository["github_teams_with_admin_access"]
-            or "analytics-hq" in repository["github_teams_with_admin_access"]
-            or "data-catalogue" in repository["github_teams_with_admin_access"]
-            or "data-platform" in repository["github_teams_with_admin_access"]
-            or "data-and-analytics-engineering" in repository["github_teams_with_admin_access"]
-            or "aws-root-account-admin-team" in repository["github_teams_with_admin_access"]
+            # Platforms and Architecture https://peoplefinder.service.gov.uk/teams/platforms
+            ## Platforms
+            contains_one_or_more(
+                [
+                    ### Hosting Platforms
+                    "modernisation-platform",
+                    "operations-engineering",
+                    "aws-root-account-admin-team",
+                    "WebOps",
+                    "Studio Webops",
+                    ### Data Platforms
+                    "analytical-platform",
+                    "data-engineering",
+                    "analytics-hq",
+                    "data-catalogue",
+                    "data-platform",
+                    "data-and-analytics-engineering",
+                    "observability-platform",
+                    ### Publishing Platforms
+                    "Form Builder",
+                    "Hale platform",
+                    "JOTW Content Devs",
+                ],
+                repository["github_teams_with_any_access"],
+            )
+            ## Criminal Justice Services
+            # Fuzzy Matches 👇
+            or repository["name"].startswith("bichard7")
         ):
             platformsAndArchitectureRepos.append(repository)
             ownersFound += 1
 
-        if "nvvs-devops-admins" in repository["github_teams_with_admin_access"] or "moj-official-techops" in repository["github_teams_with_admin_access"]:
+        if (
+            # Tech Services
+            "nvvs-devops-admins" in repository["github_teams_with_any_access"]
+            or "nvvs-devops-admins" in repository["github_teams_with_any_access_parents"]
+            or "moj-official-techops" in repository["github_teams_with_any_access"]
+            or "moj-official-techops" in repository["github_teams_with_any_access_parents"]
+        ):
             techServicesRepos.append(repository)
             ownersFound += 1
 
