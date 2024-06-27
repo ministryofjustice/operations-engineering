@@ -10,11 +10,11 @@ from github import (
     GithubException,
     NamedUser,
     RateLimitExceededException,
-    Team,
     UnknownObjectException,
 )
 from github.Organization import Organization
 from github.Repository import Repository
+from github.Team import Team
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
 from gql.transport.exceptions import TransportQueryError
@@ -1252,7 +1252,7 @@ class GithubService:
             else:
                 parents.append(team_to_check.parent.name)
                 team_to_check = team_to_check.parent
-    
+        logging.info(f"Total Parents: [ {len(parents)} ]")
         return parents
                 
 
@@ -1286,6 +1286,8 @@ class GithubService:
         logging.info(f"Total Repositories: [ {len(repositories_to_check)} ]")
         counter = 0
         for repo in repositories_to_check:
+            if repo.name != "prisoner-content-hub-load-testing":
+                continue
             if counter >= limit:
                 logging.info("Limit Reached, exiting early")
                 break
