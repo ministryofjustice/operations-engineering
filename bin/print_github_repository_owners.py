@@ -32,7 +32,7 @@ def contains_one_or_more(values: list[str], list_to_check: list[str]) -> bool:
 def main():
     github_token, repository_limit = get_environment_variables()
     github_service = GithubService(github_token, "ministryofjustice")
-    repositories = github_service.get_all_repositories(limit=repository_limit)
+    repositories = github_service.get_all_repositories(limit=900)
 
     unownedRepos = []
     reposWithMultipleOwners = []
@@ -117,8 +117,8 @@ def main():
                     "modernisation-platform",
                     "operations-engineering",
                     "aws-root-account-admin-team",
-                    "WebOps", # Cloud Platform
-                    "Studio Webops", # Digital Studio Operations (DSO)
+                    "WebOps",  # Cloud Platform
+                    "Studio Webops",  # Digital Studio Operations (DSO)
                     ### Data Platforms
                     "analytical-platform",
                     "data-engineering",
