@@ -67,10 +67,10 @@ class TestMTASTSChecker(unittest.TestCase):
                 self.failed_domains.append(f"{domain} (AWS credentials not found)")
             except Exception as e:
                 self.failed_domains.append(f"{domain} (Exception: {e})")
-                
+
         self.assertGreater(len(self.failed_domains), 0)
         self.assertIn(" (No 'mode: enforce')", self.failed_domains[0])
-        
+
     @mock_aws
     def test_no_credentials(self):
         """Test handling of missing AWS credentials."""
@@ -99,7 +99,7 @@ class TestMTASTSChecker(unittest.TestCase):
                 self.failed_domains.append(f"{domain} (AWS credentials not found)")
             except Exception as e:
                 self.failed_domains.append(f"{domain} (Exception: {e})")
-                
+
         self.assertGreater(len(self.failed_domains), 0)
         self.assertIn(" (AWS credentials not found)", self.failed_domains[0])
 
