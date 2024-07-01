@@ -2,10 +2,7 @@
 name: GitHub Feature Request
 about: Suggest an idea to raise with GitHub
 title: ''
-labels:
-  - 'github'
-  - 'feature request'
-  - 'third party'
+labels: feature request, github, third party
 assignees: ''
 
 ---

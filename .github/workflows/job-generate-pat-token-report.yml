@@ -3,6 +3,7 @@ name: 🤖 Generate PAT Token Report
 on:
   schedule:
     - cron: "0 8 * * 5"
+  workflow_dispatch:
 
 jobs:
   pat-token-report:
@@ -10,12 +11,12 @@ jobs:
     steps:
       - name: Generate a token to access Operations Engineering PAT App
         id: generate-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@ad38cffc07bac6e3857755914c4c88bfd2db4da4 # v1.10.2
         with:
           app-id: ${{ secrets.OPERATIONS_ENGINEERING_PAT_APP_ID }}
           private-key: ${{ secrets.OE_PAT_APP_PRIVATE_KEY }}
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d # v5.1.0
         with:
           python-version: "3.11"
           cache: "pipenv"

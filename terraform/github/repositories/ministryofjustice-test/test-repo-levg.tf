@@ -1,6 +1,6 @@
 module "test-repo-levg" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.7"
+  version = "1.0.1"
 
   name        = "test-repo-levg"
   description = "test repo"

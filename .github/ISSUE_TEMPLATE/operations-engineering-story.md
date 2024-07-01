@@ -16,24 +16,20 @@ assignees: ''
 **Value**
 
 
+**Functional Requirements (What):**
 
-**Functional Requirements:**
+- [ ]
+- [ ]
 
-1.
-2.
-3.
+**Non-Functional Requirements (How):**
 
-**Non-Functional Requirements:**
-
-1.
-2.
-3.
+- [ ]
+- [ ]
 
 **Acceptance Criteria:**
 
-1.
-2.
-3.
+- [ ]
+- [ ]
 
 **Notes:**
 
@@ -47,9 +43,9 @@ so that (some result): This is the reason or benefit that the user expects from 
 
 Value: This is a description of the value that this specific story delivers i.e. what benefits will be realised for users, Ops Eng, MoJ etc. The value may relate to more than one catagory e.g. saves money, removes an manual process. If there is a metric that can show the value you should include this here.
 
-Functional Requirements: Here, you list the functional requirements associated with the user story. These could be based on what you learned from the stakeholder interviews.
+Functional Requirements: Here, you list what you are going to do - the functional requirements associated with the user story. These could be based on what you learned from the stakeholder interviews, what functionality they need.
 
-Non-Functional Requirements: Here, you list the non-functional requirements associated with the user story. These could be about the system's performance, security, usability, etc.
+[Non-Functional Requirements](https://en.wikipedia.org/wiki/Non-functional_requirement): Here, you list how you are going to do it - the non-functional requirements associated with the user story. These could be about the system's performance, security, usability, standards etc, these are likely more technical than the functional requirements description.
 
 Acceptance Criteria: These are the conditions that must be met for the user story to be considered "done". It should clearly define the boundaries of the user story and help in testing.
 

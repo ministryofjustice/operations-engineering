@@ -14,7 +14,6 @@ ENABLE_LINTERS:
   - JSON_PRETTIER
   - PYTHON_PYLINT
   - PYTHON_FLAKE8
-  - PYTHON_BLACK
   - PYTHON_ISORT
   - TERRAFORM_TERRAFORM_FMT
   - TERRAFORM_TFLINT
@@ -44,6 +43,3 @@ TERRAFORM_TERRASCAN_ARGUMENTS: "scan -d . -i terraform -v"
 # https://github.com/super-linter/super-linter/issues/3044
 
 TERRAFORM_TERRASCAN_DISABLE_ERRORS_IF_LESS_THAN: 2
-
-PLUGINS:
-  - https://raw.githubusercontent.com/shiranr/linkcheck/v2.0.17.beta/mega-linter-plugin-linkcheck/linkcheck.megalinter-descriptor.yml
