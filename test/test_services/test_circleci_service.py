@@ -24,7 +24,7 @@ class TestCircleciService(unittest.TestCase):
         self.assertEqual(pipelines[0]["id"], "pipeline1")
         self.assertEqual(pipelines[1]["id"], "pipeline2")
 
-        url = f"https://circleci.com/api/v2/project/github/{self.github_org}/{repo}/pipeline"
+        url = f"https://circleci.com/api/v2/project/github/{self.github_org}/{repo}/pipeline?branch=main"
         mock_get.assert_called_once_with(url, headers=self.service.headers, timeout=60)
 
     def test_get_circleci_pipelines_for_repository_failure(self, mock_get):
