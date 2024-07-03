@@ -1,9 +1,10 @@
 ---
 name: Operations Engineering Decomission Pages Request
 about: Create a ticket for the Decomission Pages
-title: ""
-labels: "Maintenance Pages"
-assignees: ""
+title: ''
+labels: Maintenance Pages
+assignees: ''
+
 ---
 
 ## Decomission Pages Request

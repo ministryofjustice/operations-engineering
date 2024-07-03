@@ -31,5 +31,3 @@ def alert_on_low_quota():
 
 if __name__ == "__main__":
     alert_on_low_quota()
-
-

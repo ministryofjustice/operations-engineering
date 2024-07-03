@@ -1,6 +1,6 @@
 module "moj-terraform-scim-github" {
   source  = "ministryofjustice/repository/github"
-  version = "0.0.7"
+  version = "1.0.1"
 
   name        = "moj-terraform-scim-github"
   description = "Lambda function for automatic SCIM provisioning based on GitHub relationships"

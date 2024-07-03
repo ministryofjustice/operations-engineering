@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       lint_entire_codebase:
-        description: 'Lint entire codebase?'
+        description: "Lint entire codebase?"
         required: false
-        default: 'false'
+        default: "false"
 
 concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}
@@ -42,7 +42,7 @@ jobs:
         # DISABLE: COPYPASTE,SPELL # Uncomment to disable copy-paste and spell checks
         # You can override MegaLinter flavor used to have faster performances
         # More info at https://megalinter.io/latest/flavors/
-        uses: oxsecurity/megalinter@a7a0163b6c8ff7474a283d99a706e27483ddd80f # v7.10.0
+        uses: oxsecurity/megalinter/flavors/python@v7.12.0
         env:
           # All available variables are described in documentation
           # https://megalinter.io/latest/configuration/
