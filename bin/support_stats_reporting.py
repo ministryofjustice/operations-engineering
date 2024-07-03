@@ -1,4 +1,5 @@
 import os
+import sys
 from dataclasses import dataclass
 from datetime import date, timedelta
 from os.path import exists
@@ -23,6 +24,18 @@ class SupportRequest:
 
     def __hash__(self):
         return hash(self.request_action)
+
+
+def check_file_path():
+
+    filepath = "data/support_stats/support_stats.csv"
+
+    try:
+        with open(filepath, "r"):
+            pass
+    except FileNotFoundError:
+        print("The file was not found")
+        # sys.exit()
 
 
 def create_dataframe_from_csv(filename: str):
@@ -116,7 +129,7 @@ def get_yesterdays_support_requests(
 def main():
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
-    file_path = "data/support_stats/support_stats.csv"
+    # file_path = check_file_path("data/support_stats/support_stats.csv")
     all_support_requests = get_support_requests_from_csv(file_path)
     yesterdays_requests = get_yesterdays_support_requests(all_support_requests)
     slack_message = craft_message_to_slack(yesterdays_requests)
