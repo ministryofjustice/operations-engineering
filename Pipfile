@@ -27,7 +27,7 @@ datetime = "*"
 [dev-packages]
 coverage = "==7.4.4"
 freezegun = "==1.4.0"
-moto = "==5.0.9" 
+moto = "==5.0.10" 
 pytest = "==8.1.1"
 requests-mock = "==1.12.1"
 

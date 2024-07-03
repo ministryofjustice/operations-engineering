@@ -2,7 +2,12 @@ import unittest
 from unittest.mock import patch
 import boto3
 from botocore.exceptions import NoCredentialsError
-from moto import mock_s3
+# Try the original import
+try:
+    from moto import mock_s3
+except ImportError:
+    # If the original import fails, use the alternative import
+    from moto.s3 import mock_s3
 from bin.check_mta_sts import SUFFIX, domains, S3Service
 
 class TestMTASTSCheck(unittest.TestCase):
@@ -52,3 +57,4 @@ class TestMTASTSCheck(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
