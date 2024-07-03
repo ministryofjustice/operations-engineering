@@ -12,7 +12,7 @@ class CircleciService:
         }
 
     def get_circleci_pipelines_for_repository(self, repo):
-        url = self.base_url + f"project/github/{self.github_org}/{repo}/pipeline"
+        url = self.base_url + f"project/github/{self.github_org}/{repo}/pipeline?branch=main"
         response = requests.get(url, headers=self.headers, timeout=60)
         if response.status_code != 200:
             print(f"Error getting pipelines for {repo}: {response.text}")
