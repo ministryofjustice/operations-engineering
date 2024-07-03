@@ -38,15 +38,6 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DSD_CICD_ADMIN_ROLE_ARN }}
           aws-region: eu-west-2
 
-      - name: Post Link to Apply Pipeline
-        if: github.ref == 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
-          message: |
-            Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-dsd-iam.yml?query=event%3Apush+branch%3Amain
-
       - name: Terraform Format Check
         id: fmt-check
         run: terraform fmt -check
@@ -66,27 +57,6 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -input=false -no-color
-
-      - name: Delete Old Comments
-        uses: maheshrayas/action-pr-comment-delete@v3.0
-        with:
-          github_token: '${{ secrets.GITHUB_TOKEN }}'
-          org: ministryofjustice
-          repo: operations-engineering
-          user: 'github-actions[bot]'
-          issue: '${{github.event.number}}'
-
-      - name: Post Plan to GitHub PR
-        if: github.ref != 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
-          message: |
-            ## Cloudtrail Streaming Infrastructure Plan
-            ```
-            ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
-            ```
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
