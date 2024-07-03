@@ -2,9 +2,10 @@ name: 🧪 Send Support Stats to Slack
 
 on:
   workflow_dispatch:
-  push:  
-    paths:  
-      - 'data/support_stats/support_stats.csv'  
+  push:
+    paths:
+      - 'data/support_stats/support_stats.csv'
+    branches: ["main"]
 jobs:
   send-support-stats-to-slack:
     runs-on: ubuntu-latest
