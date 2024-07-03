@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch
 import boto3
 from botocore.exceptions import NoCredentialsError
-from moto import mock_aws
+from moto import mock_s3
 
 # Import the module containing the original code
 from bin.check_mta_sts import SUFFIX, domains, S3Service
@@ -13,7 +13,7 @@ class TestMTASTSChecker(unittest.TestCase):
         # Clear the failed_domains list before each test
         self.s3_service = S3Service("880656497252", "ministryofjustice")
         self.failed_domains = []
-    @mock_aws
+    @mock_s3
     def test_successful_retrieval_with_enforce(self):
         """Test successful retrieval of MTA-STS configuration with 'mode: enforce'."""
         s3_client = boto3.client("s3")
@@ -23,6 +23,9 @@ class TestMTASTSChecker(unittest.TestCase):
             s3_client.put_object(
                 Bucket=bucket_name, Key=SUFFIX, Body="version: STSv1\nmode: enforce\n"
             )
+            
+        # Re-initialize S3Service with mock s3 client
+        self.s3_service = S3Service("880656497252","ministryofjustice")    
 
         # Run the original code logic
         for domain in domains:
@@ -40,7 +43,7 @@ class TestMTASTSChecker(unittest.TestCase):
             except Exception as e:
                 self.failed_domains.append(f"{domain} (Exception: {e})")
         self.assertEqual(len(self.failed_domains), 0)
-    @mock_aws
+    @mock_s3
     def test_successful_retrieval_without_enforce(self):
         """Test successful retrieval of MTA-STS configuration without 'mode: enforce'."""
         s3_client = boto3.client("s3")
@@ -50,6 +53,8 @@ class TestMTASTSChecker(unittest.TestCase):
             s3_client.put_object(
                 Bucket=bucket_name, Key=SUFFIX, Body="version: STSv1\nmode: testing\n"
             )
+        # Re-initialize S3Service with mock s3 client
+        self.s3_service = S3Service("880656497252", "ministryofjustice")    
 
         # Run the original code logic
         for domain in domains:
@@ -70,7 +75,7 @@ class TestMTASTSChecker(unittest.TestCase):
         self.assertGreater(len(self.failed_domains), 0)
         self.assertIn(" (No 'mode: enforce')", self.failed_domains[0])
 
-    @mock_aws
+    @mock_s3
     def test_no_credentials(self):
         """Test handling of missing AWS credentials."""
         s3_client = boto3.client(
@@ -82,6 +87,9 @@ class TestMTASTSChecker(unittest.TestCase):
             s3_client.put_object(
                 Bucket=bucket_name, Key=SUFFIX, Body="version: STSv1\nmode: enforce\n"
             )
+        # Re-initialize S3Service with mock S3 client
+        self.s3_service = S3Service("880656497252","ministryofjustice")
+        self.s3_service.s3_client = s3_client    
 
         # Run the original code logic with a dummy S3 client to trigger an exception
         for domain in domains:
@@ -101,7 +109,6 @@ class TestMTASTSChecker(unittest.TestCase):
 
         self.assertGreater(len(self.failed_domains), 0)
         self.assertIn(" (AWS credentials not found)", self.failed_domains[0])
-
 
 if __name__ == "__main__":
     unittest.main()
