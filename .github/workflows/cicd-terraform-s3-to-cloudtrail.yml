@@ -32,7 +32,7 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Configure AWS Credentials for Infra Account
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_DSD_CICD_ADMIN_ROLE_ARN }}
@@ -62,3 +62,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         id: apply
         run: terraform apply -input=false -no-color -auto-approve
+
+      - name: Report failure to Slack
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        uses: ravsamhq/notify-slack-action@v2
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Terraform apply pipeline failure: $GITHUB_JOB"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
