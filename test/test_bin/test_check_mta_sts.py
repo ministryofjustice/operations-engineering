@@ -4,10 +4,10 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 # Try the original import
 try:
-    from moto import mock_s3
+    from moto import mock_aws
 except ImportError:
     # If the original import fails, use the alternative import
-    from moto.s3 import mock_s3
+    from moto.s3 import mock_aws
 from bin.check_mta_sts import SUFFIX, domains, S3Service
 
 class TestMTASTSCheck(unittest.TestCase):
@@ -15,7 +15,7 @@ class TestMTASTSCheck(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Set up mock S3 before all tests in this class
-        cls.mock = mock_s3()
+        cls.mock = mock_aws()
         cls.mock.start()
 
         cls.s3_client = boto3.client("s3")
