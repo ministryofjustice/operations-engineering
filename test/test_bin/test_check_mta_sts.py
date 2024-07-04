@@ -6,6 +6,7 @@ from botocore.exceptions import NoCredentialsError
 # Import the module containing the original code
 from bin.check_mta_sts import SUFFIX, domains, S3Service
 
+
 class TestMTASTSChecker(unittest.TestCase):
 
     def setUp(self):
@@ -59,6 +60,6 @@ class TestMTASTSChecker(unittest.TestCase):
         self.assertGreater(len(self.failed_domains), 0, f"Failed domains: {self.failed_domains}")
         self.assertIn(" (AWS credentials not found)", self.failed_domains[0])
 
+
 if __name__ == "__main__":
     unittest.main()
-
