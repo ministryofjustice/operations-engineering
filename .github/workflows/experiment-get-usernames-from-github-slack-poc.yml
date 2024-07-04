@@ -18,7 +18,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.get_github_and_slack_usernames
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           METADATA_API_URL: ${{ secrets.METADATA_API_URL }}
           METADATA_API_TOKEN: ${{ secrets.METADATA_API_TOKEN }}

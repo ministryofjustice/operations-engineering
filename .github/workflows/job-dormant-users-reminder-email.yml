@@ -33,6 +33,6 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python3 -m bin.dormant_users ${{ github.event.inputs.organisation_name }} ${{ secrets.GH_BOT_PAT_TOKEN }} ${{ secrets.S3_BUCKET_NAME }} ${{ secrets.SLACK_BOT_TOKEN }} ${{ secrets.NOTIFY_PROD_API_KEY }} ${{ secrets.AUTH0_CLIENT_SECRET }} ${{ secrets.AUTH0_CLIENT_ID }} ${{ secrets.AUTH0_DOMAIN}} false false true false
+      - run: pipenv run python3 -m bin.dormant_users ${{ github.event.inputs.organisation_name }} ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }} ${{ secrets.S3_BUCKET_NAME }} ${{ secrets.SLACK_BOT_TOKEN }} ${{ secrets.NOTIFY_PROD_API_KEY }} ${{ secrets.AUTH0_CLIENT_SECRET }} ${{ secrets.AUTH0_CLIENT_ID }} ${{ secrets.AUTH0_DOMAIN}} false false true false
         env:
           LOGGING_LEVEL: ${{ secrets.LOGGING_LEVEL }}

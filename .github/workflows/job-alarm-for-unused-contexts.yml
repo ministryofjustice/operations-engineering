@@ -20,7 +20,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.alert_on_unused_contexts
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           ADMIN_CIRCLECI_TOKEN: ${{ secrets.ADMIN_CIRCLECI_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           CIRCLE_CI_OWNER_ID: ${{ secrets.CIRCLE_CI_OWNER_ID }}

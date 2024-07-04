@@ -18,7 +18,7 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python3 -m bin.report_on_repository_standards --oauth-token ${{ secrets.GH_BOT_PAT_TOKEN }} --api-key ${{ secrets.REPORTS_API_KEY }} --url https://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk --endpoint /api/v2/update-github-reports
+      - run: pipenv run python3 -m bin.report_on_repository_standards --oauth-token ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }} --api-key ${{ secrets.REPORTS_API_KEY }} --url https://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk --endpoint /api/v2/update-github-reports
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@v2
