@@ -5,14 +5,14 @@ import os
 from services.github_service import GithubService
 
 
-def get_environment_variables() -> tuple[str]:
+def get_environment_variables() -> tuple[str, int]:
     github_token = os.getenv("ADMIN_GITHUB_TOKEN")
     if not github_token:
         raise ValueError("The env variable ADMIN_GITHUB_TOKEN is empty or missing")
 
     repository_limit = os.getenv("REPOSITORY_LIMIT") or 5
 
-    return github_token, repository_limit
+    return github_token, int(repository_limit)
 
 
 def convert_to_percentage(partial: int, total: int) -> str:
@@ -178,28 +178,53 @@ def main():
         json.dumps(
             {
                 "totals": {
-                    "totalRepoCount": totalRepositories,
-                    "hmppsRepoCount": hmppsRepoCount,
-                    "laaRepoCount": laaRepoCount,
-                    "opgRepoCount": opgRepoCount,
-                    "cicaRepoCount": cicaRepoCount,
-                    "centralDigitalRepoCount": centralDigitalRepoCount,
-                    "platformsAndArchitectureRepoCount": platformsAndArchitectureRepoCount,
-                    "unownedRepoCount": unownedRepoCount,
-                    "totalReposWithFoundOwners": totalFound,
-                    "reposWithMultipleOwnersCount": reposWithMultipleOwnersCount,
-                },
-                "percentages": {
-                    "hmppsRepoCount": convert_to_percentage(hmppsRepoCount, totalRepositories),
-                    "laaRepoCount": convert_to_percentage(laaRepoCount, totalRepositories),
-                    "opgRepoCount": convert_to_percentage(opgRepoCount, totalRepositories),
-                    "cicaRepoCount": convert_to_percentage(cicaRepoCount, totalRepositories),
-                    "centralDigitalRepoCount": convert_to_percentage(centralDigitalRepoCount, totalRepositories),
-                    "platformsAndArchitectureRepoCount": convert_to_percentage(platformsAndArchitectureRepoCount, totalRepositories),
-                    "techServicesRepoCount": convert_to_percentage(techServicesRepoCount, totalRepositories),
-                    "unownedRepoCount": convert_to_percentage(unownedRepoCount, totalRepositories),
-                    "totalReposWithFoundOwners": convert_to_percentage(totalFound, totalRepositories),
-                    "reposWithMultipleOwnersCount": convert_to_percentage(reposWithMultipleOwnersCount, totalRepositories),
+                    "totalRepos": totalRepositories,
+                    "totalReposWithFoundOwners": [
+                        totalFound,
+                        convert_to_percentage(totalFound, totalRepositories),
+                    ],
+                    "reposWithMultipleOwnersCount": [
+                        reposWithMultipleOwnersCount,
+                        convert_to_percentage(
+                            reposWithMultipleOwnersCount, totalRepositories
+                        ),
+                    ],
+                    "unownedRepoCount": [
+                        unownedRepoCount,
+                        convert_to_percentage(unownedRepoCount, totalRepositories),
+                    ],
+                    "hmppsRepoCount": [
+                        hmppsRepoCount,
+                        convert_to_percentage(hmppsRepoCount, totalRepositories),
+                    ],
+                    "laaRepoCount": [
+                        laaRepoCount,
+                        convert_to_percentage(laaRepoCount, totalRepositories),
+                    ],
+                    "opgRepoCount": [
+                        opgRepoCount,
+                        convert_to_percentage(opgRepoCount, totalRepositories),
+                    ],
+                    "cicaRepoCount": [
+                        cicaRepoCount,
+                        convert_to_percentage(cicaRepoCount, totalRepositories),
+                    ],
+                    "centralDigitalRepoCount": [
+                        centralDigitalRepoCount,
+                        convert_to_percentage(
+                            centralDigitalRepoCount, totalRepositories
+                        ),
+                    ],
+                    "platformsAndArchitectureRepoCount": [
+                        platformsAndArchitectureRepoCount,
+                        convert_to_percentage(
+                            platformsAndArchitectureRepoCount, totalRepositories
+                        ),
+                    ],
+                    "techServicesRepoCount": [
+                        techServicesRepoCount,
+                        convert_to_percentage(techServicesRepoCount, totalRepositories),
+                    ],
                 },
                 "repositories": {
                     "hmpps": hmppsRepos,
