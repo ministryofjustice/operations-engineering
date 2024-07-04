@@ -20,7 +20,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.configure_standards
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           KPI_DASHBOARD_URL: ${{ secrets.KPI_DASHBOARD_POC_URL }}
           KPI_DASHBOARD_API_KEY: ${{ secrets.KPI_DASHBOARD_POC_API_KEY }}
       - name: Report failure to Slack

@@ -20,7 +20,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.unowned_repositories ministryofjustice "${ADMIN_GITHUB_TOKEN}" "${ADMIN_SLACK_TOKEN}"
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           ADMIN_SLACK_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       - name: Report failure to Slack
         if: always()

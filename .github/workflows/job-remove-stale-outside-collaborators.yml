@@ -21,12 +21,12 @@ jobs:
       - name: Remove ministryofjustice stale outside collaborators
         run: pipenv run python -m bin.remove_stale_outside_collaborators
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_BOT_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           GITHUB_ORGANIZATION_NAME: ministryofjustice
       - name: Remove moj-analytical-services stale outside collaborators
         run: pipenv run python -m bin.remove_stale_outside_collaborators
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_BOT_TOKEN }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           GITHUB_ORGANIZATION_NAME: moj-analytical-services
       - name: Report failure to Slack
         if: always()
