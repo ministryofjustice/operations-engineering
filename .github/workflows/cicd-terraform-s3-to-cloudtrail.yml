@@ -4,12 +4,12 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - "terraform/log_streaming/**"
+      - "terraform/github/log_streaming/**"
     branches:
       - main
   push:
     paths:
-      - "terraform/log_streaming/**"
+      - "terraform/github/log_streaming/**"
     branches: ["main"]
 
 env:
@@ -25,7 +25,7 @@ jobs:
       id-token: write
     defaults:
       run:
-        working-directory: "terraform/log_streaming"
+        working-directory: "terraform/github/log_streaming"
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
