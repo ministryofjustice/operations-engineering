@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
 import boto3
-from botocore.exceptions import NoCredentialsError
 
 # Try the original import
 try:
@@ -50,16 +49,13 @@ class TestMTASTSCheck(unittest.TestCase):
                 if not sts_content.startswith("version: STSv1\nmode: enforce"):
                     print(f"Domain {domain}: Content does not start with 'version: STSv1\\nmode: enforce'")
                     failed_domains.append(f"{domain} (No 'mode: enforce')")
-            except NoCredentialsError:
-                print(f"Domain {domain}: No AWS credentials found")
-                failed_domains.append(f"{domain} (AWS credentials not found)")
             except Exception as e:
                 print(f"Domain {domain}: Exception occurred - {e}")
                 failed_domains.append(f"{domain} (Exception: {e})")
-        
+
         if failed_domains:
             print(f"Failed domains: {failed_domains}")
-        
+
         self.assertEqual(len(failed_domains), 28)
 
 if __name__ == "__main__":
