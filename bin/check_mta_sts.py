@@ -1,7 +1,8 @@
 from services.s3_service import S3Service
 
 # Keep this updated with all MTA-STS domains
-domains = ["ccrc.gov.uk",
+domains = [
+           "ccrc.gov.uk",
            "cjit.gov.uk",
            "cshrcasework.justice.gov.uk",
            "devl.justice.gov.uk",
@@ -28,7 +29,8 @@ domains = ["ccrc.gov.uk",
            "victimscommissioner.org.uk",
            "yjb.gov.uk",
            "yjbservicespp.yjb.gov.uk",
-           "youthjusticepp.yjb.gov.uk"]
+           "youthjusticepp.yjb.gov.uk"
+           ]
 
 # Define the suffix variable
 SUFFIX = ".well-known/mta-sts.txt"
@@ -36,6 +38,7 @@ SUFFIX = ".well-known/mta-sts.txt"
 def main():
     # Initialize the S3Service Client
     s3_client = S3Service("880656497252", "ministryofjustice")
+    
     # List to hold domains that do not enforce MTA-STS
     failed_domains = []
 
@@ -44,7 +47,6 @@ def main():
         if not s3_client.is_well_known_mta_sts_enforce(domain):
             print(f"{domain} (No 'mode: enforce')")
             failed_domains.append(domain)
-
 
 if __name__ == "__main__":
     main()
