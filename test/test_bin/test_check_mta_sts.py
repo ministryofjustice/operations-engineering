@@ -7,6 +7,7 @@ from botocore.exceptions import NoCredentialsError
 from bin.check_mta_sts import SUFFIX, domains, S3Service
 
 
+
 class TestMTASTSChecker(unittest.TestCase):
 
     def setUp(self):

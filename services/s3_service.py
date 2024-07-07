@@ -4,10 +4,7 @@ import os
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import boto3
-
-
 from config.constants import NO_ACTIVITY
-
 
 class S3Service:
     def __init__(self, bucket_name: str, organisation_name: str) -> None:
@@ -61,7 +58,6 @@ class S3Service:
 
     def get_active_users_from_org_people_file(self) -> list:
         three_months_ago_date = datetime.now() - relativedelta(months=3)
-
         active_users = []
         for user in self._get_users_from_org_people_file():
             # Some users have "No activity" skip over these users
@@ -71,7 +67,6 @@ class S3Service:
                 user['last_active'][0:10], '%Y-%m-%d')
             if last_active_date > three_months_ago_date:
                 active_users.append(user["username"])
-
         return active_users
 
     def _get_users_from_org_people_file(self) -> list:

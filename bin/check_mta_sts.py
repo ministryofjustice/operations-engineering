@@ -35,6 +35,7 @@ domains = [
 # Define the suffix variable
 SUFFIX = ".well-known/mta-sts.txt"
 
+
 def main():
     # Initialize the S3Service Client
     s3_client = S3Service("880656497252", "ministryofjustice")
@@ -47,6 +48,7 @@ def main():
         if not s3_client.is_well_known_mta_sts_enforce(domain):
             print(f"{domain} (No 'mode: enforce')")
             failed_domains.append(domain)
+
 
 if __name__ == "__main__":
     main()
