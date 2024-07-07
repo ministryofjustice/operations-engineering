@@ -7,7 +7,6 @@ from botocore.exceptions import NoCredentialsError
 from bin.check_mta_sts import SUFFIX, domains, S3Service
 
 
-
 class TestMTASTSChecker(unittest.TestCase):
 
     def setUp(self):
@@ -37,7 +36,7 @@ class TestMTASTSChecker(unittest.TestCase):
                     self.failed_domains.append(f"{domain} (No '{expected_mode}')")
             except NoCredentialsError:
                 self.failed_domains.append(f"{domain} (AWS credentials not found)")
-            except Exception as e:
+            except ValueError as e:
                 self.failed_domains.append(f"{domain} (Exception: {e})")
 
     def test_successful_retrieval_with_enforce(self):
