@@ -1,3 +1,4 @@
+# pylint: disable=wrong-import-order
 import unittest
 from unittest.mock import patch, MagicMock
 import boto3
