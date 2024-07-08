@@ -8,7 +8,6 @@ import boto3
 
 from config.constants import NO_ACTIVITY
 
-
 class S3Service:
     def __init__(self, bucket_name: str, organisation_name: str) -> None:
         self.client = boto3.client("s3")
