@@ -1,12 +1,11 @@
-# pylint: disable=wrong-import-order
 import csv
 import json
 import os
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 import boto3
-
+from dateutil.relativedelta import relativedelta
 from config.constants import NO_ACTIVITY
+
 
 class S3Service:
     def __init__(self, bucket_name: str, organisation_name: str) -> None:
@@ -80,9 +79,9 @@ class S3Service:
         return users
 
     def _download_file(self, object_name: str, file_path: str):
+        self.client.download_file(self.bucket_name, object_name, file_path)
         if not os.path.isfile(file_path):
             raise ValueError(f"The {file_path} file did not download or is not in the expected location")
-        
 
     def _upload_file(self, object_name: str, file_path: str):
         self.client.upload_file(file_path, self.bucket_name, object_name)
