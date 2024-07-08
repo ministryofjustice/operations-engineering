@@ -43,6 +43,22 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+def get_usernames_from_data_lake_ignoring_bots_and_collaborators(bot_list: list) -> list:
+    usernames = []
+    try:
+        with open(CSV_FILE_NAME, mode='r', encoding='utf-8') as file:
+            csv_reader = csv.DictReader(file)
+
+            for row in csv_reader:
+                username = row['login'].strip()
+                is_collaborator = row['outside_collaborator'].lower() == 'true'
+                if username not in bot_list and not is_collaborator:
+                    usernames.append(username)
+
+    except FileNotFoundError as e:
+        logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
+
+    return usernames
 
 def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
     usernames = []
@@ -86,11 +102,16 @@ def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
     usernames from the file. This process ensures that the most current data regarding dormant users is used.
     """
     download_github_dormant_users_csv_from_s3()
-    list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(
-        ALLOWED_BOT_USERS)
+    list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
 
-    list_of_dormant_users = [DormantGitHubUser(
-        github_service, user) for user in list_of_non_bot_and_non_collaborators]
+    list_of_dormant_users = [DormantGitHubUser(github_service, user) for user in list_of_non_bot_and_non_collaborators]
+
+    return list_of_dormant_users
+
+def get_dormant_users_from_data_lake(github_service: GithubService) -> list:
+    list_of_non_bot_and_non_collaborators = get_usernames_from_data_lake_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
+
+    list_of_dormant_users = [DormantGitHubUser(github_service, user) for user in list_of_non_bot_and_non_collaborators]
 
     return list_of_dormant_users
 
