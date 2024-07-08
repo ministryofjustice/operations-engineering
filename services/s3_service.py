@@ -93,6 +93,9 @@ class S3Service:
     def is_well_known_mta_sts_enforce(self, domain: str) -> bool:
         suffix = ".well-known/mta-sts.txt"
         bucket_name = f"880656497252.{domain}"
-        response = self.client.get_object(Bucket=bucket_name, Key=suffix)
-        sts_content = response['Body'].read().decode('utf-8')
-        return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
+        try:
+            response = self.client.get_object(Bucket=bucket_name, Key=suffix)
+            sts_content = response['Body'].read().decode('utf-8')
+            return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
+        except self.client.exceptions.NoSuchkey:
+            return False
