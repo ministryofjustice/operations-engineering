@@ -2,10 +2,11 @@ import csv
 import json
 import os
 from datetime import datetime
-import boto3
 from dateutil.relativedelta import relativedelta
-from config.constants import NO_ACTIVITY
 
+import boto3
+
+from config.constants import NO_ACTIVITY
 
 
 class S3Service:
