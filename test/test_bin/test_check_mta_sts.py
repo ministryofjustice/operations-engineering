@@ -2,10 +2,8 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import boto3
-
-
 from botocore.exceptions import NoCredentialsError
-from bin.check_mta_sts import SUFFIX, domains, S3Service
+from bin.check_mta_sts import SUFFIX, domains, S3Service, main
 
 class TestMTASTSChecker(unittest.TestCase):
 
@@ -62,4 +60,5 @@ class TestMTASTSChecker(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    main()
     unittest.main()
