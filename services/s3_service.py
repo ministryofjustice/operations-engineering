@@ -82,7 +82,9 @@ class S3Service:
     def _download_file(self, object_name: str, file_path: str):
         self.client.download_file(self.bucket_name, object_name, file_path)
         if not os.path.isfile(file_path):
-            raise ValueError(f"The {file_path} file did not download or is not in the expected location")
+            raise ValueError(
+                f"The {file_path} file did not download or is not in the expected location"
+                )
 
     def _upload_file(self, object_name: str, file_path: str):
         self.client.upload_file(file_path, self.bucket_name, object_name)
