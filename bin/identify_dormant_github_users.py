@@ -8,6 +8,7 @@ from botocore.exceptions import NoCredentialsError
 from services.dormant_github_user_service import DormantGitHubUser
 from services.github_service import GithubService
 from services.slack_service import SlackService
+from services.cloudtrail_service import CloudtrailService
 from utils.environment import EnvironmentVariables
 
 SLACK_CHANNEL = "operations-engineering-alerts"
@@ -43,22 +44,15 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def get_usernames_from_data_lake_ignoring_bots_and_collaborators(bot_list: list) -> list:
-    usernames = []
-    try:
-        with open(CSV_FILE_NAME, mode='r', encoding='utf-8') as file:
-            csv_reader = csv.DictReader(file)
+def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list) -> list:
+    all_users = github_service.get_all_enterprise_members()
+    all_collaborators = github_service.get_all_enterprise_collaborators()
 
-            for row in csv_reader:
-                username = row['login'].strip()
-                is_collaborator = row['outside_collaborator'].lower() == 'true'
-                if username not in bot_list and not is_collaborator:
-                    usernames.append(username)
+    cloudtrail_service = CloudtrailService()
+    active_users = cloudtrail_service.get_active_users()
 
-    except FileNotFoundError as e:
-        logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
+    return [ user for user in all_users if user not in list(set(active_users).union(bot_list, all_collaborators)) ]
 
-    return usernames
 
 def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
     usernames = []
@@ -109,9 +103,9 @@ def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
     return list_of_dormant_users
 
 def get_dormant_users_from_data_lake(github_service: GithubService) -> list:
-    list_of_non_bot_and_non_collaborators = get_usernames_from_data_lake_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
+    list_of_inactive_github_users = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, ALLOWED_BOT_USERS)
 
-    list_of_dormant_users = [DormantGitHubUser(github_service, user) for user in list_of_non_bot_and_non_collaborators]
+    list_of_dormant_users = [DormantGitHubUser(github_service, user) for user in list_of_inactive_github_users]
 
     return list_of_dormant_users
 

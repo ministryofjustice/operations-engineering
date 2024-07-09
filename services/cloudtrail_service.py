@@ -26,16 +26,30 @@ class CloudtrailService:
 
     def get_query_results(self, query_id):
         while True:
-            response = self.client.get_query_results(QueryId=query_id)
-            status = response['QueryStatus']
+            status = self.client.get_query_results(QueryId=query_id)['QueryStatus']
             print(f"Query status: {status}")
             if status in ['FAILED', 'CANCELLED', 'TIMED_OUT']:
                 raise Exception(f"Cloudtrail data lake query failsed with status: {status}")
             elif status == 'FINISHED':
-                return [list(row[0].values())[0] for row in response['QueryResultRows']]
+                return self.extract_query_results(query_id)
             time.sleep(20)
 
     def get_query_status(self, query_id):
         response = self.client.get_query_status(QueryId=query_id)
 
         return response['QueryStatus']
+
+    def extract_query_results(self, query_id):
+        response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000)
+        next_token = response["NextToken"]
+        active_users = [list(row[0].values())[0] for row in response['QueryResultRows']]
+
+        while True:
+            response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000, NextToken=next_token)
+            active_users = active_users + [list(row[0].values())[0] for row in response['QueryResultRows']]
+            if "NextToken" in response:
+                next_token = response["NextToken"]
+            else:
+                break
+
+        return active_users
