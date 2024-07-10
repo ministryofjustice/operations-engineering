@@ -41,12 +41,14 @@ class TestMTASTSChecker(unittest.TestCase):
         """Test successful retrieval of MTA-STS configuration with 'mode: enforce'."""
         with patch('boto3.client', return_value=self.mock_s3_client):
             self.run_test_logic("enforce")
+            main()
         self.assertEqual(len(self.failed_domains), 28, f"Failed domains: {self.failed_domains}")
 
     def test_successful_retrieval_without_enforce(self):
         """Test successful retrieval of MTA-STS configuration without 'mode: enforce'."""
         with patch('boto3.client', return_value=self.mock_s3_client):
             self.run_test_logic("testing")
+            main()
         self.assertGreater(len(self.failed_domains), 0, f"Failed domains: {self.failed_domains}")
         self.assertIn(" (No 'testing')", self.failed_domains[0])
 
