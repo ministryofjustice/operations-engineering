@@ -1,0 +1,32 @@
+name: 🧪 Print GitHub Reposiroty Owners
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository_limit:
+        description: "Repository Limit (defaults to 5)"
+        required: false
+        default: "5"
+  pull_request:
+    branches: main
+
+jobs:
+  print_github_repository_owners:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.print_github_repository_owners
+        env:
+          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_PAT_TOKEN }}
+          REPOSITORY_LIMIT: ${{ inputs.repository_limit }}
