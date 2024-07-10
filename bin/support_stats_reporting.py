@@ -1,3 +1,4 @@
+
 import os
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -45,6 +46,18 @@ def previous_working_day():
         diff = 1
 
     last_working_day = today - timedelta(days=diff)
+    str_last_working_day = str(last_working_day)
+
+    return str_last_working_day
+
+def get_previous_working_day(date_today=date.today()):
+    diff = 1
+    if date_today.weekday() == 0:
+        diff = 3
+    else:
+        diff = 1
+
+    last_working_day = date_today - timedelta(days=diff)
     str_last_working_day = str(last_working_day)
 
     return str_last_working_day
