@@ -1,12 +1,13 @@
 import boto3
 import time
+from botocore.exceptions import ClientError
 from datetime import datetime, timedelta
 
 class CloudtrailService:
     def __init__(self) -> None:
         self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
-    def get_active_users(self):
+    def get_active_users_for_dormant_users_process(self):
         username_key = "eventData.useridentity.principalid"
         data_store_id = "ec682140-3e75-40c0-8e04-f06207791c2e"
         period_cutoff = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d %H:%M:%S')
@@ -27,7 +28,15 @@ class CloudtrailService:
             status = self.client.get_query_results(QueryId=query_id)['QueryStatus']
             print(f"Query status: {status}")
             if status in ['FAILED', 'CANCELLED', 'TIMED_OUT']:
-                raise Exception(f"Cloudtrail data lake query failsed with status: {status}")
+                raise ClientError(
+                    {
+                        'Error': {
+                            'Code': status,
+                            'Message': f"Cloudtrail data lake query failed with status: {status}"
+                        }
+                    },
+                    operation_name='get_query_results'
+                )
             if status == 'FINISHED':
                 return self.extract_query_results(query_id)
             time.sleep(20)

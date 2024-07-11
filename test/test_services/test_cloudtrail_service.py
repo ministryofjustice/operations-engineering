@@ -1,6 +1,7 @@
 import unittest
-from unittest.mock import patch, MagicMock, call
 import boto3
+from unittest.mock import patch, MagicMock, call
+from botocore.exceptions import ClientError
 from moto import mock_aws
 from services.cloudtrail_service import CloudtrailService
 from freezegun import freeze_time
@@ -15,7 +16,7 @@ class TestCloudtrailService(unittest.TestCase):
     @freeze_time("2024-07-11 00:00:00")
     @patch.object(CloudtrailService, "get_query_results")
     @mock_aws
-    def test_get_active_users(self, mock_query_results):
+    def get_active_users_for_dormant_users_process(self, mock_query_results):
         mock_active_users = ["user1", "user2", "user3"]
         mock_query_results.return_value = mock_active_users
         self.cloudtrail_service.client.start_query = MagicMock()
@@ -25,7 +26,7 @@ class TestCloudtrailService(unittest.TestCase):
         WHERE eventTime > '2024-04-12 00:00:00';
         """
 
-        assert self.cloudtrail_service.get_active_users() == mock_active_users
+        assert self.cloudtrail_service.get_active_users_for_dormant_users_process() == mock_active_users
         self.cloudtrail_service.client.start_query.assert_called_once_with(QueryStatement=mock_query_string)
 
     @patch.object(CloudtrailService, "extract_query_results")
@@ -45,11 +46,11 @@ class TestCloudtrailService(unittest.TestCase):
     @mock_aws
     def test_get_query_results_if_fail(self):
         self.cloudtrail_service.client.get_query_results = MagicMock(return_value={'QueryStatus': 'CANCELLED'})
-        with self.assertRaises(Exception) as context:
+        with self.assertRaises(ClientError) as context:
             self.cloudtrail_service.get_query_results("mock_id")
 
         self.cloudtrail_service.client.get_query_results.assert_called_once_with(QueryId="mock_id")
-        self.assertEqual(str(context.exception), "Cloudtrail data lake query failsed with status: CANCELLED")
+        self.assertEqual(str(context.exception), "An error occurred (CANCELLED) when calling the get_query_results operation: Cloudtrail data lake query failed with status: CANCELLED")
 
     # pylint: disable=C0103, W0613
     @mock_aws

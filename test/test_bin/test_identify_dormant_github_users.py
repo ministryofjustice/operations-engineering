@@ -26,9 +26,9 @@ class TestDormantGitHubUsers(unittest.TestCase):
         self.assertEqual(len(result), 3)
         mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators.assert_called_once_with(github_service, ALLOWED_BOT_USERS)
 
-    @patch.object(CloudtrailService, "get_active_users")
-    def test_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(self, mock_get_active_users):
-        mock_get_active_users.return_value = ["member1"]
+    @patch.object(CloudtrailService, "get_active_users_for_dormant_users_process")
+    def test_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(self, mock_get_active_users_for_dormant_users_process):
+        mock_get_active_users_for_dormant_users_process.return_value = ["member1"]
         mock_github_service = MagicMock()
         mock_github_service.get_all_enterprise_members = MagicMock(return_value=["member1", "member2", "bot1", "bot2"])
 
