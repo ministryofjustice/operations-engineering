@@ -7,16 +7,16 @@ resource "aws_iam_policy" "assume_cloud_platform_route53_read_role_policy" {
   name        = "AssumeCloudPlatformRoute53ReadRolePolicy"
   description = "A policy that allows a user to assume the Cloud Platforms Route53 Read role"
 
-  policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : {
-        "Effect" : "Allow",
-        "Action" : "sts:AssumeRole",
-        "Resource" : "arn:aws:iam::${var.cloud_platform_account_id}:role/ops-eng-route53-readonly"
-      }
-    }
-  )
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action   = "sts:AssumeRole",
+        Effect   = "Allow",
+        Resource = "arn:aws:iam::${var.cloud_platform_account_id}:role/ops-eng-route53-readonly"
+      },
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "assume_cloud_platform_route53_read_role_policy_attatchment" {
