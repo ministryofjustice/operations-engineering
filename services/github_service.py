@@ -1242,11 +1242,3 @@ class GithubService:
             all_users = all_users + [user.login for user in self.github_client_core_api.get_organization(org).get_members() if user.login not in all_users]
 
         return all_users
-
-    def get_all_enterprise_collaborators(self) -> list:
-        all_collaborators = []
-
-        for org in self.organisations_in_enterprise:
-            all_collaborators = all_collaborators + [collaborator.login for collaborator in self.github_client_core_api.get_organization(org).get_outside_collaborators() if collaborator.login not in all_collaborators]
-
-        return all_collaborators

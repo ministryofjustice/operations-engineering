@@ -37,12 +37,11 @@ logger = logging.getLogger(__name__)
 
 def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list) -> list:
     all_users = github_service.get_all_enterprise_members()
-    all_collaborators = github_service.get_all_enterprise_collaborators()
 
     cloudtrail_service = CloudtrailService()
     active_users = cloudtrail_service.get_active_users()
 
-    return [ user for user in all_users if user not in list(set(active_users).union(bot_list, all_collaborators)) ]
+    return [ user for user in all_users if user not in list(set(active_users).union(bot_list)) ]
 
 
 def get_dormant_users_from_data_lake(github_service: GithubService) -> list:
