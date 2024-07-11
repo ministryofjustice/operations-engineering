@@ -54,54 +54,6 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
     return [ user for user in all_users if user not in list(set(active_users).union(bot_list, all_collaborators)) ]
 
 
-def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
-    usernames = []
-    try:
-        with open(CSV_FILE_NAME, mode='r', encoding='utf-8') as file:
-            csv_reader = csv.DictReader(file)
-
-            for row in csv_reader:
-                username = row['login'].strip()
-                is_collaborator = row['outside_collaborator'].lower() == 'true'
-                if username not in bot_list and not is_collaborator:
-                    usernames.append(username)
-
-    except FileNotFoundError as e:
-        logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
-
-    return usernames
-
-
-def download_github_dormant_users_csv_from_s3():
-    s3 = boto3.client('s3')
-    try:
-        s3.download_file(BUCKET_NAME, CSV_FILE_NAME, CSV_FILE_NAME)
-        logger.info("File %s downloaded successfully.", CSV_FILE_NAME)
-    except NoCredentialsError:
-        logger.error(
-            "Credentials not available, please check your AWS credentials.")
-    except FileNotFoundError as e:
-        logger.error("Error downloading file: %s", e)
-
-    if not os.path.isfile(CSV_FILE_NAME):
-        raise FileNotFoundError(
-            f"File {CSV_FILE_NAME} not found in the current directory.")
-
-
-def get_dormant_users_from_github_csv(github_service: GithubService) -> list:
-    """
-    This function depends on a preliminary manual process: a GitHub Enterprise user must first download the 'dormant.csv'
-    file from the GitHub Enterprise dashboard and then upload it to the 'operations-engineering-dormant-users' S3 bucket.
-    Once this setup is complete, this function will download the 'dormant.csv' file from the S3 bucket and extract a list of
-    usernames from the file. This process ensures that the most current data regarding dormant users is used.
-    """
-    download_github_dormant_users_csv_from_s3()
-    list_of_non_bot_and_non_collaborators = get_usernames_from_csv_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
-
-    list_of_dormant_users = [DormantGitHubUser(github_service, user) for user in list_of_non_bot_and_non_collaborators]
-
-    return list_of_dormant_users
-
 def get_dormant_users_from_data_lake(github_service: GithubService) -> list:
     list_of_inactive_github_users = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, ALLOWED_BOT_USERS)
 
@@ -126,18 +78,11 @@ def message_to_slack_channel(list_of_dormant_users: list) -> str:
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
 
-    dormant_users_from_csv = get_dormant_users_from_github_csv(
-        GithubService(env.get('GH_ADMIN_TOKEN'), ORGANISATION)
-    )
+    dormant_users_from_csv = get_dormant_users_from_data_lake(GithubService(env.get('GH_ADMIN_TOKEN'), ORGANISATION))
 
-    dormant_users_accoding_to_github_and_auth0 = [
-        user for user in dormant_users_from_csv if user.is_dormant
-    ]
+    dormant_users_accoding_to_github_and_auth0 = [ user for user in dormant_users_from_csv if user.is_dormant ]
 
-    SlackService(env.get('ADMIN_SLACK_TOKEN')).send_message_to_plaintext_channel_name(
-        message_to_slack_channel(
-            dormant_users_accoding_to_github_and_auth0), SLACK_CHANNEL
-    )
+    SlackService(env.get('ADMIN_SLACK_TOKEN')).send_message_to_plaintext_channel_name(message_to_slack_channel(dormant_users_accoding_to_github_and_auth0), SLACK_CHANNEL)
 
 
 if __name__ == "__main__":
