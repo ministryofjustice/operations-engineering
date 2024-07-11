@@ -25,8 +25,14 @@ provider "github" {
   owner = "ministryofjustice"
 }
 
+
 provider "github" {
   alias = "ministryofjustice-test"
   token = var.github_token
   owner = "ministryofjustice-test"
+}
+
+provider "aws" {
+  profile = "dsd_secret_manager_access_profile"
+  region  = "eu-west-2"
 }
