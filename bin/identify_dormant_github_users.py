@@ -1,9 +1,4 @@
-import csv
 import logging
-import os
-
-import boto3
-from botocore.exceptions import NoCredentialsError
 
 from services.dormant_github_user_service import DormantGitHubUser
 from services.github_service import GithubService
@@ -13,10 +8,7 @@ from utils.environment import EnvironmentVariables
 
 SLACK_CHANNEL = "operations-engineering-alerts"
 AUTH0_DOMAIN = "operations-engineering.eu.auth0.com"
-NUMBER_OF_DAYS_CONSIDERED_DORMANT = 90
-CSV_FILE_NAME = "dormant.csv"
 ORGANISATION = "ministryofjustice"
-BUCKET_NAME = "operations-engineering-dormant-users"
 # These are the users that are deemed acceptable to be dormant. They are either bots or service accounts and will be revisited regularly.
 ALLOWED_BOT_USERS = [
     "ci-hmcts",
@@ -40,8 +32,7 @@ ALLOWED_BOT_USERS = [
     "laaserviceaccount",
 ]
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list) -> list:
