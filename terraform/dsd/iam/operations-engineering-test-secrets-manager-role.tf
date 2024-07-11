@@ -15,7 +15,7 @@ resource "aws_iam_policy" "secrets_manager_policy" {
 }
 
 resource "aws_iam_role" "secrets_manager_role" {
-  name = "operations_engineering_test_secrets_manager_role"
+  name               = "operations_engineering_test_secrets_manager_role"
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
 }
 
