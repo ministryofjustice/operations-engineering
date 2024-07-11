@@ -1,3 +1,5 @@
+# pylint: disable=E1136, E1135, W0718, C0411
+
 import json
 from calendar import timegm
 from datetime import date, datetime, timedelta
@@ -15,8 +17,6 @@ from gql.transport.exceptions import TransportQueryError
 from requests import Session
 
 from config.logging_config import logging
-
-# pylint: disable=E1136, E1135, W0718, C0411
 
 logging.getLogger("gql").setLevel(logging.WARNING)
 

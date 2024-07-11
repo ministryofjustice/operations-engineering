@@ -13,7 +13,6 @@ class TestDormantGitHubUsers(unittest.TestCase):
     def setUp(self):
         self.allowed_bot_users = ["bot1", "bot2"]
 
-
     @patch('bin.identify_dormant_github_users.get_inactive_users_from_data_lake_ignoring_bots_and_collaborators')
     @patch('services.dormant_github_user_service.DormantGitHubUser')
     @patch('services.github_service.GithubService')
