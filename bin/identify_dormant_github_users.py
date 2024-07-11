@@ -32,8 +32,9 @@ ALLOWED_BOT_USERS = [
     "laaserviceaccount",
 ]
 
-logging.basicConfig(level=logging.INFO,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list) -> list:
     all_users = github_service.get_all_enterprise_members()
@@ -41,7 +42,7 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
     cloudtrail_service = CloudtrailService()
     active_users = cloudtrail_service.get_active_users()
 
-    return [ user for user in all_users if user not in list(set(active_users).union(bot_list)) ]
+    return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
 
 def get_dormant_users_from_data_lake(github_service: GithubService) -> list:
@@ -70,7 +71,7 @@ def identify_dormant_github_users():
 
     dormant_users_from_csv = get_dormant_users_from_data_lake(GithubService(env.get('GH_ADMIN_TOKEN'), ORGANISATION))
 
-    dormant_users_accoding_to_github_and_auth0 = [ user for user in dormant_users_from_csv if user.is_dormant ]
+    dormant_users_accoding_to_github_and_auth0 = [user for user in dormant_users_from_csv if user.is_dormant]
 
     SlackService(env.get('ADMIN_SLACK_TOKEN')).send_message_to_plaintext_channel_name(message_to_slack_channel(dormant_users_accoding_to_github_and_auth0), SLACK_CHANNEL)
 

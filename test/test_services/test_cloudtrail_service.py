@@ -12,7 +12,6 @@ class TestCloudtrailService(unittest.TestCase):
         self.cloudtrail_service = CloudtrailService()
         self.cloudtrail_service.client = boto3.client("cloudtrail", region_name="us-west-2")
 
-
     @freeze_time("2024-07-11 00:00:00")
     @patch.object(CloudtrailService, "get_query_results")
     @mock_aws
@@ -43,7 +42,6 @@ class TestCloudtrailService(unittest.TestCase):
         mock_extract_query_results.assert_called_once_with(mock_query_id)
         assert response == mock_active_users
 
-
     @mock_aws
     def test_get_query_results_if_fail(self):
         self.cloudtrail_service.client.get_query_results = MagicMock(return_value={'QueryStatus': 'CANCELLED'})
@@ -53,17 +51,16 @@ class TestCloudtrailService(unittest.TestCase):
         self.cloudtrail_service.client.get_query_results.assert_called_once_with(QueryId="mock_id")
         self.assertEqual(str(context.exception), "Cloudtrail data lake query failsed with status: CANCELLED")
 
-
+    # pylint: disable=C0103, W0613
     @mock_aws
     def test_extract_query_results(self):
-
         mock_next_token = "mock_next_token"
 
         def mock_get_query_results(QueryId=None, MaxQueryResults=1000, NextToken=False):
             if NextToken:
                 return {'QueryResultRows': [[{'principalId': 'test_user3'}]]}
-            else:
-                return {'NextToken': mock_next_token,'QueryResultRows': [[{'principalId': 'test_user1'}], [{'principalId': 'test_user2'}]]}
+
+            return {'NextToken': mock_next_token, 'QueryResultRows': [[{'principalId': 'test_user1'}], [{'principalId': 'test_user2'}]]}
 
         self.cloudtrail_service.client.get_query_results = MagicMock(side_effect=mock_get_query_results)
         mock_query_id = "mock_id"
