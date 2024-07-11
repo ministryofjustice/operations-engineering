@@ -23,3 +23,9 @@ resource "aws_iam_role_policy_attachment" "secrets_manager_attachment" {
   role       = aws_iam_role.secrets_manager_role.name
   policy_arn = aws_iam_policy.secrets_manager_policy.arn
 }
+
+resource "github_actions_secret" "secrets_manager_role_arn" {
+  repository      = "operations-engineering"
+  secret_name     = "AWS_SECRETS_MANAGER_ROLE_ARN"
+  plaintext_value = aws_iam_role.secrets_manager_role.arn
+}
