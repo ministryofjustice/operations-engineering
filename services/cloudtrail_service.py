@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 class CloudtrailService:
     def __init__(self) -> None:
-        self.client = boto3.client("cloudtrail")
+        self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
 
     def get_active_users(self):
@@ -34,22 +34,19 @@ class CloudtrailService:
                 return self.extract_query_results(query_id)
             time.sleep(20)
 
-    def get_query_status(self, query_id):
-        response = self.client.get_query_status(QueryId=query_id)
-
-        return response['QueryStatus']
-
     def extract_query_results(self, query_id):
         response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000)
-        next_token = response["NextToken"]
         active_users = [list(row[0].values())[0] for row in response['QueryResultRows']]
 
-        while True:
-            response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000, NextToken=next_token)
-            active_users = active_users + [list(row[0].values())[0] for row in response['QueryResultRows']]
-            if "NextToken" in response:
-                next_token = response["NextToken"]
-            else:
-                break
+        if "NextToken" in response:
+            next_token = response["NextToken"]
+
+            while True:
+                response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000, NextToken=next_token)
+                active_users = active_users + [list(row[0].values())[0] for row in response['QueryResultRows']]
+                if "NextToken" in response:
+                    next_token = response["NextToken"]
+                else:
+                    break
 
         return active_users
