@@ -22,7 +22,7 @@ terraform {
 
 provider "github" {
   token = var.github_token
-  owner = "ministryofjustice"
+  owner = var.github_owner
 }
 
 
