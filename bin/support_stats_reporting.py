@@ -1,4 +1,3 @@
-
 import os
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -36,7 +35,7 @@ def create_dataframe_from_csv(filename: str):
     return dataframe
 
 
-def previous_working_day():
+def get_previous_working_day():
     today = date.today()
 
     diff = 1
@@ -49,6 +48,7 @@ def previous_working_day():
     str_last_working_day = str(last_working_day)
 
     return str_last_working_day
+
 
 def get_previous_working_day(date_today=date.today()):
     diff = 1
@@ -87,7 +87,7 @@ def craft_message_to_slack(yesterdays_support_requests: list[SupportRequest]):
         yesterdays_support_requests
     )
 
-    previous_support_day = previous_working_day()
+    previous_support_day = get_previous_working_day()
 
     msg = f"On {previous_support_day} we received {len(yesterdays_support_requests)} Support Requests: \n\n"
     yesterdays_support_requests = list(dict.fromkeys(yesterdays_support_requests))
