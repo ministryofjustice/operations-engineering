@@ -15,3 +15,9 @@ variable "ECR_REGISTRY" {
   description = "Registry of ECR repositories"
   default     = "754256621582.dkr.ecr.eu-west-2.amazonaws.com"
 }
+
+variable "github_owner" {
+  type        = string
+  description = "Default organisation for the GitHub provider configuration"
+  default     = "ministryofjustice"
+}
