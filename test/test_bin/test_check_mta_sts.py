@@ -19,7 +19,7 @@ class TestMTASTS(unittest.TestCase):
     @mock_aws
     @patch.object(S3Service, "is_well_known_mta_sts_enforce")
     def test_check_mta_sts_without_enforce(self, mock_is_well_known_mta_sts_enforce):
-        mock_is_well_known_mta_sts_enforce.side_effect = lambda s3_service, domain: domain != "yjb.gov.uk"
+        mock_is_well_known_mta_sts_enforce.side_effect = lambda domain: domain != "yjb.gov.uk"
 
         self.assertIn("yjb.gov.uk", check_mta_sts_domains(self.s3_service))
 
