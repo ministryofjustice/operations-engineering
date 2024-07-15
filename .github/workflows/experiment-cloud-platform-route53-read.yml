@@ -19,12 +19,15 @@ jobs:
         with:
           role-to-assume: ${{ secrets.ASSUME_CLOUD_PLATFORM_ROUTE53_READ_ROLE_ARN }}
           aws-region: eu-west-2
+          role-session-name: AssumeCPRoleSession
 
       - name: Configure AWS Credentials - Role with Read Access to Cloud Platforms Route53
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.CLOUD_PLATFORM_ROUTE53_READ_ROLE_ARN }}
           aws-region: eu-west-2
+          role-session-name: AssumeCPRoleSession
+          role-chaining: true
 
       - name: Check Access
         run: |
