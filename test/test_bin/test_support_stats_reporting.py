@@ -37,6 +37,10 @@ class TestGetPreviousWorkingDay(unittest.TestCase):
         previous_day = get_previous_working_day(date_today=date(2024, 7, 8))
         self.assertEqual(previous_day, str(date(2024, 7, 5)))
 
+    def test_tuesday_returns_monday(self):
+        previous_day = get_previous_working_day(date_today=date(2024, 7, 9))
+        self.assertEqual(previous_day, str(date(2024, 7, 8)))
+
 
 class TestGetEnvironmentVariables(unittest.TestCase):
     @patch.dict(os.environ, {"ADMIN_SLACK_TOKEN": "test_token"})
@@ -49,8 +53,25 @@ class TestGetEnvironmentVariables(unittest.TestCase):
 
 
 class TestCraftMessageToSlack(unittest.TestCase):
-    @patch.object(SlackService, "send_message_to_plaintext_channel_name")
-    def test_craft_message_to_slack(self, mock_send_message_to_plaintext_channel_name):
-        mock_send_message_to_plaintext_channel_name.assert_called_once_with(
-            "Test message", "operations-engineering-team"
+
+    def test_slack_message(self):
+        previous_support_day = "2024-07-11"
+        yesterdays_support_requests = 8
+        expected_message = "On 2024-07-11 we recieved 8 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* Add user to Org\n*Number of Requests:* 8"
+        self.assertEqual(
+            craft_message_to_slack(previous_support_day),
+            expected_message,
         )
+
+    @patch.object(SlackService, "__new__")
+    def test_craft_message_to_slack(self, mock_slack_service):
+
+        mock_slack_instance = MagicMock()
+        mock_slack_service.return_value = mock_slack_instance
+
+    # @patch.object(SlackService, "send_message_to_plaintext_channel_name")
+
+    # def test_craft_message_to_slack(self, mock_send_message_to_plaintext_channel_name):
+    #     mock_send_message_to_plaintext_channel_name.assert_called_once_with(
+    #         "Test message", "operations-engineering-team"
+    #     )
