@@ -100,3 +100,4 @@ class S3Service:
             return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
         except self.client.exceptions.NoSuchkey:
             return False
+        
