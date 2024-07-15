@@ -28,7 +28,7 @@ def check_mta_sts_domains(s3_client):
     failed_domains = []
 
     for domain in domains:
-        if not s3_client.is_well_known_mta_sts_enforce(s3_client, domain):
+        if not s3_client.is_well_known_mta_sts_enforce(domain):
             print(f"{domain} (No 'mode: enforce')")
             failed_domains.append(domain)
 
