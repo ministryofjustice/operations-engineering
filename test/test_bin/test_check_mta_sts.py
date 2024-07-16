@@ -1,3 +1,4 @@
+# pylint: disable=C0411
 import unittest
 from services.s3_service import S3Service
 from unittest.mock import patch

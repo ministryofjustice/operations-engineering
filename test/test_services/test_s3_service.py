@@ -1,3 +1,4 @@
+# pylint: disable=W0221, C0411
 import os
 import csv
 import json
@@ -10,8 +11,6 @@ from io import BytesIO
 from freezegun import freeze_time
 from services.s3_service import S3Service
 from config.constants import NO_ACTIVITY
-
-# pylint: disable=W0221, C0411
 
 
 class TestS3Service(unittest.TestCase):
