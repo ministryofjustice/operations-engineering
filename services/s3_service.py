@@ -27,11 +27,6 @@ class S3Service:
             the_file.write(json.dumps(users))
         self._upload_file(self.emailed_users_file_name, self.emailed_users_file_path)
 
-    def save_r53_backup_file(self):
-        session = boto3.Session(profile_name='cp_r53_backup_profile')
-        client = session.client('s3')
-        client.upload_file("hosted_zones.json", self.bucket_name, f"{datetime.now().strftime('%Y-%m-%d')}-hosted_zones.json")
-
     def get_users_have_emailed(self):
         self._download_file(self.emailed_users_file_name, self.emailed_users_file_path)
         with open(self.emailed_users_file_path, "r", encoding="utf8") as the_file:
