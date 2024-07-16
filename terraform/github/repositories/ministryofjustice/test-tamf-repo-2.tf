@@ -8,4 +8,5 @@ module "test_tamf_repo_2" {
   team_access = {
     maintain = [var.operations_engineering_team_id]
   }
+  secrets     = {EXAMPLE_SECRET = "EXAMPLE_SECRET_VALUE"}
 }
