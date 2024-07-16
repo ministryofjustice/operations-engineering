@@ -15,6 +15,7 @@ domains = [
 # Suffix for MTA-STS files
 SUFFIX = ".well-known/mta-sts.txt"
 
+
 def main():
     s3_client = S3Service("880656497252", "ministryofjustice")
     failed_domains = check_mta_sts_domains(s3_client)
@@ -23,6 +24,7 @@ def main():
         print(f"Domains failing MTA-STS enforcement:\n{', '.join(failed_domains)}")
     else:
         print("All domains enforce MTA-STS.")
+
 
 def check_mta_sts_domains(s3_client):
     failed_domains = []

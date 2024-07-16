@@ -1,8 +1,8 @@
 import unittest
 from services.s3_service import S3Service
 from unittest.mock import patch
-from bin.check_mta_sts import main, check_mta_sts_domains
 from moto import mock_aws
+from bin.check_mta_sts import main, check_mta_sts_domains
 
 class TestMTASTS(unittest.TestCase):
     @mock_aws
