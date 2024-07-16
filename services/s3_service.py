@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 import boto3
+from botocore.exceptions import ClientError
 from dateutil.relativedelta import relativedelta
 from config.constants import NO_ACTIVITY
 
@@ -98,6 +99,5 @@ class S3Service:
             response = self.client.get_object(Bucket=bucket_name, Key=suffix)
             sts_content = response['Body'].read().decode('utf-8')
             return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
-        except self.client.exceptions.NoSuchkey:
+        except ClientError:
             return False
-        

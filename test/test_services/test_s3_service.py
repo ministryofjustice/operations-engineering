@@ -2,9 +2,11 @@ import os
 import csv
 import json
 import tempfile
-from datetime import datetime
 import unittest
+from botocore.exceptions import ClientError
+from datetime import datetime
 from unittest.mock import MagicMock, call, patch, mock_open
+from io import BytesIO
 from freezegun import freeze_time
 from services.s3_service import S3Service
 from config.constants import NO_ACTIVITY
@@ -162,35 +164,28 @@ class TestS3Service(unittest.TestCase):
         mock_download_file.assert_called_once_with(
             self.s3_service.org_people_file_name, self.s3_service.org_people_file_name)
 
-    @patch("services.s3_service.boto3.client")
-    def test_is_well_known_mta_sts_enforce_enabled(self, mock_boto_client):
-        mock_s3_client = MagicMock()
-        mock_boto_client.return_value = mock_s3_client
-        mock_s3_client.get_object.return_value = {
-            'Body': MagicMock(read=MagicMock(return_value=b'mode: enforce'))
-        }
+    def test_is_well_known_mta_sts_enforce_enabled(self):
+        self.s3_service.client.get_object.return_value = {'Body': BytesIO("mode: enforce".encode('utf-8'))}
 
-        result = self.s3_service.is_well_known_mta_sts_enforce("example.com")
-        self.assertTrue(result)
+        self.assertTrue(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
 
-    @patch("services.s3_service.boto3.client")
-    def test_is_well_known_mta_sts_enforce_disabled(self, mock_boto_client):
-        mock_s3_client = MagicMock()
-        mock_boto_client.return_value = mock_s3_client
-        mock_s3_client.get_object.return_value = {
-            'Body': MagicMock(read=MagicMock(return_value=b'mode: none'))
-        }
+    def test_is_well_known_mta_sts_enforce_disabled(self):
+        self.s3_service.client.get_object.return_value = {'Body': BytesIO("mode: disabled".encode('utf-8'))}
 
-        result = self.s3_service.is_well_known_mta_sts_enforce("example.com")
-        self.assertFalse(result)
+        self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
 
-    @patch("services.s3_service.boto3.client")
-    def test_is_well_known_mta_sts_enforce_no_such_key(self, mock_boto_client):
-        mock_s3_client = MagicMock()
-        mock_boto_client.return_value = mock_s3_client
-        mock_s3_client.get_object.side_effect = ClientError({"Error": {"Code": "NoSuchKey"}}, "get_object")
+    def test_is_well_known_mta_sts_enforce_no_such_key(self):
+        self.s3_service.client.get_object.side_effect = ClientError(
+            {
+                'Error': {
+                    'Code': "test"
+                }
+            },
+            operation_name="test"
+        )
 
-        result = self.s3_service.is_well_known_mta_sts
+        self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
 
 if __name__ == "__main__":
     unittest.main()
