@@ -5,8 +5,7 @@ import json
 import tempfile
 import unittest
 from botocore.exceptions import ClientError
-from datetime import datetime
-from unittest.mock import MagicMock, call, patch, mock_open
+from unittest.mock import call, patch, mock_open
 from io import BytesIO
 from freezegun import freeze_time
 from services.s3_service import S3Service
