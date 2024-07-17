@@ -26,14 +26,6 @@ from bin.support_stats_reporting import (
 #         self.assertEqual(slack_token, "token")
 class TestGetPreviousWorkingDay(unittest.TestCase):
 
-    def test_monday_returns_friday(self, mock_date: MagicMock):
-        mock_date.return_value.today.return_value = date("2024-07-08")
-        previous_day = get_previous_working_day()
-        self.assertEqual(previous_day, date("2024-07-05"))
-
-
-class TestGetPreviousWorkingDay(unittest.TestCase):
-
     def test_monday_returns_friday(self):
         previous_day = get_previous_working_day(date_today=date(2024, 7, 8))
         self.assertEqual(previous_day, str(date(2024, 7, 5)))
