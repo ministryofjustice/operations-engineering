@@ -3,7 +3,7 @@ from services.secret_manager_service import SecretsManagerService
 from services.pingdom_service import PingdomService
 
 
-def main():
+def fetch_aws_secrets():
     region_name = os.getenv('AWS_REGION')
     access_key = os.getenv('AWS_ACCESS_KEY_ID')
     secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -25,3 +25,7 @@ def main():
     pingdom_checks = pingdom_service.get_checks()
 
     print(f"Pingdom checks received: {pingdom_checks}")
+
+
+if __name__ == "__main__":
+    fetch_aws_secrets()
