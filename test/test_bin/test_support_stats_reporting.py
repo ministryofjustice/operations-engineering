@@ -46,9 +46,9 @@ class TestGetEnvironmentVariables(unittest.TestCase):
 
 
 class TestCraftMessageToSlack(unittest.TestCase):
-    @freeze_time("2024-07-16")
     def test_slack_message(self):
-        # previous_support_day = "2024-07-11"
+
+        date_today = date(2024, 7, 16)
         yesterdays_support_requests = [
             SupportRequest(
                 request_type="GitHub",
@@ -56,9 +56,9 @@ class TestCraftMessageToSlack(unittest.TestCase):
                 request_date="2024-07-15",
             )
         ]
-        expected_message = "On 2024-07-15 we recieved 1 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* Add user to Org\n*Number of Requests:* 9"
+        expected_message = "On 2024-07-15 we received 1 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* Add user to Org\n*Number of requests:* 1\n"
         self.assertEqual(
-            craft_message_to_slack(yesterdays_support_requests),
+            craft_message_to_slack(yesterdays_support_requests, date_today),
             expected_message,
         )
 

@@ -82,12 +82,14 @@ def get_dict_of_requests_and_volume(
     return dict_of_requests
 
 
-def craft_message_to_slack(yesterdays_support_requests: list[SupportRequest]):
+def craft_message_to_slack(
+    yesterdays_support_requests: list[SupportRequest], date_today=date.today()
+):
     dict_of_requests_and_volume = get_dict_of_requests_and_volume(
         yesterdays_support_requests
     )
 
-    previous_support_day = get_previous_working_day()
+    previous_support_day = get_previous_working_day(date_today)
 
     msg = f"On {previous_support_day} we received {len(yesterdays_support_requests)} Support Requests: \n\n"
     yesterdays_support_requests = list(dict.fromkeys(yesterdays_support_requests))
