@@ -7,14 +7,13 @@ class PingdomService:
         self.base_url = "https://api.pingdom.com/api/3.1"
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
         }
 
     def get_checks(self):
         url = f"{self.base_url}/checks"
-        response = requests.get(url, headers=self.headers, timeout=60)
+        response = requests.get(url=url, headers=self.headers, timeout=60)
 
         if response.status_code == 200:
             return response.json()
-        else:
-            response.raise_for_status()
+
+        response.raise_for_status()
