@@ -1,5 +1,4 @@
 import json
-import botocore
 import botocore.session
 from botocore.exceptions import ClientError
 from aws_secretsmanager_caching import SecretCache, SecretCacheConfig
