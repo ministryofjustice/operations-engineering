@@ -117,7 +117,7 @@ def get_list_of_support_requests(data) -> list[SupportRequest]:
 def get_yesterdays_support_requests(
     all_support_requests: list[SupportRequest],
 ) -> list[SupportRequest]:
-    yesterday = previous_working_day()  # yesterdays_date()
+    yesterday = get_previous_working_day()  # yesterdays_date()
     list_of_yesterdays_support_requests = []
     for request in all_support_requests:
         if request.request_date == yesterday:
