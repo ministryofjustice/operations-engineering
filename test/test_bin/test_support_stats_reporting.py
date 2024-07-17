@@ -74,3 +74,25 @@ class TestCraftMessageToSlack(unittest.TestCase):
     #     mock_send_message_to_plaintext_channel_name.assert_called_once_with(
     #         "Test message", "operations-engineering-team"
     #     )
+
+
+class TestMain(unittest.TestCase):
+
+    def test_raises_error_when_no_slack_token(self):
+        self.assertRaises(ValueError, main)
+
+    @patch("services.slack_service.SlackService.__new__")
+    @patch.dict(os.environ, {"ADMIN_SLACK_TOKEN": "test_token"})
+    def test_slack_message_sent_to_slack(self, mock_slack_service: MagicMock):
+        # Given
+        todays_date = date(2024, 7, 2)
+        # When
+        main(todays_date)
+        # Then
+        mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_once()
+        mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_with(
+            "On 2024-07-01 we received 0 Support Requests: \n\n",
+            "operations-engineering-team",
+        )
+        # self.assertEqual(slack_token, "test_token")
+        # slack_token = get_environment_variables()
