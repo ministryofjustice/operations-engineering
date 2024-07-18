@@ -28,3 +28,13 @@ jobs:
         env:
           GH_APP_TOKEN: ${{ steps.generate-token.outputs.token }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+
+      - name: Report failure to Slack
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

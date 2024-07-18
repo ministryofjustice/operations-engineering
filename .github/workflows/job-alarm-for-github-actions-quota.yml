@@ -25,7 +25,7 @@ jobs:
       - run: pipenv run python3 -m bin.alert_on_low_github_actions_quota
       - name: Report failure to Slack
         if: always()
-        uses: ravsamhq/notify-slack-action@v2
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
         with:
           status: ${{ job.status }}
           notify_when: "failure"
