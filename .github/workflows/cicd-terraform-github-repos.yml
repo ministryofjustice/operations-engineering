@@ -76,20 +76,12 @@ jobs:
         id: plan
         run: terraform plan -input=false -no-color
 
-      - uses: izhangzhihao/delete-comment@master
+      - name: Delete old comments on PR made by bot user
+        uses: izhangzhihao/delete-comment@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           delete_user_name: github-actions[bot]
           issue_number: ${{ github.event.number }}
-
-      # - name: Delete Old Comments
-      #   uses: maheshrayas/action-pr-comment-delete@v3.0
-      #   with:
-      #     github_token: "${{ secrets.GITHUB_TOKEN }}"
-      #     org: ministryofjustice
-      #     repo: operations-engineering
-      #     user: "github-actions[bot]"
-      #     issue: "${{github.event.number}}"
 
       - name: Post Plan to GitHub PR
         if: github.ref != 'refs/heads/main'
