@@ -4,7 +4,7 @@ resource "aws_iam_role" "dsd_route53_read_role" {
 }
 
 data "aws_iam_policy" "dsd_route53_read_role_policy" {
-  arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+  arn = "arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "dsd_route53_read_role_policy_attatchment" {
