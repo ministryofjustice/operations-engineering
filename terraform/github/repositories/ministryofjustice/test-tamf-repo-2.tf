@@ -8,7 +8,7 @@ module "test_tamf_repo_2" {
   team_access = {
     maintain = [var.operations_engineering_team_id]
   }
-  secrets     = {EXAMPLE_SECRET = jsondecode(data.aws_secretsmanager_secret_version.example_secret_version.secret_string)["EXAMPLE_SECRET"]}
+  secrets = { EXAMPLE_SECRET = jsondecode(data.aws_secretsmanager_secret_version.example_secret_version.secret_string)["EXAMPLE_SECRET"] }
 }
 
 data "aws_secretsmanager_secret" "example_secret" {
@@ -18,4 +18,3 @@ data "aws_secretsmanager_secret" "example_secret" {
 data "aws_secretsmanager_secret_version" "example_secret_version" {
   secret_id = data.aws_secretsmanager_secret.example_secret.id
 }
-
