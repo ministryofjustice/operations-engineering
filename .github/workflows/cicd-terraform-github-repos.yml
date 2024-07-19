@@ -61,12 +61,12 @@ jobs:
             Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
 
       - name: Delete old comments on PR made by bot user
+        if: github.ref != 'refs/heads/main'
         uses: izhangzhihao/delete-comment@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           delete_user_name: github-actions[bot]
           issue_number: ${{ github.event.number }}
-        continue-on-error: true
 
       - name: Terraform Format Check
         id: fmt-check
