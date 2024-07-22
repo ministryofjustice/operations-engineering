@@ -5,4 +5,4 @@ def convert_str_to_bool(the_string: str | bool) -> bool:
 
 
 def get_username(user: dict[str, any]) -> str:
-    return user["username "]
+    return user["username"]
