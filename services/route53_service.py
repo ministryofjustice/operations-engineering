@@ -38,7 +38,7 @@ class Route53Service:
         paginator = self.client.get_paginator("list_hosted_zones")
         paginator_iterator = paginator.paginate(
             PaginationConfig={
-                "MaxItems": 4,
+                "MaxItems": 500,
             }
         )
 
