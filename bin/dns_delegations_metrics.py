@@ -53,6 +53,35 @@ def __is_delegated_to_hosted_zones(
     return False
 
 
+def __show_as_json(
+    delegations: list[Delegations], hide_no_delegations: bool = True
+) -> str:
+    response = []
+
+    for delegation in delegations:
+        if hide_no_delegations and len(delegation.all) == 0:
+            continue
+
+        response.append(
+            {
+                "type": delegation.type,
+                "name": delegation.name,
+                "totals": {
+                    "all": len(delegation.all),
+                    "to_unknown": len(delegation.to_unknown),
+                    "to_cloud_platform": len(delegation.to_cloud_platform),
+                    "to_dsd": len(delegation.to_dsd),
+                },
+                "all": delegation.all,
+                "to_unknown": delegation.to_unknown,
+                "to_cloud_platform": delegation.to_cloud_platform,
+                "to_dsd": delegation.to_dsd,
+            }
+        )
+
+    return json.dumps({"delegations": response}, default=lambda o: o.__dict__)
+
+
 def main():
     dsd_route53_service = Route53Service(profile="dsd_route53_read")
     cloud_platform_route53_service = Route53Service(
@@ -101,20 +130,7 @@ def main():
 
         delegations.append(hosted_zone_delegations)
 
-    logging.info(
-        json.dumps(
-            {
-                "totals": {
-                    "all": len(dsd_delegations.all),
-                    "unknownDelegations": len(dsd_delegations.to_unknown),
-                    "internalDelegations": len(dsd_delegations.to_dsd),
-                    "cloudPlatformDelegations": len(dsd_delegations.to_cloud_platform),
-                },
-                "delegations": delegations,
-            },
-            default=lambda o: o.__dict__,
-        )
-    )
+    logging.info(__show_as_json(delegations))
 
 
 if __name__ == "__main__":
