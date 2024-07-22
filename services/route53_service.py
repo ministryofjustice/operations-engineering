@@ -3,7 +3,7 @@ import boto3
 
 
 @dataclass
-class RecordModel:
+class RecordValueModel:
     value: str
 
 
@@ -11,7 +11,7 @@ class RecordModel:
 class RecordSetModel:
     name: str
     type: str
-    records: list[RecordModel]
+    values: list[RecordValueModel]
 
 
 @dataclass
@@ -33,22 +33,22 @@ class Route53Service:
             record_set_name = record_set["Name"]
             record_set_type = record_set["Type"]
 
-            records: list[RecordModel] = []
+            record_values: list[RecordValueModel] = []
             for record in record_set.get("ResourceRecords", []):
-                records.append(RecordModel(value=record["Value"]))
+                record_values.append(RecordValueModel(value=record["Value"]))
 
             record_sets.append(
                 RecordSetModel(
                     name=record_set_name,
                     type=record_set_type,
-                    records=records,
+                    values=record_values,
                 )
             )
 
         return record_sets
 
     def get_hosted_zones(self) -> list[HostedZoneModel]:
-        response = self.client.list_hosted_zones(MaxItems="1")
+        response = self.client.list_hosted_zones(MaxItems="4")
 
         hosted_zones: list[HostedZoneModel] = []
         for zone in response["HostedZones"]:
