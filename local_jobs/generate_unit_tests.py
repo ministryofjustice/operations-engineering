@@ -8,10 +8,7 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--source-file-path", required=True, help="Path to the source file."
-    )
-    parser.add_argument(
-        "--test-file-output-path", required=True, help="Path to the output test file."
+        "--modified-files", type=str, required=True, help="Space separated list of modified files in the bin and services directories"
     )
 
     return parser.parse_args()
@@ -33,19 +30,20 @@ def build_prompt(code_to_test):
     return template
 
 def write_file_contents(path, generated_unit_tests):
-    if not os.path.isfile(path):
-        with open(path, "w") as file:
+    output_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
+    if not os.path.isfile(output_path):
+        with open(output_path, "w") as file:
             file.write(generated_unit_tests)
     else:
-        with open(path, "a") as file:
+        with open(output_path, "a") as file:
             file.write("\n\n" + generated_unit_tests)
 
-def generate_tests(args):
+def generate_tests(path):
     print("Generating unit tests")
 
-    validate_source_file_path(args.source_file_path)
+    validate_source_file_path(path)
 
-    code_to_test = read_file_contents(args.source_file_path)
+    code_to_test = read_file_contents(path)
 
     prompt = build_prompt(code_to_test)
 
@@ -53,13 +51,15 @@ def generate_tests(args):
 
     generated_unit_tests = bedrock_service.make_request(prompt)
 
-    write_file_contents(args.test_file_output_path, generated_unit_tests)
+    write_file_contents(path, generated_unit_tests)
 
     print("Unit test generation complete")
 
 def main():
     args = parse_args()
-    generate_tests(args)
+    modified_files = args.modified_files.split(" ")
+    for path in modified_files:
+        generate_tests(path)
 
 
 if __name__ == "__main__":
