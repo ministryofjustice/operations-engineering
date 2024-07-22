@@ -25,11 +25,33 @@ class Route53Service:
         session = boto3.Session(profile_name=profile)
         self.client = session.client("route53")
 
-    def __get_hosted_zone_record_sets(self, zone_id: str):
-        response = self.client.list_resource_record_sets(HostedZoneId=zone_id)
+    def __get_all_record_sets(self, zone_id: str) -> list[dict]:
+        paginator = self.client.get_paginator("list_resource_record_sets")
+        paginator_iterator = paginator.paginate(HostedZoneId=zone_id)
+
+        record_sets = []
+        for page in paginator_iterator:
+            record_sets.extend(page.get("ResourceRecordSets"))
+        return record_sets
+
+    def __get_all_hosted_zones(self) -> list[dict]:
+        paginator = self.client.get_paginator("list_hosted_zones")
+        paginator_iterator = paginator.paginate(
+            PaginationConfig={
+                "MaxItems": 4,
+            }
+        )
+
+        record_sets = []
+        for page in paginator_iterator:
+            record_sets.extend(page.get("HostedZones"))
+        return record_sets
+
+    def __get_hosted_zone_record_sets(self, zone_id: str) -> list[RecordSetModel]:
+        all_record_sets = self.__get_all_record_sets(zone_id)
 
         record_sets: list[RecordSetModel] = []
-        for record_set in response["ResourceRecordSets"]:
+        for record_set in all_record_sets:
             record_set_name = record_set["Name"]
             record_set_type = record_set["Type"]
 
@@ -48,10 +70,10 @@ class Route53Service:
         return record_sets
 
     def get_hosted_zones(self) -> list[HostedZoneModel]:
-        response = self.client.list_hosted_zones(MaxItems="4")
+        all_hosted_zones = self.__get_all_hosted_zones()
 
         hosted_zones: list[HostedZoneModel] = []
-        for zone in response["HostedZones"]:
+        for zone in all_hosted_zones:
             zone_name = zone["Name"]
             zone_id = zone["Id"]
             hosted_zones.append(
