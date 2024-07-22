@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 from services.bedrock_service import BedrockService
 
 def parse_args():
@@ -17,11 +18,33 @@ def validate_source_file_path(source_file_path):
     if not os.path.isfile(source_file_path):
         raise FileNotFoundError(f"Source file not found at {source_file_path}")
 
-def read_file_contents(path):
-    with open(path, 'r') as file:
-        content = file.read()
+def get_file_diff(path):
+    try:
+        result = subprocess.run(
+            ['git', 'diff', f'main...automatic-unit-test-generation', '--', path],
+            check=True,
+            text=True,
+            capture_output=True
+        )
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        print(f'Error: {e.stderr}')
+        return None
 
-        return content
+def process_diff(diff):
+    lines = diff.split("\n")
+    remove_metadata = lines[6:]
+    remove_deletions_and_empty_lines = [line for line in remove_metadata if line != "" and line[0] != "-"]
+    diff_with_deletions_removed = "\n".join(remove_deletions_and_empty_lines)
+    remove_addition_symbols = diff_with_deletions_removed.replace("+", "")
+
+    return remove_addition_symbols
+
+def get_modified_functions(path):
+    diff = get_file_diff(path)
+    modified_functions = process_diff(diff)
+
+    return modified_functions
 
 def build_prompt(code_to_test):
 
@@ -39,11 +62,11 @@ def write_file_contents(path, generated_unit_tests):
             file.write("\n\n" + generated_unit_tests)
 
 def generate_tests(path):
-    print("Generating unit tests")
+    print(f"Generating unit tests for {path}")
 
     validate_source_file_path(path)
 
-    code_to_test = read_file_contents(path)
+    code_to_test = get_modified_functions(path)
 
     prompt = build_prompt(code_to_test)
 
