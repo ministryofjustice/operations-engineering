@@ -57,6 +57,11 @@ def main():
     unknown_delegations_count = 0
     total_delegations = 0
 
+    delegated_domains = []
+    cloud_platform_delegated_domains = []
+    internal_delegated_domains = []
+    unkown_delegated_domains = []
+
     for hosted_zone in dsd_hosted_zones:
         for record_set in hosted_zone.record_sets:
             is_delegation = (
@@ -67,18 +72,22 @@ def main():
             if is_delegation:
                 found_delegation = False
                 total_delegations += 1
+                delegated_domains.append(record_set.name)
                 if __is_delegated_to_hosted_zones(dsd_hosted_zones, record_set):
                     internal_delgations_count += 1
+                    internal_delegated_domains.append(record_set.name)
                     found_delegation = True
 
                 if __is_delegated_to_hosted_zones(
                     cloud_platform_hosted_zones, record_set
                 ):
                     cloud_platform_delegations_count += 1
+                    cloud_platform_delegated_domains.append(record_set.name)
                     found_delegation = True
 
                 if not found_delegation:
                     unknown_delegations_count += 1
+                    unkown_delegated_domains.append(record_set.name)
 
     print(
         json.dumps(
@@ -88,7 +97,13 @@ def main():
                     "unknownDelegations": unknown_delegations_count,
                     "internalDelegations": internal_delgations_count,
                     "cloudPlatformDelegations": cloud_platform_delegations_count,
-                }
+                },
+                "delegations": {
+                    "all": delegated_domains,
+                    "cloudPlatform": cloud_platform_delegated_domains,
+                    "internal": internal_delegated_domains,
+                    "unkown": unkown_delegated_domains,
+                },
             }
         )
     )
