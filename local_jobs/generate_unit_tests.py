@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+import re
 from services.bedrock_service import BedrockService
 
 def parse_args():
@@ -21,7 +22,7 @@ def validate_source_file_path(source_file_path):
 def get_file_diff(path):
     try:
         result = subprocess.run(
-            ['git', 'diff', f'main...automatic-unit-test-generation', '--', path],
+            ['git', 'diff', f'main...automatic-unit-test-generation', '--function-context', path],
             check=True,
             text=True,
             capture_output=True
@@ -34,9 +35,21 @@ def get_file_diff(path):
 def process_diff(diff):
     lines = diff.split("\n")
     remove_metadata = lines[6:]
-    remove_deletions_and_empty_lines = [line for line in remove_metadata if line != "" and line[0] != "-"]
-    diff_with_deletions_removed = "\n".join(remove_deletions_and_empty_lines)
-    remove_addition_symbols = diff_with_deletions_removed.replace("+", "")
+    string_with_metadata_removed = "\n".join(remove_metadata)
+    functions = re.split(r'(?=def\s)', string_with_metadata_removed)
+
+    modified_functions = []
+    for function in functions:
+        for line in function.split("\n"):
+            if line.strip(" ") not in ["", "+", "-"] and (line[0] == "+" or line[0] == "-"):
+                modified_functions.append(function)
+                break
+
+    string_of_modified_functions = "\n".join(modified_functions)
+
+    remove_deletions = "\n".join([line for line in string_of_modified_functions.split("\n") if line != "" and line[0] != "-"])
+
+    remove_addition_symbols = "\n".join([line[1:] if line != "" and line[0] == "+" else line for line in remove_deletions.split("\n")])
 
     return remove_addition_symbols
 
