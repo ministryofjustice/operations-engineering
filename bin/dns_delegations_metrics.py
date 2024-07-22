@@ -6,6 +6,17 @@ from services.route53_service import (
     RecordValueModel,
     Route53Service,
 )
+from dataclasses import dataclass, field
+
+
+@dataclass
+class Delegations:
+    type: str
+    name: str
+    all: list = field(default_factory=list)
+    to_dsd: list = field(default_factory=list)
+    to_cloud_platform: list = field(default_factory=list)
+    to_unknown: list = field(default_factory=list)
 
 
 def __flatten_record_value(record_values: list[RecordValueModel]) -> list[str]:
@@ -53,59 +64,55 @@ def main():
         cloud_platform_route53_service.get_hosted_zones()
     )
 
-    internal_delgations_count = 0
-    cloud_platform_delegations_count = 0
-    unknown_delegations_count = 0
-    total_delegations = 0
-
-    delegated_domains = []
-    cloud_platform_delegated_domains = []
-    internal_delegated_domains = []
-    unkown_delegated_domains = []
+    dsd_delegations = Delegations(type="ACCOUNT", name="DSD")
+    delegations: list[Delegations] = [dsd_delegations]
 
     for hosted_zone in dsd_hosted_zones:
+        hosted_zone_delegations = Delegations(
+            type="HOSTED_ZONES", name=f"DSD - {hosted_zone.name}"
+        )
         for record_set in hosted_zone.record_sets:
             is_delegation = (
                 True
                 if record_set.type == "NS" and record_set.name != hosted_zone.name
                 else False
             )
-            if is_delegation:
-                found_delegation = False
-                total_delegations += 1
-                delegated_domains.append(record_set.name)
-                if __is_delegated_to_hosted_zones(dsd_hosted_zones, record_set):
-                    internal_delgations_count += 1
-                    internal_delegated_domains.append(record_set.name)
-                    found_delegation = True
 
-                if __is_delegated_to_hosted_zones(
-                    cloud_platform_hosted_zones, record_set
-                ):
-                    cloud_platform_delegations_count += 1
-                    cloud_platform_delegated_domains.append(record_set.name)
-                    found_delegation = True
+            if not is_delegation:
+                continue
 
-                if not found_delegation:
-                    unknown_delegations_count += 1
-                    unkown_delegated_domains.append(record_set.name)
+            found_delegation = False
+            hosted_zone_delegations.all.append(record_set.name)
+            dsd_delegations.all.append(record_set.name)
+
+            if __is_delegated_to_hosted_zones(dsd_hosted_zones, record_set):
+                hosted_zone_delegations.to_dsd.append(record_set.name)
+                dsd_delegations.to_dsd.append(record_set.name)
+                found_delegation = True
+
+            if __is_delegated_to_hosted_zones(cloud_platform_hosted_zones, record_set):
+                hosted_zone_delegations.to_cloud_platform.append(record_set.name)
+                dsd_delegations.to_cloud_platform.append(record_set.name)
+                found_delegation = True
+
+            if not found_delegation:
+                hosted_zone_delegations.to_unknown.append(record_set.name)
+                dsd_delegations.to_unknown.append(record_set.name)
+
+        delegations.append(hosted_zone_delegations)
 
     logging.info(
         json.dumps(
             {
                 "totals": {
-                    "all": total_delegations,
-                    "unknownDelegations": unknown_delegations_count,
-                    "internalDelegations": internal_delgations_count,
-                    "cloudPlatformDelegations": cloud_platform_delegations_count,
+                    "all": len(dsd_delegations.all),
+                    "unknownDelegations": len(dsd_delegations.to_unknown),
+                    "internalDelegations": len(dsd_delegations.to_dsd),
+                    "cloudPlatformDelegations": len(dsd_delegations.to_cloud_platform),
                 },
-                "delegations": {
-                    "all": delegated_domains,
-                    "cloudPlatform": cloud_platform_delegated_domains,
-                    "internal": internal_delegated_domains,
-                    "unkown": unkown_delegated_domains,
-                },
-            }
+                "delegations": delegations,
+            },
+            default=lambda o: o.__dict__,
         )
     )
 
