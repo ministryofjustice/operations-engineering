@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-import logging
+from config.logging_config import logging
 import json
 from services.route53_service import (
     HostedZoneModel,
@@ -31,11 +30,13 @@ def __is_delegated_to_hosted_zones(
             continue
 
         name_servers_to_check = __flatten_record_value(name_server_record.values)
-        hosted_zone_name_servers = __flatten_record_value(
+        hosted_zone_name_servers_to_check = __flatten_record_value(
             hosted_zones_name_servers and hosted_zones_name_servers.values
         )
+        name_servers_to_check.sort()
+        hosted_zone_name_servers_to_check.sort()
 
-        if name_servers_to_check == hosted_zone_name_servers:
+        if name_servers_to_check == hosted_zone_name_servers_to_check:
             return True
 
     return False
@@ -89,7 +90,7 @@ def main():
                     unknown_delegations_count += 1
                     unkown_delegated_domains.append(record_set.name)
 
-    print(
+    logging.info(
         json.dumps(
             {
                 "totals": {
