@@ -51,7 +51,6 @@ class S3Service:
 
     def get_active_users_from_org_people_file(self) -> list:
         three_months_ago_date = datetime.now() - relativedelta(months=3)
-        active_users = []
         for user in self._get_users_from_org_people_file():
             if user["last_active"].lower() == NO_ACTIVITY:  # Some users have "No activity" skip over these users
                 continue
@@ -96,3 +95,13 @@ class S3Service:
             return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
         except ClientError:
             return False
+
+    def test_me(self) -> list:
+        three_months_ago_date = datetime.now() - relativedelta(months=3)
+        for user in self._get_users_from_org_people_file():
+            if user["last_active"].lower() == NO_ACTIVITY:  # Some users have "No activity" skip over these users
+                continue
+            last_active_date = datetime.strptime(user['last_active'][0:10], '%Y-%m-%d')
+            if last_active_date > three_months_ago_date:
+                active_users.append(user["username"])
+        return active_users
