@@ -33,8 +33,12 @@ def build_prompt(code_to_test):
     return template
 
 def write_file_contents(path, generated_unit_tests):
-    with open(path, 'w') as file:
-        file.write(generated_unit_tests)
+    if not os.path.isfile(path):
+        with open(path, "w") as file:
+            file.write(generated_unit_tests)
+    else:
+        with open(path, "a") as file:
+            file.write("\n\n" + generated_unit_tests)
 
 def generate_tests(args):
     print("Generating unit tests")
