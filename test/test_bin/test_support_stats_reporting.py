@@ -87,12 +87,16 @@ class TestMain(unittest.TestCase):
         # Given
         todays_date = date(2024, 7, 23)
         file_path = "test/fixtures/test_data.csv"
+        all_support_requests = get_support_requests_from_csv(file_path)
+        yesterdays_requests = get_yesterdays_support_requests(
+            all_support_requests, todays_date
+        )
         # When
         main(todays_date, file_path)
         # Then
         mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_once()
         mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_with(
-            "On 2024-07-22 we received 8 Support Requests: \n\n",
+            f"On 2024-07-22 we received {len(yesterdays_requests)} Support Requests: \n\n",
             "operations-engineering-team",
         )
         # self.assertEqual(slack_token, "test_token")
