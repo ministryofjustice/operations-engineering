@@ -1,19 +1,33 @@
-import argparse
 import os
 import subprocess
 import re
 from services.bedrock_service import BedrockService
 
-def parse_args():
-    """
-    Parse command line arguments.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--modified-files", type=str, required=True, help="Space separated list of modified files in the bin and services directories"
-    )
+def get_current_branch():
+    try:
+        result = subprocess.run(
+            ['git', 'branch', '--show-current'],
+            check=True,
+            text=True,
+            capture_output=True
+        )
+        return result.stdout.strip("\n")
+    except subprocess.CalledProcessError as e:
+        print(f'Error: {e.stderr}')
+        return None
 
-    return parser.parse_args()
+def get_modified_files(branch):
+    try:
+        result = subprocess.run(
+            ['git', 'diff', '--name-only', f"main...{branch}"],
+            check=True,
+            text=True,
+            capture_output=True
+        )
+        return [file for file in result.stdout.split("\n") if "services/" in file or "bin/" in file]
+    except subprocess.CalledProcessError as e:
+        print(f'Error: {e.stderr}')
+        return None
 
 def validate_source_file_path(source_file_path):
     if not os.path.isfile(source_file_path):
@@ -22,7 +36,7 @@ def validate_source_file_path(source_file_path):
 def get_file_diff(path):
     try:
         result = subprocess.run(
-            ['git', 'diff', f'main...automatic-unit-test-generation', '--function-context', path],
+            ['git', 'diff', f"main...{get_current_branch()}", '--function-context', path],
             check=True,
             text=True,
             capture_output=True
@@ -33,10 +47,8 @@ def get_file_diff(path):
         return None
 
 def process_diff(diff):
-    lines = diff.split("\n")
-    remove_metadata = lines[6:]
-    string_with_metadata_removed = "\n".join(remove_metadata)
-    functions = re.split(r'(?=def\s)', string_with_metadata_removed)
+    remove_metadata = diff.split("\n")[6:]
+    functions = re.split(r'(?=def\s)', "\n".join(remove_metadata))
 
     modified_functions = []
     for function in functions:
@@ -45,11 +57,9 @@ def process_diff(diff):
                 modified_functions.append(function)
                 break
 
-    string_of_modified_functions = "\n".join(modified_functions)
+    remove_deletions = [line for line in "\n".join(modified_functions).split("\n") if line != "" and line[0] != "-"]
 
-    remove_deletions = "\n".join([line for line in string_of_modified_functions.split("\n") if line != "" and line[0] != "-"])
-
-    remove_addition_symbols = "\n".join([line[1:] if line != "" and line[0] == "+" else line for line in remove_deletions.split("\n")])
+    remove_addition_symbols = "\n".join([line[1:] if line != "" and line[0] == "+" else line for line in remove_deletions])
 
     return remove_addition_symbols
 
@@ -92,8 +102,8 @@ def generate_tests(path):
     print("Unit test generation complete")
 
 def main():
-    args = parse_args()
-    modified_files = args.modified_files.split(" ")
+    branch = get_current_branch()
+    modified_files = get_modified_files(branch)
     for path in modified_files:
         generate_tests(path)
 
