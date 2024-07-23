@@ -37,7 +37,9 @@ def __is_delegated_to_hosted_zones(
                 hosted_zones_name_servers = record_set
 
         if not hosted_zones_name_servers:
-            logging.warn(f"HostedZone [ ${hosted_zone.name} ] does not have NS record")
+            logging.warning(
+                f"HostedZone [ ${hosted_zone.name} ] does not have NS record"
+            )
             continue
 
         name_servers_to_check = __flatten_record_value(name_server_record.values)
@@ -51,6 +53,10 @@ def __is_delegated_to_hosted_zones(
             return True
 
     return False
+
+
+def __convert_to_percentage(partial: int, total: int) -> str:
+    return f"{round((partial / total) * 100)}%"
 
 
 def __show_as_json(
@@ -67,10 +73,30 @@ def __show_as_json(
                 "type": delegation.type,
                 "name": delegation.name,
                 "totals": {
-                    "all": len(delegation.all),
-                    "to_unknown": len(delegation.to_unknown),
-                    "to_cloud_platform": len(delegation.to_cloud_platform),
-                    "to_dsd": len(delegation.to_dsd),
+                    "all": [
+                        len(delegation.all),
+                        __convert_to_percentage(
+                            len(delegation.all), len(delegation.all)
+                        ),
+                    ],
+                    "to_unknown": [
+                        len(delegation.to_unknown),
+                        __convert_to_percentage(
+                            len(delegation.to_unknown), len(delegation.all)
+                        ),
+                    ],
+                    "to_cloud_platform": [
+                        len(delegation.to_cloud_platform),
+                        __convert_to_percentage(
+                            len(delegation.to_cloud_platform), len(delegation.all)
+                        ),
+                    ],
+                    "to_dsd": [
+                        len(delegation.to_dsd),
+                        __convert_to_percentage(
+                            len(delegation.to_dsd), len(delegation.all)
+                        ),
+                    ],
                 },
                 "all": delegation.all,
                 "to_unknown": delegation.to_unknown,
