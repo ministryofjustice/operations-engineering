@@ -46,9 +46,31 @@ def get_file_diff(path):
         print(f'Error: {e.stderr}')
         return None
 
+def diff_remove_deletions(diff):
+    return "\n".join([line for line in diff.split("\n") if line != "" and line[0] != "-"])
+
+def diff_remove_plus_signs(diff):
+    return "\n".join([line[1:] if line != "" and line[0] == "+" else line for line in diff.split("\n")])
+
+def diff_remove_metadata(diff):
+    return diff.split("@@")[2]
+
 def process_diff(diff):
-    remove_metadata = diff.split("\n")[6:]
-    functions = re.split(r'(?=def\s)', "\n".join(remove_metadata))
+    remove_metadata = diff_remove_metadata(diff)
+    split_on_functions = re.split(r'(?=def\s)', remove_metadata)
+
+    # Extract contextual data
+    context = ""
+    if "def" not in split_on_functions[0]:
+        context += split_on_functions[0]
+    # Everything before the first function, such as imports and class definition
+    context = context + "".join([function for function in split_on_functions if "__init__" in function])
+    # Add the class generator function to the context
+    context = diff_remove_deletions(diff_remove_plus_signs(context))
+    # remove any deletions and plus signs from the context
+
+    functions = [function for function in split_on_functions if "__init__" not in function and "def" in function]
+    # All functions excluding class generator
 
     modified_functions = []
     for function in functions:
@@ -56,12 +78,12 @@ def process_diff(diff):
             if line.strip(" ") not in ["", "+", "-"] and (line[0] == "+" or line[0] == "-"):
                 modified_functions.append(function)
                 break
+    # find functions which have been modified/added
 
-    remove_deletions = [line for line in "\n".join(modified_functions).split("\n") if line != "" and line[0] != "-"]
+    modified_functions = diff_remove_plus_signs(diff_remove_deletions("\n".join(modified_functions)))
+    # remove deletions and plus signs from modified functions
 
-    remove_addition_symbols = "\n".join([line[1:] if line != "" and line[0] == "+" else line for line in remove_deletions])
-
-    return remove_addition_symbols
+    return {"context": context, "modified_functions": modified_functions}
 
 def get_modified_functions(path):
     diff = get_file_diff(path)
@@ -71,7 +93,7 @@ def get_modified_functions(path):
 
 def build_prompt(code_to_test):
 
-    template = f"Please generate unit tests using the Python unittest library for the following functions:\n\n{code_to_test}"
+    template = f"Given the following context:\n\n{code_to_test['context']}\n\nPlease generate unit tests using the Python unittest library for the following functions:\n\n{code_to_test['modified_functions']}"
 
     return template
 
@@ -92,6 +114,8 @@ def generate_tests(path):
     code_to_test = get_modified_functions(path)
 
     prompt = build_prompt(code_to_test)
+
+    print(prompt)
 
     bedrock_service = BedrockService()
 
