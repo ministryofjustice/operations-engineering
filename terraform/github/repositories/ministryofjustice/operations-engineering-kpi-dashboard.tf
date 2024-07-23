@@ -10,3 +10,23 @@ module "operations-engineering-kpi-dashboard" {
     admin = [var.operations_engineering_team_id]
   }
 }
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_branch_protection.default
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_branch_protection.default
+}
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_repository.default
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_repository.default
+}
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_repository_tag_protection.default
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_repository_tag_protection.default
+}
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_team_repository.admin["4192115"]
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_team_repository.admin["4192115"]
+}
