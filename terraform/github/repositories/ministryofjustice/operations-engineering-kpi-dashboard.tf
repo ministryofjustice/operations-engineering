@@ -1,9 +1,9 @@
-module "operations-engineering-kpi-dashboard-poc" {
+module "operations-engineering-kpi-dashboard" {
   source  = "ministryofjustice/repository/github"
   version = "1.0.1"
 
-  name        = "operations-engineering-kpi-dashboard-poc"
-  description = "A POC for displaying KPI metrics of processes and services"
+  name        = "operations-engineering-kpi-dashboard"
+  description = "Display KPI metrics of processes and services"
   topics      = ["operations-engineering"]
 
   team_access = {
