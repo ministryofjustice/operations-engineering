@@ -85,13 +85,14 @@ class TestMain(unittest.TestCase):
     @patch.dict(os.environ, {"ADMIN_SLACK_TOKEN": "test_token"})
     def test_slack_message_sent_to_slack(self, mock_slack_service: MagicMock):
         # Given
-        todays_date = date(2024, 7, 2)
+        todays_date = date(2024, 7, 23)
+        file_path = "test/fixtures/test_data.csv"
         # When
-        main(todays_date)
+        main(todays_date, file_path)
         # Then
         mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_once()
         mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_with(
-            "On 2024-07-01 we received 0 Support Requests: \n\n",
+            "On 2024-07-22 we received 8 Support Requests: \n\n",
             "operations-engineering-team",
         )
         # self.assertEqual(slack_token, "test_token")
