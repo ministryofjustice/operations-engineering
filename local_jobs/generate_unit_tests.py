@@ -115,8 +115,6 @@ def generate_tests(path):
 
     prompt = build_prompt(code_to_test)
 
-    print(prompt)
-
     bedrock_service = BedrockService()
 
     generated_unit_tests = bedrock_service.make_request(prompt)
