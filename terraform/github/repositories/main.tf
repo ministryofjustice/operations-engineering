@@ -36,3 +36,23 @@ provider "aws" {
   profile = "dsd_secret_manager_access_profile"
   region  = "eu-west-2"
 }
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_branch_protection.default
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_branch_protection.default
+}
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_repository.default
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_repository.default
+}
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_repository_tag_protection.default
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_repository_tag_protection.default
+}
+
+moved {
+  from = module.ministryofjustice.module.operations-engineering-kpi-dashboard-poc.github_team_repository.admin["4192115"]
+  to   = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_team_repository.admin["4192115"]
+}
