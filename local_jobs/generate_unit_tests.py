@@ -16,10 +16,10 @@ def get_current_branch():
         print(f'Error: {e.stderr}')
         return None
 
-def get_modified_files(branch):
+def get_modified_files():
     try:
         result = subprocess.run(
-            ['git', 'diff', '--name-only', f"main...{branch}"],
+            ['git', 'diff', '--name-only', f"main...{get_current_branch()}"],
             check=True,
             text=True,
             capture_output=True
@@ -102,8 +102,7 @@ def generate_tests(path):
     print("Unit test generation complete")
 
 def main():
-    branch = get_current_branch()
-    modified_files = get_modified_files(branch)
+    modified_files = get_modified_files()
     for path in modified_files:
         generate_tests(path)
 
