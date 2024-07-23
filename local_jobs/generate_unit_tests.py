@@ -1,6 +1,7 @@
 import os
 import subprocess
 import re
+from local_jobs.prompt_template import PROMPT_TEMPLATE
 from services.bedrock_service import BedrockService
 
 def get_current_branch():
@@ -47,10 +48,10 @@ def get_file_diff(path):
         return None
 
 def diff_remove_deletions(diff):
-    return "\n".join([line for line in diff.split("\n") if line != "" and line[0] != "-"])
+    return "".join([line for line in re.split(r'(?<=\n)', diff) if line != "" and line[0] != "-"])
 
 def diff_remove_plus_signs(diff):
-    return "\n".join([line[1:] if line != "" and line[0] == "+" else line for line in diff.split("\n")])
+    return "".join([line[1:] if line != "" and line[0] == "+" else line for line in re.split(r'(?<=\n)', diff)])
 
 def diff_remove_metadata(diff):
     return diff.split("@@")[2]
@@ -80,10 +81,10 @@ def process_diff(diff):
                 break
     # find functions which have been modified/added
 
-    modified_functions = diff_remove_plus_signs(diff_remove_deletions("\n".join(modified_functions)))
+    modified_functions = diff_remove_plus_signs(diff_remove_deletions("".join(modified_functions)))
     # remove deletions and plus signs from modified functions
 
-    return {"context": context, "modified_functions": modified_functions}
+    return context + modified_functions
 
 def get_modified_functions(path):
     diff = get_file_diff(path)
@@ -92,10 +93,7 @@ def get_modified_functions(path):
     return modified_functions
 
 def build_prompt(code_to_test):
-
-    template = f"Given the following context:\n\n{code_to_test['context']}\n\nPlease generate unit tests using the Python unittest library for the following functions:\n\n{code_to_test['modified_functions']}"
-
-    return template
+    return PROMPT_TEMPLATE.format(code_to_test=code_to_test)
 
 def write_file_contents(path, generated_unit_tests):
     output_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
@@ -127,7 +125,6 @@ def main():
     modified_files = get_modified_files()
     for path in modified_files:
         generate_tests(path)
-
 
 if __name__ == "__main__":
     main()
