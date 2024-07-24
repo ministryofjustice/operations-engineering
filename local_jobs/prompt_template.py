@@ -8,7 +8,8 @@ This is the current unit test suite for this script:
 
 {unit_test_file_content}
 
-If there is a pre-existing test suite, please update the tests for the following functions which have been recently modified:
+If there is a pre-existing test suite, please add tests for any functions missing them,
+and update the tests for the following functions which have been recently modified:
 {modified_function_names}
 
 If no test suite currently exists, please write a new test suite for the provided script.
