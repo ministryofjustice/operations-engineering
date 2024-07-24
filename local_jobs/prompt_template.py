@@ -4,7 +4,6 @@ Given this context:
 Please generate unit tests, using the Python unittest library, for the following functions:
 
 {modified_functions}
-
 For example, given this context:
 
 import boto3
@@ -17,6 +16,24 @@ class CloudtrailService:
         self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
 And given these functions:
+
+    def get_query_results(self, query_id):
+        while True:
+            status = self.client.get_query_results(QueryId=query_id)['QueryStatus']
+            print(f"Query status: {{status}}")
+            if status in ['FAILED', 'CANCELLED', 'TIMED_OUT']:
+                raise ClientError(
+                    {{
+                        'Error': {{
+                            'Code': status,
+                            'Message': f"Cloudtrail data lake query failed with status: {{status}}"
+                        }}
+                    }},
+                    operation_name='get_query_results'
+                )
+            if status == 'FINISHED':
+                return self.extract_query_results(query_id)
+            time.sleep(20)
 
     def extract_query_results(self, query_id):
         response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000)
@@ -36,6 +53,29 @@ And given these functions:
         return active_users
 
 These are the expected unit tests:
+
+    @patch.object(CloudtrailService, "extract_query_results")
+    @mock_aws
+    def test_get_query_results_if_success(self, mock_extract_query_results):
+        mock_active_users = ["user1", "user2", "user3"]
+        mock_extract_query_results.return_value = mock_active_users
+        self.cloudtrail_service.client.get_query_results = MagicMock(return_value={{'QueryStatus': 'FINISHED'}})
+        mock_query_id = "mock_id"
+
+        response = self.cloudtrail_service.get_query_results(mock_query_id)
+
+        self.cloudtrail_service.client.get_query_results.assert_called_once_with(QueryId=mock_query_id)
+        mock_extract_query_results.assert_called_once_with(mock_query_id)
+        assert response == mock_active_users
+
+    @mock_aws
+    def test_get_query_results_if_fail(self):
+        self.cloudtrail_service.client.get_query_results = MagicMock(return_value={{'QueryStatus': 'CANCELLED'}})
+        with self.assertRaises(ClientError) as context:
+            self.cloudtrail_service.get_query_results("mock_id")
+
+        self.cloudtrail_service.client.get_query_results.assert_called_once_with(QueryId="mock_id")
+        self.assertEqual(str(context.exception), "An error occurred (CANCELLED) when calling the get_query_results operation: Cloudtrail data lake query failed with status: CANCELLED")
 
     @mock_aws
     def test_extract_query_results(self):
