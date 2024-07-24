@@ -1,6 +1,4 @@
 import boto3, json
-from botocore.exceptions import ClientError
-
 
 class BedrockService:
     def __init__(self) -> None:
@@ -14,13 +12,16 @@ class BedrockService:
         )
         model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
         model_kwargs = {
-            "max_tokens": 2048, "temperature": 0.1,
-            "top_k": 250, "top_p": 1, "stop_sequences": ["\n\nHuman"],
+            "max_tokens": 2048,
+            "temperature": 0.1,
+            "top_k": 250,
+            "top_p": 1,
+            "stop_sequences": ["\n\nHuman"],
         }
 
         body = {
             "anthropic_version": "bedrock-2023-05-31",
-            "system": "You are a honest and helpful bot.",
+            "system": "Generate only the tests, with no additional speech or explanation.",
             "messages": [
                 {"role": "user", "content": [{"type": "text", "text": prompt}]},
             ],

@@ -1,9 +1,12 @@
 PROMPT_TEMPLATE = """
 Given this context:
+
 {context}
+
 Please generate unit tests, using the Python unittest library, for the following functions:
 
 {modified_functions}
+
 For example, given this context:
 
 import boto3
@@ -92,4 +95,11 @@ These are the expected unit tests:
 
         assert self.cloudtrail_service.extract_query_results(mock_query_id) == ["test_user1", "test_user2", "test_user3"]
         self.cloudtrail_service.client.get_query_results.assert_has_calls([call(QueryId=mock_query_id, MaxQueryResults=1000), call(QueryId=mock_query_id, MaxQueryResults=1000, NextToken=mock_next_token)])
+
+Please abide exactly by these rules when crafting your response:
+
+- Do not acknowledge the question asked.
+- Do not include any extra information.
+- Do not explain your answers.
+- Only produce the test code, nothing else.
 """
