@@ -127,10 +127,8 @@ def main():
             type="HOSTED_ZONES", name=f"DSD - {hosted_zone.name}"
         )
         for record_set in hosted_zone.record_sets:
-            is_delegation = (
-                True
-                if record_set.type == "NS" and record_set.name != hosted_zone.name
-                else False
+            is_delegation = bool(
+                record_set.type == "NS" and record_set.name != hosted_zone.name
             )
 
             if not is_delegation:

@@ -56,7 +56,12 @@ class Route53Service:
             record_set_type = record_set["Type"]
 
             record_values: list[RecordValueModel] = []
-            for record in record_set.get("ResourceRecords", []):
+            resource_records: list[dict[str, str]]
+            try:
+                resource_records = record_set["ResourceRecords"]
+            except KeyError:
+                resource_records = []
+            for record in resource_records:
                 record_values.append(RecordValueModel(value=record["Value"]))
 
             record_sets.append(
