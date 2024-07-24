@@ -20,7 +20,7 @@ def get_current_branch():
 def get_modified_paths():
     try:
         result = subprocess.run(
-            ['git', 'diff', '--name-only', f"main...{get_current_branch()}"],
+            ['git', 'diff', '--name-only', "main"],
             check=True,
             text=True,
             capture_output=True
@@ -37,7 +37,7 @@ def validate_source_file_path(source_file_path):
 def get_file_diff(path):
     try:
         result = subprocess.run(
-            ['git', 'diff', f"main...{get_current_branch()}", '--function-context', path],
+            ['git', 'diff', "main", '--function-context', path],
             check=True,
             text=True,
             capture_output=True
