@@ -48,11 +48,14 @@ def get_file_diff(path):
         return None
 
 def extract_function_name(function_str):
-    match = re.match(r'\s*def\s+([a-zA-Z_][a-zA-Z_0-9]*)\s*\(', function_str)
+    match = re.search(r'\s*def\s+([a-zA-Z_][a-zA-Z_0-9]*)\s*\(', function_str)
     if match:
         return match.group(1)
     else:
         return None
+
+def find_new_functions(diff):
+    return [extract_function_name(line) for line in diff.split("\n") if "def" in line and line.startswith("+") and "__init__" not in line]
 
 def get_modified_function_names_from_diff(diff):
     functions = [function for function in re.split(r'(?=def\s)', diff) if "def" in function and "__init__" not in function]
@@ -60,11 +63,13 @@ def get_modified_function_names_from_diff(diff):
     modified_function_names = []
     for function in functions:
         for line in function.split("\n"):
-            if line.strip(" ") not in ["", "+", "-"] and (line[0] == "+" or line[0] == "-"):
+            if line.strip(" ") not in ["", "+", "-"] and line.startswith("+") or line.startswith("-"):
                 modified_function_names.append(extract_function_name(function))
                 break
 
-    return ", ".join(modified_function_names)
+    new_function_names = find_new_functions(diff)
+
+    return ", ".join(list(set(modified_function_names).difference(new_function_names)))
 
 def get_modified_function_names(path):
     diff = get_file_diff(path)
