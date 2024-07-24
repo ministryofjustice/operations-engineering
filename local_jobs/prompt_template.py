@@ -12,5 +12,9 @@ Please create or update the tests in the test suite provided with new tests for 
 {modified_function_names}
 
 Rules:
-- Tests must be written in Python using the unittest framework
+- Tests must be written in Python using the unittest framework.
+- Do not acknowledge the question asked.
+- Do not include any extra information.
+- Do not explain your answers.
+- Only produce the test code, nothing else.
 """
