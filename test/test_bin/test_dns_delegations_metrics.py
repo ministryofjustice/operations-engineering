@@ -23,9 +23,9 @@ def mock_boto3_session(side_effects: list):
     )
 
 
+@patch("services.route53_service.boto3")
+@patch("bin.dns_delegations_metrics.logging")
 class TestDnsDelegationsMetricsMain(unittest.TestCase):
-    @patch("services.route53_service.boto3")
-    @patch("bin.dns_delegations_metrics.logging")
     def test_logs_logs_no_delegations_when_no_hosted_zones_returned(
         self, mock_logging: MagicMock, mock_boto3: MagicMock
     ):
@@ -33,8 +33,6 @@ class TestDnsDelegationsMetricsMain(unittest.TestCase):
         main()
         mock_logging.info.assert_called_with(json.dumps({"delegations": []}))
 
-    @patch("services.route53_service.boto3")
-    @patch("bin.dns_delegations_metrics.logging")
     def test_logs_delegations_that_cannot_be_matched_as_unknown(
         self, mock_logging: MagicMock, mock_boto3: MagicMock
     ):
@@ -88,8 +86,6 @@ class TestDnsDelegationsMetricsMain(unittest.TestCase):
             )
         )
 
-    @patch("services.route53_service.boto3")
-    @patch("bin.dns_delegations_metrics.logging")
     def test_logs_delegations_to_cloud_platform(
         self, mock_logging: MagicMock, mock_boto3: MagicMock
     ):
@@ -155,8 +151,6 @@ class TestDnsDelegationsMetricsMain(unittest.TestCase):
             )
         )
 
-    @patch("services.route53_service.boto3")
-    @patch("bin.dns_delegations_metrics.logging")
     def test_logs_delegations_to_dsd(
         self, mock_logging: MagicMock, mock_boto3: MagicMock
     ):
