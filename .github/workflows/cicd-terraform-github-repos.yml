@@ -53,7 +53,7 @@ jobs:
 
       - name: Post Link to Apply Pipeline
         if: github.ref == 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: "github-actions[bot]"
@@ -86,7 +86,7 @@ jobs:
 
       - name: Post Plan to GitHub PR
         if: github.ref != 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: "github-actions[bot]"
