@@ -114,7 +114,9 @@ def generate_tests(path):
 
     generated_unit_tests = bedrock_service.make_request(prompt)
 
-    print(generated_unit_tests)
+    print(f"Generated tests: {generated_unit_tests}")
+
+    # write_file_contents(path, generated_unit_tests)
 
     print("Unit test generation complete")
 

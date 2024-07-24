@@ -20,5 +20,9 @@ This is the associated test suite:
 {example_test_suite}
 
 Rules:
-- Tests must be written in Python using the unittest framework
+- Tests must be written in Python using the unittest framework.
+- Do not acknowledge the question asked.
+- Do not include any extra information.
+- Do not explain your answers.
+- Only produce the test code, nothing else.
 """
