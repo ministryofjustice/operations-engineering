@@ -34,6 +34,5 @@ class BedrockService:
         )
 
         result = json.loads(response.get("body").read()).get("content", [])[0].get("text", "")
-        print(result)
 
         return result
