@@ -47,53 +47,35 @@ def get_file_diff(path):
         print(f'Error: {e.stderr}')
         return None
 
-def diff_remove_deletions(diff):
-    return "".join([line for line in re.split(r'(?<=\n)', diff) if line != "" and line[0] != "-"])
-
-def diff_remove_plus_signs(diff):
-    return "".join([line[1:] if line != "" and line[0] == "+" else line for line in re.split(r'(?<=\n)', diff)])
-
-def diff_remove_metadata(diff):
-    return diff.split("@@")[2]
+def extract_function_name(function_str):
+    match = re.match(r'\s*def\s+([a-zA-Z_][a-zA-Z_0-9]*)\s*\(', function_str)
+    if match:
+        return match.group(1)
+    else:
+        return None
 
 def process_diff(diff):
-    remove_metadata = diff_remove_metadata(diff)
-    split_on_functions = re.split(r'(?=def\s)', remove_metadata)
+    functions = [function for function in re.split(r'(?=def\s)', diff) if "def" in function and "__init__" not in function]
 
-    # Extract contextual data
-    context = ""
-    if "def" not in split_on_functions[0]:
-        context += split_on_functions[0]
-    # Everything before the first function, such as imports and class definition
-    context = context + "".join([function for function in split_on_functions if "__init__" in function])
-    # Add the class generator function to the context
-    context = diff_remove_deletions(diff_remove_plus_signs(context))
-    # remove any deletions and plus signs from the context
-
-    functions = [function for function in split_on_functions if "__init__" not in function and "def" in function]
-    # All functions excluding class generator
-
-    modified_functions = []
+    modified_function_names = []
     for function in functions:
         for line in function.split("\n"):
             if line.strip(" ") not in ["", "+", "-"] and (line[0] == "+" or line[0] == "-"):
-                modified_functions.append(function)
+                modified_function_names.append(extract_function_name(function))
                 break
-    # find functions which have been modified/added
 
-    modified_functions = diff_remove_plus_signs(diff_remove_deletions("".join(modified_functions)))
-    # remove deletions and plus signs from modified functions
-
-    return {'context': context, 'modified_functions': modified_functions}
+    return ", ".join(modified_function_names)
 
 def get_modified_functions(path):
     diff = get_file_diff(path)
-    modified_functions = process_diff(diff)
+    modified_function_names = process_diff(diff)
 
-    return modified_functions
+    return modified_function_names
 
-def build_prompt(code_to_test):
-    return PROMPT_TEMPLATE.format(context=code_to_test['context'], modified_functions=code_to_test['modified_functions'])
+def build_prompt(path, modified_function_names):
+    file_to_test_content = read_file_contents(path)
+    unit_test_file_content = read_file_contents(f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}")
+    return PROMPT_TEMPLATE.format(file_to_test_content=file_to_test_content, unit_test_file_content=unit_test_file_content, modified_function_names=modified_function_names)
 
 def write_file_contents(path, generated_unit_tests):
     output_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
@@ -104,14 +86,21 @@ def write_file_contents(path, generated_unit_tests):
         with open(output_path, "a") as file:
             file.write("\n\n" + generated_unit_tests)
 
+def read_file_contents(path):
+    if os.path.isfile(path):
+        with open(path, 'r') as file:
+            return file.read()
+    else:
+        return ""
+
 def generate_tests(path):
     print(f"Generating unit tests for {path}")
 
     validate_source_file_path(path)
 
-    code_to_test = get_modified_functions(path)
+    modified_function_names = get_modified_functions(path)
 
-    prompt = build_prompt(code_to_test)
+    prompt = build_prompt(path, modified_function_names)
 
     bedrock_service = BedrockService()
 
