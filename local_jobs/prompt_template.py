@@ -8,7 +8,7 @@ This is the current unit test suite for this script:
 
 {unit_test_file_content}
 
-Please create or update the tests in the test suite provided with new tests for the following functions that have been recently created or modified:
+Please update the test suite to include new tests, or updated tests if they already exist, for the following functions which have recently been created or modified:
 {modified_function_names}
 
 For example. given this script:
