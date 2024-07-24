@@ -11,6 +11,14 @@ This is the current unit test suite for this script:
 Please create or update the tests in the test suite provided with new tests for the following functions that have been recently created or modified:
 {modified_function_names}
 
+For example. given this script:
+
+{example_script}
+
+This is the associated test suite:
+
+{example_test_suite}
+
 Rules:
 - Tests must be written in Python using the unittest framework
 """

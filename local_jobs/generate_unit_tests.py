@@ -17,7 +17,7 @@ def get_current_branch():
         print(f'Error: {e.stderr}')
         return None
 
-def get_modified_files():
+def get_modified_paths():
     try:
         result = subprocess.run(
             ['git', 'diff', '--name-only', f"main...{get_current_branch()}"],
@@ -54,7 +54,7 @@ def extract_function_name(function_str):
     else:
         return None
 
-def process_diff(diff):
+def get_modified_function_names_from_diff(diff):
     functions = [function for function in re.split(r'(?=def\s)', diff) if "def" in function and "__init__" not in function]
 
     modified_function_names = []
@@ -66,16 +66,22 @@ def process_diff(diff):
 
     return ", ".join(modified_function_names)
 
-def get_modified_functions(path):
+def get_modified_function_names(path):
     diff = get_file_diff(path)
-    modified_function_names = process_diff(diff)
+    modified_function_names = get_modified_function_names_from_diff(diff)
 
     return modified_function_names
 
-def build_prompt(path, modified_function_names):
-    file_to_test_content = read_file_contents(path)
-    unit_test_file_content = read_file_contents(f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}")
-    return PROMPT_TEMPLATE.format(file_to_test_content=file_to_test_content, unit_test_file_content=unit_test_file_content, modified_function_names=modified_function_names)
+def build_prompt(file_to_test_content, unit_test_file_content, modified_function_names):
+    example_script = read_file_contents("services/cloudtrail_service.py")
+    example_test_suite = read_file_contents("test/test_services/test_cloudtrail_service.py")
+    return PROMPT_TEMPLATE.format(
+        file_to_test_content=file_to_test_content,
+        unit_test_file_content=unit_test_file_content,
+        modified_function_names=modified_function_names,
+        example_script=example_script,
+        example_test_suite=example_test_suite
+    )
 
 def write_file_contents(path, generated_unit_tests):
     output_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
@@ -98,20 +104,22 @@ def generate_tests(path):
 
     validate_source_file_path(path)
 
-    modified_function_names = get_modified_functions(path)
+    modified_function_names = get_modified_function_names(path)
+    file_to_test_content = read_file_contents(path)
+    unit_test_file_content = read_file_contents(f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}")
 
-    prompt = build_prompt(path, modified_function_names)
+    prompt = build_prompt(file_to_test_content, unit_test_file_content, modified_function_names)
 
     bedrock_service = BedrockService()
 
     generated_unit_tests = bedrock_service.make_request(prompt)
 
-    write_file_contents(path, generated_unit_tests)
+    print(generated_unit_tests)
 
     print("Unit test generation complete")
 
 def main():
-    modified_files = get_modified_files()
+    modified_files = get_modified_paths()
     for path in modified_files:
         generate_tests(path)
 
