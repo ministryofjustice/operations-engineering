@@ -1,6 +1,6 @@
 module "tech-docs-monitor" {
   source  = "ministryofjustice/repository/github"
-  version = "1.0.1"
+  version = "1.1.1"
 
   name        = "tech-docs-monitor"
   description = "Part of alphagov/tech-docs-template (issues 👉https://github.com/alphagov/tech-docs-template/issues)"

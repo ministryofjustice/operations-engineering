@@ -1,6 +1,6 @@
 module "operations-engineering-octodns-poc" {
   source  = "ministryofjustice/repository/github"
-  version = "1.0.1"
+  version = "1.1.1"
 
   name        = "operations-engineering-octodns-poc"
   description = "This repository will be used to prove the concept of managing DNS records using OctoDNS."
