@@ -1,8 +1,11 @@
 PROMPT_TEMPLATE = """
+Given this context:
+{context}
 Please generate unit tests, using the Python unittest library, for the following functions:
-{code_to_test}
 
-For example, given these functions:
+{modified_functions}
+
+For example, given this context:
 
 import boto3
 import time
@@ -12,6 +15,8 @@ from datetime import datetime, timedelta
 class CloudtrailService:
     def __init__(self) -> None:
         self.client = boto3.client("cloudtrail", region_name="eu-west-2")
+
+And given these functions:
 
     def extract_query_results(self, query_id):
         response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000)
@@ -31,20 +36,6 @@ class CloudtrailService:
         return active_users
 
 These are the expected unit tests:
-
-import unittest
-import boto3
-from unittest.mock import patch, MagicMock, call
-from botocore.exceptions import ClientError
-from moto import mock_aws
-from services.cloudtrail_service import CloudtrailService
-from freezegun import freeze_time
-
-class TestCloudtrailService(unittest.TestCase):
-    @mock_aws
-    def setUp(self):
-        self.cloudtrail_service = CloudtrailService()
-        self.cloudtrail_service.client = boto3.client("cloudtrail", region_name="us-west-2")
 
     @mock_aws
     def test_extract_query_results(self):

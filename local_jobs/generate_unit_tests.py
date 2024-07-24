@@ -25,7 +25,7 @@ def get_modified_files():
             text=True,
             capture_output=True
         )
-        return [file for file in result.stdout.split("\n") if "services/" in file or "bin/" in file]
+        return [file for file in result.stdout.split("\n") if file.split("/")[0] == "services" or file.split("/")[0] == "bin"]
     except subprocess.CalledProcessError as e:
         print(f'Error: {e.stderr}')
         return None
@@ -84,7 +84,7 @@ def process_diff(diff):
     modified_functions = diff_remove_plus_signs(diff_remove_deletions("".join(modified_functions)))
     # remove deletions and plus signs from modified functions
 
-    return context + modified_functions
+    return {'context': context, 'modified_functions': modified_functions}
 
 def get_modified_functions(path):
     diff = get_file_diff(path)
@@ -93,7 +93,7 @@ def get_modified_functions(path):
     return modified_functions
 
 def build_prompt(code_to_test):
-    return PROMPT_TEMPLATE.format(code_to_test=code_to_test)
+    return PROMPT_TEMPLATE.format(context=code_to_test['context'], modified_functions=code_to_test['modified_functions'])
 
 def write_file_contents(path, generated_unit_tests):
     output_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
