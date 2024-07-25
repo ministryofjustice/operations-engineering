@@ -13,6 +13,8 @@ Please write a new test suite, using the Python unittest framework, for the prov
 
 {file_to_test_content}
 
+The script can be accessed as a module to import classes and functions for testing, as so: 'from {module} import class/function'
+
 For example. given this script:
 
 {example_script}

@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 import json
+from services.bedrock_service import BedrockService
 
 class TestBedrockService(unittest.TestCase):
 
@@ -68,3 +69,9 @@ class TestBedrockService(unittest.TestCase):
         request = bedrock_service.format_llama_request(prompt)
 
         assert request == expected_request
+
+    @patch('boto3.client')
+    def test_init(self, mock_boto3_client):
+        BedrockService()
+
+        mock_boto3_client.assert_called_once_with("bedrock", region_name="eu-west-2")

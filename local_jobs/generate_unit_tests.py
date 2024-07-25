@@ -91,7 +91,10 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
     example_test_suite = read_file_contents("test/test_services/test_cloudtrail_service.py")
 
     if template == "new_test_suite":
+        module = path.replace("/", ".").strip(".py")
+
         return NEW_TEST_SUITE_PROMPT_TEMPLATE.format(
+        module = module,
         file_to_test_content=file_to_test_content,
         example_script=example_script,
         example_test_suite=example_test_suite
