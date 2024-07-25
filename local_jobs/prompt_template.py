@@ -20,7 +20,6 @@ For example. given this script:
 This is the associated test suite:
 
 {example_test_suite}
-
 """ + COMMON_RULES
 
 MODIFY_TEST_SUITE_PROMPT_TEMPLATE = """
@@ -45,5 +44,4 @@ For example. given this script:
 This is the associated test suite:
 
 {example_test_suite}
-
 """ + COMMON_RULES
