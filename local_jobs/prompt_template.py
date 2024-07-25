@@ -1,18 +1,17 @@
-PROMPT_TEMPLATE = """
+COMMON_RULES = """
+Rules:
+- Tests must be written in Python using the unittest framework.
+- Do not acknowledge the question asked.
+- Do not include any extra information.
+- Do not explain your answers.
+- Only produce the test code, nothing else.
+"""
 
-This a a python script:
+NEW_TEST_SUITE_PROMPT_TEMPLATE = """
+
+Please write a new test suite, using the Python unittest framework, for the provided script:
 
 {file_to_test_content}
-
-This is the current unit test suite for this script:
-
-{unit_test_file_content}
-
-If there is a pre-existing test suite, please add tests for any functions missing them,
-and update the tests for the following functions which have been recently modified:
-{modified_function_names}
-
-If no test suite currently exists, please write a new test suite for the provided script.
 
 For example. given this script:
 
@@ -22,10 +21,29 @@ This is the associated test suite:
 
 {example_test_suite}
 
-Rules:
-- Tests must be written in Python using the unittest framework.
-- Do not acknowledge the question asked.
-- Do not include any extra information.
-- Do not explain your answers.
-- Only produce the test code, nothing else.
-"""
+""" + COMMON_RULES
+
+MODIFY_TEST_SUITE_PROMPT_TEMPLATE = """
+
+This a a python script:
+
+{file_to_test_content}
+
+This is the current unit test suite for this script:
+
+{unit_test_file_content}
+
+Please update the unit tests for the following functions which have been recently modified:
+{modified_function_names}
+
+Please add tests for any functions in the script that are missing them.
+
+For example. given this script:
+
+{example_script}
+
+This is the associated test suite:
+
+{example_test_suite}
+
+""" + COMMON_RULES

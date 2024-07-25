@@ -1,7 +1,7 @@
 import os
 import subprocess
 import re
-from local_jobs.prompt_template import PROMPT_TEMPLATE
+from local_jobs.prompt_template import NEW_TEST_SUITE_PROMPT_TEMPLATE, MODIFY_TEST_SUITE_PROMPT_TEMPLATE
 from services.bedrock_service import BedrockService
 
 def get_current_branch():
@@ -33,6 +33,9 @@ def get_modified_paths():
 def validate_source_file_path(source_file_path):
     if not os.path.isfile(source_file_path):
         raise FileNotFoundError(f"Source file not found at {source_file_path}")
+
+def validate_test_file_path(path):
+    return os.path.isfile(path)
 
 def get_file_diff(path):
     try:
@@ -77,24 +80,34 @@ def get_modified_function_names(path):
 
     return modified_function_names
 
-def build_prompt(file_to_test_content, unit_test_file_content, modified_function_names):
+def build_prompt(path, template="new_test_suite", test_path="", modified_function_names=[]):
+    file_to_test_content = read_file_contents(path)
     example_script = read_file_contents("services/cloudtrail_service.py")
     example_test_suite = read_file_contents("test/test_services/test_cloudtrail_service.py")
-    return PROMPT_TEMPLATE.format(
+
+    if template == "new_test_suite":
+        return NEW_TEST_SUITE_PROMPT_TEMPLATE.format(
         file_to_test_content=file_to_test_content,
-        unit_test_file_content=unit_test_file_content,
-        modified_function_names=modified_function_names,
         example_script=example_script,
         example_test_suite=example_test_suite
     )
+    elif template == "modify_test_suite":
+        unit_test_file_content = read_file_contents(test_path)
+
+        return MODIFY_TEST_SUITE_PROMPT_TEMPLATE.format(
+            file_to_test_content=file_to_test_content,
+            unit_test_file_content=unit_test_file_content,
+            modified_function_names=modified_function_names,
+            example_script=example_script,
+            example_test_suite=example_test_suite
+        )
 
 def write_file_contents(path, generated_unit_tests):
-    output_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
-    if not os.path.isfile(output_path):
-        with open(output_path, "w") as file:
+    if not os.path.isfile(path):
+        with open(path, "w") as file:
             file.write(generated_unit_tests)
     else:
-        with open(output_path, "a") as file:
+        with open(path, "a") as file:
             file.write("\n\n" + generated_unit_tests)
 
 def read_file_contents(path):
@@ -107,13 +120,16 @@ def read_file_contents(path):
 def generate_tests(path):
     print(f"Generating unit tests for {path}")
 
+    test_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
+
     validate_source_file_path(path)
 
-    modified_function_names = get_modified_function_names(path)
-    file_to_test_content = read_file_contents(path)
-    unit_test_file_content = read_file_contents(f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}")
-
-    prompt = build_prompt(file_to_test_content, unit_test_file_content, modified_function_names)
+    if validate_test_file_path(test_path):
+        template = "modify_test_suite"
+        modified_function_names = get_modified_function_names(path)
+        prompt = build_prompt(path, template, test_path, modified_function_names)
+    else:
+        prompt = build_prompt(path)
 
     bedrock_service = BedrockService()
 
@@ -121,7 +137,7 @@ def generate_tests(path):
 
     print(generated_unit_tests)
 
-    # write_file_contents(path, generated_unit_tests)
+    write_file_contents(test_path, generated_unit_tests)
 
     print("Unit test generation complete")
 
