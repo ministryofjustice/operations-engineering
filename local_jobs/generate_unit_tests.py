@@ -119,6 +119,7 @@ def read_file_contents(path):
 
 def generate_tests(path):
     print(f"Generating unit tests for {path}")
+
     test_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
 
     validate_source_file_path(path)
