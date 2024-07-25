@@ -8,9 +8,6 @@ from services.slack_service import SlackService
 
 GITHUB_ORG = "ministryofjustice"
 
-def test():
-    print("test")
-
 
 def get_environment_variables() -> tuple:
     slack_token = os.getenv("ADMIN_SLACK_TOKEN")
