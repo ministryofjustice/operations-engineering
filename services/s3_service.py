@@ -98,11 +98,6 @@ class S3Service:
             return False
 
     def test_me(self) -> list:
-        three_months_ago_date = datetime.now() - relativedelta(months=3)
-        for user in self._get_users_from_org_people_file():
-            if user["last_active"].lower() == NO_ACTIVITY:  # Some users have "No activity" skip over these users
-                continue
-            last_active_date = datetime.strptime(user['last_active'][0:10], '%Y-%m-%d')
-            if last_active_date > three_months_ago_date:
-                active_users.append(user["username"])
-        return active_users
+        self._download_file(self.emailed_users_file_name, self.emailed_users_file_path)
+        with open(self.emailed_users_file_path, "r", encoding="utf8") as the_file:
+            return json.load(the_file)
