@@ -107,6 +107,8 @@ def read_file_contents(path):
 def generate_tests(path):
     print(f"Generating unit tests for {path}")
 
+    model = "llama"
+
     validate_source_file_path(path)
 
     modified_function_names = get_modified_function_names(path)
@@ -117,7 +119,7 @@ def generate_tests(path):
 
     bedrock_service = BedrockService()
 
-    generated_unit_tests = bedrock_service.make_request(prompt)
+    generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
 
     print(generated_unit_tests)
 
