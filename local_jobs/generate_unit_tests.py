@@ -136,18 +136,16 @@ def generate_tests(path):
     else:
         prompt = build_prompt(path)
 
-    print(prompt)
+    bedrock_service = BedrockService()
+    model = "llama"
 
-    # bedrock_service = BedrockService()
-    # model = "llama"
+    generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
 
-    # generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
+    print(generated_unit_tests)
 
-    # print(generated_unit_tests)
+    write_file_contents(test_path, generated_unit_tests)
 
-    # write_file_contents(test_path, generated_unit_tests)
-
-    # print("Unit test generation complete")
+    print("Unit test generation complete")
 
 def main():
     modified_files = get_modified_paths()
