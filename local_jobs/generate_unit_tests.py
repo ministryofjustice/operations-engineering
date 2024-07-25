@@ -143,7 +143,7 @@ def generate_tests(path):
 
     print(generated_unit_tests)
 
-    write_file_contents(test_path, generated_unit_tests)
+    # write_file_contents(test_path, generated_unit_tests)
 
     print("Unit test generation complete")
 
