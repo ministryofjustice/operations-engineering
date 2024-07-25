@@ -137,7 +137,7 @@ def generate_tests(path):
         prompt = build_prompt(path)
 
     bedrock_service = BedrockService()
-    model = "llama"
+    model = "claude"
 
     generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
 
