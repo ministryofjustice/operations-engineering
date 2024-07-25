@@ -51,6 +51,7 @@ class S3Service:
 
     def get_active_users_from_org_people_file(self) -> list:
         three_months_ago_date = datetime.now() - relativedelta(months=3)
+        active_users = []
         for user in self._get_users_from_org_people_file():
             if user["last_active"].lower() == NO_ACTIVITY:  # Some users have "No activity" skip over these users
                 continue
