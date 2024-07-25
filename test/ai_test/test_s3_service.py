@@ -147,4 +147,43 @@ class TestS3Service(unittest.TestCase):
         ]
         mock_json_load.return_value = [{"login": "some-user", "name": "some-name", "tfa_enabled": True, "is_public": False,
                                         "role": "Member", "last_active": self.fake_datetime, "saml_name_id": "some-email"}]
-        with patch(self
+        with patch(self.builtins, mock_open(read_data="data")):
+            response = self.s3_service._get_users_from_org_people_file()
+            self.assertEqual(response, expected_reply)
+        mock_download_file.assert_called_once_with(
+            self.s3_service.org_people_file_name, self.s3_service.org_people_file_name)
+
+    def test_is_well_known_mta_sts_enforce_enabled(self):
+        self.s3_service.client.get_object.return_value = {'Body': BytesIO("mode: enforce".encode('utf-8'))}
+
+        self.assertTrue(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
+    def test_is_well_known_mta_sts_enforce_disabled(self):
+        self.s3_service.client.get_object.return_value = {'Body': BytesIO("mode: disabled".encode('utf-8'))}
+
+        self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
+    def test_is_well_known_mta_sts_enforce_no_such_key(self):
+        self.s3_service.client.get_object.side_effect = ClientError(
+            {
+                'Error': {
+                    'Code': "test"
+                }
+            },
+            operation_name="test"
+        )
+
+        self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
+    @patch.object(S3Service, "_download_file")
+    @patch.object(json, "load")
+    def test_test_me(self, mock_json_load, mock_download_file):
+        with patch(self.builtins, mock_open(read_data="data")):
+            self.s3_service.test_me()
+        mock_download_file.assert_called_once_with(
+            self.s3_service.emailed_users_file_name, self.s3_service.emailed_users_file_path)
+        mock_json_load.assert_called_once()
+
+
+if __name__ == "__main__":
+    unittest.main()
