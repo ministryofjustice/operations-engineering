@@ -72,7 +72,12 @@ def get_modified_function_names_from_diff(diff):
 
     new_function_names = find_new_functions(diff)
 
-    return ", ".join(list(set(modified_function_names).difference(new_function_names)))
+    filter_out_new_functions = list(set(modified_function_names).difference(new_function_names))
+
+    if filter_out_new_functions != []:
+        return ", ".join(filter_out_new_functions)
+    else:
+        return "No existing functions have been modified."
 
 def get_modified_function_names(path):
     diff = get_file_diff(path)
@@ -131,16 +136,18 @@ def generate_tests(path):
     else:
         prompt = build_prompt(path)
 
-    bedrock_service = BedrockService()
-    model = "llama"
+    print(prompt)
 
-    generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
+    # bedrock_service = BedrockService()
+    # model = "llama"
 
-    print(generated_unit_tests)
+    # generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
 
-    write_file_contents(test_path, generated_unit_tests)
+    # print(generated_unit_tests)
 
-    print("Unit test generation complete")
+    # write_file_contents(test_path, generated_unit_tests)
+
+    # print("Unit test generation complete")
 
 def main():
     modified_files = get_modified_paths()
