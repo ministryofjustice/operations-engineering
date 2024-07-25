@@ -35,7 +35,11 @@ This is the current unit test suite for this script:
 Please update the unit tests for the following functions which have been recently modified:
 {modified_function_names}
 
-Please add tests for any functions in the script that are missing them.
+Do not modify any existing unit tests unless specified.
+
+Please add tests to the current suite for any functions in the script that are missing them.
+
+Please respond with the complete new unit test suite.
 
 For example. given this script:
 
