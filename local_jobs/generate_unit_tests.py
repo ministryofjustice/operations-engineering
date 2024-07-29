@@ -1,7 +1,7 @@
 import os
 import subprocess
 import re
-from local_jobs.prompt_template import NEW_TEST_SUITE_PROMPT_TEMPLATE, MODIFY_TEST_SUITE_PROMPT_TEMPLATE
+from local_jobs.prompt_template import NEW_TEST_SUITE_PROMPT_TEMPLATE, MODIFY_TEST_SUITE_PROMPT_TEMPLATE, FAILED_TESTS_PROMPT_TEMPLATE
 from services.bedrock_service import BedrockService
 
 def get_current_branch():
@@ -85,10 +85,13 @@ def get_modified_function_names(path):
 
     return modified_function_names
 
-def build_prompt(path, template="new_test_suite", test_path="", modified_function_names=[]):
+def build_prompt(path, template="new_test_suite", test_path="", modified_function_names=[], failed_tests=[]):
     file_to_test_content = read_file_contents(path)
     example_script = read_file_contents("services/cloudtrail_service.py")
     example_test_suite = read_file_contents("test/test_services/test_cloudtrail_service.py")
+
+    if test_path != "":
+        unit_test_file_content = read_file_contents(test_path)
 
     if template == "new_test_suite":
         module = path.replace("/", ".").strip(".py")
@@ -98,10 +101,8 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
         file_to_test_content=file_to_test_content,
         example_script=example_script,
         example_test_suite=example_test_suite
-    )
+        )
     elif template == "modify_test_suite":
-        unit_test_file_content = read_file_contents(test_path)
-
         return MODIFY_TEST_SUITE_PROMPT_TEMPLATE.format(
             file_to_test_content=file_to_test_content,
             unit_test_file_content=unit_test_file_content,
@@ -109,10 +110,15 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
             example_script=example_script,
             example_test_suite=example_test_suite
         )
+    elif template == "failed_tests":
+        return FAILED_TESTS_PROMPT_TEMPLATE.format(
+            file_to_test_content=file_to_test_content,
+            unit_test_file_content=unit_test_file_content,
+            failed_tests=failed_tests
+        )
 
 def write_file_contents(path, generated_unit_tests):
-    test_test_path = "test/ai_test/" + path.split("/")[2]
-    with open(test_test_path, "w") as file:
+    with open(path, "w") as file:
         file.write(generated_unit_tests)
 
 def read_file_contents(path):
@@ -122,33 +128,75 @@ def read_file_contents(path):
     else:
         return ""
 
-def generate_tests(path):
-    print(f"Generating unit tests for {path}")
+def run_test_suite(path):
+    test_results = subprocess.run(["pipenv", "run", "python", "-m", "unittest", path], capture_output=True, text=True).stderr
 
-    test_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
+    broken_down_test_results = test_results.split("======================================================================")
 
-    validate_source_file_path(path)
+    failed_tests = "".join([test for test in broken_down_test_results if "test_raises_error_when_no_github_token" not in test and "FAIL" in test or "ERROR" in test])
 
-    if validate_test_file_path(test_path):
-        template = "modify_test_suite"
-        modified_function_names = get_modified_function_names(path)
-        prompt = build_prompt(path, template, test_path, modified_function_names)
-    else:
-        prompt = build_prompt(path)
+    return failed_tests
 
+def generate_tests(prompt, test_path):
     bedrock_service = BedrockService()
     model = "claude"
 
+    # use bedrock to generate unit test skeleton
     generated_unit_tests = bedrock_service.request_model_response_from_bedrock(prompt, model)
 
+    # write tests to file
     write_file_contents(test_path, generated_unit_tests)
 
-    print("Unit test generation complete")
+    # Run generated unit tests - return any failed tests
+    failed_tests = run_test_suite(test_path)
+
+    return failed_tests
 
 def main():
     modified_files = get_modified_paths()
+
     for path in modified_files:
-        generate_tests(path)
+        print(f"Generating unit tests for {path}")
+
+        test_path = f"test/test_{path.split('/')[0]}/test_{path.split('/')[1]}"
+
+        validate_source_file_path(path)
+
+        # Check if test suite already exists
+        if validate_test_file_path(test_path):
+            template = "modify_test_suite"
+            modified_function_names = get_modified_function_names(path)
+
+            prompt = build_prompt(path, template, test_path, modified_function_names)
+        else:
+            prompt = build_prompt(path)
+
+        test_test_path = "test/ai_test/" + test_path.split("/")[2]
+
+        # generate unit tests for specified path
+        failed_tests = generate_tests(prompt, test_test_path)
+
+        max_cycles = 3
+        cycles = 1
+
+        #send tests back to AI to correct if there are failures
+        while len(failed_tests) > 0 and cycles < max_cycles:
+            print(f"Generation {cycles} of the test suite has produced the following errors: {failed_tests}")
+
+            cycles += 1
+
+            print(f"Generating generation {cycles} of the test suite")
+
+            template = "failed_tests"
+            prompt = build_prompt(path, template, test_test_path, [], failed_tests)
+
+            failed_tests = generate_tests(prompt, test_test_path)
+
+        print("Unit test generation complete")
+
+        if len(failed_tests) > 0:
+            print(f"Final test suite still has failures: {failed_tests}")
+
 
 if __name__ == "__main__":
     main()
