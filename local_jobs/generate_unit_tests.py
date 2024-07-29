@@ -85,7 +85,7 @@ def get_modified_function_names(path):
 
     return modified_function_names
 
-def build_prompt(path, template="new_test_suite", test_path="", modified_function_names=[], failed_tests=[]):
+def build_prompt(path, template="new_test_suite", test_path="", modified_function_names=[], failed_tests=""):
     file_to_test_content = read_file_contents(path)
     example_script = read_file_contents("services/cloudtrail_service.py")
     example_test_suite = read_file_contents("test/test_services/test_cloudtrail_service.py")
@@ -133,7 +133,7 @@ def run_test_suite(path):
 
     broken_down_test_results = test_results.split("======================================================================")
 
-    failed_tests = "".join([test for test in broken_down_test_results if "test_raises_error_when_no_github_token" not in test and "FAIL" in test or "ERROR" in test])
+    failed_tests = "".join([test for test in broken_down_test_results if "test_raises_error_when_no_github_token" not in test and "fail" in test.lower() or "error" in test.lower()])
 
     return failed_tests
 
@@ -162,7 +162,7 @@ def main():
 
         validate_source_file_path(path)
 
-        # Check if test suite already exists
+        # Check if test suite already exists and create prompt
         if validate_test_file_path(test_path):
             template = "modify_test_suite"
             modified_function_names = get_modified_function_names(path)

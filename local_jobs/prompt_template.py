@@ -7,6 +7,8 @@ Rules:
 - Only produce the test code, nothing else.
 - Make sure that you are importing classes and function into the test script in the correct way:
 "from services.my_service import MyService" for services and "from bin.my_job import my_function" for bin jobs.
+- Do not include any markdown in the output e.g. ```python something ```
+- Ensure constants are correctly imported: "from config.constants import MY_CONSTANT"
 """
 
 NEW_TEST_SUITE_PROMPT_TEMPLATE = """
@@ -41,7 +43,9 @@ Please update the unit tests for the following functions which have been recentl
 
 Do not modify any existing unit tests unless specified.
 
-Please add tests to the current suite for functions in the script that are missing them.
+Please add tests to the current suite for functions in the script do not have unit tests.
+
+Do not create additional unit tests for functions that are already associated with unit tests.
 
 Please respond with the complete new unit test suite.
 
@@ -63,8 +67,10 @@ This is the current unit test suite for this script:
 
 {unit_test_file_content}
 
-These are the tests that are currently failing:
+These are the current unit test failures:
 {failed_tests}
 
-Please fix the failing tests and return the new test suite.
+Please amend the failing tests so that they pass and return the new test suite.
+
+Use mock_response.__getitem__.return_value to mock response["body"].
 """ + COMMON_RULES

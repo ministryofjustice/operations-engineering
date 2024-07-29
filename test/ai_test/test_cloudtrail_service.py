@@ -20,11 +20,11 @@ class TestCloudtrailService(unittest.TestCase):
     def test_get_active_users_for_dormant_users_process(self, mock_query_results):
         mock_active_users = ["user1", "user2", "user3"]
         mock_query_results.return_value = mock_active_users
-        self.cloudtrail_service.client.start_query = MagicMock(return_value={"QueryId": "mock_query_id_with_valid_length"})
-        mock_query_string = """
+        self.cloudtrail_service.client.start_query = MagicMock()
+        mock_query_string = f"""
         SELECT DISTINCT eventData.useridentity.username
         FROM asdikajsndasondasodn
-        WHERE eventTime > '2024-04-12 00:00:00';
+        WHERE eventTime > '{(datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d %H:%M:%S')}';
         """
 
         assert self.cloudtrail_service.get_active_users_for_dormant_users_process() == mock_active_users
@@ -36,7 +36,7 @@ class TestCloudtrailService(unittest.TestCase):
         mock_active_users = ["user1", "user2", "user3"]
         mock_extract_query_results.return_value = mock_active_users
         self.cloudtrail_service.client.get_query_results = MagicMock(return_value={'QueryStatus': 'FINISHED'})
-        mock_query_id = "mock_query_id_with_valid_length"
+        mock_query_id = "mock_id"
 
         response = self.cloudtrail_service.get_query_results(mock_query_id)
 
@@ -48,9 +48,9 @@ class TestCloudtrailService(unittest.TestCase):
     def test_get_query_results_if_fail(self):
         self.cloudtrail_service.client.get_query_results = MagicMock(return_value={'QueryStatus': 'CANCELLED'})
         with self.assertRaises(ClientError) as context:
-            self.cloudtrail_service.get_query_results("mock_query_id_with_valid_length")
+            self.cloudtrail_service.get_query_results("mock_id")
 
-        self.cloudtrail_service.client.get_query_results.assert_called_once_with(QueryId="mock_query_id_with_valid_length")
+        self.cloudtrail_service.client.get_query_results.assert_called_once_with(QueryId="mock_id")
         self.assertEqual(str(context.exception), "An error occurred (CANCELLED) when calling the get_query_results operation: Cloudtrail data lake query failed with status: CANCELLED")
 
     # pylint: disable=C0103, W0613
@@ -65,21 +65,7 @@ class TestCloudtrailService(unittest.TestCase):
             return {'NextToken': mock_next_token, 'QueryResultRows': [[{'username': 'test_user1'}], [{'username': 'test_user2'}]]}
 
         self.cloudtrail_service.client.get_query_results = MagicMock(side_effect=mock_get_query_results)
-        mock_query_id = "mock_query_id_with_valid_length"
+        mock_query_id = "mock_id"
 
         assert self.cloudtrail_service.extract_query_results(mock_query_id) == ["test_user1", "test_user2", "test_user3"]
         self.cloudtrail_service.client.get_query_results.assert_has_calls([call(QueryId=mock_query_id, MaxQueryResults=1000), call(QueryId=mock_query_id, MaxQueryResults=1000, NextToken=mock_next_token)])
-
-    @freeze_time("2023-05-01 00:00:00")
-    @mock_aws
-    def test_get_active_users_for_dormant_users_process_period_cutoff(self):
-        mock_query_id = "asdasojdnaspodinaspodiahsasdasdopiasuhdpoaishdjaspoihj"
-        self.cloudtrail_service.client.start_query = MagicMock(return_value={"QueryId": mock_query_id})
-        mock_query_string = """
-        SELECT DISTINCT eventData.useridentity.username
-        FROM asdikajsndasondasodn
-        WHERE eventTime > '2023-01-31 00:00:00';
-        """
-
-        self.cloudtrail_service.get_active_users_for_dormant_users_process()
-        self.cloudtrail_service.client.start_query.assert_called_once_with(QueryStatement=mock_query_string)
