@@ -8,6 +8,6 @@ module "technical-guidance" {
   topics       = ["operations-engineering"]
 
   team_access = {
-    admin = [var.operations_engineering_team_id]
+    admin = [data.github_team.operations_engineering.id]
   }
 }

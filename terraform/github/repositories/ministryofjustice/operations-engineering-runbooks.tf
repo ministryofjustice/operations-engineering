@@ -8,6 +8,6 @@ module "operations-engineering-runbooks" {
   topics       = ["operations-engineering", "documentation"]
 
   team_access = {
-    admin = [var.operations_engineering_team_id]
+    admin = [data.github_team.operations_engineering.id]
   }
 }

@@ -8,6 +8,6 @@ module "moj-terraform-aws-sso" {
   topics      = ["operations-engineering", "aws", "terraform", "iam", "sso", "terraform-module", "civil-service", "aws-sso"]
 
   team_access = {
-    admin = [var.operations_engineering_team_id]
+    admin = [data.github_team.operations_engineering.id]
   }
 }

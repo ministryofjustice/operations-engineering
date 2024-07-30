@@ -9,6 +9,6 @@ module "terraform-github-repository" {
   type            = "module"
 
   team_access = {
-    admin = [var.operations_engineering_team_id]
+    admin = [data.github_team.operations_engineering.id]
   }
 }
