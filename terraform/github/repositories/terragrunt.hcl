@@ -5,12 +5,11 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    bucket = "cloud-platform-fad89ef06d68fdbc1928cb37acd8fc9f"
+    bucket = "operations-engineering-test-terraform-state-bucket"
 
-    key = "terraform/github-repos/operations-engineering-prod/terraform.tfstate"
+    key = "terraform/dsd/github_repositories/terraform.tfstate"
     region         = "eu-west-2"
     encrypt        = true
-    dynamodb_table = "cp-1aaae79e1c9a29a8"
     acl            = "private"
   }
 }

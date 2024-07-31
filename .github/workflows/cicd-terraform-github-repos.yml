@@ -53,10 +53,10 @@ jobs:
           aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_secret_manager_access_profile
           aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_secret_manager_access_profile
 
-      - name: Configure AWS credentials to access state bucket in Cloud Platform account
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
+          role-to-assume: ${{ secrets.AWS_DSD_CICD_ADMIN_ROLE_ARN }}
           aws-region: eu-west-2
 
       - name: Terraform Format Check
