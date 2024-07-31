@@ -15,7 +15,6 @@ on:
 env:
   TERRAFORM_VERSION: "1.6.6"
   TF_VAR_github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
-  TG_SKIP_BUCKET_UPDATE: true
 
 jobs:
   terraform:
@@ -70,4 +69,4 @@ jobs:
 
       - name: Terragrunt Plan
         id: plan
-        run: terragrunt run-all plan
+        run: export TG_SKIP_BUCKET_UPDATE=true && terragrunt run-all plan
