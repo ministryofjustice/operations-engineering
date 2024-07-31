@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date
 import unittest
 from unittest.mock import patch, MagicMock
 from services.slack_service import SlackService
