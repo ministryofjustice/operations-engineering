@@ -1,0 +1,64 @@
+name: 🧪 DNS Delegations Metrics
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dns-delegations-metrics:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials - Role with Read Access to DSD Route53
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DSD_ROUTE53_READ_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Create Profile to With ReadOnly Access to DSD Route53
+        run: |
+          aws configure set region ${{ env.AWS_REGION }} --profile="dsd_route53_read"
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile="dsd_route53_read"
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile="dsd_route53_read"
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile="dsd_route53_read"
+
+      - name: Configure AWS Credentials - Role to Assume Cloud Platforms Route53 Read Role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ASSUME_CLOUD_PLATFORM_ROUTE53_READ_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Configure AWS Credentials - Role with Read Access to Cloud Platforms Route53
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CLOUD_PLATFORM_ROUTE53_READ_ROLE_ARN }}
+          aws-region: eu-west-2
+          role-skip-session-tagging: true
+          role-chaining: true
+
+      - name: Create Profile to With ReadOnly Access to Cloud Platforms Route53
+        run: |
+          aws configure set region ${{ env.AWS_REGION }} --profile="cloud_platform_route53_read"
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile="cloud_platform_route53_read"
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile="cloud_platform_route53_read"
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile="cloud_platform_route53_read"
+
+      - name: Check Access
+        run: |
+          aws route53 list-hosted-zones --max-items="1" --profile="dsd_route53_read" --output="json" | jq ".HostedZones[].Name"
+          aws route53 list-hosted-zones --max-items="1" --profile="cloud_platform_route53_read" --output="json" | jq ".HostedZones[].Name"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+
+      - name: Execute DNS Delegations Metrics Script
+        run: pipenv run python3 -m bin.dns_delegations_metrics

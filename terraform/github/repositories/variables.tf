@@ -4,6 +4,12 @@ variable "github_token" {
   default     = ""
 }
 
+variable "github_owner" {
+  type        = string
+  description = "Default organisation for the GitHub provider configuration"
+  default     = "ministryofjustice"
+}
+
 variable "ECR_REGION" {
   type        = string
   description = "Region of ECR repositories"

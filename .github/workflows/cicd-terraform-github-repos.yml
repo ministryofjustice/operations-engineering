@@ -15,7 +15,6 @@ on:
 env:
   TERRAFORM_VERSION: "1.6.6"
   TF_VAR_github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
-
 jobs:
   terraform:
     name: "Terraform Github Repos"
@@ -33,7 +32,20 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_SECRETS_MANAGER_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Save AWS credentials for accessing AWS Secrets Manager in the DSD account to a new profile
+        run: |
+          aws configure set region ${{ env.AWS_REGION }} --profile dsd_secret_manager_access_profile
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile dsd_secret_manager_access_profile
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_secret_manager_access_profile
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_secret_manager_access_profile
+
+      - name: Configure AWS credentials to access state bucket in Cloud Platform account
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD}}
@@ -41,12 +53,20 @@ jobs:
 
       - name: Post Link to Apply Pipeline
         if: github.ref == 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
+          repo-token-user-login: "github-actions[bot]"
           message: |
             Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
+
+      - name: Delete old comments on PR made by bot user
+        if: github.ref != 'refs/heads/main'
+        uses: izhangzhihao/delete-comment@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_user_name: github-actions[bot]
+          issue_number: ${{ github.event.number }}
 
       - name: Terraform Format Check
         id: fmt-check
@@ -64,21 +84,12 @@ jobs:
         id: plan
         run: terraform plan -input=false -no-color
 
-      - name: Delete Old Comments
-        uses: maheshrayas/action-pr-comment-delete@v3.0
-        with:
-          github_token: '${{ secrets.GITHUB_TOKEN }}'
-          org: ministryofjustice
-          repo: operations-engineering
-          user: 'github-actions[bot]'
-          issue: '${{github.event.number}}'
-
       - name: Post Plan to GitHub PR
         if: github.ref != 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
+          repo-token-user-login: "github-actions[bot]"
           message: |
             ## Terraform github repositories plan
             ```
@@ -89,3 +100,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         id: apply
         run: terraform apply -input=false -no-color -auto-approve
+
+      - name: Report failure to Slack
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

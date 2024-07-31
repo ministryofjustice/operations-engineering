@@ -48,6 +48,14 @@ jobs:
           message: |
             Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-teams.yml?query=event%3Apush+branch%3Amain
 
+      - name: Delete old comments on PR made by bot user
+        if: github.ref != 'refs/heads/main'
+        uses: izhangzhihao/delete-comment@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_user_name: github-actions[bot]
+          issue_number: ${{ github.event.number }}
+
       - name: Terraform Format Check
         id: fmt-check
         run: terraform fmt -check
@@ -63,15 +71,6 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: terraform plan -input=false -no-color
-
-      - name: Delete Old Comments
-        uses: maheshrayas/action-pr-comment-delete@v3.0
-        with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
-          org: ministryofjustice
-          repo: operations-engineering
-          user: "github-actions[bot]"
-          issue: "${{github.event.number}}"
 
       - name: Post Plan to GitHub PR
         if: github.ref != 'refs/heads/main'
@@ -89,3 +88,13 @@ jobs:
         if: github.ref == 'refs/heads/main'
         id: apply
         run: terraform apply -input=false -no-color -auto-approve
+
+      - name: Report failure to Slack
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # v2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -1,3 +1,5 @@
+# pylint: disable=E1136, E1135, W0718, C0411
+
 import json
 from calendar import timegm
 from datetime import date, datetime, timedelta
@@ -15,8 +17,6 @@ from gql.transport.exceptions import TransportQueryError
 from requests import Session
 
 from config.logging_config import logging
-
-# pylint: disable=E1136, E1135
 
 logging.getLogger("gql").setLevel(logging.WARNING)
 
@@ -71,6 +71,7 @@ class GithubService:
                  enterprise_name: str = ENTERPRISE_NAME) -> None:
         self.organisation_name: str = organisation_name
         self.enterprise_name: str = enterprise_name
+        self.organisations_in_enterprise: list = ["ministryofjustice", "moj-analytical-services"]
 
         self.github_client_core_api: Github = Github(org_token)
         self.github_client_gql_api: Client = Client(transport=AIOHTTPTransport(
@@ -1232,3 +1233,12 @@ class GithubService:
         logging.error(
             f"Failed to fetch PAT list: {response.status_code}, error: {response}")
         return []
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_all_enterprise_members(self) -> list:
+        all_users = []
+
+        for org in self.organisations_in_enterprise:
+            all_users = all_users + [user.login for user in self.github_client_core_api.get_organization(org).get_members() if user.login not in all_users]
+
+        return all_users

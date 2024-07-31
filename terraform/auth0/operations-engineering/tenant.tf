@@ -1,3 +1,4 @@
+
 resource "auth0_tenant" "tenant" {
   allow_organization_name_in_authentication_api = false
   allowed_logout_urls                           = []
@@ -9,7 +10,7 @@ resource "auth0_tenant" "tenant" {
   friendly_name                                 = null
   idle_session_lifetime                         = 72
   picture_url                                   = null
-  sandbox_version                               = "18"
+  sandbox_version                               = "12"
   session_lifetime                              = 168
   support_email                                 = null
   support_url                                   = null
@@ -49,13 +50,13 @@ resource "auth0_tenant" "tenant" {
 resource "auth0_resource_server" "auth0_management_api" {
   allow_offline_access                            = false
   enforce_policies                                = null
-  identifier                                      = "https://operations-engineering-test.uk.auth0.com/api/v2/"
+  identifier                                      = "https://operations-engineering.eu.auth0.com/api/v2/"
   name                                            = "Auth0 Management API"
   signing_alg                                     = "RS256"
   signing_secret                                  = null
   skip_consent_for_verifiable_first_party_clients = false
   token_dialect                                   = null
-  token_lifetime                                  = 86400
+  token_lifetime                                  = 360
   token_lifetime_for_web                          = 7200
   verification_location                           = null
 }
@@ -89,5 +90,38 @@ resource "auth0_attack_protection" "attack_protection" {
       max_attempts = 50
       rate         = 1200
     }
+  }
+}
+
+resource "auth0_guardian" "guardian" {
+  email         = false
+  otp           = false
+  policy        = "never"
+  recovery_code = false
+  duo {
+    enabled         = false
+    hostname        = null
+    integration_key = null
+    secret_key      = null # sensitive
+  }
+  phone {
+    enabled       = false
+    message_types = []
+    provider      = null
+  }
+  push {
+    enabled  = false
+    provider = null
+  }
+  webauthn_platform {
+    enabled                  = false
+    override_relying_party   = false
+    relying_party_identifier = null
+  }
+  webauthn_roaming {
+    enabled                  = false
+    override_relying_party   = false
+    relying_party_identifier = null
+    user_verification        = null
   }
 }

@@ -1,77 +1,41 @@
-import boto3
-from botocore.exceptions import NoCredentialsError
+from services.s3_service import S3Service
 
-# Usage:
-#   Fill in AWS creds
-#   Run the script
-#   Action output
+# List of MTA-STS domains
+domains = [
+    "ccrc.gov.uk", "cjit.gov.uk", "cshrcasework.justice.gov.uk", "devl.justice.gov.uk",
+    "g.justice.gov.uk", "govfsl.com", "hmiprisons.gov.uk", "hmiprobation.gov.uk",
+    "ima-citizensrights.org.uk", "imb.org.uk", "judicialappointments.gov.uk",
+    "judicialconduct.gov.uk", "judicialombudsman.gov.uk", "judiciary.uk", "justice.gov.uk",
+    "lawcommission.gov.uk", "newsletter.ima-citizensrights.org.uk", "obr.uk", "ospt.gov.uk",
+    "ppo.gov.uk", "publicguardian.gov.uk", "sentencingcouncil.gov.uk", "sentencingcouncil.org.uk",
+    "ukgovwales.gov.uk", "victimscommissioner.org.uk", "yjb.gov.uk", "yjbservicespp.yjb.gov.uk",
+    "youthjusticepp.yjb.gov.uk"
+]
 
-# Improvements:
-#   Look up domains dynamically
-#   Add this to actions somewhere
-
-# Auth
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""
-AWS_SESSION_TOKEN = ""
-
-s3 = boto3.client('s3',
-                  aws_access_key_id=AWS_ACCESS_KEY_ID,
-                  aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                  aws_session_token=AWS_SESSION_TOKEN)
-
-BASE_URL = "https://s3.amazonaws.com/880656497252."
+# Suffix for MTA-STS files
 SUFFIX = ".well-known/mta-sts.txt"
 
-# Keep this updated with all MTA-STS domains
-domains = ["ccrc.gov.uk",
-           "cjit.gov.uk",
-           "cshrcasework.justice.gov.uk",
-           "devl.justice.gov.uk",
-           "g.justice.gov.uk",
-           "govfsl.com",
-           "hmiprisons.gov.uk",
-           "hmiprobation.gov.uk",
-           "ima-citizensrights.org.uk",
-           "imb.org.uk",
-           "judicialappointments.gov.uk",
-           "judicialconduct.gov.uk",
-           "judicialombudsman.gov.uk",
-           "judiciary.uk",
-           "justice.gov.uk",
-           "lawcommission.gov.uk",
-           "newsletter.ima-citizensrights.org.uk",
-           "obr.uk",
-           "ospt.gov.uk",
-           "ppo.gov.uk",
-           "publicguardian.gov.uk",
-           "sentencingcouncil.gov.uk",
-           "sentencingcouncil.org.uk",
-           "ukgovwales.gov.uk",
-           "victimscommissioner.org.uk",
-           "yjb.gov.uk",
-           "yjbservicespp.yjb.gov.uk",
-           "youthjusticepp.yjb.gov.uk"]
 
-failed_domains = []
+def main():
+    s3_client = S3Service("880656497252", "ministryofjustice")
+    failed_domains = check_mta_sts_domains(s3_client)
 
-# Check MTA STS is configured
-for domain in domains:
-    bucket_name = f"880656497252.{domain}"
+    if failed_domains:
+        print(f"Domains failing MTA-STS enforcement:\n{', '.join(failed_domains)}")
+    else:
+        print("All domains enforce MTA-STS.")
 
-    try:
-        response = s3.get_object(Bucket=bucket_name, Key=SUFFIX)
-        sts_content = response['Body'].read().decode('utf-8')
-        has_enforce = any(line.startswith("mode: enforce")
-                          for line in sts_content.split('\n'))
 
-        if not has_enforce:
-            failed_domains.append(f"{domain} (No 'mode: enforce')")
-    except NoCredentialsError:
-        failed_domains.append(f"{domain} (AWS credentials not found)")
-    except Exception as e:
-        failed_domains.append(f"{domain} (Exception: {e}")
+def check_mta_sts_domains(s3_client):
+    failed_domains = []
 
-# Failed domains
-for domain in failed_domains:
-    print(domain)
+    for domain in domains:
+        if not s3_client.is_well_known_mta_sts_enforce(domain):
+            print(f"{domain} (No 'mode: enforce')")
+            failed_domains.append(domain)
+
+    return failed_domains
+
+
+if __name__ == "__main__":
+    main()

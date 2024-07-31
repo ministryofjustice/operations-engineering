@@ -1,15 +1,15 @@
+# pylint: disable=W0221, C0411
 import os
 import csv
 import json
 import tempfile
-from datetime import datetime
 import unittest
-from unittest.mock import MagicMock, call, patch, mock_open
+from botocore.exceptions import ClientError
+from unittest.mock import call, patch, mock_open
+from io import BytesIO
 from freezegun import freeze_time
 from services.s3_service import S3Service
 from config.constants import NO_ACTIVITY
-
-# pylint: disable=W0221
 
 
 class TestS3Service(unittest.TestCase):
@@ -70,15 +70,6 @@ class TestS3Service(unittest.TestCase):
             self.s3_service.save_emailed_users_file(["some-user"])
         mock_upload_file.assert_called_once_with(
             self.s3_service.emailed_users_file_name, self.s3_service.emailed_users_file_path)
-
-    @patch('services.s3_service.boto3.Session')
-    def test_save_r53_backup_file(self, mock_session):
-        mock_client = MagicMock()
-        mock_session.return_value.client = mock_client
-
-        self.s3_service.save_r53_backup_file()
-
-        mock_client.assert_has_calls([call().upload_file('hosted_zones.json', 'test-bucket', f"{datetime.now().strftime('%Y-%m-%d')}-hosted_zones.json")])
 
     @patch.object(S3Service, "_download_file")
     @patch.object(json, "load")
@@ -161,6 +152,28 @@ class TestS3Service(unittest.TestCase):
             self.assertEqual(response, expected_reply)
         mock_download_file.assert_called_once_with(
             self.s3_service.org_people_file_name, self.s3_service.org_people_file_name)
+
+    def test_is_well_known_mta_sts_enforce_enabled(self):
+        self.s3_service.client.get_object.return_value = {'Body': BytesIO("mode: enforce".encode('utf-8'))}
+
+        self.assertTrue(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
+    def test_is_well_known_mta_sts_enforce_disabled(self):
+        self.s3_service.client.get_object.return_value = {'Body': BytesIO("mode: disabled".encode('utf-8'))}
+
+        self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
+    def test_is_well_known_mta_sts_enforce_no_such_key(self):
+        self.s3_service.client.get_object.side_effect = ClientError(
+            {
+                'Error': {
+                    'Code': "test"
+                }
+            },
+            operation_name="test"
+        )
+
+        self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
 
 
 if __name__ == "__main__":

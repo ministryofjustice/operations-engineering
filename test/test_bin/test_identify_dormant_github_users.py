@@ -1,74 +1,38 @@
 import unittest
-from unittest.mock import MagicMock, mock_open, patch
-
-from botocore.exceptions import ClientError, NoCredentialsError
+from unittest.mock import MagicMock, patch
 
 from bin.identify_dormant_github_users import (
-    ALLOWED_BOT_USERS, download_github_dormant_users_csv_from_s3,
-    get_dormant_users_from_github_csv,
-    get_usernames_from_csv_ignoring_bots_and_collaborators)
+    ALLOWED_BOT_USERS,
+    get_dormant_users_from_data_lake,
+    get_inactive_users_from_data_lake_ignoring_bots_and_collaborators)
 
+from services.cloudtrail_service import CloudtrailService
 
 class TestDormantGitHubUsers(unittest.TestCase):
 
     def setUp(self):
         self.allowed_bot_users = ["bot1", "bot2"]
 
-    @patch('bin.identify_dormant_github_users.download_github_dormant_users_csv_from_s3')
-    @patch('bin.identify_dormant_github_users.get_usernames_from_csv_ignoring_bots_and_collaborators')
+    @patch('bin.identify_dormant_github_users.get_inactive_users_from_data_lake_ignoring_bots_and_collaborators')
     @patch('services.dormant_github_user_service.DormantGitHubUser')
     @patch('services.github_service.GithubService')
-    def test_get_dormant_users_from_github_csv(self, mock_github_service, mock_dormant_github_user, mock_get_usernames, mock_download_csv):
-        mock_get_usernames.return_value = ['user1', 'user2', 'user3']
-
-        mock_dormant_github_user.side_effect = lambda github_service, user: MagicMock(
-            __str__=lambda: f'DormantGitHubUser({user})')
+    def test_get_dormant_users_from_data_lake(self, mock_github_service, mock_dormant_github_user, mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators):
+        mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators.return_value = ['user1', 'user2', 'user3']
         github_service = mock_github_service
+        mock_dormant_github_user.side_effect = lambda github_service, user: MagicMock(__str__=lambda: f'DormantGitHubUser({user})')
 
-        result = get_dormant_users_from_github_csv(github_service)
+        result = get_dormant_users_from_data_lake(github_service)
 
         self.assertEqual(len(result), 3)
-        mock_download_csv.assert_called_once()
-        mock_get_usernames.assert_called_once_with(ALLOWED_BOT_USERS)
+        mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators.assert_called_once_with(github_service, ALLOWED_BOT_USERS)
 
-    def test_get_usernames_from_csv_ignoring_bots_empty_csv(self):
-        mock_file_content = ""
-        with patch("builtins.open", mock_open(read_data=mock_file_content)):
-            result = get_usernames_from_csv_ignoring_bots_and_collaborators(
-                self.allowed_bot_users)
-        self.assertEqual(result, [])
+    @patch.object(CloudtrailService, "get_active_users_for_dormant_users_process")
+    def test_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(self, mock_get_active_users_for_dormant_users_process):
+        mock_get_active_users_for_dormant_users_process.return_value = ["member1"]
+        mock_github_service = MagicMock()
+        mock_github_service.get_all_enterprise_members = MagicMock(return_value=["member1", "member2", "bot1", "bot2"])
 
-    def test_get_usernames_from_csv_ignoring_bots_only_bots(self):
-        mock_file_content = "created_at,id,login,role,last_logged_ip,2fa_enabled?,outside_collaborator\n2011-05-04 10:06:20 +0100,767430,bot2,user,165.225.16.122,true,false\n2012-06-19 10:02:40 +0100,1866734,bot1,user,31.121.104.4,true,false"
-        bot_list = ['bot1', 'bot2']
-        with patch("builtins.open", mock_open(read_data=mock_file_content)):
-            result = get_usernames_from_csv_ignoring_bots_and_collaborators(
-                bot_list=bot_list)
-        self.assertEqual(result, [])
-
-    def test_get_usernames_from_csv_ignoring_bots_and_collaborators(self):
-        mock_file_content = "created_at,id,login,role,last_logged_ip,2fa_enabled?,outside_collaborator\n2011-05-04 10:06:20 +0100,767430,joebloggs,user,165.225.16.122,true,false\n2012-06-19 10:02:40 +0100,1866734,jamesoutsidecollaborator,user,31.121.104.4,true,true"
-        bot_list = ['bot1', 'bot2']
-        with patch("builtins.open", mock_open(read_data=mock_file_content)):
-            usernames = get_usernames_from_csv_ignoring_bots_and_collaborators(
-                bot_list)
-        self.assertEqual(usernames, ['joebloggs'])
-
-    @patch('boto3.client')
-    def test_download_github_dormant_users_csv_from_s3_no_credentials(self, mock_boto3_client):
-        # Mock boto3 client to raise NoCredentialsError
-        mock_boto3_client.side_effect = NoCredentialsError
-        with self.assertRaises(NoCredentialsError):
-            download_github_dormant_users_csv_from_s3()
-
-    @patch('boto3.client')
-    def test_download_github_dormant_users_csv_from_s3_file_not_found(self, mock_boto3_client):
-        # Mock boto3 client to raise ClientError for a not found file
-        error_response = {'Error': {'Code': '404', 'Message': 'Not Found'}}
-        mock_boto3_client.side_effect = ClientError(
-            error_response, 'get_object')
-        with self.assertRaises(ClientError):
-            download_github_dormant_users_csv_from_s3()
+        assert get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(mock_github_service, self.allowed_bot_users) == ["member2"]
 
 
 if __name__ == '__main__':

@@ -1,0 +1,30 @@
+name: 🧪 Cloud Platform Read Route53
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cloud-platform-read-route53:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials - Role to Assume Cloud Platforms Route53 Read Role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.ASSUME_CLOUD_PLATFORM_ROUTE53_READ_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Configure AWS Credentials - Role with Read Access to Cloud Platforms Route53
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CLOUD_PLATFORM_ROUTE53_READ_ROLE_ARN }}
+          aws-region: eu-west-2
+          role-skip-session-tagging: true
+          role-chaining: true
+
+      - name: Check Access
+        run: |
+          aws route53 list-hosted-zones --max-items="1" --output="json" | jq ".HostedZones[].Name"
