@@ -69,4 +69,4 @@ jobs:
 
       - name: Terragrunt Plan
         id: plan
-        run: export TG_SKIP_BUCKET_UPDATE=true && terragrunt run-all plan
+        run: terragrunt run-all plan --terragrunt-non-interactive
