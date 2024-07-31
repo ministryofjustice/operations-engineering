@@ -1,5 +1,4 @@
 remote_state {
-  disable_init = true
   backend = "s3"
   generate = {
     path      = "backend.tf"
