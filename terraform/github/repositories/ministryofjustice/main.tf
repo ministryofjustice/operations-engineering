@@ -1,4 +1,11 @@
 terraform {
+  backend "s3" {
+    acl     = "private"
+    bucket  = "operations-engineering-test-terraform-state-bucket"
+    encrypt = true
+    key     = "terraform/dsd/github_repositories/minstryofjustice/terraform.tfstate"
+    region  = "eu-west-2"
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
