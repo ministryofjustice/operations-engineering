@@ -12,5 +12,6 @@ remote_state {
     encrypt        = true
     dynamodb_table = "cp-1aaae79e1c9a29a8"
     acl            = "private"
+    skip_bucket_update = true
   }
 }
