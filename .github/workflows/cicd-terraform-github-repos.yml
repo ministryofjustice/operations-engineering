@@ -70,9 +70,3 @@ jobs:
       - name: Terragrunt Plan
         id: plan
         run: terragrunt run-all plan --terragrunt-non-interactive
-        continue-on-error: true
-
-      - name: Terraform Plan
-        id: tf-plan
-        working-directory: "terraform/github/repositories/ministryofjustice-test"
-        run: terraform plan
