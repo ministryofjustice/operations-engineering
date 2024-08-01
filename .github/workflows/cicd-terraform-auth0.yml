@@ -57,7 +57,6 @@ jobs:
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: "github-actions[bot]"
           message: |
             Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-auth0.yml?query=event%3Apush+branch%3Amain
 
@@ -90,7 +89,6 @@ jobs:
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: "github-actions[bot]"
           message: |
             ## Terraform github repositories plan
             ```
