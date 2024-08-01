@@ -67,7 +67,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           delete_user_name: github-actions[bot]
-          ssue_number: ${{ github.event.number }}
+          issue_number: ${{ github.event.number }}
 
       - name: Terraform fmt
         id: fmt
