@@ -14,6 +14,7 @@ on:
     branches: ["main"]
 
 env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TERRAFORM_VERSION: "1.6.6"
 
   TF_VAR_auth0_client_id: ${{ secrets.AUTH0_OPERATIONS_ENGINEERING_PROD_DEFAULT_CLIENTID }}
@@ -54,10 +55,9 @@ jobs:
 
       - name: Post Link to Apply Pipeline
         if: github.ref == 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: "github-actions[bot]"
           message: |
             Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-auth0.yml?query=event%3Apush+branch%3Amain
 
@@ -67,7 +67,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           delete_user_name: github-actions[bot]
-          ssue_number: ${{ github.event.number }}
+          issue_number: ${{ github.event.number }}
 
       - name: Terraform fmt
         id: fmt
@@ -87,10 +87,9 @@ jobs:
 
       - name: Post Plan to GitHub PR
         if: github.ref != 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: "github-actions[bot]"
           message: |
             ## Terraform github repositories plan
             ```

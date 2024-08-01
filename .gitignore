@@ -13,6 +13,7 @@ htmlcov
 *__pycache__*
 .DS_Store
 .terraform*
+codeql*
 
 ministryofjustice_first_email_list.json
 moj-analytical-services_first_email_list.json
