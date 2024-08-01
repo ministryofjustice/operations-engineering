@@ -3,7 +3,7 @@ module "github-collaborators" {
   version = "1.0.1"
 
   name            = "github-collaborators"
-  description     = "Manage outside collaborators on our Github repositories"
+  description     = "Manage outside collaborators on our Github repositories lalalal"
   has_discussions = true
   topics          = ["operations-engineering"]
 
