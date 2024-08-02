@@ -17,6 +17,7 @@ def get_current_branch():
         print(f'Error: {e.stderr}')
         return None
 
+
 def get_modified_paths():
     try:
         result = subprocess.run(
@@ -30,12 +31,15 @@ def get_modified_paths():
         print(f'Error: {e.stderr}')
         return None
 
+
 def validate_source_file_path(source_file_path):
     if not os.path.isfile(source_file_path):
         raise FileNotFoundError(f"Source file not found at {source_file_path}")
 
+
 def validate_test_file_path(path):
     return os.path.isfile(path)
+
 
 def get_file_diff(path):
     try:
@@ -50,15 +54,19 @@ def get_file_diff(path):
         print(f'Error: {e.stderr}')
         return None
 
+
 def extract_function_name(function_str):
     match = re.search(r'\s*def\s+([a-zA-Z_][a-zA-Z_0-9]*)\s*\(', function_str)
+
     if match:
         return match.group(1)
-    else:
-        return None
+
+    return None
+
 
 def find_new_functions(diff):
     return [extract_function_name(line) for line in diff.split("\n") if "def" in line and line.startswith("+") and "__init__" not in line]
+
 
 def get_modified_function_names_from_diff(diff):
     functions = [function for function in re.split(r'(?=def\s)', diff) if "def" in function and "__init__" not in function]
@@ -74,10 +82,11 @@ def get_modified_function_names_from_diff(diff):
 
     filter_out_new_functions = list(set(modified_function_names).difference(new_function_names))
 
-    if filter_out_new_functions != []:
+    if len(filter_out_new_functions) > 0:
         return ", ".join(filter_out_new_functions)
-    else:
-        return "No existing functions have been modified."
+
+    return "No existing functions have been modified."
+
 
 def get_modified_function_names(path):
     diff = get_file_diff(path)
@@ -85,10 +94,12 @@ def get_modified_function_names(path):
 
     return modified_function_names
 
-def build_prompt(path, template="new_test_suite", test_path="", modified_function_names=[], failed_tests=""):
+
+def build_prompt(path, template="new_test_suite", test_path="", modified_function_names="", failed_tests=""):
     file_to_test_content = read_file_contents(path)
     example_script = read_file_contents("services/cloudtrail_service.py")
     example_test_suite = read_file_contents("test/test_services/test_cloudtrail_service.py")
+    unit_test_file_content = ""
 
     if test_path != "":
         unit_test_file_content = read_file_contents(test_path)
@@ -97,10 +108,10 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
         module = path.replace("/", ".").strip(".py")
 
         return NEW_TEST_SUITE_PROMPT_TEMPLATE.format(
-        module = module,
-        file_to_test_content=file_to_test_content,
-        example_script=example_script,
-        example_test_suite=example_test_suite
+            module=module,
+            file_to_test_content=file_to_test_content,
+            example_script=example_script,
+            example_test_suite=example_test_suite
         )
     elif template == "modify_test_suite":
         return MODIFY_TEST_SUITE_PROMPT_TEMPLATE.format(
@@ -110,32 +121,36 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
             example_script=example_script,
             example_test_suite=example_test_suite
         )
-    elif template == "failed_tests":
+    if template == "failed_tests":
         return FAILED_TESTS_PROMPT_TEMPLATE.format(
             file_to_test_content=file_to_test_content,
             unit_test_file_content=unit_test_file_content,
             failed_tests=failed_tests
         )
 
+
 def write_file_contents(path, generated_unit_tests):
-    with open(path, "w") as file:
+    with open(path, "w", encoding='utf-8') as file:
         file.write(generated_unit_tests)
+
 
 def read_file_contents(path):
     if os.path.isfile(path):
-        with open(path, 'r') as file:
+        with open(path, 'r', encoding='utf-8') as file:
             return file.read()
     else:
         return ""
 
+
 def run_test_suite(path):
-    test_results = subprocess.run(["pipenv", "run", "python", "-m", "unittest", path], capture_output=True, text=True).stderr
+    test_results = subprocess.run(["pipenv", "run", "python", "-m", "unittest", path], capture_output=True, text=True, check=True).stderr
 
     broken_down_test_results = test_results.split("======================================================================")
 
     failed_tests = "".join([test for test in broken_down_test_results if "test_raises_error_when_no_github_token" not in test and "fail" in test.lower() or "error" in test.lower()])
 
     return failed_tests
+
 
 def generate_tests(prompt, test_path):
     bedrock_service = BedrockService()
@@ -151,6 +166,7 @@ def generate_tests(prompt, test_path):
     failed_tests = run_test_suite(test_path)
 
     return failed_tests
+
 
 def main():
     modified_files = get_modified_paths()
@@ -179,7 +195,7 @@ def main():
         max_cycles = 3
         cycles = 1
 
-        #send tests back to AI to correct if there are failures
+        # send tests back to AI to correct if there are failures
         while len(failed_tests) > 0 and cycles < max_cycles:
             print(f"Generation {cycles} of the test suite has produced the following errors: {failed_tests}")
 
