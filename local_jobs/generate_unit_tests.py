@@ -113,7 +113,8 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
             example_script=example_script,
             example_test_suite=example_test_suite
         )
-    elif template == "modify_test_suite":
+
+    if template == "modify_test_suite":
         return MODIFY_TEST_SUITE_PROMPT_TEMPLATE.format(
             file_to_test_content=file_to_test_content,
             unit_test_file_content=unit_test_file_content,
@@ -121,6 +122,7 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
             example_script=example_script,
             example_test_suite=example_test_suite
         )
+
     if template == "failed_tests":
         return FAILED_TESTS_PROMPT_TEMPLATE.format(
             file_to_test_content=file_to_test_content,
