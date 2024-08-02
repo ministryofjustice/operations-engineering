@@ -96,8 +96,3 @@ class S3Service:
             return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
         except ClientError:
             return False
-
-    def test_me(self) -> list:
-        self._download_file(self.emailed_users_file_name, self.emailed_users_file_path)
-        with open(self.emailed_users_file_path, "r", encoding="utf8") as the_file:
-            return json.load(the_file)

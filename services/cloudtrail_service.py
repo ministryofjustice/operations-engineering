@@ -8,8 +8,8 @@ class CloudtrailService:
         self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
     def get_active_users_for_dormant_users_process(self):
-        username_key = "eventData.useridentity.username"
-        data_store_id = "asdikajsndasondasodn"
+        username_key = "eventData.useridentity.principalid"
+        data_store_id = "ec682140-3e75-40c0-8e04-f06207791c2e"
         period_cutoff = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d %H:%M:%S')
 
         query_string = f"""
