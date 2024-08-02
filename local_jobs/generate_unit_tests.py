@@ -130,6 +130,8 @@ def build_prompt(path, template="new_test_suite", test_path="", modified_functio
             failed_tests=failed_tests
         )
 
+    return ""
+
 
 def write_file_contents(path, generated_unit_tests):
     with open(path, "w", encoding='utf-8') as file:
