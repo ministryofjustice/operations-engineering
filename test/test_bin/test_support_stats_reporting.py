@@ -2,7 +2,6 @@ import os
 from datetime import date
 import unittest
 from unittest.mock import patch, MagicMock
-from services.slack_service import SlackService
 from bin.support_stats_reporting import (
     SupportRequest,
     create_dataframe_from_csv,
