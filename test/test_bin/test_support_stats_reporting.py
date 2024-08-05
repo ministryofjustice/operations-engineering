@@ -5,11 +5,33 @@ from unittest.mock import patch, MagicMock
 from services.slack_service import SlackService
 from bin.support_stats_reporting import (
     SupportRequest,
+    create_dataframe_from_csv,
+    get_yesterdays_support_requests,
     get_previous_working_day,
     get_environment_variables,
     craft_message_to_slack,
     main,
 )
+
+
+class TestSupportRequestHash(unittest.TestCase):
+
+    def test_support_request_hash(self):
+        support_request1 = SupportRequest("Type A", "Action A", "2023-05-01")
+        support_request2 = SupportRequest("Type B", "Action A", "2023-05-02")
+        self.assertEqual(hash(support_request1), hash(support_request2))
+
+
+class TestCreateDataframeFromCsv(unittest.TestCase):
+
+    @patch("pandas.read_csv")
+    def test_create_dataframe_from_csv(self, mock_read_csv):
+        mock_dataframe = MagicMock()
+        mock_read_csv.return_value = mock_dataframe
+        filepath = "test/fixtures/test_data.csv"
+        result = create_dataframe_from_csv(filepath)
+        mock_read_csv.assert_called_with(filepath)
+        self.assertEqual(result, mock_dataframe)
 
 
 class TestGetPreviousWorkingDay(unittest.TestCase):
@@ -21,6 +43,26 @@ class TestGetPreviousWorkingDay(unittest.TestCase):
     def test_tuesday_returns_monday(self):
         previous_day = get_previous_working_day(date_today=date(2024, 7, 9))
         self.assertEqual(previous_day, str(date(2024, 7, 8)))
+
+
+class TestGetYesterdaysSupportRequests(unittest.TestCase):
+
+    @patch("bin.support_stats_reporting.get_previous_working_day")
+    def test_get_yesterdays_support_requests(self, mock_previous_working_day):
+        mock_previous_working_day.return_value = "2023-05-01"
+        all_support_requests = [
+            SupportRequest("Type A", "Action A", "2023-05-01"),
+            SupportRequest("Type B", "Action B", "2023-05-02"),
+            SupportRequest("Type C", "Action C", "2023-05-01"),
+        ]
+        expected_result = [
+            SupportRequest("Type A", "Action A", "2023-05-01"),
+            SupportRequest("Type C", "Action C", "2023-05-01"),
+        ]
+        result = get_yesterdays_support_requests(
+            all_support_requests, todays_date=date(2024, 7, 23)
+        )
+        self.assertEqual(result, expected_result)
 
 
 class TestGetEnvironmentVariables(unittest.TestCase):
@@ -50,17 +92,8 @@ class TestCraftMessageToSlack(unittest.TestCase):
             expected_message,
         )
 
-        # @patch.object(SlackService, "__new__")
-        # def test_craft_message_to_slack(self, mock_slack_service):
-
-        mock_slack_instance = MagicMock()
-        mock_slack_service.return_value = mock_slack_instance
-
 
 class TestMain(unittest.TestCase):
-
-    # def test_raises_error_when_no_slack_token(self):
-    #     self.assertRaises(ValueError, main)
 
     @patch("services.slack_service.SlackService.__new__")
     @patch.dict(os.environ, {"ADMIN_SLACK_TOKEN": "test_token"})
@@ -71,25 +104,7 @@ class TestMain(unittest.TestCase):
 
         main(todays_date, file_path)
 
-        # mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_once()
         mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_with(
             "On 2024-07-22 we received 8 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* GitHub – add user to org\n*Number of requests:* 2\n--\n*Type:* GitHub\n*Action:* GitHub – remove user from org\n*Number of requests:* 1\n--\n*Type:* 1Password\n*Action:* 1Password - information/help\n*Number of requests:* 1\n--\n*Type:* API\n*Action:* API Key\n*Number of requests:* 1\n--\n*Type:* DNS\n*Action:* DNS/Domain\n*Number of requests:* 1\n--\n*Type:* Other\n*Action:* Tools Information/help\n*Number of requests:* 1\n--\n*Type:* Other\n*Action:* Refer to another team\n*Number of requests:* 1\n",
             "operations-engineering-team",
         )
-
-    # @patch("services.slack_service.SlackService.__new__")
-    # @patch.dict(os.environ, {"ADMIN_SLACK_TOKEN": "test_token"})
-    # def test_slack_message_sent_to_slack_with_no_request_data(
-    #     self, mock_slack_service: MagicMock
-    # ):
-
-    #     todays_date = date(2024, 7, 24)
-    #     file_path = "test/fixtures/test_data.csv"
-
-    #     main(todays_date, file_path)
-
-    #     mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_once()
-    #     mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_with(
-    #         "On 2024-07-23 we received 0 Support Requests: \n\n",
-    #         "operations-engineering-team",
-    #     )
