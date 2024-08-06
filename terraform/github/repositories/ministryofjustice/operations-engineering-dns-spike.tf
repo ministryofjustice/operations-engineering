@@ -7,6 +7,6 @@ module "operations-engineering-dns-spike" {
   topics      = ["operations-engineering", "dns", "spike"]
 
   team_access = {
-    admin = [var.operations_engineering_team_id]
+    admin = [data.github_team.operations_engineering.id]
   }
 }

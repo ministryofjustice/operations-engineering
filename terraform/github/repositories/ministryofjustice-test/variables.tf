@@ -1,9 +1,5 @@
-variable "operations_engineering_test_team_id" {
-  description = "operations-engineering-test team id"
+variable "github_token" {
   type        = string
-}
-
-variable "test_team_access_team_id" {
-  description = "test-team-access team id"
-  type        = string
+  description = "Required by the GitHub Terraform provider"
+  default     = ""
 }

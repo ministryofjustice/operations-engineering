@@ -9,6 +9,6 @@ module "operations-engineering" {
   topics          = ["operations-engineering", "python", "issue-tracker"]
 
   team_access = {
-    admin = [var.operations_engineering_team_id]
+    admin = [data.github_team.operations_engineering.id]
   }
 }
