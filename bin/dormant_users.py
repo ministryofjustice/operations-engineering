@@ -35,6 +35,7 @@ MINISTRY_OF_JUSTICE_ALLOW_LIST = [
     "laaserviceaccount",
     "analytical-platform-bot",
     "hmppsdigitalserviceaccount",
+    "hmpps-dso-pr-reviewer",
 ]
 
 MOJ_ANALYTICAL_SERVICES_ALLOW_LIST = [
