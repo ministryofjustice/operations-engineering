@@ -13,7 +13,7 @@ from bin.support_stats_reporting import (
 )
 
 
-class TestRequestActionHash(unittest.TestCase):
+class TestSupportRequestHashReturnsRequestActionHash(unittest.TestCase):
 
     def test_support_request_hash(self):
         support_request1 = SupportRequest("Type A", "Action A", "2023-05-01")
