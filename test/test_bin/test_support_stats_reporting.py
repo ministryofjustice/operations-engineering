@@ -13,7 +13,7 @@ from bin.support_stats_reporting import (
 )
 
 
-class TestSupportRequestHash(unittest.TestCase):
+class TestRequestActionHash(unittest.TestCase):
 
     def test_support_request_hash(self):
         support_request1 = SupportRequest("Type A", "Action A", "2023-05-01")
@@ -46,20 +46,18 @@ class TestGetPreviousWorkingDay(unittest.TestCase):
 
 class TestGetYesterdaysSupportRequests(unittest.TestCase):
 
-    @patch("bin.support_stats_reporting.get_previous_working_day")
-    def test_get_yesterdays_support_requests(self, mock_previous_working_day):
-        mock_previous_working_day.return_value = "2023-05-01"
+    def test_get_yesterdays_support_requests(self):
         all_support_requests = [
-            SupportRequest("Type A", "Action A", "2023-05-01"),
-            SupportRequest("Type B", "Action B", "2023-05-02"),
-            SupportRequest("Type C", "Action C", "2023-05-01"),
+            SupportRequest("Type A", "Action A", "2024-07-23"),
+            SupportRequest("Type B", "Action B", "2024-07-24"),
+            SupportRequest("Type C", "Action C", "2024-07-23"),
         ]
         expected_result = [
-            SupportRequest("Type A", "Action A", "2023-05-01"),
-            SupportRequest("Type C", "Action C", "2023-05-01"),
+            SupportRequest("Type A", "Action A", "2024-07-23"),
+            SupportRequest("Type C", "Action C", "2024-07-23"),
         ]
         result = get_yesterdays_support_requests(
-            all_support_requests, todays_date=date(2024, 7, 23)
+            all_support_requests, todays_date=date(2024, 7, 24)
         )
         self.assertEqual(result, expected_result)
 
