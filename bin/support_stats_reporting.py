@@ -35,16 +35,14 @@ def create_dataframe_from_csv(filename: str):
     return dataframe
 
 
-def previous_working_day():
-    today = date.today()
-
+def get_previous_working_day(date_today):
     diff = 1
-    if today.weekday() == 0:
+    if date_today.weekday() == 0:
         diff = 3
     else:
         diff = 1
 
-    last_working_day = today - timedelta(days=diff)
+    last_working_day = date_today - timedelta(days=diff)
     str_last_working_day = str(last_working_day)
 
     return str_last_working_day
@@ -69,12 +67,14 @@ def get_dict_of_requests_and_volume(
     return dict_of_requests
 
 
-def craft_message_to_slack(yesterdays_support_requests: list[SupportRequest]):
+def craft_message_to_slack(
+    yesterdays_support_requests: list[SupportRequest], date_today=date.today()
+):
     dict_of_requests_and_volume = get_dict_of_requests_and_volume(
         yesterdays_support_requests
     )
 
-    previous_support_day = previous_working_day()
+    previous_support_day = get_previous_working_day(date_today)
 
     msg = f"On {previous_support_day} we received {len(yesterdays_support_requests)} Support Requests: \n\n"
     yesterdays_support_requests = list(dict.fromkeys(yesterdays_support_requests))
@@ -102,9 +102,9 @@ def get_list_of_support_requests(data) -> list[SupportRequest]:
 
 
 def get_yesterdays_support_requests(
-    all_support_requests: list[SupportRequest],
+    all_support_requests: list[SupportRequest], todays_date
 ) -> list[SupportRequest]:
-    yesterday = previous_working_day()  # yesterdays_date()
+    yesterday = get_previous_working_day(todays_date)  # yesterdays_date()
     list_of_yesterdays_support_requests = []
     for request in all_support_requests:
         if request.request_date == yesterday:
@@ -113,13 +113,14 @@ def get_yesterdays_support_requests(
     return list_of_yesterdays_support_requests
 
 
-def main():
+def main(todays_date=date.today, file_path="data/support_stats/support_stats.csv"):
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
-    file_path = "data/support_stats/support_stats.csv"
     all_support_requests = get_support_requests_from_csv(file_path)
-    yesterdays_requests = get_yesterdays_support_requests(all_support_requests)
-    slack_message = craft_message_to_slack(yesterdays_requests)
+    yesterdays_requests = get_yesterdays_support_requests(
+        all_support_requests, todays_date
+    )
+    slack_message = craft_message_to_slack(yesterdays_requests, todays_date)
 
     print(slack_message)
 
