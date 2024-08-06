@@ -3,7 +3,6 @@ from datetime import datetime
 from time import sleep
 
 from dateutil.relativedelta import relativedelta
-
 from config.constants import (MINISTRY_OF_JUSTICE, MISSING_EMAIL_ADDRESS,
                               MOJ_ANALYTICAL_SERVICES)
 from config.logging_config import logging
