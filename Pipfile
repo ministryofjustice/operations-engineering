@@ -23,7 +23,6 @@ python-dateutil = "==2.8.2"
 requests = "==2.31.0"
 slack-sdk = "==3.27.1"
 toml = "==0.10.2"
-datetime = "*"
 
 [dev-packages]
 coverage = "==7.4.4"
