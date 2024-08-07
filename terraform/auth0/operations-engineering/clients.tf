@@ -11,7 +11,6 @@ resource "auth0_client" "pagerduty" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -89,7 +88,6 @@ resource "auth0_client" "moj_auth0_azure_prod" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = "This is used for ALL our authentication between Auth0 and Azure AD: Join GitHub dev, Join GitHub prod, ministryofjustice-test SSO."
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -143,7 +141,6 @@ resource "auth0_client" "dockersso" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -198,7 +195,6 @@ resource "auth0_client" "terraform_provider_auth0" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -244,7 +240,6 @@ resource "auth0_client" "default_app" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -290,7 +285,6 @@ resource "auth0_client" "operations_engineering_standards_report" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token"]
   initiate_login_uri                    = null
@@ -344,7 +338,6 @@ resource "auth0_client" "prod_auth0managementapi" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -390,7 +383,6 @@ resource "auth0_client" "test_operations_engineering_moj_github_login" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token"]
   initiate_login_uri                    = null
@@ -444,7 +436,6 @@ resource "auth0_client" "github_enterprise_cloud" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -526,7 +517,6 @@ resource "auth0_client" "api_explorer_application" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -625,7 +615,6 @@ resource "auth0_client" "moj_microsoft_authentication_dev" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = "This application should be used for any authentication to Microsoft tools required for development environments."
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
