@@ -113,7 +113,7 @@ def get_yesterdays_support_requests(
     return list_of_yesterdays_support_requests
 
 
-def main(todays_date=date.today, file_path="data/support_stats/support_stats.csv"):
+def main(todays_date=date.today(), file_path="data/support_stats/support_stats.csv"):
     slack_token = get_environment_variables()
     slack_service = SlackService(str(slack_token))
     all_support_requests = get_support_requests_from_csv(file_path)
