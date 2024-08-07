@@ -612,11 +612,6 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
   }
 }
 
-import {
-  to = auth0_client.moj_microsoft_authentication_dev
-  id = "txtioOhKYn9f0LqZbsm98MhuG5qbHqFD"
-}
-
 resource "auth0_client" "moj_microsoft_authentication_dev" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.join-github.service.justice.gov.uk/", "http://dev.join-github.service.justice.gov.uk/"]
@@ -646,6 +641,60 @@ resource "auth0_client" "moj_microsoft_authentication_dev" {
   sso                                   = false
   sso_disabled                          = false
   web_origins                           = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://dev.join-github.service.justice.gov.uk/"]
+  jwt_configuration {
+    alg                 = "RS256"
+    lifetime_in_seconds = 35994
+    scopes              = {}
+    secret_encoded      = false
+  }
+  native_social_login {
+    apple {
+      enabled = false
+    }
+    facebook {
+      enabled = false
+    }
+  }
+  refresh_token {
+    expiration_type              = "non-expiring"
+    idle_token_lifetime          = 2592000
+    infinite_idle_token_lifetime = true
+    infinite_token_lifetime      = true
+    leeway                       = 0
+    rotation_type                = "non-rotating"
+    token_lifetime               = 31557600
+  }
+}
+
+resource "auth0_client" "moj_microsoft_authentication_prod" {
+  allowed_clients                       = []
+  allowed_logout_urls                   = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://join-github.service.justice.gov.uk/", "http://join-github.service.justice.gov.uk/"]
+  allowed_origins                       = []
+  app_type                              = "regular_web"
+  callbacks                             = ["http://*.cloud-platform.service.justice.gov.uk/auth/callback", "https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://join-github.service.justice.gov.uk/auth/callback", "http://join-github.service.justice.gov.uk/auth/callback"]
+  client_aliases                        = []
+  client_metadata                       = {}
+  cross_origin_auth                     = false
+  cross_origin_loc                      = null
+  custom_login_page                     = null
+  custom_login_page_on                  = true
+  description                           = "This application should be used for any authentication to Microsoft tools required for production environments."
+  encryption_key                        = {}
+  form_template                         = null
+  grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
+  initiate_login_uri                    = null
+  is_first_party                        = true
+  is_token_endpoint_ip_header_trusted   = false
+  logo_uri                              = null
+  name                                  = "MoJ Microsoft Authentication Prod"
+  oidc_backchannel_logout_urls          = []
+  oidc_conformant                       = true
+  organization_require_behavior         = "no_prompt"
+  organization_usage                    = null
+  require_pushed_authorization_requests = false
+  sso                                   = false
+  sso_disabled                          = false
+  web_origins                           = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://join-github.service.justice.gov.uk/"]
   jwt_configuration {
     alg                 = "RS256"
     lifetime_in_seconds = 35994
