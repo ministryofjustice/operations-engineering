@@ -631,7 +631,7 @@ resource "auth0_client" "moj_microsoft_authentication_dev" {
   initiate_login_uri                    = null
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
-  logo_uri                              = nullth0
+  logo_uri                              = null
   name                                  = "MoJ Microsoft Authentication Dev"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
