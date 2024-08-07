@@ -612,6 +612,11 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
   }
 }
 
+import {
+  to = auth0_client.moj_microsoft_authentication_dev
+  id = "txtioOhKYn9f0LqZbsm98MhuG5qbHqFD"
+}
+
 resource "auth0_client" "moj_microsoft_authentication_dev" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.join-github.service.justice.gov.uk/", "http://dev.join-github.service.justice.gov.uk/"]
