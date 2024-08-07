@@ -679,7 +679,6 @@ resource "auth0_client" "moj_microsoft_authentication_prod" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = "This application should be used for any authentication to Microsoft tools required for production environments."
-  encryption_key                        = {}
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
