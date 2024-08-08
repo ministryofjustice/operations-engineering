@@ -1,8 +1,8 @@
 name: 🤖 Apply Standards to Repos Test
 
 on:
-  schedule:
-    - cron: "0 7 * * *" # Every day at 0700
+  push:
+    branches: [aga-test-services]
   workflow_dispatch: # So we can trigger manually
 
 jobs:
