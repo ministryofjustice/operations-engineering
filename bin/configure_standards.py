@@ -25,6 +25,8 @@ def main():
 
     current_repos = [repo_dict['repo']['name']
                      for repo_dict in data['search']['repos']]
+    
+    print(len(current_repos))
 
     '''try:
         KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_number_of_repositories_with_standards_label(len(current_repos))
