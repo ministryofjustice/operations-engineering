@@ -1,4 +1,4 @@
-name: 🤖 Apply Standards to Repos
+name: 🤖 Apply Standards to Repos Test
 
 on:
   schedule:
