@@ -7,6 +7,7 @@ ENTERPRISE = "ministry-of-justice-uk"
 SLACK_CHANNEL = "operations-engineering-alerts"
 SR_SLACK_CHANNEL = "operations-engineering-team"
 OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
+    "SeanPrivett",
     "SteveMarshall",
     "andyrogers1973",
     "jasonBirchall",
@@ -15,6 +16,5 @@ OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
     "connormaglynn",
     "PepperMoJ",
     "levgorbunov1",
-    "vijaykannan21",
     "moj-operations-engineering-bot",
 ]
