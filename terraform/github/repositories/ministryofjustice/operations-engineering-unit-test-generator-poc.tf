@@ -1,4 +1,4 @@
-module "operations-engineering-example" {
+module "operations-engineering-unit-test-generator-poc" {
   source  = "ministryofjustice/repository/github"
   version = "1.1.1"
 
