@@ -10,7 +10,7 @@ resource "auth0_client" "pagerduty" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "This enables Auth0 SSO via GitHub to login to PagerDuty."
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -87,7 +87,7 @@ resource "auth0_client" "dockersso" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "This enables Auth0 SSO via Github to login to Docker."
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
@@ -142,7 +142,7 @@ resource "auth0_client" "terraform_provider_auth0" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "This enables Terraform to manage Auth0 in code via operations-engineering repository; uses the Auth0 Management API protected entity."
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -175,51 +175,6 @@ resource "auth0_client" "terraform_provider_auth0" {
   }
 }
 
-resource "auth0_client" "default_app" {
-  allowed_clients                       = []
-  allowed_logout_urls                   = []
-  allowed_origins                       = []
-  app_type                              = null
-  callbacks                             = []
-  client_aliases                        = []
-  client_metadata                       = {}
-  cross_origin_auth                     = false
-  cross_origin_loc                      = null
-  custom_login_page                     = null
-  custom_login_page_on                  = true
-  description                           = null
-  form_template                         = null
-  grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
-  initiate_login_uri                    = null
-  is_first_party                        = true
-  is_token_endpoint_ip_header_trusted   = false
-  logo_uri                              = null
-  name                                  = "Default App"
-  oidc_backchannel_logout_urls          = []
-  oidc_conformant                       = true
-  organization_require_behavior         = null
-  organization_usage                    = null
-  require_pushed_authorization_requests = false
-  sso                                   = false
-  sso_disabled                          = false
-  web_origins                           = []
-  jwt_configuration {
-    alg                 = "RS256"
-    lifetime_in_seconds = 36000
-    scopes              = {}
-    secret_encoded      = false
-  }
-  refresh_token {
-    expiration_type              = "non-expiring"
-    idle_token_lifetime          = 1296000
-    infinite_idle_token_lifetime = true
-    infinite_token_lifetime      = true
-    leeway                       = 0
-    rotation_type                = "non-rotating"
-    token_lifetime               = 2592000
-  }
-}
-
 resource "auth0_client" "operations_engineering_standards_report" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://operations-engineering-reports.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-dev.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk"]
@@ -232,7 +187,7 @@ resource "auth0_client" "operations_engineering_standards_report" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "This enables login via GitHub SSO to the Standards Report: https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/"
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token"]
   initiate_login_uri                    = null
@@ -285,7 +240,7 @@ resource "auth0_client" "prod_auth0managementapi" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "Potentially Dormant Users: uses the Auth0 Management API protected entity"
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -318,140 +273,6 @@ resource "auth0_client" "prod_auth0managementapi" {
   }
 }
 
-resource "auth0_client" "test_operations_engineering_moj_github_login" {
-  allowed_clients                       = []
-  allowed_logout_urls                   = []
-  allowed_origins                       = []
-  app_type                              = "spa"
-  callbacks                             = ["http://localhost:4567"]
-  client_aliases                        = []
-  client_metadata                       = {}
-  cross_origin_auth                     = false
-  cross_origin_loc                      = null
-  custom_login_page                     = null
-  custom_login_page_on                  = true
-  description                           = null
-  form_template                         = null
-  grant_types                           = ["authorization_code", "implicit", "refresh_token"]
-  initiate_login_uri                    = null
-  is_first_party                        = true
-  is_token_endpoint_ip_header_trusted   = false
-  logo_uri                              = null
-  name                                  = "test-operations-engineering-moj-github-login"
-  oidc_backchannel_logout_urls          = []
-  oidc_conformant                       = true
-  organization_require_behavior         = null
-  organization_usage                    = null
-  require_pushed_authorization_requests = false
-  sso                                   = false
-  sso_disabled                          = false
-  web_origins                           = ["localhost:4567"]
-  jwt_configuration {
-    alg                 = "RS256"
-    lifetime_in_seconds = 36000
-    scopes              = {}
-    secret_encoded      = false
-  }
-  native_social_login {
-    apple {
-      enabled = false
-    }
-    facebook {
-      enabled = false
-    }
-  }
-  refresh_token {
-    expiration_type              = "expiring"
-    idle_token_lifetime          = 1296000
-    infinite_idle_token_lifetime = false
-    infinite_token_lifetime      = false
-    leeway                       = 0
-    rotation_type                = "rotating"
-    token_lifetime               = 2592000
-  }
-}
-
-resource "auth0_client" "github_enterprise_cloud" {
-  allowed_clients                       = []
-  allowed_logout_urls                   = []
-  allowed_origins                       = []
-  app_type                              = "sso_integration"
-  callbacks                             = ["https://github.com/orgs/ministryofjustice-test/saml/consume"]
-  client_aliases                        = []
-  client_metadata                       = {}
-  cross_origin_auth                     = false
-  cross_origin_loc                      = null
-  custom_login_page                     = null
-  custom_login_page_on                  = true
-  description                           = null
-  form_template                         = null
-  grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
-  initiate_login_uri                    = null
-  is_first_party                        = true
-  is_token_endpoint_ip_header_trusted   = false
-  logo_uri                              = null
-  name                                  = "GitHub Enterprise Cloud"
-  oidc_backchannel_logout_urls          = []
-  oidc_conformant                       = true
-  organization_require_behavior         = null
-  organization_usage                    = null
-  require_pushed_authorization_requests = false
-  sso                                   = false
-  sso_disabled                          = false
-  web_origins                           = []
-  addons {
-    samlp {
-      audience                      = "https://github.com/orgs/ministryofjustice-test"
-      authn_context_class_ref       = null
-      binding                       = null
-      create_upn_claim              = true
-      destination                   = null
-      digest_algorithm              = "sha256"
-      include_attribute_name_format = true
-      issuer                        = null
-      lifetime_in_seconds           = 3600
-      map_identities                = false
-      map_unknown_claims_as_is      = false
-      mappings = {
-        email   = "emails"
-        name    = "full_name"
-        user_id = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-      }
-      name_identifier_format             = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
-      name_identifier_probes             = ["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
-      passthrough_claims_with_no_mapping = false
-      recipient                          = null
-      sign_response                      = false
-      signature_algorithm                = "rsa-sha256"
-      signing_cert                       = null
-      typed_attributes                   = true
-      logout {
-        callback    = null
-        slo_enabled = true
-      }
-    }
-    sso_integration {
-      name    = "github-enterprise-cloud"
-      version = null
-    }
-  }
-  jwt_configuration {
-    alg                 = "RS256"
-    lifetime_in_seconds = 36000
-    scopes              = {}
-    secret_encoded      = false
-  }
-  refresh_token {
-    expiration_type              = "non-expiring"
-    idle_token_lifetime          = 1296000
-    infinite_idle_token_lifetime = true
-    infinite_token_lifetime      = true
-    leeway                       = 0
-    rotation_type                = "non-rotating"
-    token_lifetime               = 2592000
-  }
-}
-
 resource "auth0_client" "api_explorer_application" {
   allowed_clients                       = []
   allowed_logout_urls                   = []
@@ -464,7 +285,7 @@ resource "auth0_client" "api_explorer_application" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "Uses Auth0 management API protected entity."
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -509,7 +330,7 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = null
+  description                           = "This enables GitHub SSO login to the KPI Dashboard."
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token"]
   initiate_login_uri                    = null
@@ -550,26 +371,32 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
   }
 }
 
-resource "auth0_client" "moj_microsoft_authentication_dev" {
+moved {
+  from = auth0_client.moj_microsoft_authentication_dev
+  to   = auth0_client.join_github_dev
+}
+
+
+resource "auth0_client" "join_github_dev" {
   allowed_clients                       = []
-  allowed_logout_urls                   = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.join-github.service.justice.gov.uk/", "http://dev.join-github.service.justice.gov.uk/"]
+  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.join-github.service.justice.gov.uk/", "http://dev.join-github.service.justice.gov.uk/"]
   allowed_origins                       = []
   app_type                              = "regular_web"
-  callbacks                             = ["http://*.cloud-platform.service.justice.gov.uk/auth/callback", "https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://dev.join-github.service.justice.gov.uk/auth/callback", "http://dev.join-github.service.justice.gov.uk/auth/callback"]
+  callbacks                             = ["https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://dev.join-github.service.justice.gov.uk/auth/callback", "http://dev.join-github.service.justice.gov.uk/auth/callback"]
   client_aliases                        = []
   client_metadata                       = {}
   cross_origin_auth                     = false
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "This application should be used for any authentication to Microsoft tools required for development environments."
+  description                           = "This enables Microsoft authentication to Join GitHub Dev: https://dev.join-github.service.justice.gov.uk/."
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "MoJ Microsoft Authentication Dev"
+  name                                  = "Join GitHub Dev"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = "no_prompt"
@@ -577,7 +404,7 @@ resource "auth0_client" "moj_microsoft_authentication_dev" {
   require_pushed_authorization_requests = false
   sso                                   = false
   sso_disabled                          = false
-  web_origins                           = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://dev.join-github.service.justice.gov.uk/"]
+  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://dev.join-github.service.justice.gov.uk/"]
   jwt_configuration {
     alg                 = "RS256"
     lifetime_in_seconds = 35994
@@ -603,26 +430,31 @@ resource "auth0_client" "moj_microsoft_authentication_dev" {
   }
 }
 
-resource "auth0_client" "moj_microsoft_authentication_prod" {
+moved {
+  from = auth0_client.moj_microsoft_authentication_prod
+  to   = auth0_client.join_github
+}
+
+resource "auth0_client" "join_github" {
   allowed_clients                       = []
-  allowed_logout_urls                   = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://join-github.service.justice.gov.uk/", "http://join-github.service.justice.gov.uk/"]
+  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://join-github.service.justice.gov.uk/", "http://join-github.service.justice.gov.uk/"]
   allowed_origins                       = []
   app_type                              = "regular_web"
-  callbacks                             = ["http://*.cloud-platform.service.justice.gov.uk/auth/callback", "https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://join-github.service.justice.gov.uk/auth/callback", "http://join-github.service.justice.gov.uk/auth/callback"]
+  callbacks                             = ["https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://join-github.service.justice.gov.uk/auth/callback", "http://join-github.service.justice.gov.uk/auth/callback"]
   client_aliases                        = []
   client_metadata                       = {}
   cross_origin_auth                     = false
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "This application should be used for any authentication to Microsoft tools required for production environments."
+  description                           = "This enables Microsoft authentication to Join GitHub (Prod): https://join-github.service.justice.gov.uk/."
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "MoJ Microsoft Authentication Prod"
+  name                                  = "Join GitHub"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = "no_prompt"
@@ -630,7 +462,7 @@ resource "auth0_client" "moj_microsoft_authentication_prod" {
   require_pushed_authorization_requests = false
   sso                                   = false
   sso_disabled                          = false
-  web_origins                           = ["http://*.cloud-platform.service.justice.gov.uk", "http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://join-github.service.justice.gov.uk/"]
+  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://join-github.service.justice.gov.uk/"]
   jwt_configuration {
     alg                 = "RS256"
     lifetime_in_seconds = 35994
