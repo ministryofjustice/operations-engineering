@@ -3,7 +3,7 @@ module "operations-engineering-unit-test-generator-poc" {
   version = "1.1.2"
 
   name        = "operations-engineering-unit-test-generator-poc"
-  description = "CLI tool to automatically generate Python unit tests, using the unittest framework. This project is in POC."
+  description = "CLI tool to automatically generate Python unit tests (unittest framework). This project is in POC."
   topics      = ["operations-engineering"]
 
   team_access = {
