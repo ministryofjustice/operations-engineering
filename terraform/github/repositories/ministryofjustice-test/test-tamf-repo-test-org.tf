@@ -1,6 +1,6 @@
 module "test_tamf_repo_test_org" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.1"
+  version = "1.1.2"
 
   name        = "test-tamf-repo-test-org"
   description = "Test repo to test new module input team_access"
