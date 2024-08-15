@@ -1,6 +1,6 @@
 module "operations-engineering-dns-issues" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.1"
+  version = "1.1.2"
 
   name        = "operations-engineering-dns-issues"
   description = "DNS requests are captured here as GitHub Issues. It should remain internal due to the sensitive nature of the information."
