@@ -80,6 +80,8 @@ jobs:
         id: validate
         run: terraform validate -no-color
 
+      - run: terraform state list
+
       - name: Terraform Plan
         id: plan
         run: terraform plan -input=false -no-color
