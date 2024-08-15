@@ -92,7 +92,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           message: |
-            ## Terraform github repositories plan
+            ## Terraform auth0 plan
             ```
             ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
             ```
