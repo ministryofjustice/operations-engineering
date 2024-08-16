@@ -1170,14 +1170,23 @@ class GithubService:
             "https://api.github.com/repos/ministryofjustice/operations-engineering/actions/variables/GHA_MINUTES_QUOTA_THRESHOLD", json.dumps(payload), headers=headers)
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_gha_minutes_quota_threshold(self):
+    def _get_repository_variable(self, variable_name): 
         actions_variable = self.github_client_core_api.get_repo(
-            'ministryofjustice/operations-engineering').get_variable("GHA_MINUTES_QUOTA_THRESHOLD")
-        return int(actions_variable.value)
-
+            'ministryofjustice/operations-engineering').get_variable(variable_name)
+        return actions_variable.value
+    
+    def get_gha_minutes_quota_threshold(self):
+        return int(self._get_repository_variable("GHA_MINUTES_QUOTA_THRESHOLD"))
+    
+    def get_gha_minutes_quota_base_threshold(self):
+        return int(self._get_repository_variable("GHA_MINUTES_QUOTA_BASE_THRESHOLD"))
+    
+    def get_gha_minutes_quota_total_included(self):
+        return int(self._get_repository_variable("GHA_MINUTES_QUOTA_TOTAL_INCLUDED"))
+    
     @retries_github_rate_limit_exception_at_next_reset_once
     def reset_alerting_threshold_if_first_day_of_month(self):
-        base_alerting_threshold = 70
+        base_alerting_threshold = self.get_gha_minutes_quota_base_threshold()
 
         if date.today().day == 1:
             self.modify_gha_minutes_quota_threshold(base_alerting_threshold)
@@ -1201,7 +1210,7 @@ class GithubService:
 
         print(f"Total minutes used: {total_minutes_used}")
 
-        total_quota = 50000
+        total_quota = self.get_gha_minutes_quota_total_included()
 
         percentage_used = (total_minutes_used / total_quota) * 100
 
