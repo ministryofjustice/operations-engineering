@@ -142,7 +142,7 @@ resource "auth0_client" "terraform_provider_auth0" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "This enables Terraform to manage Auth0 in code via operations-engineering repository; uses the Auth0 Management API protected entity."
+  description                           = "This enables Terraform to manage Auth0 in code via the operations-engineering repository."
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -228,7 +228,12 @@ resource "auth0_client" "operations_engineering_standards_report" {
   }
 }
 
-resource "auth0_client" "prod_auth0managementapi" {
+moved {
+  from = auth0_client.prod_auth0managementapi
+  to   = auth0_client.legacy_dormant_users
+}
+
+resource "auth0_client" "legacy_dormant_users" {
   allowed_clients                       = []
   allowed_logout_urls                   = []
   allowed_origins                       = []
@@ -240,14 +245,14 @@ resource "auth0_client" "prod_auth0managementapi" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "Potentially Dormant Users: uses the Auth0 Management API protected entity"
+  description                           = "Enables (Legacy) Dormant Users process to read and delete Auth0 users."
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Prod-Auth0ManagementAPI"
+  name                                  = "(Legacy) Dormant Users"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = null
