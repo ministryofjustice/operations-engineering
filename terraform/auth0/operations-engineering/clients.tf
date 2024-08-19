@@ -175,7 +175,12 @@ resource "auth0_client" "terraform_provider_auth0" {
   }
 }
 
-resource "auth0_client" "operations_engineering_standards_report" {
+moved {
+  from = auth0_client.operations_engineering_standards_report
+  to   = auth0_client.standards_report
+}
+
+resource "auth0_client" "standards_report" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://operations-engineering-reports.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-dev.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk"]
   allowed_origins                       = []
@@ -194,7 +199,7 @@ resource "auth0_client" "operations_engineering_standards_report" {
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Operations-Engineering-Standards-Report"
+  name                                  = "Standards Report"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = null
@@ -226,11 +231,6 @@ resource "auth0_client" "operations_engineering_standards_report" {
     rotation_type                = "non-rotating"
     token_lifetime               = 2592000
   }
-}
-
-moved {
-  from = auth0_client.prod_auth0managementapi
-  to   = auth0_client.legacy_dormant_users
 }
 
 resource "auth0_client" "legacy_dormant_users" {
@@ -278,7 +278,12 @@ resource "auth0_client" "legacy_dormant_users" {
   }
 }
 
-resource "auth0_client" "operations_engineering_kpi_dashboard" {
+moved {
+  from = auth0_client.operations_engineering_kpi_dashboard
+  to   = auth0_client.kpi_dashboard
+}
+
+resource "auth0_client" "kpi_dashboard" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://operations-engineering-kpi-dashboard.cloud-platform.service.justice.gov.uk", "http://operations-engineering-kpi-dashboard-poc.cloud-platform.service.justice.gov.uk", "http://operations-engineering-kpi-dashboard-prod.cloud-platform.service.justice.gov.uk"]
   allowed_origins                       = []
@@ -297,7 +302,7 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Operations-Engineering-KPI-Dashboard"
+  name                                  = "KPI Dashboard"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = null
@@ -330,12 +335,6 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
     token_lifetime               = 2592000
   }
 }
-
-moved {
-  from = auth0_client.moj_microsoft_authentication_dev
-  to   = auth0_client.join_github_dev
-}
-
 
 resource "auth0_client" "join_github_dev" {
   allowed_clients                       = []
@@ -388,11 +387,6 @@ resource "auth0_client" "join_github_dev" {
     rotation_type                = "non-rotating"
     token_lifetime               = 31557600
   }
-}
-
-moved {
-  from = auth0_client.moj_microsoft_authentication_prod
-  to   = auth0_client.join_github
 }
 
 resource "auth0_client" "join_github" {
