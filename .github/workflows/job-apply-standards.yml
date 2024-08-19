@@ -4,8 +4,6 @@ on:
   schedule:
     - cron: "0 7 * * *" # Every day at 0700
   workflow_dispatch: # So we can trigger manually
-  pull_request:
-    branches: [main]
 
 jobs:
   configure-standards:
