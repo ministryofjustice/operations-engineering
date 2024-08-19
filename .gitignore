@@ -14,6 +14,7 @@ htmlcov
 .DS_Store
 .terraform*
 codeql*
+codeql-custom-queries-python/
 
 ministryofjustice_first_email_list.json
 moj-analytical-services_first_email_list.json
