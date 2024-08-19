@@ -1772,6 +1772,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         self,
         mock_get_all_organisations_in_enterprise,
         mock_calculate_total_minutes_used,
+        mock_get_gha_minutes_quota_total_included,
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_gha_minutes_quota_threshold,
         _mock_github_client_rest_api,
@@ -1782,6 +1783,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise.return_value = [
             "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 37500
+        mock_get_gha_minutes_quota_total_included.return_value = 50000
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
         result = github_service.check_if_gha_minutes_quota_is_low()
@@ -1798,6 +1800,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         self,
         mock_get_all_organisations_in_enterprise,
         mock_calculate_total_minutes_used,
+        mock_get_gha_minutes_quota_total_included,
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_gha_minutes_quota_threshold,
         _mock_github_client_rest_api,
@@ -1808,6 +1811,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise.return_value = [
             "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 5000
+        mock_get_gha_minutes_quota_total_included.return_value = 50000
         mock_get_gha_minutes_quota_threshold.return_value = 70
 
         result = github_service.check_if_gha_minutes_quota_is_low()
