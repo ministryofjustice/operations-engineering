@@ -194,7 +194,7 @@ resource "auth0_client" "operations_engineering_standards_report" {
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Operations-Engineering-Standards-Report"
+  name                                  = "Operations Engineering Standards Report"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = null
@@ -226,11 +226,6 @@ resource "auth0_client" "operations_engineering_standards_report" {
     rotation_type                = "non-rotating"
     token_lifetime               = 2592000
   }
-}
-
-moved {
-  from = auth0_client.prod_auth0managementapi
-  to   = auth0_client.legacy_dormant_users
 }
 
 resource "auth0_client" "legacy_dormant_users" {
@@ -297,7 +292,7 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Operations-Engineering-KPI-Dashboard"
+  name                                  = "Operations Engineering KPI Dashboard"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = null
@@ -330,12 +325,6 @@ resource "auth0_client" "operations_engineering_kpi_dashboard" {
     token_lifetime               = 2592000
   }
 }
-
-moved {
-  from = auth0_client.moj_microsoft_authentication_dev
-  to   = auth0_client.join_github_dev
-}
-
 
 resource "auth0_client" "join_github_dev" {
   allowed_clients                       = []
@@ -388,11 +377,6 @@ resource "auth0_client" "join_github_dev" {
     rotation_type                = "non-rotating"
     token_lifetime               = 31557600
   }
-}
-
-moved {
-  from = auth0_client.moj_microsoft_authentication_prod
-  to   = auth0_client.join_github
 }
 
 resource "auth0_client" "join_github" {
