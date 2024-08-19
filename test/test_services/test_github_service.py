@@ -1767,6 +1767,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_gha_minutes_quota_total_included")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
     def test_alert_on_low_quota_if_low(
         self,
@@ -1795,6 +1796,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "get_gha_minutes_quota_threshold")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "get_gha_minutes_quota_total_included")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
     def test_alert_on_low_quota_if_not_low(
         self,
