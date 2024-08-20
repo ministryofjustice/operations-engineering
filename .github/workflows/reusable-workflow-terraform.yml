@@ -14,6 +14,12 @@ on:
                 required: true
             tf_var_github_token:
                 required: true
+            aws_secrets_manager_role_arn:
+                required: true
+            repo_github_token:
+                required: true
+            slack_webhook_url:
+                required: true
 
 # How to pass env vars in?
 env:
@@ -43,7 +49,7 @@ jobs:
       - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
         uses: aws-actions/configure-aws-credentials@v4
         with:
-            role-to-assume: ${{ secrets.AWS_SECRETS_MANAGER_ROLE_ARN }}
+            role-to-assume: ${{ secrets.aws_secrets_manager_role_arn }}
             aws-region: eu-west-2
 
       - name: Save AWS credentials for accessing AWS Secrets Manager in the DSD account to a new profile
@@ -63,7 +69,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.repo_github_token }}
           repo-token-user-login: "github-actions[bot]"
           message: |
             Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
@@ -72,7 +78,7 @@ jobs:
         if: github.ref != 'refs/heads/main'
         uses: izhangzhihao/delete-comment@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.repo_github_token }}
           delete_user_name: github-actions[bot]
           issue_number: ${{ github.event.number }}
         continue-on-error: true
@@ -97,7 +103,7 @@ jobs:
         if: github.ref != 'refs/heads/main'
         uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.repo_github_token }}
           repo-token-user-login: "github-actions[bot]"
           message: |
             ## Terraform github repositories plan
@@ -118,4 +124,4 @@ jobs:
           notify_when: "failure"
           notification_title: "Failed GitHub Action Run"
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
