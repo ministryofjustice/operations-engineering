@@ -1172,7 +1172,7 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def _get_repository_variable(self, variable_name):
         actions_variable = self.github_client_core_api.get_repo(
-            'ministryofjustice/operations-engineering').get_variable(variable_name)
+            f'{self.organisation_name}/operations-engineering').get_variable(variable_name)
         return actions_variable.value
 
     @retries_github_rate_limit_exception_at_next_reset_once
