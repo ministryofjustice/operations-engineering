@@ -12,11 +12,13 @@ on:
         secrets:
             iam_role:
                 required: true
+            github_token:
+                required: true
 
 # How to pass env vars in?
 env:
   TERRAFORM_VERSION: ${{ inputs.terraform_version }}
-  TF_VAR_github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
+  TF_VAR_github_token: ${{ secrets.github_token }}
 
 jobs:
   terraform:
