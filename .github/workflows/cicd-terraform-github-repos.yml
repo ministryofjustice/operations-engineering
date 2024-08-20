@@ -24,5 +24,4 @@ jobs:
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
       env: |
-        TF_VAR_github_token=test
-        test2=test2
+        TF_VAR_github_token=${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
