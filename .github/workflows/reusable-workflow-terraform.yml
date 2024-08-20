@@ -40,11 +40,14 @@ jobs:
 
       - name: Set environment variables
         run: |
-            if [ -n "${{ secrets.env }}" ]; then
-                for i in "${{ secrets.env }}"
-                do
-                    printf "%s\n" $i >> $GITHUB_ENV
-                done
+          if [ -n "${{ secrets.env }}" ]; then
+              echo "${{ secrets.env }}" | while IFS= read -r line; do
+                  echo "$line" >> $GITHUB_ENV
+              done
+          else
+              echo "No environment variables to set"
+          fi
+
 
       - uses: actions/checkout@v4
 
