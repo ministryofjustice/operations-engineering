@@ -54,7 +54,7 @@ jobs:
       - name: Configure AWS credentials to access state bucket in Cloud Platform account
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ inputs.iam_role }}
+          role-to-assume: ${{ secrets.iam_role }}
           aws-region: eu-west-2
 
       - name: Post Link to Apply Pipeline
