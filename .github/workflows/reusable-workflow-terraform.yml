@@ -39,8 +39,7 @@ jobs:
     steps:
 
       - name: Set environment variables
-        run: |
-          echo ${{ secrets.env }}
+        run: echo test
 
       - uses: actions/checkout@v4
 
