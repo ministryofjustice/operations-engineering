@@ -9,9 +9,9 @@ on:
             terraform_version:
                 required: true
                 type: string
+        secrets:
             iam_role:
                 required: true
-                type: string
 
 # How to pass env vars in?
 env:
