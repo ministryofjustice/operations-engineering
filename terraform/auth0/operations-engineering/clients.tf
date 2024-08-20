@@ -175,11 +175,6 @@ resource "auth0_client" "terraform_provider_auth0" {
   }
 }
 
-moved {
-  from = auth0_client.operations_engineering_standards_report
-  to   = auth0_client.standards_report
-}
-
 resource "auth0_client" "standards_report" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://operations-engineering-reports.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-dev.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk"]
@@ -276,11 +271,6 @@ resource "auth0_client" "legacy_dormant_users" {
     rotation_type                = "non-rotating"
     token_lifetime               = 31557600
   }
-}
-
-moved {
-  from = auth0_client.operations_engineering_kpi_dashboard
-  to   = auth0_client.kpi_dashboard
 }
 
 resource "auth0_client" "kpi_dashboard" {
