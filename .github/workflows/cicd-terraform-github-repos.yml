@@ -20,4 +20,4 @@ jobs:
       terraform_version: "1.6.6"
     secrets:
       iam_role: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD }}
-      github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
+      tf_var_github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
