@@ -19,3 +19,6 @@ class KpiService:
 
     def track_number_of_repositories_with_standards_label(self, count: int):
         self.__post("/api/indicator/add", {"indicator": "REPOSITORIES_WITH_STANDARDS_LABEL", "count": count})
+
+    def track_enterprise_github_actions_quota_usage(self, count: int):
+        self.__post("/api/indicator/add", {"indicator": "ENTERPRISE_GITHUB_ACTIONS_QUOTA_USAGE", "count": count})
