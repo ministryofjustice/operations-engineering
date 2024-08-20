@@ -20,7 +20,8 @@ jobs:
       terraform_version: "1.6.6"
     secrets:
       iam_role: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD }}
-      tf_var_github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
       aws_secrets_manager_role_arn: ${{ secrets.AWS_SECRETS_MANAGER_ROLE_ARN }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      env: |
+        TF_VAR_github_token=${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}

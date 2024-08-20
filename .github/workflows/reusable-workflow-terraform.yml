@@ -12,19 +12,18 @@ on:
         secrets:
             iam_role:
                 required: true
-            tf_var_github_token:
-                required: true
             aws_secrets_manager_role_arn:
                 required: true
             repo_github_token:
                 required: true
             slack_webhook_url:
                 required: true
+            env:
+                required: false
 
 # How to pass env vars in?
 env:
   TERRAFORM_VERSION: ${{ inputs.terraform_version }}
-  TF_VAR_github_token: ${{ secrets.tf_var_github_token }}
 
 jobs:
   terraform:
@@ -38,6 +37,14 @@ jobs:
       run:
         working-directory: ${{ inputs.path }}
     steps:
+
+      - name: Set environment variables
+        run: |
+            if [ -n "${{ secrets.env }}" ]; then
+                for i in "${{ secrets.env }}"
+                do
+                    printf "%s\n" $i >> $GITHUB_ENV
+                done
 
       - uses: actions/checkout@v4
 
