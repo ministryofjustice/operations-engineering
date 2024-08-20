@@ -1839,7 +1839,6 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
             "GHA_MINUTES_QUOTA_TOTAL": "50000",
             "GHA_MINUTES_QUOTA_THRESHOLD": "70",
             "GHA_MINUTES_QUOTA_BASE_THRESHOLD": "70"
-
         }.get(name)
 
 
