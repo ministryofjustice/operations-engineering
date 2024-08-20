@@ -42,11 +42,11 @@ jobs:
 
       - name: Set environment variables
         run: |
-            if [ -n "${{ secrets.env }}" ]; then
-                for i in ${{ secrets.env }}; do
-                    printf "%s\n" "$i" >> $GITHUB_ENV
-                done
-            fi
+            echo "${{ secrets.env }}" | while IFS='=' read -r key value; do
+                if [ -n "$key" ]; then
+                    echo "$key=$value" >> $GITHUB_ENV
+                fi
+            done
 
       - uses: hashicorp/setup-terraform@v3
         with:
