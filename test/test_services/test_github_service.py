@@ -1741,10 +1741,11 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
     def test_reset_alerting_threshold_if_first_day_of_month(
         self,
-        mock_modify_gha_minutes_quota_threshold, 
+        mock_modify_gha_minutes_quota_threshold,
         mock_get_gha_minutes_quota_base_threshold,
         _mock_github_client_rest_api,
-        _mock_github_client_core_api):
+        _mock_github_client_core_api
+    ):
         github_service = GithubService("", ORGANISATION_NAME)
 
         mock_get_gha_minutes_quota_base_threshold.return_value = 70
