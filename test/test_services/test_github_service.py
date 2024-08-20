@@ -1736,6 +1736,24 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         self.assertEqual(70, response)
 
+    def test_get_gha_minutes_quota_base_threshold(self, _mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(
+            Variable, name="GHA_MINUTES_QUOTA_BASE_THRESHOLD", value="70")
+
+        response = GithubService(
+            "", ORGANISATION_NAME).get_gha_minutes_quota_base_threshold()
+
+        self.assertEqual(70, response)
+
+    def test_get_gha_minutes_quota_total_included(self, _mock_github_client_rest_api, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(
+            Variable, name="GHA_MINUTES_QUOTA_TOTAL_INCLUDED", value="50000")
+
+        response = GithubService(
+            "", ORGANISATION_NAME).get_gha_minutes_quota_total_included()
+
+        self.assertEqual(50000, response)
+
     @freeze_time("2021-02-01")
     @patch.object(GithubService, "get_gha_minutes_quota_base_threshold")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
