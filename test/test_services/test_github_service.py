@@ -1727,28 +1727,47 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
             ]
         )
 
-    def test_get_gha_minutes_quota_threshold(self, _mock_github_client_rest_api, mock_github_client_core_api):
+    def test_get_repository_variable(self, _mock_github_client_rest_api, mock_github_client_core_api):
         mock_github_client_core_api.return_value.get_repo().get_variable.return_value = Mock(
             Variable, name="GHA_MINUTES_QUOTA_THRESHOLD", value="70")
 
         response = GithubService(
-            "", ORGANISATION_NAME).get_gha_minutes_quota_threshold()
+            "", ORGANISATION_NAME)._get_repository_variable(variable_name="GHA_MINUTES_QUOTA_THRESHOLD")
 
-        self.assertEqual(70, response)
+        self.assertEqual('70', response)
 
     @freeze_time("2021-02-01")
+    @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
-    def test_reset_alerting_threshold_if_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
+    def test_reset_alerting_threshold_if_first_day_of_month(
+        self,
+        mock_modify_gha_minutes_quota_threshold,
+        mock_get_repository_variable,
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
+    ):
         github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         github_service.reset_alerting_threshold_if_first_day_of_month()
 
         mock_modify_gha_minutes_quota_threshold.assert_called_once_with(70)
 
     @freeze_time("2021-02-22")
+    @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "modify_gha_minutes_quota_threshold")
-    def test_reset_alerting_threshold_if_not_first_day_of_month(self, mock_modify_gha_minutes_quota_threshold, _mock_github_client_rest_api, _mock_github_client_core_api):
+    def test_reset_alerting_threshold_if_not_first_day_of_month(
+        self,
+        mock_modify_gha_minutes_quota_threshold,
+        mock_get_repository_variable,
+        _mock_github_client_rest_api,
+        _mock_github_client_core_api
+    ):
+
         github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         github_service.reset_alerting_threshold_if_first_day_of_month()
 
@@ -1764,7 +1783,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         self.assertEqual(
             github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
 
-    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
@@ -1773,7 +1792,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise,
         mock_calculate_total_minutes_used,
         mock_reset_alerting_threshold_if_first_day_of_month,
-        mock_get_gha_minutes_quota_threshold,
+        mock_get_repository_variable,
         _mock_github_client_rest_api,
         _mock_github_client_core_api
     ):
@@ -1782,7 +1801,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise.return_value = [
             "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 37500
-        mock_get_gha_minutes_quota_threshold.return_value = 70
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         result = github_service.check_if_gha_minutes_quota_is_low()
 
@@ -1790,7 +1809,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         self.assertEqual(result['threshold'], 70)
         self.assertEqual(result['percentage_used'], 75)
 
-    @patch.object(GithubService, "get_gha_minutes_quota_threshold")
+    @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
     @patch.object(GithubService, "calculate_total_minutes_used")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
@@ -1799,7 +1818,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise,
         mock_calculate_total_minutes_used,
         mock_reset_alerting_threshold_if_first_day_of_month,
-        mock_get_gha_minutes_quota_threshold,
+        mock_get_repository_variable,
         _mock_github_client_rest_api,
         _mock_github_client_core_api
     ):
@@ -1808,12 +1827,19 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise.return_value = [
             "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 5000
-        mock_get_gha_minutes_quota_threshold.return_value = 70
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         result = github_service.check_if_gha_minutes_quota_is_low()
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result, False)
+
+    def _mock_repository_variable(self, name):
+        return {
+            "GHA_MINUTES_QUOTA_TOTAL": "50000",
+            "GHA_MINUTES_QUOTA_THRESHOLD": "70",
+            "GHA_MINUTES_QUOTA_BASE_THRESHOLD": "70"
+        }.get(name)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
