@@ -1748,9 +1748,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_repository_variable.side_effect = lambda name: {
-            "GHA_MINUTES_QUOTA_BASE_THRESHOLD": "70"
-        }.get(name)
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         github_service.reset_alerting_threshold_if_first_day_of_month()
 
@@ -1769,9 +1767,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_repository_variable.side_effect = lambda name: {
-            "GHA_MINUTES_QUOTA_BASE_THRESHOLD": "70"
-        }.get(name)
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         github_service.reset_alerting_threshold_if_first_day_of_month()
 
@@ -1805,10 +1801,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise.return_value = [
             "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 37500
-        mock_get_repository_variable.side_effect = lambda name: {
-            "GHA_MINUTES_QUOTA_TOTAL": "50000",
-            "GHA_MINUTES_QUOTA_THRESHOLD": "70"
-        }.get(name)
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         result = github_service.check_if_gha_minutes_quota_is_low()
 
@@ -1834,15 +1827,20 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_get_all_organisations_in_enterprise.return_value = [
             "org1", "org2"]
         mock_calculate_total_minutes_used.return_value = 5000
-        mock_get_repository_variable.side_effect = lambda name: {
-            "GHA_MINUTES_QUOTA_TOTAL": "50000",
-            "GHA_MINUTES_QUOTA_THRESHOLD": "70"
-        }.get(name)
+        mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         result = github_service.check_if_gha_minutes_quota_is_low()
 
         mock_reset_alerting_threshold_if_first_day_of_month.assert_called_once()
         self.assertEqual(result, False)
+
+    def _mock_repository_variable(self, name):
+        return {
+            "GHA_MINUTES_QUOTA_TOTAL": "50000",
+            "GHA_MINUTES_QUOTA_THRESHOLD": "70",
+            "GHA_MINUTES_QUOTA_BASE_THRESHOLD": "70"
+
+        }.get(name)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
