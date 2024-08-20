@@ -25,3 +25,4 @@ jobs:
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
       env: |
         TF_VAR_github_token=test
+        test2=test2

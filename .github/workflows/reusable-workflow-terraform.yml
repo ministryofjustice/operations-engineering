@@ -38,10 +38,15 @@ jobs:
         working-directory: ${{ inputs.path }}
     steps:
 
-      - name: Set environment variables
-        run: echo test
-
       - uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          if [ -n "${{ secrets.env }}" ]; then
+              for i in "${{ secrets.env }}"
+              do
+                  printf "%s\n" $i >> $GITHUB_ENV
+              done
 
       - uses: hashicorp/setup-terraform@v3
         with:
