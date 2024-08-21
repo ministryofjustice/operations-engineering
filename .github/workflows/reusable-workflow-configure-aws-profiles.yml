@@ -1,24 +1,24 @@
 name: "♻️ Configure AWS Profiles Reusable Workflow"
 
 on:
-    workflow_call:
-        inputs:
-          profile_name:
-            required: true
-            type: string
-          pre_existing_profiles:
-            required: false
-            type: boolean
-            default: false
-        secrets:
-          iam_role:
-            required: true
-          gpg_private_key:
-            required: true
-          gpg_public_key:
-            required: true
-          gpg_passphrase:
-            required: true
+  workflow_call:
+    inputs:
+      profile_name:
+        required: true
+        type: string
+      pre_existing_profiles:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      iam_role:
+        required: true
+      gpg_private_key:
+        required: true
+      gpg_public_key:
+        required: true
+      gpg_passphrase:
+        required: true
 
 jobs:
   configure-aws-profiles:

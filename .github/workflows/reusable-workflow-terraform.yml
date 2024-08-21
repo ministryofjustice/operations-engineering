@@ -1,46 +1,46 @@
 name: "♻️ Terraform Reusable Workflow"
 
 on:
-    workflow_call:
-        inputs:
-            path:
-                required: true
-                type: string
-            terraform_version:
-                required: true
-                type: string
-            stack_name:
-                required: true
-                type: string
-            aws_profiles:
-                required: false
-                type: boolean
-                default: false
-            build_lambdas:
-                required: false
-                type: boolean
-                default: false
-            build_lambdas_command:
-                required: false
-                type: string
-            lambda_module_name:
-                required: false
-                type: string
-        secrets:
-            iam_role:
-                required: true
-            repo_github_token:
-                required: true
-            slack_webhook_url:
-                required: true
-            env:
-                required: false
-            gpg_private_key:
-                required: false
-            gpg_public_key:
-                required: false
-            gpg_passphrase:
-                required: false
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      terraform_version:
+        required: true
+        type: string
+      stack_name:
+        required: true
+        type: string
+      aws_profiles:
+        required: false
+        type: boolean
+        default: false
+      build_lambdas:
+        required: false
+        type: boolean
+        default: false
+      build_lambdas_command:
+        required: false
+        type: string
+      lambda_module_name:
+        required: false
+        type: string
+    secrets:
+      iam_role:
+        required: true
+      repo_github_token:
+        required: true
+      slack_webhook_url:
+        required: true
+      env:
+        required: false
+      gpg_private_key:
+        required: false
+      gpg_public_key:
+        required: false
+      gpg_passphrase:
+        required: false
 
 env:
   TERRAFORM_VERSION: ${{ inputs.terraform_version }}
@@ -64,8 +64,8 @@ jobs:
         run: |
           while IFS='=' read -r key value; do
             if [ -n "$key" ]; then
-              echo "$key=${value}" >> $GITHUB_ENV
-              echo "::add-mask::$value"
+              echo "$key=${value}" >> "$GITHUB_ENV"
+              echo "::add-mask::${value}"
             fi
           done <<< "${{ secrets.env }}"
 

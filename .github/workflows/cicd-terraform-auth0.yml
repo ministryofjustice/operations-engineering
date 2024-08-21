@@ -16,10 +16,10 @@ on:
 jobs:
   terraform-auth0:
     strategy:
-        matrix:
-          path:
-            - "operations-engineering-test"
-            - "operations-engineering"
+      matrix:
+        path:
+          - "operations-engineering-test"
+          - "operations-engineering"
     uses: ./.github/workflows/reusable-workflow-terraform.yml
     with:
       terraform_version: "1.6.6"
