@@ -9,6 +9,9 @@ on:
             terraform_version:
                 required: true
                 type: string
+            stack_name:
+                required: true
+                type: string
         secrets:
             iam_role:
                 required: true
@@ -82,7 +85,7 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Configure AWS credentials to access state bucket in Cloud Platform account
+      - name: Configure AWS credentials for Terraform
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.iam_role }}
@@ -129,7 +132,7 @@ jobs:
           repo-token: ${{ secrets.repo_github_token }}
           repo-token-user-login: "github-actions[bot]"
           message: |
-            ## Terraform github repositories plan
+            ## Terraform ${{ inputs.stack_name }} plan
             ```
             ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
             ```
