@@ -1,7 +1,6 @@
 import os
 import sys
 import logging
-from requests.exceptions import RequestException
 
 from services.github_service import GithubService
 from services.kpi_service import KpiService
@@ -25,15 +24,16 @@ def fetch_gha_quota():
 
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
 
-    # get all organisations
+    # Get all organisations
     organisations = github_service.get_all_organisations_in_enterprise()
-    # get total quota usage
+    # Get total quota usage
     total_minutes_used = github_service.calculate_total_minutes_used(organisations)
 
-    # save metric in KPI dashboard db
+    # Save metric in KPI dashboard db
     try:
         KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used)
-    except RequestException as e:
+    # pylint: disable=W0718
+    except Exception as e:
         logging.info("Issue when trying to fetch github action quota for the enterprise")
         logging.error(e)
 
