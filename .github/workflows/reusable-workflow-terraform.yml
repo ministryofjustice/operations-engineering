@@ -18,6 +18,12 @@ on:
                 required: true
             env:
                 required: false
+            gpg_private_key:
+                required: false
+            gpg_public_key:
+                required: false
+            gpg_passphrase:
+                required: false
 
 env:
   TERRAFORM_VERSION: ${{ inputs.terraform_version }}
@@ -60,13 +66,17 @@ jobs:
           path: ~/.aws
         continue-on-error: true
 
-      - name: Decrypt AWS credentials
+      - name: Import GPG keys
         if: ${{ steps.download-aws-credentials.outcome == 'success' }}
         run: |
           mkdir -p ~/.gnupg
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
-          echo "${{ secrets.GPG_PUBLIC_KEY }}" | gpg --import
-          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
+          chmod 700 ~/.gnupg
+          echo "${{ secrets.gpg_private_key }}" | gpg --import --batch --yes
+          echo "${{ secrets.gpg_public_key }}" | gpg --import --batch --yes
+
+      - name: Decrypt AWS credentials
+        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+        run: echo "${{ secrets.gpg_passphrase }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - uses: hashicorp/setup-terraform@v3
         with:

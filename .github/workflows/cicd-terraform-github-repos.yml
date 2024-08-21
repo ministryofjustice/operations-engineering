@@ -32,5 +32,8 @@ jobs:
       iam_role: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      gpg_public_key: ${{ secrets.GPG_PUBLIC_KEY }}
+      gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
       env: |
         TF_VAR_github_token=${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
