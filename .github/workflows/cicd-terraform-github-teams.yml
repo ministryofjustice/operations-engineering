@@ -12,89 +12,16 @@ on:
       - "terraform/github/teams/**"
     branches: ["main"]
 
-env:
-  TERRAFORM_VERSION: "1.6.6"
-  TF_VAR_github_token: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
-
 jobs:
-  terraform:
-    name: "Terraform GitHub Teams"
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      id-token: write
-    defaults:
-      run:
-        working-directory: "terraform/github/teams"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.TERRAFORM_GITHUB_TEAMS_S3_ROLE_ARN_PROD}}
-          aws-region: eu-west-2
-
-      - name: Post Link to Apply Pipeline
-        if: github.ref == 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: "github-actions[bot]"
-          message: |
-            Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-teams.yml?query=event%3Apush+branch%3Amain
-
-      - name: Delete old comments on PR made by bot user
-        if: github.ref != 'refs/heads/main'
-        uses: izhangzhihao/delete-comment@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          delete_user_name: github-actions[bot]
-          issue_number: ${{ github.event.number }}
-
-      - name: Terraform Format Check
-        id: fmt-check
-        run: terraform fmt -check
-
-      - name: Terraform Init
-        id: init
-        run: terraform init -input=false -no-color
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -input=false -no-color
-
-      - name: Post Plan to GitHub PR
-        if: github.ref != 'refs/heads/main'
-        uses: mshick/add-pr-comment@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: "github-actions[bot]"
-          message: |
-            ## Terraform GitHub Teams plan
-            ```
-            ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
-            ```
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        id: apply
-        run: terraform apply -input=false -no-color -auto-approve
-
-      - name: Report failure to Slack
-        if: ${{ always() && github.ref == 'refs/heads/main' }}
-        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # v2.5.0
-        with:
-          status: ${{ job.status }}
-          notify_when: "failure"
-          notification_title: "Failed GitHub Action Run"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  terraform-github-repos:
+    uses: ./.github/workflows/reusable-workflow-terraform.yml
+    with:
+      path: "terraform/github/repositories"
+      terraform_version: "1.6.6"
+      stack_name: "github teams"
+    secrets:
+      iam_role: ${{ secrets.TERRAFORM_GITHUB_TEAMS_S3_ROLE_ARN_PROD }}
+      repo_github_token: ${{ secrets.GITHUB_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      env: |
+        TF_VAR_github_token=${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
