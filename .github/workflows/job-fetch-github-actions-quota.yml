@@ -1,0 +1,34 @@
+name: Fetch GitHub Actions quota
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  low-quota-threshold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.fetch_github_actions_quota
+        env: 
+          GH_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
+          KPI_DASHBOARD_URL: ${{ secrets.KPI_DASHBOARD_PROD_URL }}
+          KPI_DASHBOARD_API_KEY: ${{ secrets.KPI_DASHBOARD_PROD_API_KEY }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed to fetch github actions quota"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

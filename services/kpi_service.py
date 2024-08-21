@@ -43,3 +43,6 @@ class KpiService:
 
     def track_sentry_replays_used_for_day(self, count: int):
         self.__add_indicator("SENTRY_REPLAYS_USED_OVER_PAST_DAY", count)
+    
+    def track_enterprise_github_actions_quota_usage(self, count: int):
+        self.__add_indicator("ENTERPRISE_GITHUB_ACTIONS_QUOTA_USAGE", count)
