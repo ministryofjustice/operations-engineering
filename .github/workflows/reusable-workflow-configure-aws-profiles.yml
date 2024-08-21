@@ -6,6 +6,10 @@ on:
           profile_name:
             required: true
             type: string
+          pre_existing_profiles:
+            required: false
+            type: boolean
+            default: false
         secrets:
           iam_role:
             required: true
@@ -24,6 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
+        if: ${{ inputs.pre_existing_profiles }}
         name: Import AWS configuration
         with:
           name: aws-config
@@ -31,6 +36,7 @@ jobs:
         continue-on-error: true
 
       - uses: actions/download-artifact@v4
+        if: ${{ inputs.pre_existing_profiles }}
         id: download-aws-credentials
         name: Import AWS credentials
         with:
@@ -46,7 +52,7 @@ jobs:
           echo "${{ secrets.gpg_public_key }}" | gpg --import --batch --yes
 
       - name: Decrypt AWS credentials
-        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+        if: ${{ inputs.pre_existing_profiles }}
         run: echo "${{ secrets.gpg_passphrase }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - name: Configure AWS credentials
