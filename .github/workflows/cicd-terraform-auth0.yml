@@ -23,10 +23,10 @@ jobs:
     uses: ./.github/workflows/reusable-workflow-terraform.yml
     with:
       terraform_version: "1.6.6"
-    secrets:
-      iam_role: ${{ secrets.TERRAFORM_AUTH0_S3_ROLE_ARN_DEV }}
       path: "terraform/auth0/${{ matrix.path }}"
       stack_name: ${{ matrix.path }}
+    secrets:
+      iam_role: ${{ secrets.TERRAFORM_AUTH0_S3_ROLE_ARN_DEV }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
       env: |
