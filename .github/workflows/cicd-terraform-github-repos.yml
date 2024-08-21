@@ -15,6 +15,8 @@ on:
 jobs:
   configure-aws-profiles:
     uses: ./.github/workflows/reusable-workflow-configure-aws-profiles.yml
+    with:
+      profile_name: "dsd_secret_manager_access_profile"
     secrets:
       iam_role: ${{ secrets.AWS_SECRETS_MANAGER_ROLE_ARN }}
       gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}

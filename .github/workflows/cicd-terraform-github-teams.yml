@@ -13,10 +13,10 @@ on:
     branches: ["main"]
 
 jobs:
-  terraform-github-repos:
+  terraform-github-teams:
     uses: ./.github/workflows/reusable-workflow-terraform.yml
     with:
-      path: "terraform/github/repositories"
+      path: "terraform/github/teams"
       terraform_version: "1.6.6"
       stack_name: "github teams"
     secrets:
