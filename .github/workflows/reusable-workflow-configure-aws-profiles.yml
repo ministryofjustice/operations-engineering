@@ -31,8 +31,8 @@ jobs:
       - name: Import GPG keys
         run: |
           mkdir -p ~/.gnupg
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
-          echo "${{ secrets.GPG_PUBLIC_KEY }}" | gpg --import
+          echo ${{ secrets.GPG_PRIVATE_KEY }} | gpg --import
+          echo ${{ secrets.GPG_PUBLIC_KEY }} | gpg --import
 
       - name: Decrypt AWS credentials
         if: ${{ steps.download-aws-credentials.outcome == 'success' }}
