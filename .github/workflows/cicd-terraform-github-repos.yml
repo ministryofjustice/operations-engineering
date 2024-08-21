@@ -39,6 +39,13 @@ jobs:
           path: ~/.aws/config
           retention-days: 1
 
+      - uses: actions/upload-artifact@v4
+        name: Export AWS credentials
+        with:
+          name: aws-credentials
+          path: ~/.aws/credentials
+          retention-days: 1
+
   terraform-github-repos:
     needs: configure-aws-profiles
     uses: ./.github/workflows/reusable-workflow-terraform.yml
