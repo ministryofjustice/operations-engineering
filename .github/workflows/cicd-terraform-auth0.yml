@@ -24,7 +24,7 @@ jobs:
     with:
       terraform_version: "1.6.6"
       path: "terraform/auth0/${{ matrix.path }}"
-      stack_name: ${{ matrix.path }}
+      stack_name: "auth0 (${{ matrix.path }})"
     secrets:
       iam_role: ${{ secrets.TERRAFORM_AUTH0_S3_ROLE_ARN_DEV }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
