@@ -12,8 +12,6 @@ on:
         secrets:
             iam_role:
                 required: true
-            aws_secrets_manager_role_arn:
-                required: true
             repo_github_token:
                 required: true
             slack_webhook_url:
@@ -47,23 +45,15 @@ jobs:
                 fi
             done
 
+      - uses: actions/download-artifact@v4.3.6
+        name: Import AWS configuration
+        with:
+          name: aws-config
+          path: ~/.aws/config
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
-
-      # How to pass aws profiles in?
-      - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-            role-to-assume: ${{ secrets.aws_secrets_manager_role_arn }}
-            aws-region: eu-west-2
-
-      - name: Save AWS credentials for accessing AWS Secrets Manager in the DSD account to a new profile
-        run: |
-            aws configure set region ${{ env.AWS_REGION }} --profile dsd_secret_manager_access_profile
-            aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile dsd_secret_manager_access_profile
-            aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_secret_manager_access_profile
-            aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_secret_manager_access_profile
 
       - name: Configure AWS credentials to access state bucket in Cloud Platform account
         uses: aws-actions/configure-aws-credentials@v4
