@@ -62,11 +62,13 @@ jobs:
 
       - name: Set environment variables
         run: |
-          while IFS='=' read -r key value; do
+          echo "$env_vars" | while IFS='=' read -r key value; do
             if [ -n "$key" ]; then
               echo "$key=$value" >> $GITHUB_ENV
             fi
-          done <<< "${{ secrets.env }}"
+          done
+        env:
+          env_vars: ${{ secrets.env }}
 
       - uses: actions/download-artifact@v4
         if: ${{ inputs.aws_profiles }}
