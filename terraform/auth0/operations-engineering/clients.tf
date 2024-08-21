@@ -275,10 +275,10 @@ resource "auth0_client" "legacy_dormant_users" {
 
 resource "auth0_client" "kpi_dashboard" {
   allowed_clients                       = []
-  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://operations-engineering-kpi-dashboard.cloud-platform.service.justice.gov.uk", "http://operations-engineering-kpi-dashboard-poc.cloud-platform.service.justice.gov.uk", "http://operations-engineering-kpi-dashboard-prod.cloud-platform.service.justice.gov.uk"]
+  allowed_logout_urls                   = []
   allowed_origins                       = []
   app_type                              = "regular_web"
-  callbacks                             = ["http://127.0.0.1:4567/callback", "http://127.0.0.1:4567/auth/callback", "http://localhost:4567/auth/callback", "https://localhost:4567/auth/callback", "http://127.0.0.1/callback", "http://localhost:4567/callback", "http://localhost/callback", "http://operations-engineering-kpi-dashboard.cloud-platform.service.justice.gov.uk/callback", "http://operations-engineering-kpi-dashboard-poc.cloud-platform.service.justice.gov.uk/callback", "http://operations-engineering-kpi-dashboard-prod.cloud-platform.service.justice.gov.uk/callback"]
+  callbacks                             = ["https://kpi-dashboard.cloud-platform.service.justice.gov.uk/oidc/idp/callback", "http://0.0.0.0:4567/oidc/idp/callback", "http://localhost:4567/oidc/idp/callback", "http://127.0.0.1:4567/oidc/idp/callback"]
   client_aliases                        = []
   client_metadata                       = {}
   cross_origin_auth                     = false
@@ -300,7 +300,7 @@ resource "auth0_client" "kpi_dashboard" {
   require_pushed_authorization_requests = false
   sso                                   = false
   sso_disabled                          = false
-  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://operations-engineering-kpi-dashboard.cloud-platform.service.justice.gov.uk", "http://operations-engineering-kpi-dashboard-poc.cloud-platform.service.justice.gov.uk", "http://operations-engineering-kpi-dashboard-prod.cloud-platform.service.justice.gov.uk"]
+  web_origins                           = ["https://kpi-dashboard.cloud-platform.service.justice.gov.uk", "http://0.0.0.0:4567", "http://localhost:4567", "http://127.0.0.1:4567"]
   jwt_configuration {
     alg                 = "RS256"
     lifetime_in_seconds = 36000

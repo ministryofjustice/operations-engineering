@@ -9,21 +9,40 @@ START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
 
 
+@patch("services.kpi_service.KpiService.__new__")
 @patch("services.slack_service.SlackService.__new__")
 @patch("clients.sentry_client.SentryClient.__new__")
 class TestSentryUsageAlertMain(unittest.TestCase):
     @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
     @patch.dict(os.environ, {"SLACK_TOKEN": "token"})
-    def test_main_smoke_test(self, mock_sentry_client: MagicMock, _mock_slack_service: MagicMock):
-        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = 1, START_TIME, END_TIME
+    def test_main_smoke_test(
+        self,
+        mock_sentry_client: MagicMock,
+        _mock_slack_service: MagicMock,
+        _mock_kpi_service: MagicMock,
+    ):
+        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = (
+            1,
+            START_TIME,
+            END_TIME,
+        )
         sentry_usage_alert.main()
 
     @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
     @patch.dict(os.environ, {"SLACK_TOKEN": "token"})
     @patch.dict(os.environ, {"PERIOD_IN_DAYS": "1"})
     @patch.dict(os.environ, {"USAGE_THRESHOLD": "20"})
-    def test_sends_notifications_to_slack_when_usage_above_threshold(self, mock_sentry_client: MagicMock, mock_slack_service: MagicMock):
-        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = 10000000, START_TIME, END_TIME
+    def test_sends_notifications_to_slack_when_usage_above_threshold(
+        self,
+        mock_sentry_client: MagicMock,
+        mock_slack_service: MagicMock,
+        _mock_kpi_service: MagicMock,
+    ):
+        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = (
+            10000000,
+            START_TIME,
+            END_TIME,
+        )
         sentry_usage_alert.main()
         mock_slack_service.return_value.send_usage_alert_to_operations_engineering.assert_has_calls(
             [
@@ -69,11 +88,44 @@ class TestSentryUsageAlertMain(unittest.TestCase):
 
     @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
     @patch.dict(os.environ, {"SLACK_TOKEN": "token"})
-    def test_sends_no_notifications_to_slack_when_usage_below_threshold(self, mock_sentry_client: MagicMock, mock_slack_service: MagicMock):
-        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = 1, START_TIME, END_TIME
+    def test_sends_no_notifications_to_slack_when_usage_below_threshold(
+        self,
+        mock_sentry_client: MagicMock,
+        mock_slack_service: MagicMock,
+        _mock_kpi_service: MagicMock,
+    ):
+        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = (
+            1,
+            START_TIME,
+            END_TIME,
+        )
         sentry_usage_alert.main()
         mock_slack_service.return_value.send_error_usage_alert_to_operations_engineering.assert_not_called()
         mock_slack_service.return_value.send_transaction_usage_alert_to_operations_engineering.assert_not_called()
+
+    @patch.dict(os.environ, {"SENTRY_TOKEN": "token"})
+    @patch.dict(os.environ, {"SLACK_TOKEN": "token"})
+    def test_tracks_quota_usage_in_kpi_service(
+        self,
+        mock_sentry_client: MagicMock,
+        _mock_slack_service: MagicMock,
+        mock_kpi_service: MagicMock,
+    ):
+        mock_sentry_client.return_value.get_usage_total_for_period_in_days.return_value = (
+            1,
+            START_TIME,
+            END_TIME,
+        )
+        sentry_usage_alert.main()
+        mock_kpi_service.return_value.track_sentry_errors_used_for_day.assert_has_calls(
+            [call(1)]
+        )
+        mock_kpi_service.return_value.track_sentry_transactions_used_for_day.assert_has_calls(
+            [call(1)]
+        )
+        mock_kpi_service.return_value.track_sentry_replays_used_for_day.assert_has_calls(
+            [call(1)]
+        )
 
 
 @patch("requests.get", new=MagicMock)
@@ -90,7 +142,9 @@ class TestGetEnvironmentVariables(unittest.TestCase):
     @patch.dict(os.environ, {"PERIOD_IN_DAYS": "1"})
     @patch.dict(os.environ, {"USAGE_THRESHOLD": "20"})
     def test_returns_values(self):
-        sentry_token, slack_token, period_in_days, usage_threshold = sentry_usage_alert.get_environment_variables()
+        sentry_token, slack_token, period_in_days, usage_threshold = (
+            sentry_usage_alert.get_environment_variables()
+        )
         self.assertEqual(sentry_token, "sentry_token")
         self.assertEqual(slack_token, "slack_token")
         self.assertEqual(period_in_days, 1)
