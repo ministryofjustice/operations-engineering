@@ -38,6 +38,7 @@ jobs:
           retention-days: 1
 
   terraform-github-repos:
+    needs: configure-aws-profiles
     uses: ./.github/workflows/reusable-workflow-terraform.yml
     with:
       path: "terraform/github/repositories"
