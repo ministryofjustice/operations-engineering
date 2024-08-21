@@ -12,6 +12,10 @@ on:
             stack_name:
                 required: true
                 type: string
+            aws_profiles:
+                required: false
+                type: boolean
+                default: false
         secrets:
             iam_role:
                 required: true
@@ -55,6 +59,7 @@ jobs:
             done
 
       - uses: actions/download-artifact@v4
+        if: ${{ inputs.aws_profiles }}
         name: Import AWS configuration
         with:
           name: aws-config
@@ -62,6 +67,7 @@ jobs:
         continue-on-error: true
 
       - uses: actions/download-artifact@v4
+        if: ${{ inputs.aws_profiles }}
         id: download-aws-credentials
         name: Import AWS credentials
         with:
@@ -70,7 +76,7 @@ jobs:
         continue-on-error: true
 
       - name: Import GPG keys
-        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+        if: ${{ inputs.aws_profiles }}
         run: |
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
@@ -78,7 +84,7 @@ jobs:
           echo "${{ secrets.gpg_public_key }}" | gpg --import --batch --yes
 
       - name: Decrypt AWS credentials
-        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+        if: ${{ inputs.aws_profiles }}
         run: echo "${{ secrets.gpg_passphrase }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - uses: hashicorp/setup-terraform@v3

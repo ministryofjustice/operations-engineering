@@ -30,6 +30,7 @@ jobs:
       path: "terraform/github/repositories"
       terraform_version: "1.6.6"
       stack_name: "github repositories"
+      aws_profiles: true
     secrets:
       iam_role: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -30,6 +30,7 @@ jobs:
       path: "terraform/dsd/iam"
       terraform_version: "1.6.6"
       stack_name: "dsd iam"
+      aws_profiles: true
     secrets:
       iam_role: ${{ secrets.R53_BACKUP_ROLE_ARN }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
