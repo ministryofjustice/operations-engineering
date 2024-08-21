@@ -17,6 +17,10 @@ jobs:
     uses: ./.github/workflows/reusable-workflow-configure-aws-profiles.yml
     secrets:
       iam_role: ${{ secrets.AWS_SECRETS_MANAGER_ROLE_ARN }}
+      gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      gpg_public_key: ${{ secrets.GPG_PUBLIC_KEY }}
+      gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
 
   terraform-github-repos:
     needs: configure-aws-profiles

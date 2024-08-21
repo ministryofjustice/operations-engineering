@@ -5,6 +5,12 @@ on:
         secrets:
             iam_role:
                 required: true
+            gpg_private_key:
+                required: true
+            gpg_public_key:
+                required: true
+            gpg_passphrase:
+                required: true
 
 jobs:
   configure-aws-profiles:
@@ -31,12 +37,12 @@ jobs:
       - name: Import GPG keys
         run: |
           mkdir -p ~/.gnupg
-          echo ${{ secrets.GPG_PRIVATE_KEY }} | gpg --import
-          echo ${{ secrets.GPG_PUBLIC_KEY }} | gpg --import
+          echo "${{ secrets.gpg_private_key }}" | gpg --import
+          echo "${{ secrets.gpg_public_key }}" | gpg --import
 
       - name: Decrypt AWS credentials
         if: ${{ steps.download-aws-credentials.outcome == 'success' }}
-        run: echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
+        run: echo "${{ secrets.gpg_passphrase }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
         uses: aws-actions/configure-aws-credentials@v4
@@ -53,7 +59,7 @@ jobs:
           aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_secret_manager_access_profile
 
       - name: Encrypt AWS credentials
-        run: gpg --batch --yes --passphrase ${{ secrets.GPG_PASSPHRASE }} -c ~/.aws/credentials
+        run: gpg --batch --yes --passphrase ${{ secrets.gpg_passphrase }} -c ~/.aws/credentials
 
       - uses: actions/upload-artifact@v4
         name: Export AWS configuration
