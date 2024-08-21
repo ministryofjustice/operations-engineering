@@ -1,13 +1,3 @@
-resource "null_resource" "build_lambdas" {
-  provisioner "local-exec" {
-    command = "cd .terraform/modules/github-cloudtrail-auditlog && make all"
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
-
 module "github-cloudtrail-auditlog" {
   source                          = "github.com/ministryofjustice/operations-engineering-cloudtrail-lake-github-audit-log-terraform-module?ref=main"
   create_github_auditlog_s3bucket = var.create_github_auditlog_s3bucket

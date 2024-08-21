@@ -16,6 +16,16 @@ on:
                 required: false
                 type: boolean
                 default: false
+            build_lambdas:
+                required: false
+                type: boolean
+                default: false
+            build_lambdas_command:
+                required: false
+                type: string
+            lambda_module_name:
+                required: false
+                type: string
         secrets:
             iam_role:
                 required: true
@@ -122,6 +132,10 @@ jobs:
       - name: Terraform Init
         id: init
         run: ls -latr; terraform init -input=false -no-color
+
+      - name: Build Lambdas
+        if: ${{ inputs.build_lambdas }}
+        run: cd .terraform/modules/${{ inputs.lambda_module_name }} && ${{ inputs.build_lambdas_command }}
 
       - name: Terraform Validate
         id: validate
