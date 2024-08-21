@@ -64,7 +64,7 @@ jobs:
         run: |
           echo "${{ secrets.env }}" | while IFS='=' read -r key value; do
             if [ -n "$key" ]; then
-              echo "$key=$value" >> $GITHUB_ENV
+              echo "$key=::add-mask::$value" >> $GITHUB_ENV
             fi
           done
 
