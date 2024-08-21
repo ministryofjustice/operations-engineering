@@ -38,7 +38,6 @@ jobs:
         run: |
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
-          export GPG_TTY=$(tty)
           echo "${{ secrets.gpg_private_key }}" | gpg --import
           echo "${{ secrets.gpg_public_key }}" | gpg --import
 
