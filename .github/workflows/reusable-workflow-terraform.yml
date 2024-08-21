@@ -53,6 +53,7 @@ jobs:
         continue-on-error: true
 
       - uses: actions/download-artifact@v4
+        id: download-aws-credentials
         name: Import AWS credentials
         with:
           name: aws-credentials
@@ -60,6 +61,7 @@ jobs:
         continue-on-error: true
 
       - name: Decrypt AWS credentials
+        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
         run: echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - uses: hashicorp/setup-terraform@v3
