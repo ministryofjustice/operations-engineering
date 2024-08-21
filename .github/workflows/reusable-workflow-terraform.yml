@@ -49,7 +49,9 @@ jobs:
         name: Import AWS configuration
         with:
           name: aws-config
-          path: ~/.aws/config
+          path: ~/.aws
+
+      - run: ls -l ~/.aws
 
       - uses: hashicorp/setup-terraform@v3
         with:
