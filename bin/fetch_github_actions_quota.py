@@ -1,6 +1,4 @@
 import os
-import sys
-import logging
 
 from services.github_service import GithubService
 from services.kpi_service import KpiService
@@ -26,7 +24,7 @@ def fetch_gha_quota():
     total_minutes_used = github_service.calculate_total_minutes_used(organisations)
 
     # Save metric in KPI dashboard db
-    KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used) 
+    KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used)
 
 
 if __name__ == "__main__":
