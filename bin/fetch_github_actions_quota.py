@@ -18,10 +18,6 @@ def get_environment_variables() -> str:
 
 def fetch_gha_quota():
     github_token = get_environment_variables()
-    if github_token is None:
-        print("No GH_TOKEN environment variable set")
-        sys.exit(1)
-
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
 
     # Get all organisations
@@ -30,12 +26,7 @@ def fetch_gha_quota():
     total_minutes_used = github_service.calculate_total_minutes_used(organisations)
 
     # Save metric in KPI dashboard db
-    try:
-        KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used)
-    # pylint: disable=W0718
-    except Exception as e:
-        logging.info("Issue when trying to fetch github action quota for the enterprise")
-        logging.error(e)
+    KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used) 
 
 
 if __name__ == "__main__":

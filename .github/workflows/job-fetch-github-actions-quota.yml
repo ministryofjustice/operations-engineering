@@ -1,4 +1,4 @@
-name: Fetch GitHub Actions quota
+name: 🤖 Fetch GitHub Actions quota
 
 on:
   schedule:
