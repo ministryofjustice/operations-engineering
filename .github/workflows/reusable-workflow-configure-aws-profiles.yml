@@ -32,6 +32,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.iam_role }}
           aws-region: eu-west-2
+          role-duration-seconds: 240
 
       - name: Save AWS credentials for accessing AWS Secrets Manager in the DSD account to a new profile
         run: |
