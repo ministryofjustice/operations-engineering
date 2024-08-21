@@ -28,13 +28,15 @@ jobs:
           path: ~/.aws
         continue-on-error: true
 
-      - name: Decrypt AWS credentials
-        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+      - name: Import GPG keys
         run: |
           mkdir -p ~/.gnupg
           echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
           echo "${{ secrets.GPG_PUBLIC_KEY }}" | gpg --import
-          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
+
+      - name: Decrypt AWS credentials
+        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+        run: echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
         uses: aws-actions/configure-aws-credentials@v4
