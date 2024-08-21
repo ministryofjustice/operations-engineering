@@ -21,11 +21,16 @@ jobs:
         continue-on-error: true
 
       - uses: actions/download-artifact@v4
+        id: download-aws-credentials
         name: Import AWS credentials
         with:
           name: aws-credentials
           path: ~/.aws
         continue-on-error: true
+
+      - name: Decrypt AWS credentials
+        if: ${{ steps.download-aws-credentials.outcome == 'success' }}
+        run: echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
       - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
         uses: aws-actions/configure-aws-credentials@v4
@@ -41,6 +46,9 @@ jobs:
           aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_secret_manager_access_profile
           aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_secret_manager_access_profile
 
+      - name: Encrypt AWS credentials
+        run: gpg --batch --yes --passphrase ${{ secrets.GPG_PASSPHRASE }} -c ~/.aws/credentials
+
       - uses: actions/upload-artifact@v4
         name: Export AWS configuration
         with:
@@ -52,5 +60,5 @@ jobs:
         name: Export AWS credentials
         with:
           name: aws-credentials
-          path: ~/.aws/credentials
+          path: ~/.aws/credentials.gpg
           retention-days: 1

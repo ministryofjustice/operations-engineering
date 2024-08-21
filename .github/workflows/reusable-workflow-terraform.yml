@@ -59,6 +59,9 @@ jobs:
           path: ~/.aws
         continue-on-error: true
 
+      - name: Decrypt AWS credentials
+        run: echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
+
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
