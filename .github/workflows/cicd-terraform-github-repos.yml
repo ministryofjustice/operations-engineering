@@ -32,7 +32,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile dsd_secret_manager_access_profile
           aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile dsd_secret_manager_access_profile
 
-      - uses: actions/upload-artifact@v4.3.6
+      - uses: actions/upload-artifact@v4
         name: Export AWS configuration
         with:
           name: aws-config
