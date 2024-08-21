@@ -49,14 +49,14 @@ jobs:
         if: ${{ steps.download-aws-credentials.outcome == 'success' }}
         run: echo "${{ secrets.gpg_passphrase }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
 
-      - name: Configure AWS credentials for accessing AWS Secrets Manager in the DSD account
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.iam_role }}
           aws-region: eu-west-2
           role-duration-seconds: 900
 
-      - name: Save AWS credentials for accessing AWS Secrets Manager in the DSD account to a new profile
+      - name: Save AWS credentials to a new profile
         run: |
           aws configure set region ${{ env.AWS_REGION }} --profile ${{ inputs.profile_name }}
           aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile ${{ inputs.profile_name }}
