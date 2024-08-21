@@ -34,7 +34,7 @@ def fetch_gha_quota():
     try:
         KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used)
     except RequestException as e:
-        logging.info("An error occurred with the database POST request")
+        logging.info("Issue when trying to fetch github action quota for the enterprise")
         logging.error(e)
 
 
