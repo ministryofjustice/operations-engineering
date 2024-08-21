@@ -38,11 +38,8 @@ jobs:
         run: |
           mkdir -p ~/.gnupg
           chmod 700 ~/.gnupg
-          export GPG_TTY=$(tty)
-          echo "${{ secrets.gpg_private_key }}" | base64 --decode > ~/.gnupg/private.key
-          echo "${{ secrets.gpg_public_key }}" | base64 --decode > ~/.gnupg/public.key
-          gpg --import ~/.gnupg/private.key
-          gpg --import ~/.gnupg/public.key
+          echo "${{ secrets.gpg_private_key }}" | gpg --import --batch --yes
+          echo "${{ secrets.gpg_public_key }}" | gpg --import --batch --yes
 
       - name: Decrypt AWS credentials
         if: ${{ steps.download-aws-credentials.outcome == 'success' }}
