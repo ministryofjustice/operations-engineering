@@ -28,6 +28,8 @@ class TestFetchGithubActionsQuota(unittest.TestCase):
 
         self.assertEqual(str(context.exception), "The env variable GH_TOKEN is empty or missing")
 
+    @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+    @patch("gql.Client.__new__", new=MagicMock)
     @patch("github.Github.__new__", new=MagicMock)
     @patch("bin.fetch_github_actions_quota.get_environment_variables")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
