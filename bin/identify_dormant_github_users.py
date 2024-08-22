@@ -44,38 +44,46 @@ class DormantUser:
     email: str
 
 
-def get_inactive_users_from_github_audit_log_using_cloudtrail(all_users: list) -> list:
-    AWS_MOJDS_AWS_PROFILE = "880656497252_AdministratorAccess"
-    cloudtrail_service = CloudtrailService(AWS_MOJDS_AWS_PROFILE)
+def check_github_for_dormant_users_excluding_bots(
+    all_github_users: list, aws_profile: str
+) -> list:
+    """We export the enterprise audit log from GitHub into AWS Cloudtrail.
+    This function will check the cloudtrail logs for the last time a user
+    was active on GitHub. If they don't appear in the logs, and aren't a bot,
+    as defined above, they are deemed dormant.
+    """
+    cloudtrail_service = CloudtrailService(aws_profile)
     active_users = cloudtrail_service.get_active_users_for_dormant_users_process()
 
     return [
         user
-        for user in all_users
+        for user in all_github_users
         if user not in list(set(active_users).union(ALLOWED_BOT_USERS))
     ]
 
 
-def get_active_users_from_auth0_log_group() -> list:
-    AWS_OPERATIONS_ENGINEERING_PROFILE = "211125434264_modernisation-platform-sandbox"
+def get_active_users_from_auth0_log_group(aws_profile: str) -> list:
+    """Operations Engineering, Cloud, Mod and Analytical Platforms all have thir own
+    Auth0 tenants. All logs are collected in a single Cloudwatch log group.
+    This function will parse the logs and return a list of active users using
+    an insights query.
+    """
     cloudwatch_log_group = "/aws/events/LogsFromOperationsEngineeringAuth0"
 
-    cloudwatch_service = CloudWatchService(
-        AWS_OPERATIONS_ENGINEERING_PROFILE, cloudwatch_log_group
-    )
+    cloudwatch_service = CloudWatchService(aws_profile, cloudwatch_log_group)
     return cloudwatch_service.get_all_auth0_users_that_appear_in_tenants()
 
 
 def get_dormant_users_according_to_github_and_auth0(
-    github_token, dormant_users_according_to_github: list
-):
-    active_email_addresses = get_active_users_from_auth0_log_group()
+    github_token, dormant_users_according_to_github: list, aws_profile: str
+) -> list:
+    active_email_addresses = get_active_users_from_auth0_log_group(aws_profile)
     github_service = GithubService(github_token, ORGANISATION)
 
-    dormant_users = []
-    for user in dormant_users_according_to_github:
-        new_user = DormantUser(user, github_service.get_user_org_email_address(user))
-        dormant_users.append(new_user)
+    dormant_users = [
+        DormantUser(user, github_service.get_user_org_email_address(user))
+        for user in dormant_users_according_to_github
+    ]
 
     return [user for user in dormant_users if user.email not in active_email_addresses]
 
@@ -96,8 +104,8 @@ def identify_dormant_github_users():
     required_env_vars = [
         "GH_ADMIN_TOKEN",
         "ADMIN_SLACK_TOKEN",
-        # "MOJDSD_AWS_PROFILE",
-        # "MODERNISATION_PLATFORM_SANDBOX",
+        "MOJDSD_AWS_PROFILE",
+        "MODERNISATION_PLATFORM_SANDBOX",
     ]
     env = EnvironmentVariables(required_env_vars)
 
@@ -105,35 +113,24 @@ def identify_dormant_github_users():
         env.get("GH_ADMIN_TOKEN"), ORGANISATION
     ).get_all_enterprise_members()
 
-    logger.info("Identifying dormant GitHub users according to GitHub")
-    dormant_users_according_to_github = (
-        get_inactive_users_from_github_audit_log_using_cloudtrail(all_github_users)
+    dormant_users_according_to_github = check_github_for_dormant_users_excluding_bots(
+        all_github_users, env.get("MOJDSD_AWS_PROFILE")
     )
-    logger.info(
-        f"Number of users defined dormant: {len(dormant_users_according_to_github)}"
-    )
-    logger.info("Identifying dormant GitHub users according to Auth0")
 
     dormant_users_accoding_to_github_and_auth0 = (
         get_dormant_users_according_to_github_and_auth0(
-            env.get("GH_ADMIN_TOKEN"), dormant_users_according_to_github
+            env.get("GH_ADMIN_TOKEN"),
+            dormant_users_according_to_github,
+            env.get("MODRNISATION_PLATFORM_SANDBOX"),
         )
     )
     for user in dormant_users_accoding_to_github_and_auth0:
         logger.info(f"User: {user}")
-        logger.info(
-            f"Number of users defined dormant: {len(dormant_users_accoding_to_github_and_auth0)}"
-        )
 
-    # for user in dormant_users_accoding_to_github_and_auth0:
-    #     logger.info(
-    #         f"User: {user.name}, Last Github Activity: {user.last_github_activity}, Last Auth0 Activity: {user.last_auth0_activity}"
-    #     )
-    #
-    # logger.info(
-    #     "Number of users defined dormant:",
-    #     len(dormant_users_accoding_to_github_and_auth0),
-    # )
+    logger.info(
+        f"Number of users defined dormant: \
+        {len(dormant_users_accoding_to_github_and_auth0)}"
+    )
     #
     # SlackService(env.get("ADMIN_SLACK_TOKEN")).send_message_to_plaintext_channel_name(
     #     message_to_slack_channel(dormant_users_accoding_to_github_and_auth0),
