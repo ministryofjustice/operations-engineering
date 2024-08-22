@@ -22,11 +22,11 @@ on:
       lambda_module_name:
         required: false
         type: string
-      profile_name:
+      aws_profile_name:
         required: false
         type: string
     secrets:
-      profile_arn:
+      aws_profile_arn:
         required: false
       iam_role:
         required: true
@@ -66,17 +66,17 @@ jobs:
       - name: Configure AWS credentials for profile
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.profile_arn }}
+          role-to-assume: ${{ secrets.aws_profile_arn }}
           aws-region: eu-west-2
           role-duration-seconds: 900
         continue-on-error: true
 
       - name: Create AWS profile
         run: |
-          aws configure set region ${{ env.AWS_REGION }} --profile ${{ inputs.profile_name }}
-          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile ${{ inputs.profile_name }}
-          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile ${{ inputs.profile_name }}
-          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile ${{ inputs.profile_name }}
+          aws configure set region ${{ env.AWS_REGION }} --profile ${{ inputs.aws_profile_name }}
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile ${{ inputs.aws_profile_name }}
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile ${{ inputs.aws_profile_name }}
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile ${{ inputs.aws_profile_name }}
         continue-on-error: true
 
       - uses: hashicorp/setup-terraform@v3

@@ -19,10 +19,10 @@ jobs:
       path: "terraform/dsd/iam"
       terraform_version: "1.6.6"
       name: "dsd iam"
-      profile_name: "dsd_profile"
+      aws_profile_name: "dsd_profile"
     secrets:
       iam_role: ${{ secrets.R53_BACKUP_ROLE_ARN }}
-      profile_arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
+      aws_profile_arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
       env: |
