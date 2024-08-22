@@ -12,63 +12,17 @@ on:
       - "terraform/github/log_streaming/**"
     branches: ["main"]
 
-env:
-  TERRAFORM_VERSION: "1.6.6"
-
 jobs:
-  cloudtrail-streaming-terraform:
-    name: "CloudTrail Streaming Terraform"
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      id-token: write
-    defaults:
-      run:
-        working-directory: "terraform/github/log_streaming"
-    steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_DSD_CICD_ADMIN_ROLE_ARN }}
-          aws-region: eu-west-2
-
-      - name: Terraform Format Check
-        id: fmt-check
-        run: terraform fmt -check
-
-      - name: Terraform Init
-        id: init
-        run: ls -latr; terraform init -input=false -no-color
-
-      - name: Build Lambdas
-        id: build-lambdas
-        run: cd .terraform/modules/github-cloudtrail-auditlog && make all
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -input=false -no-color
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        id: apply
-        run: terraform apply -input=false -no-color -auto-approve
-
-      - name: Report failure to Slack
-        if: ${{ always() && github.ref == 'refs/heads/main' }}
-        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
-        with:
-          status: ${{ job.status }}
-          notify_when: "failure"
-          notification_title: "Terraform apply pipeline failure: $GITHUB_JOB"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  terraform-cloudtrail-streaming:
+    uses: ./.github/workflows/reusable-workflow-terraform.yml
+    with:
+      path: "terraform/github/log_streaming"
+      terraform_version: "1.6.6"
+      name: "cloudtrail log streaming"
+      build_lambdas: true
+      lambda_module_name: "github-cloudtrail-auditlog"
+      build_lambdas_command: "make all"
+    secrets:
+      iam_role: ${{ secrets.AWS_DSD_CICD_ADMIN_ROLE_ARN }}
+      repo_github_token: ${{ secrets.GITHUB_TOKEN }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

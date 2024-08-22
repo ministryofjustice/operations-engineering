@@ -1,0 +1,155 @@
+name: "♻️ Terraform Reusable Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      terraform_version:
+        required: true
+        type: string
+      name:
+        required: true
+        type: string
+      build_lambdas:
+        required: false
+        type: boolean
+        default: false
+      build_lambdas_command:
+        required: false
+        type: string
+      lambda_module_name:
+        required: false
+        type: string
+      aws_profile_name:
+        required: false
+        type: string
+    secrets:
+      aws_profile_arn:
+        required: false
+      iam_role:
+        required: true
+      repo_github_token:
+        required: true
+      slack_webhook_url:
+        required: true
+      env:
+        required: false
+
+env:
+  TERRAFORM_VERSION: ${{ inputs.terraform_version }}
+
+jobs:
+  terraform:
+    name: "Terraform ${{ inputs.path }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    defaults:
+      run:
+        working-directory: ${{ inputs.path }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          while IFS='=' read -r key value; do
+            if [ -n "$key" ]; then
+              echo "$key=${value}" >> "$GITHUB_ENV"
+              echo "::add-mask::${value}"
+            fi
+          done <<< "${{ secrets.env }}"
+
+      - name: Configure AWS credentials for profile
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.aws_profile_arn }}
+          aws-region: eu-west-2
+          role-duration-seconds: 900
+        continue-on-error: true
+
+      - name: Create AWS profile
+        run: |
+          aws configure set region ${{ env.AWS_REGION }} --profile ${{ inputs.aws_profile_name }}
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile ${{ inputs.aws_profile_name }}
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile ${{ inputs.aws_profile_name }}
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile ${{ inputs.aws_profile_name }}
+        continue-on-error: true
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Configure AWS credentials for Terraform
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.iam_role }}
+          aws-region: eu-west-2
+
+      - name: Post Link to Apply Pipeline
+        if: github.ref == 'refs/heads/main'
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
+        with:
+          repo-token: ${{ secrets.repo_github_token }}
+          repo-token-user-login: "github-actions[bot]"
+          message: |
+            Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
+
+      - name: Delete old comments on PR made by bot user
+        if: github.ref != 'refs/heads/main'
+        uses: izhangzhihao/delete-comment@master
+        with:
+          github_token: ${{ secrets.repo_github_token }}
+          delete_user_name: github-actions[bot]
+          issue_number: ${{ github.event.number }}
+        continue-on-error: true
+
+      - name: Terraform Format Check
+        id: fmt-check
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: ls -latr; terraform init -input=false -no-color
+
+      - name: Build Lambdas
+        if: ${{ inputs.build_lambdas }}
+        run: cd .terraform/modules/${{ inputs.lambda_module_name }} && ${{ inputs.build_lambdas_command }}
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -input=false -no-color
+
+      - name: Post Plan to GitHub PR
+        if: github.ref != 'refs/heads/main'
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
+        with:
+          repo-token: ${{ secrets.repo_github_token }}
+          repo-token-user-login: "github-actions[bot]"
+          message: |
+            ## Terraform ${{ inputs.name }} plan
+            ```
+            ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
+            ```
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        id: apply
+        run: terraform apply -input=false -no-color -auto-approve
+
+      - name: Report failure to Slack
+        if: ${{ always() && github.ref == 'refs/heads/main' }}
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed GitHub Action Run"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.slack_webhook_url }}
