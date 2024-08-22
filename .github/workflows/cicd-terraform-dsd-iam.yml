@@ -13,31 +13,18 @@ on:
     branches: ["main"]
 
 jobs:
-  configure-aws-profiles:
-    uses: ./.github/workflows/reusable-workflow-configure-aws-profiles.yml
-    with:
-      profile_name: "dsd_profile"
-    secrets:
-      iam_role: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
-      gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-      gpg_public_key: ${{ secrets.GPG_PUBLIC_KEY }}
-      gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
-
   terraform-dsd-iam:
-    needs: configure-aws-profiles
     uses: ./.github/workflows/reusable-workflow-terraform.yml
     with:
       path: "terraform/dsd/iam"
       terraform_version: "1.6.6"
       name: "dsd iam"
-      aws_profiles: true
+      profile_name: "dsd_profile"
     secrets:
       iam_role: ${{ secrets.R53_BACKUP_ROLE_ARN }}
+      profile_arn: ${{ secrets.AWS_DSD_CREATE_IAM_ROLE_ARN }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-      gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-      gpg_public_key: ${{ secrets.GPG_PUBLIC_KEY }}
-      gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
       env: |
         TF_VAR_github_token=${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
         TF_VAR_cloud_platform_account_id=${{ secrets.CLOUD_PLATFORM_ACCOUNT_ID }}

@@ -12,10 +12,6 @@ on:
       name:
         required: true
         type: string
-      aws_profiles:
-        required: false
-        type: boolean
-        default: false
       build_lambdas:
         required: false
         type: boolean
@@ -26,7 +22,12 @@ on:
       lambda_module_name:
         required: false
         type: string
+      profile_name:
+        required: false
+        type: string
     secrets:
+      profile_arn:
+        required: false
       iam_role:
         required: true
       repo_github_token:
@@ -34,12 +35,6 @@ on:
       slack_webhook_url:
         required: true
       env:
-        required: false
-      gpg_private_key:
-        required: false
-      gpg_public_key:
-        required: false
-      gpg_passphrase:
         required: false
 
 env:
@@ -57,7 +52,6 @@ jobs:
       run:
         working-directory: ${{ inputs.path }}
     steps:
-
       - uses: actions/checkout@v4
 
       - name: Set environment variables
@@ -69,34 +63,21 @@ jobs:
             fi
           done <<< "${{ secrets.env }}"
 
-      - uses: actions/download-artifact@v4
-        if: ${{ inputs.aws_profiles }}
-        name: Import AWS configuration
+      - name: Configure AWS credentials for profile
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          name: aws-config
-          path: ~/.aws
+          role-to-assume: ${{ secrets.profile_arn }}
+          aws-region: eu-west-2
+          role-duration-seconds: 900
         continue-on-error: true
 
-      - uses: actions/download-artifact@v4
-        if: ${{ inputs.aws_profiles }}
-        id: download-aws-credentials
-        name: Import AWS credentials
-        with:
-          name: aws-credentials
-          path: ~/.aws
-        continue-on-error: true
-
-      - name: Import GPG keys
-        if: ${{ inputs.aws_profiles }}
+      - name: Create AWS profile
         run: |
-          mkdir -p ~/.gnupg
-          chmod 700 ~/.gnupg
-          echo "${{ secrets.gpg_private_key }}" | gpg --import --batch --yes
-          echo "${{ secrets.gpg_public_key }}" | gpg --import --batch --yes
-
-      - name: Decrypt AWS credentials
-        if: ${{ inputs.aws_profiles }}
-        run: echo "${{ secrets.gpg_passphrase }}" | gpg --batch --yes --passphrase-fd 0 -d ~/.aws/credentials.gpg > ~/.aws/credentials
+          aws configure set region ${{ env.AWS_REGION }} --profile ${{ inputs.profile_name }}
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile ${{ inputs.profile_name }}
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile ${{ inputs.profile_name }}
+          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile ${{ inputs.profile_name }}
+        continue-on-error: true
 
       - uses: hashicorp/setup-terraform@v3
         with:
