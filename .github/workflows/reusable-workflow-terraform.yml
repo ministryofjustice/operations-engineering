@@ -9,7 +9,7 @@ on:
       terraform_version:
         required: true
         type: string
-      stack_name:
+      name:
         required: true
         type: string
       aws_profiles:
@@ -153,7 +153,7 @@ jobs:
           repo-token: ${{ secrets.repo_github_token }}
           repo-token-user-login: "github-actions[bot]"
           message: |
-            ## Terraform ${{ inputs.stack_name }} plan
+            ## Terraform ${{ inputs.name }} plan
             ```
             ${{ steps.plan.outputs.stdout || steps.plan.outputs.stderr }}
             ```

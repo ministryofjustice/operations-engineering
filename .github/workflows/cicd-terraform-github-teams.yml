@@ -18,7 +18,7 @@ jobs:
     with:
       path: "terraform/github/teams"
       terraform_version: "1.6.6"
-      stack_name: "github teams"
+      name: "github teams"
     secrets:
       iam_role: ${{ secrets.TERRAFORM_GITHUB_TEAMS_S3_ROLE_ARN_PROD }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
