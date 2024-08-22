@@ -28,6 +28,7 @@ class TestFetchGithubActionsQuota(unittest.TestCase):
 
         self.assertEqual(str(context.exception), "The env variable GH_TOKEN is empty or missing")
 
+    @patch("github.Github.__new__")
     @patch("bin.fetch_github_actions_quota.get_environment_variables")
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
     @patch.object(GithubService, "calculate_total_minutes_used")
