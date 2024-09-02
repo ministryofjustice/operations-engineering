@@ -168,7 +168,8 @@ def save_dormant_users_to_csv(dormant_users: list[DormantUser]):
         for user in dormant_users:
             csv_writer.writerow([user.name, user.email])
 
-    logger.info(f"Dormant users have been written to {output_csv_file_name}")
+    logger.info("Dormant users have been written to %s",
+                {output_csv_file_name})
 
 
 def identify_dormant_github_users():
