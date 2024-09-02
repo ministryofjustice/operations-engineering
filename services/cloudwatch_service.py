@@ -44,7 +44,8 @@ class CloudWatchService:
         | parse @message '"user_name":"*"' as user_name
         | stats count() by user_name
         """
-        start_time = int((datetime.now() - timedelta(days=days_to_check)).timestamp())
+        start_time = int(
+            (datetime.now() - timedelta(days=days_to_check)).timestamp())
         end_time = int(datetime.now().timestamp())
 
         query_id = self.run_insights_query(query, start_time, end_time)
