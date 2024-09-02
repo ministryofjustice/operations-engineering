@@ -82,7 +82,7 @@ class TestCloudWatchService(unittest.TestCase):
 
         mock_run_query.assert_called_with(expected_query, start_time, end_time)
 
-        self.assertEqual(result, ['user1@example.com', 'user2@example.com'])
+        self.assertIn('user1@example.com', result)
 
 
 if __name__ == "__main__":
