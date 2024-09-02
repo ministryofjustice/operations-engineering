@@ -1,15 +1,24 @@
+import csv
 import logging
+import os
 from dataclasses import dataclass
+from datetime import datetime
 
-from services.cloudtrail_service import CloudtrailService
+import boto3
+from botocore.exceptions import NoCredentialsError
+
 from services.cloudwatch_service import CloudWatchService
 from services.github_service import GithubService
 from services.slack_service import SlackService
 from utils.environment import EnvironmentVariables
 
+BUCKET_NAME = "operations-engineering-identify-dormant-github-user-csv"
+CSV_FILE_NAME = "dormant.csv"
+MOJ_ORGANISATION = "ministryofjustice"
+AP_ORGANISATION = "moj-analytical-services"
 SLACK_CHANNEL = "operations-engineering-alerts"
-ORGANISATION = "ministryofjustice"
-# These are the users that are deemed acceptable to be dormant. They are either bots or service accounts and will be revisited regularly.
+# These are the users that are deemed acceptable to be dormant.
+# They are either bots or service accounts and will be revisited regularly.
 ALLOWED_BOT_USERS = [
     "ci-hmcts",
     "cloud-platform-dummy-user",
@@ -41,28 +50,80 @@ logger = logging.getLogger(__name__)
 @dataclass
 class DormantUser:
     name: str
-    email: str
+    email: str | None
 
 
-def check_github_for_dormant_users_excluding_bots(
-    all_github_users: list, aws_profile: str
-) -> list:
-    """We export the enterprise audit log from GitHub into AWS Cloudtrail.
-    This function will check the cloudtrail logs for the last time a user
-    was active on GitHub. If they don't appear in the logs, and aren't a bot,
-    as defined above, they are deemed dormant.
+def get_usernames_from_csv_ignoring_bots_and_collaborators(bot_list: list) -> list:
+    usernames = []
+    try:
+        with open(CSV_FILE_NAME, mode="r", encoding="utf-8") as file:
+            csv_reader = csv.DictReader(file)
+
+            for row in csv_reader:
+                username = row["login"].strip()
+                is_collaborator = row["outside_collaborator"].lower() == "true"
+                if username not in bot_list and not is_collaborator:
+                    usernames.append(username)
+
+    except FileNotFoundError as e:
+        logging.error("Error reading from file %s: %s", CSV_FILE_NAME, e)
+
+    return usernames
+
+
+def download_github_dormant_users_csv_from_s3():
+    s3 = boto3.client("s3")
+    try:
+        s3.download_file(BUCKET_NAME, CSV_FILE_NAME, CSV_FILE_NAME)
+        logger.info("File %s downloaded successfully.", CSV_FILE_NAME)
+    except NoCredentialsError:
+        logger.error(
+            "Credentials not available, please check your AWS credentials.")
+    except FileNotFoundError as e:
+        logger.error("Error downloading file: %s", e)
+
+    if not os.path.isfile(CSV_FILE_NAME):
+        raise FileNotFoundError(
+            f"File {CSV_FILE_NAME} not found in the current directory."
+        )
+
+
+def get_dormant_users_from_github_csv(
+    env_vars: EnvironmentVariables,
+) -> list[DormantUser]:
     """
-    cloudtrail_service = CloudtrailService(aws_profile)
-    active_users = cloudtrail_service.get_active_users_for_dormant_users_process()
+    This function depends on a preliminary manual process: a GitHub Enterprise user
+    must first download the 'dormant.csv' file from the GitHub Enterprise dashboard and
+    then upload it to an S3 bucket. Once this setup is complete, this function will
+    download the 'dormant.csv' file from the S3 bucket and extract a list of
+    usernames from the file.
 
-    return [
-        user
-        for user in all_github_users
-        if user not in list(set(active_users).union(ALLOWED_BOT_USERS))
+    This process ensures that the most current data regarding dormant users is used.
+    """
+    download_github_dormant_users_csv_from_s3()
+    users = get_usernames_from_csv_ignoring_bots_and_collaborators(
+        ALLOWED_BOT_USERS)
+
+    # We need to check both the MOJ and AP GitHub organisations as
+    # there is no enterprise opion for this.
+    moj_github_org = GithubService(env_vars.get(
+        "GH_MOJ_ADMIN_TOKEN"), MOJ_ORGANISATION)
+    ap_github_org = GithubService(env_vars.get(
+        "GH_AP_ADMIN_TOKEN"), AP_ORGANISATION)
+
+    dormant_users = [
+        DormantUser(
+            user,
+            moj_github_org.get_user_org_email_address(user)
+            or ap_github_org.get_user_org_email_address(user),
+        )
+        for user in users
     ]
 
+    return dormant_users
 
-def get_active_users_from_auth0_log_group(aws_profile: str) -> list:
+
+def get_active_users_from_auth0_log_group() -> list:
     """Operations Engineering, Cloud, Mod and Analytical Platforms all have thir own
     Auth0 tenants. All logs are collected in a single Cloudwatch log group.
     This function will parse the logs and return a list of active users using
@@ -70,72 +131,65 @@ def get_active_users_from_auth0_log_group(aws_profile: str) -> list:
     """
     cloudwatch_log_group = "/aws/events/LogsFromOperationsEngineeringAuth0"
 
-    cloudwatch_service = CloudWatchService(aws_profile, cloudwatch_log_group)
+    cloudwatch_service = CloudWatchService(cloudwatch_log_group)
     return cloudwatch_service.get_all_auth0_users_that_appear_in_tenants()
 
 
-def get_dormant_users_according_to_github_and_auth0(
-    github_token, dormant_users_according_to_github: list, aws_profile: str
-) -> list:
-    active_email_addresses = get_active_users_from_auth0_log_group(aws_profile)
-    github_service = GithubService(github_token, ORGANISATION)
+def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> list:
+    active_email_addresses = get_active_users_from_auth0_log_group()
 
-    dormant_users = [
-        DormantUser(user, github_service.get_user_org_email_address(user))
+    dormant_users_not_in_auth0 = [
+        user
         for user in dormant_users_according_to_github
+        if user.email not in active_email_addresses
     ]
-
-    return [user for user in dormant_users if user.email not in active_email_addresses]
+    return dormant_users_not_in_auth0
 
 
 def message_to_slack_channel(list_of_dormant_users: list) -> str:
     msg = (
         "Hello 🤖, \n\n"
-        f"The identify dormant GitHub users script has identified {len(list_of_dormant_users)} dormant users. \n-----\n"
+        f"The identify dormant GitHub users script has found{
+            len(list_of_dormant_users)} dormant users. \n-----\n"
     )
 
     for user in list_of_dormant_users:
-        msg += f"{user.name} | Last Github Activity: {user.last_github_activity} | Last Auth0 Activity: {user.last_auth0_activity}\n"
+        msg += f"GitHub username: {user.name} | Email: {user.email}\n"
 
     return msg
 
 
+def save_dormant_users_to_csv(dormant_users: list[DormantUser]):
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    output_csv_file_name = f"{current_date}_dormant_users.csv"
+
+    with open(output_csv_file_name, mode="w", newline="", encoding="utf-8") as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(["Name", "Email"])
+        for user in dormant_users:
+            csv_writer.writerow([user.name, user.email])
+
+    logger.info(f"Dormant users have been written to {output_csv_file_name}")
+
+
 def identify_dormant_github_users():
     required_env_vars = [
-        "GH_ADMIN_TOKEN",
+        "GH_MOJ_ADMIN_TOKEN",
+        "GH_AP_ADMIN_TOKEN",
         "ADMIN_SLACK_TOKEN",
-        "MOJDSD_AWS_PROFILE",
-        "MODERNISATION_PLATFORM_SANDBOX",
     ]
     env = EnvironmentVariables(required_env_vars)
 
-    all_github_users = GithubService(
-        env.get("GH_ADMIN_TOKEN"), ORGANISATION
-    ).get_all_enterprise_members()
+    githubs_list_of_dormant_users = get_dormant_users_from_github_csv(env)
 
-    dormant_users_according_to_github = check_github_for_dormant_users_excluding_bots(
-        all_github_users, env.get("MOJDSD_AWS_PROFILE")
+    dormant_users_accoding_to_github_and_auth0 = filter_out_active_auth0_users(
+        githubs_list_of_dormant_users
     )
 
-    dormant_users_accoding_to_github_and_auth0 = (
-        get_dormant_users_according_to_github_and_auth0(
-            env.get("GH_ADMIN_TOKEN"),
-            dormant_users_according_to_github,
-            env.get("MODRNISATION_PLATFORM_SANDBOX"),
-        )
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_message_to_plaintext_channel_name(
+        message_to_slack_channel(dormant_users_accoding_to_github_and_auth0),
+        SLACK_CHANNEL,
     )
-    for user in dormant_users_accoding_to_github_and_auth0:
-        logger.info(f"User: {user}")
-
-    logger.info(
-        f"Number of users defined dormant: \
-        {len(dormant_users_accoding_to_github_and_auth0)}"
-    )
-    #
-    # SlackService(env.get("ADMIN_SLACK_TOKEN")).send_message_to_plaintext_channel_name(
-    #     message_to_slack_channel(dormant_users_accoding_to_github_and_auth0),
-    #     SLACK_CHANNEL,
-    # )
 
 
 if __name__ == "__main__":
