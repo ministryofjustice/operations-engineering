@@ -146,14 +146,13 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
     return dormant_users_not_in_auth0
 
 
-def message_to_slack_channel(list_of_dormant_users: list) -> str:
+def message_to_slack_channel(dormant_users: list) -> str:
     msg = (
         "Hello 🤖, \n\n"
-        f"The identify dormant GitHub users script has found{
-            len(list_of_dormant_users)} dormant users. \n-----\n"
+        "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n\n"
     )
 
-    for user in list_of_dormant_users:
+    for user in dormant_users:
         msg += f"GitHub username: {user.name} | Email: {user.email}\n"
 
     return msg

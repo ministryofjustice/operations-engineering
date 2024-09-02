@@ -43,10 +43,9 @@ class TestDormantGitHubUsers(unittest.TestCase):
         ]
 
         result = message_to_slack_channel(dormant_users)
-
         expected_message = (
             "Hello 🤖, \n\n"
-            "The identify dormant GitHub users script has identified 2 dormant users. \n-----\n"
+            "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n\n"
             "GitHub username: user1 | Email: user1@example.com\n"
             "GitHub username: user2 | Email: user2@example.com\n"
         )
