@@ -33,7 +33,7 @@ class CloudWatchService:
             response = self.client.get_query_results(queryId=query_id)
             if response["status"] == "Complete":
                 return response["results"]
-            elif time.time() - start_time > timeout:
+            if time.time() - start_time > timeout:
                 logger.error("Query timed out")
                 return None
             time.sleep(1)  # Sleep to rate limit the polling
