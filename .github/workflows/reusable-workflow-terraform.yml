@@ -111,6 +111,8 @@ jobs:
         id: fmt-check
         run: terraform fmt -check
 
+      - run: terraform force-unlock 46d04faf-a9b0-b77e-5ee5-174f709b0565
+
       - name: Terraform Init
         id: init
         run: ls -latr; terraform init -input=false -no-color
