@@ -736,7 +736,6 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_user_org_email_address(self, user_name) -> str | None:
-        logging.info(f"Getting user {user_name} email address")
         data = self.github_client_gql_api.execute(gql("""
             query($organisation_name: String!, $user_name: String!) {
                 user(login: $user_name) {
