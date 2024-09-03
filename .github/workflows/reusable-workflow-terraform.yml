@@ -115,8 +115,6 @@ jobs:
         id: init
         run: ls -latr; terraform init -input=false -no-color
 
-      - run: terraform force-unlock -force 46d04faf-a9b0-b77e-5ee5-174f709b0565
-
       - name: Build Lambdas
         if: ${{ inputs.build_lambdas }}
         run: cd .terraform/modules/${{ inputs.lambda_module_name }} && ${{ inputs.build_lambdas_command }}
