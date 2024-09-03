@@ -134,7 +134,7 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
     dormant_users_not_in_auth0 = [
         user
         for user in dormant_users_according_to_github
-        if user.email not in active_email_addresses
+        if user.email.lower() not in active_email_addresses
     ]
     return dormant_users_not_in_auth0
 
