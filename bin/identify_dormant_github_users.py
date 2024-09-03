@@ -77,8 +77,7 @@ def download_github_dormant_users_csv_from_s3():
         s3.download_file(BUCKET_NAME, CSV_FILE_NAME, CSV_FILE_NAME)
         logger.info("File %s downloaded successfully.", CSV_FILE_NAME)
     except NoCredentialsError:
-        logger.error(
-            "Credentials not available, please check your AWS credentials.")
+        logger.error("Credentials not available, please check your AWS credentials.")
     except FileNotFoundError as e:
         logger.error("Error downloading file: %s", e)
 
@@ -101,8 +100,7 @@ def get_dormant_users_from_github_csv(
     This process ensures that the most current data regarding dormant users is used.
     """
     download_github_dormant_users_csv_from_s3()
-    users = get_usernames_from_csv_ignoring_bots_and_collaborators(
-        ALLOWED_BOT_USERS)
+    users = get_usernames_from_csv_ignoring_bots_and_collaborators(ALLOWED_BOT_USERS)
 
     dormant_users = [
         DormantUser(
@@ -134,7 +132,7 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
     dormant_users_not_in_auth0 = [
         user
         for user in dormant_users_according_to_github
-        if user.email and user.email.lower() in active_email_addresses
+        if user.email and user.email.lower() not in active_email_addresses
     ]
     return dormant_users_not_in_auth0
 
@@ -161,8 +159,7 @@ def save_dormant_users_to_csv(dormant_users: list[DormantUser]):
         for user in dormant_users:
             csv_writer.writerow([user.name, user.email])
 
-    logger.info("Dormant users have been written to %s",
-                {output_csv_file_name})
+    logger.info("Dormant users have been written to %s", {output_csv_file_name})
 
 
 def identify_dormant_github_users():
@@ -175,13 +172,12 @@ def identify_dormant_github_users():
 
     # To identify email addresses, we need to check both
     # the MOJ and AP GitHub organisations as there is no enterprise opion for this.
-    moj_github_org = GithubService(env.get(
-        "GH_MOJ_ADMIN_TOKEN"), MOJ_ORGANISATION)
-    ap_github_org = GithubService(env.get(
-        "GH_AP_ADMIN_TOKEN"), AP_ORGANISATION)
+    moj_github_org = GithubService(env.get("GH_MOJ_ADMIN_TOKEN"), MOJ_ORGANISATION)
+    ap_github_org = GithubService(env.get("GH_AP_ADMIN_TOKEN"), AP_ORGANISATION)
 
     githubs_list_of_dormant_users = get_dormant_users_from_github_csv(
-        moj_github_org, ap_github_org)
+        moj_github_org, ap_github_org
+    )
 
     dormant_users_accoding_to_github_and_auth0 = filter_out_active_auth0_users(
         githubs_list_of_dormant_users
