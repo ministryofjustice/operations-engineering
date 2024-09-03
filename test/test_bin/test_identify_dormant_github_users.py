@@ -56,6 +56,24 @@ class TestDormantGitHubUsers(unittest.TestCase):
 
         self.assertEqual(result, expected_message)
 
+    def test_message_to_slack_channel(self):
+        dormant_users = [
+            DormantUser(name='user1', email='user1@example.com'),
+            DormantUser(name='user2', email='user2@example.com')
+        ]
+    
+        result = message_to_slack_channel(dormant_users)
+    
+        expected_message = (
+            "Hello 🤖,\n\n"
+            "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n\n"
+            "- user1 | user1@example.com\n"
+            "- user2 | user2@example.com\n"
+        )
+    
+        self.assertEqual(result, expected_message)
+
+
 
 if __name__ == "__main__":
     unittest.main()
