@@ -89,7 +89,7 @@ def download_github_dormant_users_csv_from_s3():
 
 
 def get_dormant_users_from_github_csv(
-    env_vars: EnvironmentVariables,
+    moj_github_org: GithubService, ap_github_org: GithubService
 ) -> list[DormantUser]:
     """
     This function depends on a preliminary manual process: a GitHub Enterprise user
@@ -103,13 +103,6 @@ def get_dormant_users_from_github_csv(
     download_github_dormant_users_csv_from_s3()
     users = get_usernames_from_csv_ignoring_bots_and_collaborators(
         ALLOWED_BOT_USERS)
-
-    # We need to check both the MOJ and AP GitHub organisations as
-    # there is no enterprise opion for this.
-    moj_github_org = GithubService(env_vars.get(
-        "GH_MOJ_ADMIN_TOKEN"), MOJ_ORGANISATION)
-    ap_github_org = GithubService(env_vars.get(
-        "GH_AP_ADMIN_TOKEN"), AP_ORGANISATION)
 
     dormant_users = [
         DormantUser(
@@ -180,7 +173,15 @@ def identify_dormant_github_users():
     ]
     env = EnvironmentVariables(required_env_vars)
 
-    githubs_list_of_dormant_users = get_dormant_users_from_github_csv(env)
+    # To identify email addresses, we need to check both
+    # the MOJ and AP GitHub organisations as there is no enterprise opion for this.
+    moj_github_org = GithubService(env.get(
+        "GH_MOJ_ADMIN_TOKEN"), MOJ_ORGANISATION)
+    ap_github_org = GithubService(env.get(
+        "GH_AP_ADMIN_TOKEN"), AP_ORGANISATION)
+
+    githubs_list_of_dormant_users = get_dormant_users_from_github_csv(
+        moj_github_org, ap_github_org)
 
     dormant_users_accoding_to_github_and_auth0 = filter_out_active_auth0_users(
         githubs_list_of_dormant_users
