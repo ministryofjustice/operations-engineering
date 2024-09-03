@@ -125,7 +125,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -input=false -no-color
+        run: terraform plan -input=false -no-color | make redact-terraform-output
 
       - name: Post Plan to GitHub PR
         if: github.ref != 'refs/heads/main'
@@ -142,7 +142,7 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         id: apply
-        run: terraform apply -input=false -no-color -auto-approve
+        run: terraform apply -input=false -no-color -auto-approve | make redact-terraform-output
 
       - name: Report failure to Slack
         if: ${{ always() && github.ref == 'refs/heads/main' }}
