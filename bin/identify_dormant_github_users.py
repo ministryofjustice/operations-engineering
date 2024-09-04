@@ -146,7 +146,7 @@ def message_to_slack_channel(dormant_users: list) -> str:
     )
 
     for user in dormant_users:
-        msg += f"GitHub username: {user.name} | Email: {user.email}\n"
+        msg += f"{user.name} | {user.email}\n"
 
     return msg
 
