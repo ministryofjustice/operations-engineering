@@ -50,8 +50,8 @@ class TestDormantGitHubUsers(unittest.TestCase):
         expected_message = (
             "Hello 🤖, \n\n"
             "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n\n"
-            "GitHub username: user1 | Email: user1@example.com\n"
-            "GitHub username: user2 | Email: user2@example.com\n"
+            "user1 | user1@example.com\n"
+            "user2 | user2@example.com\n"
         )
 
         self.assertEqual(result, expected_message)
