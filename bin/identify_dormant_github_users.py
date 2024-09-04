@@ -20,25 +20,29 @@ SLACK_CHANNEL = "operations-engineering-alerts"
 # These are the users that are deemed acceptable to be dormant.
 # They are either bots or service accounts and will be revisited regularly.
 ALLOWED_BOT_USERS = [
+    "HmppsDigitalServiceAccount",
+    "SonarQubeBot",
+    "analytical-platform-bot",
     "ci-hmcts",
     "cloud-platform-dummy-user",
     "correspondence-tool-bot",
     "form-builder-developers",
     "gecko-moj",
+    "hmpps-dso-pr-reviewer",
     "hmpps-pcs-tooling",
     "jenkins-moj",
     "laa-machine",
+    "laa-service-account",
+    "laaserviceaccount",
+    "moj-observability-platform-bot",
+    "moj-operations-engineering-bot",
+    "mojanalytics",
     "mojplatformsdeploy",
+    "operations-engineering-servicenow",
     "opg-integrations",
     "opg-use-an-lpa",
     "opg-weblate",
     "slack-moj",
-    "SonarQubeBot",
-    "moj-operations-engineering-bot",
-    "operations-engineering-servicenow",
-    "laa-service-account",
-    "mojanalytics",
-    "laaserviceaccount",
 ]
 
 logging.basicConfig(
