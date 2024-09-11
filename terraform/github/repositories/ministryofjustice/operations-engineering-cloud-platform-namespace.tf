@@ -3,7 +3,7 @@ module "operations-engineering-cloud-platform-namespace" {
   version = "1.1.2"
 
   name        = "operations-engineering-cloud-platform-namespace"
-  description = "This reoisitory contains the terraform code for an operations engineering namespace in the cloud platform"
+  description = "This repository contains the terraform code for an operations engineering namespace in the cloud platform"
   topics      = ["operations-engineering"]
 
   team_access = {
