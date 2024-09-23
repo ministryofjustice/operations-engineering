@@ -485,7 +485,7 @@ resource "auth0_client" "github" {
   }
   addons {
     samlp {
-      audience = "https://github.com/orgs/ministryofjustice-test"
+      audience = "https://github.com/orgs/ministryofjustice"
       mappings = {
         user_id = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
         email   = "emails"
