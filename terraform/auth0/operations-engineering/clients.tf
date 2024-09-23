@@ -432,7 +432,7 @@ resource "auth0_client" "join_github" {
   }
 }
 
-resource "auth0_client" "join_github_dev_2.0" {
+resource "auth0_client" "join_github_dev_2" {
   allowed_clients                       = []
   allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.join-github.service.justice.gov.uk/", "http://dev.join-github.service.justice.gov.uk/"]
   allowed_origins                       = []
