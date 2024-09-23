@@ -16,6 +16,7 @@ jobs:
   terraform-github-teams:
     uses: ./.github/workflows/reusable-workflow-terraform.yml
     with:
+      workflow_name: "github-teams"
       path: "terraform/github/teams"
       terraform_version: "1.6.6"
       name: "github teams"

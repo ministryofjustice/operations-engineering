@@ -25,6 +25,9 @@ on:
       aws_profile_name:
         required: false
         type: string
+      workflow_name:
+        type: string
+        required: true
     secrets:
       aws_profile_arn:
         required: false
@@ -96,7 +99,7 @@ jobs:
           repo-token: ${{ secrets.repo_github_token }}
           repo-token-user-login: "github-actions[bot]"
           message: |
-            Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-github-repos.yml?query=event%3Apush+branch%3Amain
+            Your PR is applying here: https://github.com/ministryofjustice/operations-engineering/actions/workflows/cicd-terraform-${{ inputs.workflow_name }}.yml?query=event%3Apush+branch%3Amain
 
       - name: Delete old comments on PR made by bot user
         if: github.ref != 'refs/heads/main'
