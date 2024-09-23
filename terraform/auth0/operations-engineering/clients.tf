@@ -483,4 +483,19 @@ resource "auth0_client" "github" {
     rotation_type                = "non-rotating"
     token_lifetime               = 31557600
   }
+  addons {
+    samlp {
+      audience = "https://github.com/orgs/ministryofjustice-test"
+      mappings = {
+        user_id = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        email   = "emails"
+        name    = "full_name"
+      }
+      passthrough_claims_with_no_mapping = false
+      map_identities                     = false
+      signature_algorithm                = "rsa-sha256"
+      digest_algorithm                   = "sha256"
+      name_identifier_probes             = ["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
+    }
+  }
 }
