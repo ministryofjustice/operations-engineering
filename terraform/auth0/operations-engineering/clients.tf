@@ -432,26 +432,26 @@ resource "auth0_client" "join_github" {
   }
 }
 
-resource "auth0_client" "join_github_dev_2" {
+resource "auth0_client" "github" {
   allowed_clients                       = []
-  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.join-github.service.justice.gov.uk/", "http://dev.join-github.service.justice.gov.uk/"]
+  allowed_logout_urls                   = []
   allowed_origins                       = []
   app_type                              = "regular_web"
-  callbacks                             = ["https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://dev.join-github.service.justice.gov.uk/auth/callback", "http://dev.join-github.service.justice.gov.uk/auth/callback"]
+  callbacks                             = ["https://github.com/orgs/ministryofjustice/saml/consume"]
   client_aliases                        = []
   client_metadata                       = {}
-  cross_origin_auth                     = false
+  cross_origin_auth                     = true
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "This enables Microsoft and Google Workspace authentication to Join GitHub Dev: https://dev.join-github.service.justice.gov.uk/."
+  description                           = "Web application to SSO into ministryofjustice GitHub Organisation"
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Join GitHub Dev 2.0"
+  name                                  = "GitHub"
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = "no_prompt"
@@ -459,10 +459,10 @@ resource "auth0_client" "join_github_dev_2" {
   require_pushed_authorization_requests = false
   sso                                   = false
   sso_disabled                          = false
-  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://dev.join-github.service.justice.gov.uk/"]
+  web_origins                           = []
   jwt_configuration {
     alg                 = "RS256"
-    lifetime_in_seconds = 35994
+    lifetime_in_seconds = 36000
     scopes              = {}
     secret_encoded      = false
   }
