@@ -452,7 +452,6 @@ resource "auth0_client" "github" {
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
   name                                  = "GitHub"
-  oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = "no_prompt"
   organization_usage                    = null
