@@ -338,7 +338,7 @@ resource "auth0_client" "dns_form_dev" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "This enables Microsoft and Google authentication to the DNS Form currently in Dev: https://dns-form-dev.cloud-platform.service.justice.gov.uk/."
+  description                           = "This enables authentication to the DNS Form currently in Dev"
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
