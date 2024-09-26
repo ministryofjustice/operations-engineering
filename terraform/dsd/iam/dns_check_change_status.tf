@@ -11,6 +11,7 @@ resource "aws_iam_policy" "dns_check_change_status_policy" {
           "route53:ListHostedZones",
           "route53:ListHostedZonesByName",
           "route53:ListResourceRecordSets",
+          "route53:GetChange",
           "cloudtrail:LookupEvents"
         ]
         Resource = "*"
