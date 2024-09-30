@@ -1,6 +1,6 @@
 module "operations-engineering-kpi-dashboard" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.2"
+  version = "1.2.0"
 
   name         = "operations-engineering-kpi-dashboard"
   description  = "Display KPI metrics of processes and services"

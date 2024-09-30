@@ -1,6 +1,6 @@
 module "operations-engineering-support-metadata" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.2"
+  version = "1.2.0"
 
   name            = "operations-engineering-support-metadata"
   description     = "This repository contains the data and tools for reporting Oerations Engineering support requests."
