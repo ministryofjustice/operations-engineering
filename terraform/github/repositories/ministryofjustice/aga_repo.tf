@@ -1,6 +1,6 @@
 module "operations-engineering-aga-test" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.2"
+  version = "1.2.0"
 
   name        = "operations-engineering-aga-test"
   description = "this is a test and will be deleted"
