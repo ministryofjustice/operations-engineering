@@ -1,6 +1,6 @@
 module "operations-engineering-find-a-github-repository-owner" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.2"
+  version = "1.2.0"
 
   name        = "operations-engineering-find-a-github-repository-owner"
   description = "Find Owners of GitHub Reposistories"

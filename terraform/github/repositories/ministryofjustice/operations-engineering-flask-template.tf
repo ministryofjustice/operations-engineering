@@ -1,6 +1,6 @@
 module "operations-engineering-flask-template" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.2"
+  version = "1.2.0"
 
   name        = "operations-engineering-flask-template"
   type        = "template"

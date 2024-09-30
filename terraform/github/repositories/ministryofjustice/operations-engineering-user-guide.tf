@@ -1,6 +1,6 @@
 module "operations-engineering-user-guide" {
   source  = "ministryofjustice/repository/github"
-  version = "1.1.2"
+  version = "1.2.0"
 
   name         = "operations-engineering-user-guide"
   description  = "User documentation for Operations Engineering"
