@@ -551,3 +551,47 @@ resource "auth0_client" "github" {
     }
   }
 }
+
+resource "auth0_client" "find_a_github_repository_owner" {
+  allowed_logout_urls                   = ["https://find-a-github-repository-owner-dev.cloud-platform.service.justice.gov.uk/"]
+  app_type                              = "regular_web"
+  callbacks                             = ["https://find-a-github-repository-owner-dev.cloud-platform.service.justice.gov.uk/auth/callback"]
+  cross_origin_auth                     = false
+  custom_login_page_on                  = true
+  description                           = "This secures the web application to MoJ employees"
+  grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
+  is_first_party                        = true
+  is_token_endpoint_ip_header_trusted   = false
+  name                                  = "Find a GitHub Repository Owner Dev"
+  oidc_conformant                       = true
+  organization_require_behavior         = "no_prompt"
+  require_pushed_authorization_requests = false
+  sso                                   = false
+  sso_disabled                          = false
+  web_origins                           = ["https://find-a-github-repository-owner-dev.cloud-platform.service.justice.gov.uk/"]
+  jwt_configuration {
+    alg                 = "RS256"
+    lifetime_in_seconds = 35994
+    scopes              = {}
+    secret_encoded      = false
+  }
+  native_social_login {
+    apple {
+      enabled = false
+    }
+    facebook {
+      enabled = false
+    }
+  }
+  refresh_token {
+    expiration_type              = "non-expiring"
+    idle_token_lifetime          = 2592000
+    infinite_idle_token_lifetime = true
+    infinite_token_lifetime      = true
+    leeway                       = 0
+    rotation_type                = "non-rotating"
+    token_lifetime               = 31557600
+  }
+}
+
+
