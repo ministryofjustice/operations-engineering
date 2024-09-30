@@ -4,7 +4,6 @@ module "operations-engineering-certificate-form" {
 
   name         = "operations-engineering-certificate-form"
   description  = "An experimental web form that assists with automating part of the certificate renewal process."
-  homepage_url = "https://dns-form-dev.cloud-platform.service.justice.gov.uk/"
   topics       = ["operations-engineering"]
 
   template     = {
