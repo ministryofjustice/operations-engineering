@@ -7,7 +7,7 @@ module "operations-engineering-acronyms-app-poc" {
   topics      = ["operations-engineering", "poc"]
   visibility  = "public"
 
-  template    = {
+  template = {
     owner      = "ministryofjustice"
     repository = "operations-engineering-flask-template"
   }
