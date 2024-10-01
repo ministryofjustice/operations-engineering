@@ -2,11 +2,11 @@ module "operations-engineering-certificate-form" {
   source  = "ministryofjustice/repository/github"
   version = "1.2.0"
 
-  name         = "operations-engineering-certificate-form"
-  description  = "An experimental web form that assists with automating part of the certificate renewal process."
-  topics       = ["operations-engineering"]
+  name        = "operations-engineering-certificate-form"
+  description = "An experimental web form that assists with automating part of the certificate renewal process."
+  topics      = ["operations-engineering"]
 
-  template     = {
+  template = {
     owner      = "ministryofjustice"
     repository = "operations-engineering-flask-template"
   }
