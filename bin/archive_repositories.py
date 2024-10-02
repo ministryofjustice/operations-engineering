@@ -61,6 +61,7 @@ MOJ_ANALYTICAL_SERVICES_REPOS_ALLOW_LIST = [
     "airflow-viper-to-external-ds",
     "shinyGovstyle",
     "segmentation-data-creation",
+    "nixon-foi",
 ]
 
 
