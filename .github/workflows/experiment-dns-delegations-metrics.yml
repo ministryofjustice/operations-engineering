@@ -11,18 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Configure AWS Credentials - Role with Read Access to DSD Route53
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: ministryofjustice/github-actions/setup-aws-profile@18.2.1
         with:
-          role-to-assume: ${{ secrets.DSD_ROUTE53_READ_ROLE_ARN }}
-          aws-region: eu-west-2
-
-      - name: Create Profile to With ReadOnly Access to DSD Route53
-        run: |
-          aws configure set region ${{ env.AWS_REGION }} --profile="dsd_route53_read"
-          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }} --profile="dsd_route53_read"
-          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} --profile="dsd_route53_read"
-          aws configure set aws_session_token ${{ env.AWS_SESSION_TOKEN }} --profile="dsd_route53_read"
+          role-arn: ${{ secrets.DSD_ROUTE53_READ_ROLE_ARN }}
+          profile-name: dsd_route53_read
 
       - name: Configure AWS Credentials - Role to Assume Cloud Platforms Route53 Read Role
         uses: aws-actions/configure-aws-credentials@v4
