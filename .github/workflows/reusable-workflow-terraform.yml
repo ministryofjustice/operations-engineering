@@ -25,6 +25,7 @@ on:
       aws_profile_name:
         required: false
         type: string
+        default: ''
       workflow_name:
         type: string
         required: true
@@ -67,10 +68,10 @@ jobs:
           done <<< "${{ secrets.env }}"
 
       - uses: ministryofjustice/github-actions/setup-aws-profile@v18.2.1
+        if: ${{ inputs.aws_profile_name != '' }}
         with:
           role-arn: ${{ secrets.aws_profile_arn }}
           profile-name: ${{ inputs.aws_profile_name }}
-        continue-on-error: true
 
       - uses: hashicorp/setup-terraform@v3
         with:
