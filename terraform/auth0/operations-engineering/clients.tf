@@ -490,7 +490,7 @@ resource "auth0_client" "github" {
   allowed_logout_urls                   = []
   allowed_origins                       = []
   app_type                              = "regular_web"
-  callbacks                             = ["https://github.com/orgs/ministryofjustice/saml/consume"]
+  callbacks                             = ["https://github.com/orgs/ministryofjustice/saml/consume", "https://github.com/orgs/moj-analytical-services/saml/consume"]
   client_aliases                        = []
   client_metadata                       = {}
   cross_origin_auth                     = true
@@ -537,7 +537,6 @@ resource "auth0_client" "github" {
   }
   addons {
     samlp {
-      audience = "https://github.com/orgs/ministryofjustice"
       mappings = {
         user_id = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
         email   = "emails"
@@ -593,5 +592,3 @@ resource "auth0_client" "find_a_github_repository_owner" {
     token_lifetime               = 31557600
   }
 }
-
-
