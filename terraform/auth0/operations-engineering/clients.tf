@@ -497,7 +497,7 @@ resource "auth0_client" "github" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "Web application to SSO into ministryofjustice GitHub Organisation"
+  description                           = "Web application to SSO into ministryofjustice or moj-analytical-services GitHub Organisations"
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
