@@ -39,4 +39,7 @@ jobs:
         TF_VAR_auth0_domain_test=${{ secrets.AUTH0_OPERATIONS_ENGINEERING_DEV_DOMAIN }}
         TF_VAR_auth0_azure_client_secret_test=${{ secrets.AZURE_CLIENT_SECRET_TEST }}
         TF_VAR_auth0_azure_client_id_test=${{ secrets.AZURE_CLIENT_ID_TEST }}
+        TF_VAR_terraform_provider_auth0_encryption_key=${{ secrets.TERRAFORM_PROVIDER_AUTH0_ENCRYPTION_KEY }}
+        TF_VAR_default_app_encryption_key=${{ secrets.DEFAULT_APP_ENCRYPTION_KEY }}
+
 
