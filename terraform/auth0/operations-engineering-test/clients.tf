@@ -151,7 +151,7 @@ resource "auth0_client" "default_app" {
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "Default App"
+  name                                  = var.default_app_name
   oidc_backchannel_logout_urls          = []
   oidc_conformant                       = true
   organization_require_behavior         = null
