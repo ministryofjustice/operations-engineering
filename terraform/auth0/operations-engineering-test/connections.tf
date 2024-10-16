@@ -17,8 +17,4 @@ resource "auth0_connection" "google_workspace" {
     })
     set_user_root_attributes = "on_each_login"
   }
-
-  enabled_clients = [
-    var.github_application_client_id  # Add the GitHub application's client ID here
-  ]
 }
