@@ -11,7 +11,6 @@ resource "auth0_client" "terraform_provider_auth0" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = var.terraform_provider_auth0_encryption_key
   form_template                         = null
   grant_types                           = ["client_credentials"]
   initiate_login_uri                    = null
@@ -146,7 +145,6 @@ resource "auth0_client" "default_app" {
   custom_login_page                     = null
   custom_login_page_on                  = true
   description                           = null
-  encryption_key                        = var.default_app_encryption_key
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
