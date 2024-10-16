@@ -3,9 +3,10 @@ module "operations-engineering-join-github" {
   version = "1.2.0"
 
   name         = "operations-engineering-join-github"
-  description  = "An application to augment the process of joining a Ministry of Justice GitHub Organisation"
+  description  = "Archived Repository: An application to augment the process of joining a Ministry of Justice GitHub Organisation"
   homepage_url = "https://dev.join-github.service.justice.gov.uk/"
   topics       = ["operations-engineering"]
+  archived     = true
 
   team_access = {
     admin = [var.operations_engineering_team_id]
