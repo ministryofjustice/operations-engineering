@@ -19,26 +19,20 @@ variable "auth0_client_secret_test" {
   sensitive   = true
 }
 
-variable "azure_client_secret_test" {
-  description = "Test client secret for azure connection"
+variable "google_workspace_connection_client_id" {
+  description = "Client ID value for the Google Workspace connection"
   type        = string
   sensitive   = true
 }
 
-variable "azure_client_id_test" {
-  description = "Test client ID for azure connection"
+variable "google_workspace_connection_secret" {
+  description = "Client secret value fo the Google Workspace connection"
   type        = string
   sensitive   = true
 }
 
-variable "terraform_provider_auth0_encryption_key" {
-  description = "Encryption key value for terraform provider auth0"
-  type        = string
-  sensitive   = true
-}
-
-variable "default_app_encryption_key" {
-  description = "Encryption key value for the default app"
+variable "github_application_client_id" {
+  description = "Client ID value fo the the GitHub Application in Auth0"
   type        = string
   sensitive   = true
 }
