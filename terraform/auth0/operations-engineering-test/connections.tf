@@ -1,5 +1,5 @@
 resource "auth0_connection" "google_workspace" {
-  name                 = "Google"
+  name                 = "Google Workspace Connection"
   is_domain_connection = false
   strategy             = "google-apps"
   show_as_button       = true
