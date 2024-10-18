@@ -4,7 +4,7 @@ module "operations-engineering-dns-form" {
 
   name         = "operations-engineering-dns-form"
   description  = "A web form that captures the requirements for a DNS change"
-  homepage_url = "https://dns-form-dev.cloud-platform.service.justice.gov.uk/"
+  homepage_url = "https://dev.change-dns.service.justice.gov.uk/"
   topics       = ["operations-engineering"]
 
   team_access = {
