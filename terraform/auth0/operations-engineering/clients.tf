@@ -328,10 +328,10 @@ resource "auth0_client" "kpi_dashboard" {
 
 resource "auth0_client" "dns_form_dev" {
   allowed_clients                       = []
-  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dns-form-dev.cloud-platform.service.justice.gov.uk/", "http://dns-form-dev.cloud-platform.service.justice.gov.uk/"]
+  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://0.0.0.0", "https://dev.change-dns.service.justice.gov.uk/", "http://dev.change-dns.service.justice.gov.uk/"]
   allowed_origins                       = []
   app_type                              = "regular_web"
-  callbacks                             = ["https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://dns-form-dev.cloud-platform.service.justice.gov.uk/auth/callback", "http://dns-form-dev.cloud-platform.service.justice.gov.uk/auth/callback"]
+  callbacks                             = ["https://localhost:4567/auth/callback", "http://127.0.0.1:4567/auth/callback", "http://127.0.0.1/auth/callback", "http://localhost:4567/auth/callback", "http://0.0.0.0:4567/auth/callback", "http://localhost/auth/callback", "https://dev.change-dns.service.justice.gov.uk/auth/callback", "http://dev.change-dns.service.justice.gov.uk/auth/callback"]
   client_aliases                        = []
   client_metadata                       = {}
   cross_origin_auth                     = false
@@ -353,7 +353,7 @@ resource "auth0_client" "dns_form_dev" {
   require_pushed_authorization_requests = false
   sso                                   = false
   sso_disabled                          = false
-  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://dns-form-dev.cloud-platform.service.justice.gov.uk/"]
+  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://0.0.0.0:4567", "https://dev.change-dns.service.justice.gov.uk/"]
   jwt_configuration {
     alg                 = "RS256"
     lifetime_in_seconds = 35994
