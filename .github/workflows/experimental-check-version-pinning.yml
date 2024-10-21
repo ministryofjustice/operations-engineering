@@ -30,4 +30,4 @@ jobs:
         run: pipenv install
 
       - name: Run the custom script
-        run: pipenv run python3 -m bin.check_version_pinning.py
+        run: pipenv run python3 -m bin.check_version_pinning
