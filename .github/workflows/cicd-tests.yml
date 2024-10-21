@@ -29,6 +29,6 @@ jobs:
       - name: Show Coverage
         run: pipenv run tests_report
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@ef609d6cb5624f374eed2390087f7ac0fc5f688a # v4.6.0
         with:
           token: ${{secrets.CODECOV_TOKEN}}
