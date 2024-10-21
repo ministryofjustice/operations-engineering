@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock, mock_open, patch
+from unittest.mock import mock_open, patch
 
 from bin.check_version_pinning import check_version_pinning
 
