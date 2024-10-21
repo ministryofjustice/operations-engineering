@@ -11,6 +11,7 @@ class TestCheckVersionPinning(unittest.TestCase):
     @patch("yaml.safe_load")
     def test_no_yaml_files(self, mock_yaml_load, mock_open_file, mock_os_walk):
         # Simulate os.walk returning no .yml or .yaml files
+        _ = mock_open_file
         mock_os_walk.return_value = [(".github/workflows", [], [])]
         mock_yaml_load.return_value = None
 
@@ -24,7 +25,7 @@ class TestCheckVersionPinning(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open)
     @patch("yaml.safe_load")
     def test_yaml_file_without_uses(self, mock_yaml_load, mock_open_file, mock_os_walk):
-        # Simulate a workflow file without 'uses'
+        _ = mock_open_file
         mock_os_walk.return_value = [(".github/workflows", [], ["workflow.yml"])]
         mock_yaml_load.return_value = {
             "jobs": {"build": {"steps": [{"name": "Checkout code"}]}}
@@ -43,6 +44,7 @@ class TestCheckVersionPinning(unittest.TestCase):
         self, mock_yaml_load, mock_open_file, mock_os_walk
     ):
         # Simulate a workflow file with a pinned version (@v)
+        _ = mock_open_file
         mock_os_walk.return_value = [(".github/workflows", [], ["workflow.yml"])]
         mock_yaml_load.return_value = {
             "jobs": {"build": {"steps": [{"uses": "some-org/some-action@v1.0.0"}]}}
@@ -61,6 +63,7 @@ class TestCheckVersionPinning(unittest.TestCase):
     def test_workflow_ignoring_actions(
         self, mock_yaml_load, mock_open_file, mock_os_walk
     ):
+        _ = mock_open_file
         # Simulate a workflow file with an action to be ignored
         mock_os_walk.return_value = [(".github/workflows", [], ["workflow.yml"])]
         mock_yaml_load.return_value = {
@@ -86,6 +89,7 @@ class TestCheckVersionPinning(unittest.TestCase):
     def test_workflow_with_mixed_versions(
         self, mock_yaml_load, mock_open_file, mock_os_walk
     ):
+        _ = mock_open_file
         # Simulate a workflow with both ignored and non-ignored actions
         mock_os_walk.return_value = [(".github/workflows", [], ["workflow.yml"])]
         mock_yaml_load.return_value = {
