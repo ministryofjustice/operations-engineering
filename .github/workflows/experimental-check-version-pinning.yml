@@ -1,0 +1,33 @@
+name: 🧪 Check Version Pinning
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check-version-pinning:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+
+      - name: Install Pipenv
+        run: pip install pipenv
+
+      - name: Verify Pipfile.lock is in sync
+        run: pipenv verify
+      - name: Install dependencies
+        run: pipenv install
+
+      - name: Run the custom script
+        run: pipenv run python3 -m bin.check_version_pinning.py
