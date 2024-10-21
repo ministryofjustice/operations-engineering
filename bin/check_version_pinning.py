@@ -44,11 +44,16 @@ def check_version_pinning(workflow_directory=".github/workflows"):
 
     if all_results:
         print(
-            "It may not be related to this PR, but the following third-party\n \
-        GitHub Actions are using version pinning rather than commit has pinning:"
+            "It may not be related to this PR, but the following third-party\n"
+            "GitHub Actions are using version pinning rather than SHA hash pinning:\n"
         )
         for result in all_results:
-            print(result)
+            print(f"  - {result}")
+
+        print(
+            "\nPlease see the following documentation for more information:\n"
+            "https://tinyurl.com/3sev9etr"
+        )
         sys.exit(1)
     else:
         print("No workflows found with pinned versions (@v).")
