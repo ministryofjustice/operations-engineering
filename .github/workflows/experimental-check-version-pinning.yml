@@ -29,5 +29,5 @@ jobs:
       - name: Install dependencies
         run: pipenv install
 
-      - name: Run the custom script
+      - name: Check for incorrectly pinned Actions
         run: pipenv run python3 -m bin.check_version_pinning
