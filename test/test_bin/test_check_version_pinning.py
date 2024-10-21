@@ -50,12 +50,13 @@ class TestCheckVersionPinning(unittest.TestCase):
             "jobs": {"build": {"steps": [{"uses": "some-org/some-action@v1.0.0"}]}}
         }
 
-        with patch("builtins.print") as mock_print:
+        with patch("builtins.print") as mock_print, self.assertRaises(SystemExit) as cm:
             check_version_pinning()
             mock_print.assert_any_call("Found workflows with pinned versions (@v):")
             mock_print.assert_any_call(
                 ".github/workflows/workflow.yml: some-org/some-action@v1.0.0"
             )
+            self.assertEqual(cm.exception.code, 1)
 
     @patch("os.walk")
     @patch("builtins.open", new_callable=mock_open)
@@ -104,12 +105,13 @@ class TestCheckVersionPinning(unittest.TestCase):
             }
         }
 
-        with patch("builtins.print") as mock_print:
+        with patch("builtins.print") as mock_print, self.assertRaises(SystemExit) as cm:
             check_version_pinning()
             mock_print.assert_any_call("Found workflows with pinned versions (@v):")
             mock_print.assert_any_call(
                 ".github/workflows/workflow.yml: some-org/some-action@v1.0.0"
             )
+            self.assertEqual(cm.exception.code, 1)
 
 
 if __name__ == "__main__":

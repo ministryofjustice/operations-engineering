@@ -1,4 +1,5 @@
 import os
+import sys
 
 import yaml
 
@@ -45,6 +46,7 @@ def check_version_pinning(workflow_directory=".github/workflows"):
         print("Found workflows with pinned versions (@v):")
         for result in all_results:
             print(result)
+        sys.exit(1)
     else:
         print("No workflows found with pinned versions (@v).")
 
