@@ -12,7 +12,7 @@ def find_workflow_files(workflow_directory=".github/workflows"):
 
 
 def parse_yaml_file(file_path):
-    with open(file_path, "r") as f:
+    with open(file_path, "r", buffering=-1, encoding="utf-8") as f:
         try:
             return yaml.safe_load(f)
         except yaml.YAMLError as e:
