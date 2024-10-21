@@ -94,7 +94,7 @@ jobs:
 
       - name: Delete old comments on PR made by bot user
         if: github.ref != 'refs/heads/main'
-        uses: izhangzhihao/delete-comment@master
+        uses: izhangzhihao/delete-comment@d075704468e1cf74e60944d9f335351213c34d85 # master
         with:
           github_token: ${{ secrets.repo_github_token }}
           delete_user_name: github-actions[bot]
