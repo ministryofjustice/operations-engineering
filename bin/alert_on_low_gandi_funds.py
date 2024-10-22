@@ -19,6 +19,7 @@ def low_gandi_funds_message(remaining_gandi_funds):
     )
 
     return msg
+from config.constants import GANDI_FUND_THRESHOLD
 
 
 def alert_on_low_gandi_funds():
