@@ -1,6 +1,6 @@
 import os
 from datetime import datetime, timedelta
-from config.constants import MINISTRY_OF_JUSTICE, SLACK_CHANNEL, OPERATIONS_ENGINEERING_GITHUB_USERNAMES
+from config.constants import MINISTRY_OF_JUSTICE, OPERATIONS_ENGINEERING_GITHUB_USERNAMES
 
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -24,23 +24,6 @@ def _calculate_date(in_last_days: int) -> str:
     date = current_date - timedelta(days=in_last_days)
     timestamp_format = "%Y-%m-%d"
     return date.strftime(timestamp_format)
-
-
-def new_members_detected_message(new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, org, audit_log_url, time_delta_in_days):
-    msg = (
-        f"Hi all, \n\n"
-        f"Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
-        f"*Added by Operations Engineering:*\n"
-        f"{new_members_added_by_oe}\n\n"
-        f"*Added externally:*\n"
-        f"{new_members_added_externally}\n\n"
-        f"{percentage}% of the new joiners were added by operations engineering.\n\n"
-        f"Please review the audit log for more details: {audit_log_url}\n\n"
-        f"Have a swell day, \n\n"
-        "The GitHub Organisation Monitoring Bot"
-    )
-
-    return msg
 
 
 def main():
@@ -67,8 +50,8 @@ def main():
                 new_members_added_externally += individual_message
         percentage = round((total_members_added_by_oe / len(new_members)) * 100)
 
-        slack_service.send_message_to_plaintext_channel_name(
-            new_members_detected_message(new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days), SLACK_CHANNEL)
+        slack_service.send_new_github_joiner_metrics_alert(
+            new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, MINISTRY_OF_JUSTICE, audit_log_url, time_delta_in_days)
 
 
 if __name__ == "__main__":

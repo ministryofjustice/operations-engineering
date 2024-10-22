@@ -6,7 +6,6 @@ from os.path import exists
 import pandas as pd
 from collections import defaultdict
 
-from config.constants import SR_SLACK_CHANNEL
 from services.slack_service import SlackService
 
 
@@ -67,7 +66,7 @@ def get_dict_of_requests_and_volume(
     return dict_of_requests
 
 
-def craft_message_to_slack(
+def craft_support_statistics(
     yesterdays_support_requests: list[SupportRequest], date_today=date.today()
 ):
     dict_of_requests_and_volume = get_dict_of_requests_and_volume(
@@ -120,13 +119,9 @@ def main(todays_date=date.today(), file_path="data/support_stats/support_stats.c
     yesterdays_requests = get_yesterdays_support_requests(
         all_support_requests, todays_date
     )
-    slack_message = craft_message_to_slack(yesterdays_requests, todays_date)
+    support_statistics = craft_support_statistics(yesterdays_requests, todays_date)
 
-    print(slack_message)
-
-    slack_service.send_message_to_plaintext_channel_name(
-        slack_message, SR_SLACK_CHANNEL
-    )
+    slack_service.send_slack_support_stats_report(support_statistics)
 
 
 if __name__ == "__main__":
