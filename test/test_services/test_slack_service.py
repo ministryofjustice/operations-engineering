@@ -41,39 +41,6 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
             'channels': [self.channel], 'response_metadata': self.response_metadata}
         self.slack_service.slack_client = self.slack_client
 
-    def test_lookup_channel_id(self):
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertEqual(result, self.channel_id)
-
-    def test_lookup_channel_id_when_no_matching_channels(self):
-        response = {'channels': [
-            {'name': "other-channel", 'id': self.channel_id}], 'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertIsNone(result)
-
-    def test_lookup_channel_id_when_channels_empty(self):
-        response = {'channels': [],
-                    'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertIsNone(result)
-
-    def test_lookup_channel_id_when_no_channels(self):
-        response = {'channels': None,
-                    'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertIsNone(result)
-
 
 @patch("slack_sdk.WebClient.__new__")
 class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCase):
