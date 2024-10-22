@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import patch
-from config.constants import SLACK_CHANNEL
 from bin.generate_pat_token_report import generate_pat_token_report, count_expired_tokens
 
 from services.github_service import GithubService
