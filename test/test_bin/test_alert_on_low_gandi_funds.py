@@ -19,7 +19,7 @@ class TestAlerts(unittest.TestCase):
 
         alert_on_low_gandi_funds()
 
-        mock_slack_instance.send_message_to_plaintext_channel_name.assert_called_once()
+        mock_slack_instance.send_low_gandi_funds_alert.assert_called_once()
 
     @patch.dict('os.environ', {'GANDI_FUNDS_TOKEN': 'test_gandi_token', 'ADMIN_SLACK_TOKEN': 'test_slack_token', 'GANDI_ORG_ID': 'test_org_id'})
     @patch('bin.alert_on_low_gandi_funds.GandiService')
@@ -31,7 +31,7 @@ class TestAlerts(unittest.TestCase):
 
         alert_on_low_gandi_funds()
 
-        mock_slack_instance.send_message_to_plaintext_channel_name.assert_not_called()
+        mock_slack_instance.send_low_gandi_funds_alert.assert_not_called()
 
     @patch.dict('os.environ', {})
     def test_exit_no_gandi_funds_token(self):

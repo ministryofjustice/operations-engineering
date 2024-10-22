@@ -8,7 +8,7 @@ from bin.support_stats_reporting import (
     get_yesterdays_support_requests,
     get_previous_working_day,
     get_environment_variables,
-    craft_message_to_slack,
+    craft_support_statistics,
     main,
 )
 
@@ -74,7 +74,6 @@ class TestGetEnvironmentVariables(unittest.TestCase):
 
 class TestCraftMessageToSlack(unittest.TestCase):
     def test_slack_message(self):
-
         date_today = date(2024, 7, 16)
         yesterdays_support_requests = [
             SupportRequest(
@@ -83,11 +82,13 @@ class TestCraftMessageToSlack(unittest.TestCase):
                 request_date="2024-07-15",
             )
         ]
-        expected_message = "On 2024-07-15 we received 1 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* Add user to Org\n*Number of requests:* 1\n"
-        self.assertEqual(
-            craft_message_to_slack(yesterdays_support_requests, date_today),
-            expected_message,
+        expected_message = (
+            "On 2024-07-15 we received 1 Support Requests: \n\n"
+            "--\n*Type:* GitHub\n*Action:* Add user to Org\n*Number of requests:* 1\n"
         )
+
+        result_message = craft_support_statistics(yesterdays_support_requests, date_today)
+        self.assertEqual(result_message, expected_message)
 
 
 class TestMain(unittest.TestCase):
@@ -101,7 +102,5 @@ class TestMain(unittest.TestCase):
 
         main(todays_date, file_path)
 
-        mock_slack_service.return_value.send_message_to_plaintext_channel_name.assert_called_with(
-            "On 2024-07-22 we received 8 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* GitHub – add user to org\n*Number of requests:* 2\n--\n*Type:* GitHub\n*Action:* GitHub – remove user from org\n*Number of requests:* 1\n--\n*Type:* 1Password\n*Action:* 1Password - information/help\n*Number of requests:* 1\n--\n*Type:* API\n*Action:* API Key\n*Number of requests:* 1\n--\n*Type:* DNS\n*Action:* DNS/Domain\n*Number of requests:* 1\n--\n*Type:* Other\n*Action:* Tools Information/help\n*Number of requests:* 1\n--\n*Type:* Other\n*Action:* Refer to another team\n*Number of requests:* 1\n",
-            "operations-engineering-team",
-        )
+        mock_slack_service.return_value.send_slack_support_stats_report.assert_called_with(
+            "On 2024-07-22 we received 8 Support Requests: \n\n--\n*Type:* GitHub\n*Action:* GitHub – add user to org\n*Number of requests:* 2\n--\n*Type:* GitHub\n*Action:* GitHub – remove user from org\n*Number of requests:* 1\n--\n*Type:* 1Password\n*Action:* 1Password - information/help\n*Number of requests:* 1\n--\n*Type:* API\n*Action:* API Key\n*Number of requests:* 1\n--\n*Type:* DNS\n*Action:* DNS/Domain\n*Number of requests:* 1\n--\n*Type:* Other\n*Action:* Tools Information/help\n*Number of requests:* 1\n--\n*Type:* Other\n*Action:* Refer to another team\n*Number of requests:* 1\n"        )
