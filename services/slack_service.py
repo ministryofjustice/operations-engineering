@@ -179,15 +179,21 @@ class SlackService:
         self._send_alert_to_operations_engineering(blocks)
 
     def _send_alert_to_operations_engineering(self, blocks: list[dict]):
-        self.slack_client.chat_postMessage(channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-                                           mrkdown=True,
-                                           blocks=blocks
-                                           )
+        try:
+            self.slack_client.chat_postMessage(
+                channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
+                mrkdown=True,
+                blocks=blocks
+            )
+        except SlackApiError as e:
+            logging.error("Slack API error: {%s}", e.response['error'])
+        except Exception as e:
+            logging.error("Failed to send Slack alert: {%s}", str(e))
 
-    def _create_block_with_message(self, message):
+    def _create_block_with_message(self, message, block_type="section"):
         return [
             {
-                "type": "section",
+                "type": block_type,
                 "text": {
                     "type": "mrkdwn",
                     "text": message
