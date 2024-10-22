@@ -3,7 +3,7 @@ import time
 from textwrap import dedent
 from urllib.parse import quote
 
-from slack_sdk import WebClient
+from slack_sdk import WebClient, SlackApiError
 
 from services.sentry_service import UsageStats
 
@@ -194,25 +194,6 @@ class SlackService:
                 }
             }
         ]
-
-    def send_unowned_repos_slack_message(self, repositories: list):
-        self.slack_client.chat_postMessage(
-            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-            mrkdown=True,
-            blocks=[
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": dedent(f"""
-                            *Unowned Repositories Automation*
-                            Repositories on the GitHub Organisation that have no team or collaborator:
-                            {repositories}
-                        """).strip("\n")
-                    }
-                }
-            ]
-        )
 
     def get_all_slack_usernames(self):
         """Fetches all usernames and user email addresses from the Slack API.
