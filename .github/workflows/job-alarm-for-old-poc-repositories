@@ -4,10 +4,11 @@ on:
   schedule:
     - cron: "0 4 * * *"
   workflow_dispatch:
+  pull_request:
 
 env:
   ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-  # GH_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
+  GH_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
 
 jobs:
   old-poc-repositories-alarm:
