@@ -112,14 +112,14 @@ class SlackService:
     def send_new_github_joiner_metrics_alert(self, new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, org, audit_log_url, time_delta_in_days):
         message = dedent(
             f"""
-                *New GitHub Joiner Metrics*
-                Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org.
-                *Added by Operations Engineering:*
-                {new_members_added_by_oe}
-                *Added externally:*
-                {new_members_added_externally}
-                {percentage}% of the new joiners were added by operations engineering.
-                Please review the audit log for more details: {audit_log_url}
+            *New GitHub Joiner Metrics*
+            Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org.
+            *Added by Operations Engineering:*
+            {new_members_added_by_oe}
+            *Added externally:*
+            {new_members_added_externally}
+            {percentage}% of the new joiners were added by operations engineering.
+            Please review the audit log for more details: {audit_log_url}
             """).strip("/n")
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
