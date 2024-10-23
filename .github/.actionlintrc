@@ -1,4 +1,6 @@
 rules:
   action:
     require:
-      - ref: true  
+      ref: 
+        - true  # Enforce pinned version
+        - ref: ^[a-f0-9]{40}$ # Enforce pinned commit hash
