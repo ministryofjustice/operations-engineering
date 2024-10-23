@@ -1,10 +1,11 @@
 module "operations-engineering-metadata-poc" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
 
   name        = "operations-engineering-metadata-poc"
   description = "PoC For Cross Identification Between MoJ Services"
   topics      = ["operations-engineering"]
+  poc         = true
 
   team_access = {
     admin = [var.operations_engineering_team_id]
