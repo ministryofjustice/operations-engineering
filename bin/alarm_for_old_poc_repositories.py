@@ -24,7 +24,7 @@ def alert_for_old_poc_repositories():
 
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
 
-    print(github_service.get_paginated_list_of_repositories_per_topic("poc"))
+    print(github_service.get_paginated_list_of_repositories_per_topic("poc", None))
 
 if __name__ == "__main__":
     alert_for_old_poc_repositories()
