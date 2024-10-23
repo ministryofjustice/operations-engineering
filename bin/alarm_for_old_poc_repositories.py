@@ -1,7 +1,7 @@
 # get all repositories in poc topic - github service
 # get age of all target repositories using gh api - github service
 # calculate age of repositories - github service
-# compare to threshold and alert - job level
+# compare  to threshold and alert - job level
 
 import sys
 import os
