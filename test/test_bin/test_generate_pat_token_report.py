@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch
-from config.constants import SLACK_CHANNEL
-from bin.generate_pat_token_report import generate_pat_token_report, expired_tokens_message, count_expired_tokens
+from bin.generate_pat_token_report import generate_pat_token_report, count_expired_tokens
 
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -22,20 +21,20 @@ class TestPATTokenMonitoring(unittest.TestCase):
     @patch('bin.generate_pat_token_report.count_expired_tokens')
     @patch.object(GithubService, "__new__")
     @patch.object(GithubService, 'get_new_pat_creation_events_for_organization')
-    @patch.object(SlackService, 'send_message_to_plaintext_channel_name')
+    @patch.object(SlackService, 'send_pat_report_alert')
     def test_main_expired_tokens_found(self, mock_send_message, mock_get_pat_events, _mock_github_service, mock_count_expired_tokens):
         mock_get_pat_events.return_value = [{'token_expired': True}, {'token_expired': True}]
         mock_count_expired_tokens.return_value = 2
 
         generate_pat_token_report()
 
-        mock_send_message.assert_called_once_with(expired_tokens_message(), SLACK_CHANNEL)
+        mock_send_message.assert_called_once()
 
     @patch.dict('os.environ', {'ADMIN_SLACK_TOKEN': 'mock_slack_token', 'GH_APP_TOKEN': 'mock_gh_token'})
     @patch('bin.generate_pat_token_report.count_expired_tokens')
     @patch.object(GithubService, "__new__")
     @patch.object(GithubService, 'get_new_pat_creation_events_for_organization')
-    @patch.object(SlackService, 'send_message_to_plaintext_channel_name')
+    @patch.object(SlackService, 'send_pat_report_alert')
     def test_main_no_expired_tokens_found(self, mock_send_message, mock_get_pat_events, _mock_github_service, mock_count_expired_tokens):
         mock_get_pat_events.return_value = [{'token_expired': False}, {'token_expired': False}]
         mock_count_expired_tokens.return_value = 0

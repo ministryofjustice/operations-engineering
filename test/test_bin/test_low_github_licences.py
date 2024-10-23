@@ -1,29 +1,13 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from bin.alert_on_low_github_licences import low_threshold_triggered_message, alert_on_low_github_licences
+from bin.alert_on_low_github_licences import alert_on_low_github_licenses
 
 from services.github_service import GithubService
 from services.slack_service import SlackService
 
 
 class TestGithubLicenseAlerting(unittest.TestCase):
-
-    def test_low_threshold_triggered_message(self):
-        """ Test the message format for low threshold alert. """
-        remaining_licences = 5
-        expected_message = (
-            "Hi team 👋, \n\n"
-            "There are only 5     GitHub licences remaining in the enterprise account. \n\n"
-            "Please add more licences using the instructions outlined here: \n"
-            "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html \n\n"
-
-            "Thanks, \n\n"
-
-            "The GitHub Licence Alerting Bot"
-        )
-        self.assertEqual(low_threshold_triggered_message(
-            remaining_licences), expected_message)
 
     @patch.object(GithubService, "__new__")
     @patch.object(SlackService, "__new__")
@@ -40,9 +24,9 @@ class TestGithubLicenseAlerting(unittest.TestCase):
         mock_slack_instance = MagicMock()
         mock_slack_service.return_value = mock_slack_instance
 
-        alert_on_low_github_licences(10)
+        alert_on_low_github_licenses()
 
-        mock_slack_instance.send_message_to_plaintext_channel_name.assert_called()
+        mock_slack_instance.send_low_github_licenses_alert.assert_called()
 
 
 if __name__ == '__main__':
