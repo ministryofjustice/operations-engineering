@@ -1244,6 +1244,7 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def calculate_repo_age(self, repo: str) -> list:
+        print("calculating repo age")
         creation_date = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo}").created_at
 
         age_in_days = (datetime.now(timezone.utc) - creation_date).days
