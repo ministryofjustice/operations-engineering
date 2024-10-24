@@ -1878,5 +1878,41 @@ class TestGithubServiceGetAllEnterpriseMembers(unittest.TestCase):
         self.assertEqual(2, len(response))
 
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGetOldPOCRepositories(unittest.TestCase):
+
+    @freeze_time("2024-10-24")
+    def test_calculate_repo_age(self, mock_github_client_core_api):
+        mock_github_client_core_api.return_value.get_repo().created_at = datetime.fromisoformat("2024-10-04 00:00:00+00:00")
+
+        response = GithubService("", ORGANISATION_NAME).calculate_repo_age("repo1")
+
+        self.assertEqual(20, response)
+
+    @patch.object(GithubService, "calculate_repo_age")
+    @patch.object(GithubService, "get_paginated_list_of_repositories_per_topic")
+    def test_get_old_poc_repositories_if_exist(self, mock_get_paginated_list_of_repositories_per_topic, mock_calculate_repo_age, mock_github_client_core_api):
+        mock_get_paginated_list_of_repositories_per_topic.return_value = {'search': {'repos': [
+            {'repo': {'name': 'operations-engineering-metadata-poc', 'isDisabled': False, 'isLocked': False, 'hasIssuesEnabled': True, 'repositoryTopics': {'edges': [{'node': {'topic': {'name': 'operations-engineering'}}}, {'node': {'topic': {'name': 'poc'}}}]}, 'collaborators': {'totalCount': 0}}},
+            {'repo': {'name': 'operations-engineering-unit-test-generator-poc', 'isDisabled': False, 'isLocked': False, 'hasIssuesEnabled': True, 'repositoryTopics': {'edges': [{'node': {'topic': {'name': 'operations-engineering'}}}, {'node': {'topic': {'name': 'poc'}}}]}, 'collaborators': {'totalCount': 0}}},
+        ],
+        'pageInfo': {'hasNextPage': False, 'endCursor': 'Y3Vyc29yOjQ='}}}
+        mock_calculate_repo_age.return_value = 30
+
+        response = GithubService("", ORGANISATION_NAME).get_old_poc_repositories()
+
+        self.assertEqual({"operations-engineering-metadata-poc": 30, "operations-engineering-unit-test-generator-poc": 30}, response)
+
+    @patch.object(GithubService, "get_paginated_list_of_repositories_per_topic")
+    def test_get_old_poc_repositories_if_not_exist(self, mock_get_paginated_list_of_repositories_per_topic, mock_github_client_core_api):
+        mock_get_paginated_list_of_repositories_per_topic.return_value = {'search': {'repos': [], 'pageInfo': {'hasNextPage': False, 'endCursor': 'Y3Vyc29yOjQ='}}}
+
+        response = GithubService("", ORGANISATION_NAME).get_old_poc_repositories()
+
+        self.assertEqual({}, response)
+
+
 if __name__ == "__main__":
     unittest.main()
