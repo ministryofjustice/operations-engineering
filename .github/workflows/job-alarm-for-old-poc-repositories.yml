@@ -4,9 +4,6 @@ on:
   schedule:
     - cron: "0 4 * * *"
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
 
 env:
   ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
@@ -30,12 +27,12 @@ jobs:
 
       - run: pipenv run python3 -m bin.alarm_for_old_poc_repositories
 
-      # - name: Report failure to Slack
-      #   if: always()
-      #   uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
-      #   with:
-      #     status: ${{ job.status }}
-      #     notify_when: "failure"
-      #     notification_title: "Failed: Alarm for Old POC Repositories"
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@472601e839b758e36c455b5d3e5e1a217d4807bd # 2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+          notification_title: "Failed: Alarm for Old POC Repositories"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
