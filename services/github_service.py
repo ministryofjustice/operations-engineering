@@ -1267,4 +1267,6 @@ class GithubService:
     def test_function(self) -> list:
         poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("poc", None)['search']['repos']]
 
+        print(poc_repositories[0])
+
         return self.github_client_core_api.get_repo(f"{self.organisation_name}/{poc_repositories[0]}").created_at
