@@ -1246,15 +1246,13 @@ class GithubService:
     def calculate_repo_age(self, repo: str) -> list:
         creation_date = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo}").created_at
 
-        print(creation_date)
-
         age_in_days = (datetime.now(timezone.utc) - creation_date).days
 
         return age_in_days
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_old_poc_repositories(self) -> list:
-        poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("poc", None)['search']['repos']]
+        poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("testlev", None)['search']['repos']]
 
         old_poc_repositories = {}
         age_threshold = 30
