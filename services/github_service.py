@@ -1241,3 +1241,17 @@ class GithubService:
             all_users = all_users + [user.login for user in self.github_client_core_api.get_organization(org).get_members() if user.login not in all_users]
 
         return all_users
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def repo_is_old(self, repo: str) -> list:
+        creation_date = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo}").created_at
+
+        print(f"{repo} was created at {creation_date}")
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_old_poc_repositories(self) -> list:
+        poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("poc", None)['search']['repos']]
+
+        old_poc_repositories = [repo for repo in poc_repositories if self.repo_is_old(repo)]
+
+        return old_poc_repositories
