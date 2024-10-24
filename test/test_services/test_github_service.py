@@ -120,6 +120,7 @@ class TestGithubServiceInit(unittest.TestCase):
 class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
 
     # Default for archiving a repository
+    # pylint: disable=R0917
     def __get_repository(self, last_active_date: datetime, created_at_date: datetime, archived: bool = False, fork: bool = False, repo_name: str = None, has_commits: bool = True) -> Mock:
         repository_to_consider_for_archiving = Mock(
             Repository, archived=archived, fork=fork)
