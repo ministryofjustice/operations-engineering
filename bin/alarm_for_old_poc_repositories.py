@@ -19,11 +19,11 @@ def alert_for_old_poc_repositories():
     slack_token = os.environ.get("ADMIN_SLACK_TOKEN")
 
     if github_token is None:
-        print("No GITHUB_TOKEN environment variable set")
+        print("No GH_TOKEN environment variable set")
         sys.exit(1)
 
     if slack_token is None:
-        print("No SLACK_TOKEN environment variable set")
+        print("No ADMIN_SLACK_TOKEN environment variable set")
         sys.exit(1)
 
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
