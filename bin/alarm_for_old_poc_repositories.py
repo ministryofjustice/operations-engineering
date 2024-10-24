@@ -32,7 +32,7 @@ def alert_for_old_poc_repositories():
 
     old_poc_repositories = github_service.get_old_poc_repositories()
 
-    if old_poc_repositories != {}:
+    if old_poc_repositories:
         slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
 
 
