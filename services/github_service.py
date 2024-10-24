@@ -2,7 +2,7 @@
 
 import json
 from calendar import timegm
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from time import gmtime, sleep
 from typing import Any, Callable
 
@@ -1248,9 +1248,7 @@ class GithubService:
 
         print(creation_date)
 
-        timestamp = datetime.fromisoformat(creation_date)
-
-        age_in_days = (datetime.now() - timestamp).days
+        age_in_days = (datetime.now(timezone.utc) - creation_date).days
 
         return age_in_days
 
