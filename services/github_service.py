@@ -1252,7 +1252,7 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_old_poc_repositories(self) -> list:
-        poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("testlev", None)['search']['repos']]
+        poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("poc", None)['search']['repos']]
 
         old_poc_repositories = {}
         age_threshold = 30
