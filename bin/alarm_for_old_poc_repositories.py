@@ -30,9 +30,9 @@ def alert_for_old_poc_repositories():
     slack_service = SlackService(slack_token)
 
     # old_poc_repositories = github_service.get_old_poc_repositories()
-    poc_repositories = github_service.test_function()
+    created_date = github_service.test_function()
 
-    print(poc_repositories)
+    print(created_date)
 
     # if old_poc_repositories != {}:
     #     slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
