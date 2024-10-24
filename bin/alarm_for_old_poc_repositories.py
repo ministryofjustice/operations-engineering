@@ -14,6 +14,7 @@ def construct_message(repositories):
 
     return intro + core_content + action
 
+
 def alert_for_old_poc_repositories():
     github_token = os.environ.get("GH_TOKEN")
     slack_token = os.environ.get("ADMIN_SLACK_TOKEN")
@@ -33,6 +34,7 @@ def alert_for_old_poc_repositories():
 
     if old_poc_repositories != {}:
         slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
+
 
 if __name__ == "__main__":
     alert_for_old_poc_repositories()
