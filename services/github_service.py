@@ -1246,9 +1246,9 @@ class GithubService:
     def calculate_repo_age(self, repo: str) -> list:
         creation_date = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo}").created_at
 
-        timestamp = datetime.fromisoformat(creation_date)
+        print(creation_date)
 
-        age_in_days = (datetime.now() - timestamp).days
+        age_in_days = (datetime.now() - creation_date).days
 
         return age_in_days
 
