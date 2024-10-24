@@ -1248,7 +1248,9 @@ class GithubService:
 
         print(creation_date)
 
-        age_in_days = (datetime.now() - creation_date).days
+        timestamp = datetime.fromisoformat(creation_date)
+
+        age_in_days = (datetime.now() - timestamp).days
 
         return age_in_days
 
