@@ -29,12 +29,13 @@ def alert_for_old_poc_repositories():
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
     slack_service = SlackService(slack_token)
 
-    old_poc_repositories = github_service.get_old_poc_repositories()
+    # old_poc_repositories = github_service.get_old_poc_repositories()
+    poc_repositories = github_service.test_function()
 
-    print(old_poc_repositories)
+    print(poc_repositories)
 
-    if old_poc_repositories != {}:
-        slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
+    # if old_poc_repositories != {}:
+    #     slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
 
 if __name__ == "__main__":
     alert_for_old_poc_repositories()
