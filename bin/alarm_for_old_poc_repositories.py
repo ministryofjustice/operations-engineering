@@ -34,8 +34,8 @@ def alert_for_old_poc_repositories():
 
     # print(created_date)
 
-    # if old_poc_repositories != {}:
-    #     slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
+    if old_poc_repositories != {}:
+        slack_service.send_message_to_plaintext_channel_name(construct_message(old_poc_repositories), SLACK_CHANNEL)
 
 if __name__ == "__main__":
     alert_for_old_poc_repositories()
