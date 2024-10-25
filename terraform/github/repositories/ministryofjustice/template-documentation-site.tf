@@ -1,6 +1,8 @@
 module "template-documentation-site" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name         = "template-documentation-site"
   type         = "template"

@@ -1,6 +1,8 @@
 module "operations-engineering-example" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name         = "operations-engineering-example"
   description  = "Example application to showcase how to deploy code"

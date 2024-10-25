@@ -1,6 +1,8 @@
 module "moj-terraform-aws-sso" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   type        = "module"
   name        = "moj-terraform-aws-sso"
