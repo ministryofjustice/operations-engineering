@@ -1,6 +1,8 @@
 module "github-collaborators" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name            = "github-collaborators"
   description     = "Manage outside collaborators on our Github repositories"

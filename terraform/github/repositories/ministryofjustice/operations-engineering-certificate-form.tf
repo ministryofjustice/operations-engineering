@@ -1,6 +1,8 @@
 module "operations-engineering-certificate-form" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name        = "operations-engineering-certificate-form"
   description = "An experimental web form that assists with automating part of the certificate renewal process."

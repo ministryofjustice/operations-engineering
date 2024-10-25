@@ -1,6 +1,8 @@
 module "operations-engineering-github-actions-dashboard" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name        = "operations-engineering-github-actions-dashboard"
   description = "A GitHub repository for the Operations Engineering GitHub Actions dashboard"
