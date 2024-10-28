@@ -215,6 +215,15 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
+    def send_alert_for_poc_repositories(self, repositories):
+        message = (
+            "The following POC GitHub Repositories persist:\n\n"
+            + "\n".join([f"https://github.com/ministryofjustice/{repo} - {age} days old" for repo, age in repositories.items()])
+            + "\n\nConsider if they are still required. If not, please archive them by removing them from the Terraform configuration: https://github.com/ministryofjustice/operations-engineering/tree/main/terraform/github/repositories/ministryofjustice"
+        )
+        blocks = self._create_block_with_message(message)
+        self._send_alert_to_operations_engineering(blocks)
+
     def send_remove_users_slack_message(self, number_of_users: int, organisation_name: str):
         message = f"*Dormant Users Automation*\nRemoved {number_of_users} users from the {organisation_name} GitHub Organisation.\nSee the GH Action for more info: {self.OPERATION_ENGINEERING_REPOSITORY_URL}"
         blocks = self._create_block_with_message(message)
