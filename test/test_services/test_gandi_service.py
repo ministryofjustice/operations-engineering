@@ -9,7 +9,7 @@ class TestGandiService(unittest.TestCase):
         self.token = "test_token"
         self.url_extension = "v5/organization/"
         self.org_id = "example_org_id"
-        self.gandi_service = GandiService(self.token, self.url_extension)
+        self.gandi_service = GandiService(self.token, self.org_id)
 
     @patch('services.gandi_service.requests.get')
     def test_get_current_account_balance_from_org_success(self, mock_get):
@@ -18,7 +18,7 @@ class TestGandiService(unittest.TestCase):
         mock_response.raise_for_status = MagicMock()
         mock_get.return_value = mock_response
 
-        balance = self.gandi_service.get_current_account_balance_from_org(self.org_id)
+        balance = self.gandi_service.get_current_account_balance_from_org()
         self.assertEqual(balance, 100.00)
 
     @patch('services.gandi_service.requests.get')
@@ -26,7 +26,7 @@ class TestGandiService(unittest.TestCase):
         mock_get.side_effect = requests.exceptions.HTTPError("Unauthorized")
 
         with self.assertRaises(requests.exceptions.HTTPError):
-            self.gandi_service.get_current_account_balance_from_org(self.org_id)
+            self.gandi_service.get_current_account_balance_from_org()
 
     @patch('services.gandi_service.requests.get')
     def test_get_current_account_balance_from_org_type_error(self, mock_get):
@@ -36,7 +36,7 @@ class TestGandiService(unittest.TestCase):
         mock_get.return_value = mock_response
 
         with self.assertRaises(KeyError):
-            self.gandi_service.get_current_account_balance_from_org(self.org_id)
+            self.gandi_service.get_current_account_balance_from_org()
 
 
 if __name__ == '__main__':

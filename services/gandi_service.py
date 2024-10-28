@@ -9,9 +9,14 @@ class GandiService:
         self._validate_token()
 
     def _validate_token(self):
-        validation_url = f"{self.base_url}/organization/organizations/" + self.org_id
-        response = requests.get(validation_url, headers=self.headers, timeout=60)
-        response.raise_for_status()
+        try:
+            validation_url = f"{self.base_url}/organization/organizations/" + self.org_id
+            response = requests.get(validation_url, headers=self.headers, timeout=60)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as http_error:
+            if http_error.response.status_code in [401, 403]:
+                error_message = {"Invalid API token provided. {http_error}"}
+                raise ValueError(error_message)
 
     def get_current_account_balance_from_org(self):
         response = requests.get(url=self.base_url + "/billing/info/" + self.org_id, headers=self.headers, timeout=60)
