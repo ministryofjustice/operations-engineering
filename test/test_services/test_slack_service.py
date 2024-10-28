@@ -41,62 +41,6 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
             'channels': [self.channel], 'response_metadata': self.response_metadata}
         self.slack_service.slack_client = self.slack_client
 
-    def test_send_message_to_plaintext_channel_name(self):
-        self.slack_client.chat_postMessage.return_value = self.response
-        self.slack_service.send_message_to_plaintext_channel_name(
-            self.message, self.channel_name)
-        self.slack_client.chat_postMessage.assert_called_once_with(
-            channel=self.channel_id, text=self.message)
-
-    def test_send_message_to_plaintext_channel_name_when_no_channel_name_exists(self):
-        response = {'channels': [],
-                    'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        self.slack_service.send_message_to_plaintext_channel_name(
-            self.message, self.channel_name)
-        self.slack_client.chat_postMessage.assert_not_called()
-
-    def test_send_message_to_plaintext_channel_name_when_response_not_okay(self):
-        response = {'ok': False, "error": "some-error"}
-        self.slack_client.chat_postMessage.return_value = response
-        self.slack_service.send_message_to_plaintext_channel_name(
-            self.message, self.channel_name)
-        self.slack_client.chat_postMessage.assert_called_once_with(
-            channel=self.channel_id, text=self.message)
-
-    def test_lookup_channel_id(self):
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertEqual(result, self.channel_id)
-
-    def test_lookup_channel_id_when_no_matching_channels(self):
-        response = {'channels': [
-            {'name': "other-channel", 'id': self.channel_id}], 'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertIsNone(result)
-
-    def test_lookup_channel_id_when_channels_empty(self):
-        response = {'channels': [],
-                    'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertIsNone(result)
-
-    def test_lookup_channel_id_when_no_channels(self):
-        response = {'channels': None,
-                    'response_metadata': self.response_metadata}
-        self.slack_client.conversations_list.return_value = response
-        result = self.slack_service._lookup_channel_id(self.channel_name)
-        self.slack_client.conversations_list.assert_called_once_with(
-            limit=200, cursor='')
-        self.assertIsNone(result)
-
 
 @patch("slack_sdk.WebClient.__new__")
 class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCase):
@@ -209,7 +153,7 @@ class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Dormants Users Automation*\nRemove these users from the Dormants Users allow list:\n[\'some-user1\', \'some-user2\', \'some-user3\']'
+                        "text": '*Dormant Users Automation*\n\nRemove these users from the Dormant Users allow list:\n[\'some-user1\', \'some-user2\', \'some-user3\']'
                     }
                 }
             ]
@@ -230,7 +174,7 @@ class SendRemoveUsersFromGithubAlertToOperationsEngineering(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Dormants Users Automation*\nRemoved 3 users from the some-org GitHub Organisation.\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering'
+                        "text": '*Dormant Users Automation*\n\nRemoved 3 users from the some-org GitHub Organisation.\n\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering'
                     }
                 }
             ]
@@ -253,7 +197,7 @@ class SendUndeliveredEmailAlertToOperationsEngineering(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Dormants Users Automation*\nUndelivered emails for some-org GitHub Organisation:\n[\'some-user1@domain.com\', \'some-user2@domain.com\', \'some-user3@domain.com\']\nRemove these users manually'
+                        "text": '*Dormant Users Automation*\n\nUndelivered emails for some-org GitHub Organisation:\n[\'some-user1@domain.com\', \'some-user2@domain.com\', \'some-user3@domain.com\']\n\nRemove these users manually.'
                     }
                 }
             ]
@@ -289,6 +233,173 @@ class TestSlackService(unittest.TestCase):
             blocks=self.blocks
         )
 
+    def test_send_slack_support_stats_report(self):
+        support_statistics = "Test support stats"
+        expected_message = (
+            "*Slack Support Stats Report*\n\n"
+            "Here an overview of our recent support statistics:\n"
+            f"{support_statistics}"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_slack_support_stats_report(support_statistics)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_dormant_user_list(self):
+        user_list = "Test user list"
+        expected_message = (
+            "*Dormant User Report*\n\n"
+            "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n"
+            f"{user_list}"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_dormant_user_list(user_list)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_pat_report_alert(self):
+        expected_message = (
+            "*Expired PAT Report*\n\n"
+            "Some expired PAT(s) have been detected.\n\n"
+            "Please review the current list here:\n"
+            "https://github.com/organizations/ministryofjustice/settings/personal-access-tokens/active"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_pat_report_alert()
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_new_github_joiner_metrics_alert(self):
+        new_members_added_by_oe = "OE members"
+        new_members_added_externally = "External members"
+        percentage = 50
+        total_new_members = 10
+        org = "Test Org"
+        audit_log_url = "http://auditlog.url"
+        time_delta_in_days = 7
+        expected_message = (
+            f"*GitHub Joiner Metrics*\n\n"
+            f"Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
+            f"*Added by Operations Engineering:*\n"
+            f"{new_members_added_by_oe}\n\n"
+            f"*Added externally:*\n"
+            f"{new_members_added_externally}\n\n"
+            f"{percentage}% of the new joiners were added by operations engineering.\n\n"
+            f"Please review the audit log for more details: {audit_log_url}"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_new_github_joiner_metrics_alert(
+            new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, org, audit_log_url, time_delta_in_days
+        )
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_new_github_owners_alert(self):
+        new_owner = "Test Owner"
+        date_added = "2024-07-22"
+        added_by = "Test Admin"
+        org = "Test Org"
+        audit_log_url = "http://auditlog.url"
+        expected_message = (
+            f"*New GitHub Owners Detected*\n\n"
+            f"A new owner has been detected in the `{org}` GitHub org.\n\n"
+            f"*New owner:* {new_owner}\n"
+            f"*Date added:* {date_added}\n"
+            f"*By who:* {added_by}\n\n"
+            f"Please review the audit log for more details: {audit_log_url}"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_new_github_owners_alert(new_owner, date_added, added_by, org, audit_log_url)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_low_github_licenses_alert(self):
+        remaining_licenses = 5
+        expected_message = (
+            f"*Low GitHub Licenses Remaining*\n\n"
+            f"There are only {remaining_licenses} GitHub licenses remaining in the enterprise account.\n\n"
+            f"Please add more licenses using the instructions outlined here:"
+            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_low_github_licenses_alert(remaining_licenses)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_low_github_actions_quota_alert(self):
+        percentage_used = 90
+        expected_message = (
+            f"*Low GitHub Actions Quota*\n\n"
+            f"{round(100 - percentage_used, 1)}% of the Github Actions minutes quota remains.\n"
+            f"What to do next: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-actions-minutes-procedure.html#low-github-actions-minutes-procedure"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_low_github_actions_quota_alert(percentage_used)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_low_gandi_funds_alert(self):
+        remaining_funds = 100
+        threshold = 500
+        expected_message = (
+            f"*Low Gandi Funds Remaining*\n\n"
+            f":warning: We currently have £{remaining_funds} left out of £{threshold}\n\n"
+            f"Please read the following Runbook for next steps:"
+            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/certificates/manual-ssl-certificate-processes.html#regenerating-certificates"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_low_gandi_funds_alert(remaining_funds, threshold)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_unknown_user_alert_to_operations_engineering(self):
+        users = ["user1", "user2"]
+        expected_message = (
+            "*Dormant Users Automation*\n\n"
+            "Remove these users from the Dormant Users allow list:\n"
+            f"{users}"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_unknown_user_alert_to_operations_engineering(users)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_remove_users_from_github_alert(self):
+        number_of_users = 3
+        organisation_name = "Test Org"
+        expected_message = (
+            "*Dormant Users Automation*\n\n"
+            f"Removed {number_of_users} users from the {organisation_name} GitHub Organisation.\n\n"
+            f"See the GH Action for more info: https://github.com/ministryofjustice/operations-engineering"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_remove_users_from_github_alert_to_operations_engineering(number_of_users, organisation_name)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
+    def test_send_unused_circleci_context_alert(self):
+        number_of_contexts = 4
+        expected_message = (
+            "*Unused CircleCI Contexts*\n\n"
+            f"A total of {number_of_contexts} unused CircleCI contexts have been detected.\n\n"
+            f"Please see the GH Action for more information: https://github.com/ministryofjustice/operations-engineering"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_unused_circleci_context_alert_to_operations_engineering(number_of_contexts)
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
     def test_send_unknown_users_slack_message(self):
         self.slack_service.send_unknown_users_slack_message(
             ["some-user1", "some-user2", "some-user3"])
@@ -300,7 +411,7 @@ class TestSlackService(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Dormants Users Automation*\nRemove these users from the Dormants Users allow list:\n[\'some-user1\', \'some-user2\', \'some-user3\']'
+                        "text": '*Dormant Users Automation*\nRemove these users from the Dormant Users allow list:\n[\'some-user1\', \'some-user2\', \'some-user3\']'
                     }
                 }
             ]
@@ -317,7 +428,7 @@ class TestSlackService(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Dormants Users Automation*\nRemoved 3 users from the some-org GitHub Organisation.\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering'
+                        "text": '*Dormant Users Automation*\nRemoved 3 users from the some-org GitHub Organisation.\nSee the GH Action for more info: https://github.com/ministryofjustice/operations-engineering'
                     }
                 }
             ]
@@ -338,7 +449,7 @@ class TestSlackService(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Dormants Users Automation*\nUndelivered emails for some-org GitHub Organisation:\n[\'some-user1@domain.com\', \'some-user2@domain.com\', \'some-user3@domain.com\']\nRemove these users manually'
+                        "text": '*Dormant Users Automation*\nUndelivered emails for some-org GitHub Organisation:\n[\'some-user1@domain.com\', \'some-user2@domain.com\', \'some-user3@domain.com\']\nRemove these users manually'
                     }
                 }
             ]
@@ -360,7 +471,7 @@ class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": '*Unowned Repositories Automation*\nRepositories on the GitHub Organisation that have no team or collaborator:\n[\'some-repo1\', \'some-repo2\', \'some-repo3\']'
+                        "text": '*Unowned Repositories Automation*\n\nRepositories on the GitHub Organisation that have no team or collaborator:\n[\'some-repo1\', \'some-repo2\', \'some-repo3\']'
                     }
                 }
             ]

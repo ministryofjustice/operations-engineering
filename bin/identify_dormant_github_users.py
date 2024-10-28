@@ -16,7 +16,6 @@ BUCKET_NAME = "operations-engineering-identify-dormant-github-user-csv"
 CSV_FILE_NAME = "dormant.csv"
 MOJ_ORGANISATION = "ministryofjustice"
 AP_ORGANISATION = "moj-analytical-services"
-SLACK_CHANNEL = "operations-engineering-alerts"
 # These are the users that are deemed acceptable to be dormant.
 # They are either bots or service accounts and will be revisited regularly.
 ALLOWED_BOT_USERS = [
@@ -143,12 +142,8 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
     return dormant_users_not_in_auth0
 
 
-def message_to_slack_channel(dormant_users: list) -> str:
-    msg = (
-        "Hello 🤖, \n\n"
-        "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n\n"
-    )
-
+def _create_dormant_user_list(dormant_users: list) -> str:
+    msg = ""
     for user in dormant_users:
         msg += f"{user.name} | {user.email}\n"
 
@@ -187,14 +182,12 @@ def identify_dormant_github_users():
     githubs_list_of_dormant_users = get_dormant_users_from_github_csv(
         moj_github_org, ap_github_org)
 
-    dormant_users_accoding_to_github_and_auth0 = filter_out_active_auth0_users(
+    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(
         githubs_list_of_dormant_users
     )
 
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_message_to_plaintext_channel_name(
-        message_to_slack_channel(dormant_users_accoding_to_github_and_auth0),
-        SLACK_CHANNEL,
-    )
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(
+        _create_dormant_user_list(dormant_users_according_to_github_and_auth0))
 
 
 if __name__ == "__main__":
