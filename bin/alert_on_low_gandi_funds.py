@@ -34,9 +34,9 @@ def alert_on_low_gandi_funds():
     if organisation_id is None:
         print("No GANDI_ORG_ID environment variable set")
         sys.exit(1)
-    gandi_service = GandiService(gandi_token, "v5/billing/info/")
+    gandi_service = GandiService(gandi_token, organisation_id)
 
-    remaining_gandi_funds = gandi_service.get_current_account_balance_from_org(organisation_id)
+    remaining_gandi_funds = gandi_service.get_current_account_balance_from_org()
 
     if remaining_gandi_funds < GANDI_FUND_THRESHOLD:
         SlackService(slack_token).send_message_to_plaintext_channel_name(

@@ -2,19 +2,18 @@ import requests
 
 
 class GandiService:
-    def __init__(self, token, url_extension) -> None:
+    def __init__(self, token, org_id) -> None:
         self.headers = {'Authorization': f'Bearer {token}'}
-        self.url = "https://api.gandi.net/" + url_extension
+        self.base_url = "https://api.gandi.net/v5"
+        self.org_id = org_id
+        self._validate_token()
 
-    def get_current_account_balance_from_org(self, org_id):
-        try:
-            response = requests.get(
-                url=self.url + org_id, headers=self.headers, timeout=60)
-            response.raise_for_status()
-            return float(response.json()['prepaid']['amount'])
-        except requests.exceptions.HTTPError as authentication_error:
-            raise requests.exceptions.HTTPError(
-                f"You may need to export your Gandi API key:\n {authentication_error}") from authentication_error
-        except TypeError as api_key_error:
-            raise TypeError(
-                f"Gandi API key does not exist or is in the wrong format:\n {api_key_error}") from api_key_error
+    def _validate_token(self):
+        validation_url = f"{self.base_url}/organization/organizations/" + self.org_id
+        response = requests.get(validation_url, headers=self.headers, timeout=60)
+        response.raise_for_status()
+
+    def get_current_account_balance_from_org(self):
+        response = requests.get(url=self.base_url + "/billing/info/" + self.org_id, headers=self.headers, timeout=60)
+        response.raise_for_status()
+        return float(response.json()['prepaid']['amount'])
