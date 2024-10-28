@@ -2,7 +2,7 @@
 
 import json
 from calendar import timegm
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from time import gmtime, sleep
 from typing import Any, Callable
 
@@ -1241,3 +1241,25 @@ class GithubService:
             all_users = all_users + [user.login for user in self.github_client_core_api.get_organization(org).get_members() if user.login not in all_users]
 
         return all_users
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def calculate_repo_age(self, repo: str) -> list:
+        creation_date = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo}").created_at
+
+        age_in_days = (datetime.now(timezone.utc) - creation_date).days
+
+        return age_in_days
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_old_poc_repositories(self) -> list:
+        poc_repositories = [repo['repo']['name'] for repo in self.get_paginated_list_of_repositories_per_topic("poc", None)['search']['repos']]
+
+        old_poc_repositories = {}
+        age_threshold = 30
+
+        for repo in poc_repositories:
+            age = self.calculate_repo_age(repo)
+            if age >= age_threshold:
+                old_poc_repositories[repo] = age
+
+        return old_poc_repositories

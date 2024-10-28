@@ -1,11 +1,12 @@
 module "operations-engineering-acronyms-app-poc" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
 
   name        = "operations-engineering-acronyms-app-poc"
   description = "A web app for viewing and adding acronyms, featuring sentiment analysis validation."
   topics      = ["operations-engineering", "poc"]
   visibility  = "public"
+  poc         = true
 
   template = {
     owner      = "ministryofjustice"

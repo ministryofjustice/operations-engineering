@@ -1,6 +1,8 @@
 module "operations-engineering-cloud-platform-namespace" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name        = "operations-engineering-cloud-platform-namespace"
   description = "This repository contains the terraform code for an operations engineering namespace in the cloud platform"

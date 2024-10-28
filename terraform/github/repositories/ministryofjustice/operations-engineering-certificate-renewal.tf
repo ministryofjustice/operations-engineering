@@ -1,6 +1,8 @@
 module "operations-engineering-certificate-renewal" {
   source  = "ministryofjustice/repository/github"
-  version = "1.2.0"
+  version = "1.2.1"
+
+  poc = false
 
   name        = "operations-engineering-certificate-renewal"
   description = "An application to automatically manage the renewal of certificates, and notify when certificates are close to expiring."

@@ -26,10 +26,22 @@ assignees: ''
 - [ ]
 - [ ]
 
+
 **Acceptance Criteria:**
 
 - [ ]
 - [ ]
+
+
+**Assumptions (Optional):**
+
+-
+-
+
+**Risks and Mitigation (Optional):**
+
+-
+-
 
 **Notes:**
 
@@ -48,5 +60,9 @@ Functional Requirements: Here, you list what you are going to do - the functiona
 [Non-Functional Requirements](https://en.wikipedia.org/wiki/Non-functional_requirement): Here, you list how you are going to do it - the non-functional requirements associated with the user story. These could be about the system's performance, security, usability, standards etc, these are likely more technical than the functional requirements description.
 
 Acceptance Criteria: These are the conditions that must be met for the user story to be considered "done". It should clearly define the boundaries of the user story and help in testing.
+
+Assumptions (optional): Where appropriate list any important assumptions here.
+
+Risks and Mitigation (optional): Where appropriate list any important risks relevant to this ticket and if possible a mitigation strategy.
 
 Notes: This is for any additional information or details about the user story. -->
