@@ -17,7 +17,7 @@ jobs:
         with:
           role-to-assume: ${{secrets.AWS_GITHUB_DORMANT_USERS_ARN}}
           aws-region: eu-west-2
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: "3.11"
           cache: "pipenv"

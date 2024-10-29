@@ -42,7 +42,7 @@ jobs:
           aws route53 list-hosted-zones --max-items="1" --profile="dsd_route53_read" --output="json" | jq ".HostedZones[].Name"
           aws route53 list-hosted-zones --max-items="1" --profile="cloud_platform_route53_read" --output="json" | jq ".HostedZones[].Name"
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: "3.11"
           cache: "pipenv"
