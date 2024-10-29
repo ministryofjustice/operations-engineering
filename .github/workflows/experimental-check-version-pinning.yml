@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Check for unpinned Actions
-        uses: ministryofjustice/github-actions/check-version-pinning@2f98b7260e4c0200a99027347e73cba80bc26712
+        uses: ministryofjustice/github-actions/check-version-pinning@ccf9e3a4a828df1ec741f6c8e6ed9d0acaef3490
         with:
           workflow_directory: ".github/workflows"
           scan_mode: "full"
