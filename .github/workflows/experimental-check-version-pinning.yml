@@ -5,6 +5,7 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 jobs:
   check-version-pinning:
@@ -15,19 +16,8 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Set up Python
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      - name: Check for unpinned Actions
+        uses: ministryofjustice/github-actions/check-version-pinning@ccf9e3a4a828df1ec741f6c8e6ed9d0acaef3490
         with:
-          python-version: "3.11"
-          cache: "pipenv"
-
-      - name: Install Pipenv
-        run: pip install pipenv
-
-      - name: Verify Pipfile.lock is in sync
-        run: pipenv verify
-      - name: Install dependencies
-        run: pipenv install
-
-      - name: Check for incorrectly pinned Actions
-        run: pipenv run python3 -m bin.check_version_pinning
+          workflow_directory: ".github/workflows"
+          scan_mode: "full"
