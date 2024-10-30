@@ -5,7 +5,7 @@ module "github-actions" {
   poc = false
 
   name        = "github-actions"
-  description = "A github action which will run code formatters against PRs, and commit any resulting changes"
+  description = "A collection of reusable GitHub Actions for the Ministry of Justice, designed to streamline and enhance workflows across our projects."
   topics      = ["operations-engineering"]
 
   team_access = {
