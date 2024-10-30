@@ -118,10 +118,10 @@ class NotifyService:
 
     def _send_email_crs(self, email_params, recipients):
         for email in recipients:
-            domain_name = utilities.remove_suffix_if_present(
+            domain_name = self._remove_suffix_if_present(
                 email_params['domain_name'])
             try:
-                NotificationsAPIClient(self.api_key).send_email_notification(
+                self.client.send_email_notification(
                     email_address=email,
                     template_id=self.config['template_ids']['cert_expiry'],
                     personalisation={

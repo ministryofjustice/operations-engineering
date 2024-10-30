@@ -79,12 +79,12 @@ class GandiService:
                 }
         return valid_state_certificates
 
-    def get_expired_certificates_from_valid_certificate_list(self, valid_state_certificate_list: dict, email_list):
+    def get_expired_certificates_from_valid_certificate_list(self, valid_state_certificate_list: dict, email_list, cert_expiry_thresholds: list[int]):
         expired_certificates = {}
         for domain_item in valid_state_certificate_list:
             days_between_now_and_expiry_date = self._get_days_between_now_and_expiry_date(
                 valid_state_certificate_list[domain_item]['expiry_date'])
-            if days_between_now_and_expiry_date in self.config['cert_expiry_thresholds']:
+            if days_between_now_and_expiry_date in cert_expiry_thresholds:
                 email_addresses_of_domain_owners = \
                     self._get_email_address_of_domain_owners(
                         domain_item, email_list)
