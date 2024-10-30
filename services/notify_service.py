@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import requests
 from notifications_python_client.notifications import NotificationsAPIClient
+
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 
@@ -159,7 +160,7 @@ class NotifyService:
 
     def send_report_email_crs(self, report, template_id, email):
         try:
-            NotificationsAPIClient(self.api_key).send_email_notification(
+            self.client.send_email_notification(
                 email_address=email,
                 template_id=template_id,
                 personalisation={

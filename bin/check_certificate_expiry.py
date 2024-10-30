@@ -27,14 +27,12 @@ logger = logging.getLogger(__name__)
 
 def get_environment_variables() -> str:
     gandi_token = os.environ.get("GANDI_FUNDS_TOKEN")
-    if gandi_token is None:
-        print("No GANDI_FUNDS_TOKEN environment variable set")
-        sys.exit(1)
+    if not gandi_token:
+        raise ValueError("No GANDI_FUNDS_TOKEN environment variable set")
 
     notify_api_key = os.environ.get("NOTIFY_PROD_API_KEY")
-    if notify_api_key is None:
-        print("No NOTIFY_PROD_API_KEY environment variable set")
-        sys.exit(1)
+    if not notify_api_key:
+        raise ValueError("No NOTIFY_PROD_API_KEY environment variable set")
 
     return gandi_token, notify_api_key
 
@@ -91,7 +89,7 @@ def main(testrun: bool = False, test_email: str = ""):
             logger.info("Building main report...")
             report = notify_service.build_main_report_string_crs(
                 email_parameter_list)
-            logger.info(f"Sending test report to {test_email}...")
+            logger.info("Sending test report to %s...", test_email)
             notify_service.send_report_email_crs(
                 report, CERT_REPORT_TEMPLATE_ID, test_email)
 
