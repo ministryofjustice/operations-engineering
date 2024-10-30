@@ -1,9 +1,11 @@
 import requests
+import datetime
 
 
 class GandiService:
     def __init__(self, token, url_extension) -> None:
         self.headers = {'Authorization': f'Bearer {token}'}
+        self.params = {'per_page': 1000}
         self.url = "https://api.gandi.net/" + url_extension
 
     def get_current_account_balance_from_org(self, org_id):
@@ -18,9 +20,9 @@ class GandiService:
         except TypeError as api_key_error:
             raise TypeError(
                 f"Gandi API key does not exist or is in the wrong format:\n {api_key_error}") from api_key_error
-    
+
     def _get_email_address_of_domain_owners(self, domain_name, email_list):
-        domain_name_to_check = utilities.remove_suffix_if_present(domain_name)
+        domain_name_to_check = self._remove_suffix_if_present(domain_name)
         if email_list[domain_name_to_check]['external_cname']:
             return email_list[domain_name_to_check]['external_cname']
         email_addresses_of_domain_owners = [
@@ -30,6 +32,10 @@ class GandiService:
                 iter(email_list[domain_name_to_check]['recipientcc'])
             )
         return email_addresses_of_domain_owners
+
+    def _remove_suffix_if_present(self, domain_name):
+        base, sep, suffix = domain_name.rpartition('.')
+        return base if sep == '.' and suffix.isdigit() else domain_name
 
     def _check_certificate_state(self, domain_item, email_list, certificate_state) -> bool:
         return domain_item['cn'] in email_list and domain_item['status'] == certificate_state
@@ -87,6 +93,3 @@ class GandiService:
                     "emails": email_addresses_of_domain_owners
                 }
         return expired_certificates
-
-    
-    
