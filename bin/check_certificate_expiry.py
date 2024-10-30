@@ -25,7 +25,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def get_environment_variables() -> str:
+def get_environment_variables() -> tuple:
     gandi_token = os.environ.get("GANDI_FUNDS_TOKEN")
     if not gandi_token:
         raise ValueError("No GANDI_FUNDS_TOKEN environment variable set")
