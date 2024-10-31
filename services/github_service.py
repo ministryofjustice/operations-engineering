@@ -13,7 +13,7 @@ from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
-from gql.transport.exceptions import TransportQueryError
+from gql.transport.exceptions import TransportServerError
 from requests import Session
 
 from config.logging_config import logging
@@ -37,7 +37,7 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
         """
         try:
             return func(*args, **kwargs)
-        except (RateLimitExceededException, TransportQueryError) as exception:
+        except (RateLimitExceededException, TransportServerError) as exception:
             logging.warning(
                 f"Caught {type(exception).__name__}, retrying calls when rate limit resets.")
             rate_limits = args[0].github_client_core_api.get_rate_limit()
