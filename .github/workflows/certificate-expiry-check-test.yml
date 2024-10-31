@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@main
         with:
           role-to-assume: ${{secrets.AWS_CERTIFICATE_EMAIL_ARN}}
           aws-region: eu-west-2
@@ -35,5 +35,5 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.check_certificate_expiry --test agnieszka.bachleda@justice.gov.uk
         env:
-          GANDI_FUNDS_TOKEN: ${{ secrets.GANDI_FUNDS_TOKEN }}
+          GANDI_CERTIFICATES_TOKEN: ${{ secrets.GANDI_CERTIFICATES_TOKEN }}
           NOTIFY_PROD_API_KEY: ${{ secrets.NOTIFY_PROD_API_KEY }}

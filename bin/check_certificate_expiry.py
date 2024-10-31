@@ -26,9 +26,9 @@ logger = logging.getLogger(__name__)
 
 
 def get_environment_variables() -> tuple:
-    gandi_token = os.environ.get("GANDI_FUNDS_TOKEN")
+    gandi_token = os.environ.get("GANDI_CERTIFICATES_TOKEN")
     if not gandi_token:
-        raise ValueError("No GANDI_FUNDS_TOKEN environment variable set")
+        raise ValueError("No GANDI_CERTIFICATES_TOKEN environment variable set")
 
     notify_api_key = os.environ.get("NOTIFY_PROD_API_KEY")
     if not notify_api_key:
