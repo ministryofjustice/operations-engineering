@@ -21,7 +21,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: ${{secrets.AWS_CERTIFICATE_EMAIL_ARN}}
+          role-to-assume: ${{secrets.AWS_ID}}
           aws-region: eu-west-2
       - name: checkout repo content
         uses: actions/checkout@v4
