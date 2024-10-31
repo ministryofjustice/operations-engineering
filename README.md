@@ -28,7 +28,7 @@ These are just a few examples of this repository's useful tools and features. Fo
 2. **Install pre-commit:** `make local-setup`
 3. **Navigate to the Repo:** `cd operations-engineering`
 4. **Install Dependencies:** `pipenv install --dev`
-5. **Run a script:** `pipenv run python -m bin.dormant_users`
+5. **Run a script:** `pipenv run python -m bin.identify_dormant_github_users`
 
 ## Pipenv
 
