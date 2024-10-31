@@ -12,7 +12,7 @@ from github.NamedUser import NamedUser
 from github.Organization import Organization
 from github.Repository import Repository
 from github.Variable import Variable
-from gql.transport.exceptions import TransportQueryError
+from gql.transport.exceptions import TransportServerError
 
 from services.github_service import (
     GithubService, retries_github_rate_limit_exception_at_next_reset_once)
@@ -65,9 +65,9 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
                           "test_arg")
 
     @freeze_time("2023-02-01")
-    def test_function_is_called_twice_when_transport_query_error_raised_once(self):
+    def test_function_is_called_twice_when_transport_server_error_raised_once(self):
         mock_function = Mock(
-            side_effect=[TransportQueryError(Mock(), Mock(), Mock()), Mock()])
+            side_effect=[TransportServerError(Mock(), Mock()), Mock()])
         mock_github_client = Mock(Github)
         mock_github_client.get_rate_limit().graphql.reset = datetime.now()
         mock_github_service = Mock(
@@ -79,14 +79,14 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
     @freeze_time("2023-02-01")
     def test_rate_limit_exception_raised_when_transport_query_error_raised_twice(self):
         mock_function = Mock(side_effect=[
-            TransportQueryError(Mock(), Mock(), Mock()),
-            TransportQueryError(Mock(), Mock(), Mock())]
+            TransportServerError(Mock(), Mock()),
+            TransportServerError(Mock(), Mock())]
         )
         mock_github_client = Mock(Github)
         mock_github_client.get_rate_limit().graphql.reset = datetime.now()
         mock_github_service = Mock(
             GithubService, github_client_core_api=mock_github_client)
-        self.assertRaises(TransportQueryError,
+        self.assertRaises(TransportServerError,
                           retries_github_rate_limit_exception_at_next_reset_once(
                               mock_function), mock_github_service,
                           "test_arg")
