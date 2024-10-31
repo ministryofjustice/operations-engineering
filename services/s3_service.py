@@ -8,6 +8,7 @@ class S3Service:
     def __init__(self, bucket_name: str, organisation_name: str) -> None:
         self.client = boto3.client("s3")
         self.bucket_name = bucket_name
+        self.organisation_name = organisation_name
 
     def _download_file(self, object_name: str, file_path: str):
         self.client.download_file(self.bucket_name, object_name, file_path)
