@@ -1,15 +1,11 @@
 # pylint: disable=W0221, C0411
 import os
-import csv
-import json
 import tempfile
 import unittest
 from botocore.exceptions import ClientError
-from unittest.mock import call, patch, mock_open
+from unittest.mock import call, patch
 from io import BytesIO
-from freezegun import freeze_time
 from services.s3_service import S3Service
-from config.constants import NO_ACTIVITY
 
 
 class TestS3Service(unittest.TestCase):
