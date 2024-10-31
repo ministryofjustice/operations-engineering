@@ -173,7 +173,7 @@ def identify_dormant_github_users():
     env = EnvironmentVariables(required_env_vars)
 
     # To identify email addresses, we need to check both
-    # the MOJ and AP GitHub organisations as there is no enterprise opion for this.
+    # the MOJ and AP GitHub organisations as there is no enterprise option for this.
     moj_github_org = GithubService(env.get(
         "GH_MOJ_ADMIN_TOKEN"), MOJ_ORGANISATION)
     ap_github_org = GithubService(env.get(
