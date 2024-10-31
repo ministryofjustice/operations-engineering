@@ -40,9 +40,9 @@ def get_environment_variables() -> tuple:
 def get_json_file_from_s3():
     s3 = boto3.client("s3")
     try:
-
-        s3.download_fileobj(S3_BUCKET_NAME, S3_OBJECT_NAME, S3_OBJECT_NAME)
-        logger.info("File %s downloaded successfully.", S3_OBJECT_NAME)
+        with open(file_path, 'wb') as file:
+            s3.download_fileobj(S3_BUCKET_NAME, S3_OBJECT_NAME, file)
+            logger.info("File %s downloaded successfully.", S3_OBJECT_NAME)
         with open(S3_OBJECT_NAME, 'r', encoding="utf-8") as file:
             mappings = file.read()
         return json.loads(mappings)
