@@ -1,0 +1,35 @@
+name: Certificate Expiry Test Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: What is the email address of the recipient?
+jobs:
+  certificate-expiry-check-test-run:
+    name: Run certificate expiry script in test mode
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@main
+        with:
+          role-to-assume: ${{secrets.AWS_CERTIFICATE_EMAIL_ARN}}
+          aws-region: eu-west-2
+      - name: checkout repo content
+        uses: actions/checkout@v4
+      - name: Python Setup
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.check_certificate_expiry --test agnieszka.bachleda@justice.gov.uk
+        env:
+          GANDI_CERTIFICATES_TOKEN: ${{ secrets.GANDI_CERTIFICATES_TOKEN }}
+          NOTIFY_PROD_API_KEY: ${{ secrets.NOTIFY_PROD_API_KEY }}
