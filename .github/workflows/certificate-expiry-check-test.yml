@@ -37,3 +37,6 @@ jobs:
         env:
           GANDI_CERTIFICATES_TOKEN: ${{ secrets.GANDI_CERTIFICATES_TOKEN }}
           NOTIFY_PROD_API_KEY: ${{ secrets.NOTIFY_PROD_API_KEY }}
+          S3_CERT_BUCKET_NAME: ${{ secrets.S3_CERT_BUCKET_NAME }}
+          S3_CERT_OBJECT_NAME: ${{ secrets.S3_CERT_OBJECT_NAME }}
+          
