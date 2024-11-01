@@ -1,6 +1,7 @@
+# pylint: disable=C0411
 from datetime import datetime, timezone
 import requests
-from notifications_python_client.notifications import NotificationsAPIClient  # pylint: disable=C0411
+from notifications_python_client.notifications import NotificationsAPIClient
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 
