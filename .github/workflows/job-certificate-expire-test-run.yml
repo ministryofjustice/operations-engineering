@@ -1,8 +1,6 @@
 name: Certificate Expiry Test Run
 
 on:
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
     inputs:
       email:
@@ -30,7 +28,7 @@ jobs:
         run: |
           pip install pipenv
           pipenv install
-      - run: pipenv run python3 -m bin.check_certificate_expiry --test agnieszka.bachleda@justice.gov.uk
+      - run: pipenv run python3 -m bin.check_certificate_expiry --test ${{ github.event.inputs.email }}
         env:
           GANDI_CERTIFICATES_TOKEN: ${{ secrets.GANDI_CERTIFICATES_TOKEN }}
           NOTIFY_PROD_API_KEY: ${{ secrets.NOTIFY_PROD_API_KEY }}
