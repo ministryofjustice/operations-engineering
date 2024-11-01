@@ -2,11 +2,6 @@ import os
 import sys
 import logging
 
-import boto3
-from botocore.exceptions import NoCredentialsError
-import json
-from json import JSONDecodeError
-
 from services.gandi_service import GandiService
 from services.notify_service import NotifyService
 from services.s3_service import S3Service
@@ -67,7 +62,7 @@ def main(testrun: bool = False, test_email: str = ""):
     if expired_certificate_list := gandi_service.get_expired_certificates_from_valid_certificate_list(
             valid_certificate_list, email_mappings, cert_config["CERT_EXPIRY_THRESHOLDS"]
     ):
-        
+
         print("Building parameters to send emails...")
         email_parameter_list = notify_service.build_email_parameter_list_crs(
             expired_certificate_list)

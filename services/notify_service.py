@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import requests
 from notifications_python_client.notifications import NotificationsAPIClient
+
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 
@@ -103,7 +104,7 @@ class NotifyService:
             raise requests.exceptions.HTTPError(
                 f"You may need to export your Notify API Key:\n {api_key_error}"
             ) from api_key_error
-    
+
     def build_email_parameter_list_crs(self, valid_certificate_list):
         emails_parameter_list = []
         for valid_certificate in valid_certificate_list:
