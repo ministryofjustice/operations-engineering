@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 import requests
-from notifications_python_client.notifications import NotificationsAPIClient
-
+from notifications_python_client.notifications import NotificationsAPIClient  # noqa: C0411
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 
