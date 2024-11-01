@@ -110,7 +110,7 @@ class NotifyService:
             params = {
                 'email_addresses': valid_certificate_list.get(valid_certificate).get('emails'),
                 'domain_name': valid_certificate,
-                'csr_email': self.config['reply_email'],
+                'csr_email': self.config['CERT_REPLY_EMAIL'],
                 'end_date': valid_certificate_list.get(valid_certificate).get('expiry_date')
             }
             emails_parameter_list.append(params)
@@ -123,7 +123,7 @@ class NotifyService:
             try:
                 self.client.send_email_notification(
                     email_address=email,
-                    template_id=self.config['template_ids']['cert_expiry'],
+                    template_id=self.config["CERT_EXPIRY_TEMPALATE_ID"],
                     personalisation={
                         "domain_name": domain_name,
                         "csr_email": email_params['csr_email'],
@@ -138,7 +138,7 @@ class NotifyService:
     def send_emails_from_parameters_crs(self, email_parameter_list):
         for email_parameters in email_parameter_list:
             self._send_email_crs(email_parameters,
-                             email_parameters['email_addresses'])
+                                 email_parameters['email_addresses'])
 
     def send_test_email_from_parameters_crs(self, email_parameter_list, test_email):
         for email_parameters in email_parameter_list:

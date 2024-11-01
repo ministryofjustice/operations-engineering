@@ -1,4 +1,5 @@
 import requests
+import datetime
 
 
 class GandiService:
@@ -19,7 +20,7 @@ class GandiService:
         except TypeError as api_key_error:
             raise TypeError(
                 f"Gandi API key does not exist or is in the wrong format:\n {api_key_error}") from api_key_error
-    
+
     def _get_email_address_of_domain_owners(self, domain_name, email_list):
         domain_name_to_check = self._remove_suffix_if_present(domain_name)
         if email_list[domain_name_to_check]['external_cname']:

@@ -9,20 +9,24 @@ from json import JSONDecodeError
 
 from services.gandi_service import GandiService
 from services.notify_service import NotifyService
+from services.s3_service import S3Service
 
 from config.constants import MINISTRY_OF_JUSTICE
 
-S3_BUCKET_NAME = "operations-engineering-certificate-email"
-S3_OBJECT_NAME = "mappings.json"
-CERT_URL_EXTENSION = "v5/certificate/issued-certs"
-CERT_REPORT_TEMPLATE_ID = "04b6ca6c-2945-4a0d-a267-53fb61b370ef"
-CERT_REPLY_EMAIL = "certificates@digital.justice.gov.uk"
-CERT_EXPIRY_THRESHOLDS = [30]
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+
+cert_config = {
+    "CERT_REPLY_EMAIL": "certificates@digital.justice.gov.uk",
+    "CERT_EXPIRY_THRESHOLDS": [30],
+    "CERT_URL_EXTENSION": "v5/certificate/issued-certs",
+    "CERT_REPORT_TEMPLATE_ID": "04b6ca6c-2945-4a0d-a267-53fb61b370ef",
+    "CERT_EXPIRY_TEMPALATE_ID": "06abd028-0a8f-43d9-a122-90a92f9b62ee"
+}
 
 
 def get_environment_variables() -> tuple:
@@ -34,54 +38,40 @@ def get_environment_variables() -> tuple:
     if not notify_api_key:
         raise ValueError("No NOTIFY_PROD_API_KEY environment variable set")
 
-    return gandi_token, notify_api_key
+    s3_bucket_name = os.environ.get("S3_CERT_BUCKET_NAME")
+    if not s3_bucket_name:
+        raise ValueError("S3_CERT_BUCKET_NAME environment variable set")
 
+    s3_object_name = os.environ.get("S3_CERT_OBJECT_NAME")
+    if not s3_object_name:
+        raise ValueError("S3_CERT_OBJECT_NAME environment variable set")
 
-def get_json_file_from_s3():
-    s3 = boto3.client("s3")
-    try:
-        with open(S3_OBJECT_NAME, 'wb') as file:
-            s3.download_fileobj(S3_BUCKET_NAME, S3_OBJECT_NAME, file)
-            logger.info("File %s downloaded successfully.", S3_OBJECT_NAME)
-        with open(S3_OBJECT_NAME, 'r', encoding="utf-8") as file:
-            mappings = file.read()
-        return json.loads(mappings)
-
-    except NoCredentialsError:
-        logger.error(
-            "Credentials not available, please check your AWS credentials.")
-    except FileNotFoundError as e:
-        logger.error("Error downloading file: %s", e)
-
-    except JSONDecodeError as e:
-        logger.error("File not in JSON Format: %s", e)
+    return gandi_token, notify_api_key, s3_bucket_name, s3_object_name
 
 
 def main(testrun: bool = False, test_email: str = ""):
 
-    # Instantiate services
+    gandi_token, notify_api_key, s3_bucket_name, s3_object_name = get_environment_variables()
     logger.info("Instantiating services...")
-    gandi_token, notify_api_key = get_environment_variables()
-    gandi_service = GandiService(gandi_token, CERT_URL_EXTENSION)
-    notify_service = NotifyService("", notify_api_key, MINISTRY_OF_JUSTICE)
+    gandi_service = GandiService(gandi_token, cert_config["CERT_URL_EXTENSION"])
+    notify_service = NotifyService(cert_config, notify_api_key, MINISTRY_OF_JUSTICE)
+    s3_service = S3Service(s3_bucket_name, MINISTRY_OF_JUSTICE,)
 
-    # Get a list of the email mappings from S3
     logger.info("Extracting email map from S3")
-    email_mappings = get_json_file_from_s3()
+    email_mappings = s3_service.get_json_file(s3_object_name, s3_object_name)
 
     logger.info("Extracting certificate list from Gandi...")
     certificate_list = gandi_service.get_certificate_list()
     valid_certificate_list = gandi_service.get_certificates_in_valid_state(
         certificate_list, email_mappings)
     if expired_certificate_list := gandi_service.get_expired_certificates_from_valid_certificate_list(
-            valid_certificate_list, email_mappings, CERT_EXPIRY_THRESHOLDS
+            valid_certificate_list, email_mappings, cert_config["CERT_EXPIRY_THRESHOLDS"]
     ):
-        # Build parameters to send emails
+        
         print("Building parameters to send emails...")
         email_parameter_list = notify_service.build_email_parameter_list_crs(
             expired_certificate_list)
 
-        # Send emails for the expired certificates using Notify based on whether it's a test run or not
         if testrun:
             logger.info("Sending test email to {test_email}...")
             notify_service.send_test_email_from_parameters_crs(
@@ -91,7 +81,7 @@ def main(testrun: bool = False, test_email: str = ""):
                 email_parameter_list)
             logger.info("Sending test report to %s...", test_email)
             notify_service.send_report_email_crs(
-                report, CERT_REPORT_TEMPLATE_ID, test_email)
+                report, cert_config["CERT_REPORT_TEMPLATE_ID"], test_email)
 
         else:
             logger.info("Sending live emails...")
@@ -101,7 +91,7 @@ def main(testrun: bool = False, test_email: str = ""):
                 email_parameter_list)
             print("Sending live report to Operations Engineering...")
             notify_service.send_report_email_crs(
-                report, CERT_REPORT_TEMPLATE_ID, CERT_REPLY_EMAIL)
+                report, cert_config["CERT_REPORT_TEMPLATE_ID"], cert_config["CERT_REPLY_EMAIL"])
     else:
         logger.info("No expiring certificates found.")
 
