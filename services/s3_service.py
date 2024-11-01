@@ -1,7 +1,10 @@
 # pylint: disable=wrong-import-order
 import os
 import boto3
+import json
 from botocore.exceptions import ClientError
+
+from json import JSONDecodeError
 
 
 class S3Service:
@@ -32,3 +35,18 @@ class S3Service:
             return any(line.startswith("mode: enforce") for line in sts_content.split('\n'))
         except ClientError:
             return False
+
+    def get_json_file(self, object_name: str, file_path: str):
+
+        try:
+            with open(file_path, 'wb') as file:
+                self.client.download_fileobj(self.bucket_name, object_name, file)
+            with open(file_path, 'r', encoding="utf-8") as file:
+                mappings = file.read()
+            return json.loads(mappings)
+
+        except FileNotFoundError as e:
+            raise FileNotFoundError("Error downloading file") from e
+
+        except JSONDecodeError as e:
+            raise ValueError("File not in JSON Format") from e
