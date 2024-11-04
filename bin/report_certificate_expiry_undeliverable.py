@@ -37,7 +37,7 @@ def main(testrun: bool = False, test_email: str = ""):
 
     print("Building undelivered email report...")
     undelivered_email_report = notify_service.check_for_undelivered_emails_for_template(
-        cert_config[ "CERT_EXPIRY_TEMPALATE_ID"])
+        cert_config["CERT_EXPIRY_TEMPALATE_ID"])
 
     if len(undelivered_email_report) == 0:
         print("No undeliverable emails found, nice!")
@@ -47,14 +47,14 @@ def main(testrun: bool = False, test_email: str = ""):
         report = notify_service.build_undeliverable_email_report_string_crs(
                 undelivered_email_report)
         print(f"Sending test undelivered email test report to {test_email}...")
-        notify_service.send_report_email(
+        notify_service.send_report_email_crs(
             report, cert_config['CERT_UNDELIVERED_REPORT_TEMPALATE_ID'], test_email)
     else:
         logger.info("Building undelivered email live report...")
         report = notify_service.build_undeliverable_email_report_string_crs(
                 undelivered_email_report)
         print("Sending live undelivered emailreport to Operations Engineering...")
-        notify_service.send_report_email(
+        notify_service.send_report_email_crs(
             report, cert_config["CERT_UNDELIVERED_REPORT_TEMPALATE_ID"], cert_config["CERT_REPLY_EMAIL"])
 
 
