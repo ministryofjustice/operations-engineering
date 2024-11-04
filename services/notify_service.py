@@ -159,16 +159,13 @@ class NotifyService:
         )
 
     def build_undeliverable_email_report_string_crs(self, undeliverable_email_list):
-        if undeliverable_email_list is None:
-            return
-
         return "".join(
             f"Email Address: {undeliverable_email['email_address']}\n"
             f"Sent at: {undeliverable_email['created_at']}\n"
             f"Status: {undeliverable_email['status']} \n\n"
             for undeliverable_email in undeliverable_email_list
         )
-        
+
     def send_report_email_crs(self, report, template_id, email):
         try:
             self.client.send_email_notification(
