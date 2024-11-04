@@ -1,0 +1,32 @@
+name: Certificate Expiry Undeliverable Report Test Run
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      email:
+        description: What is the email address of the recipient?
+jobs:
+  certificate-expiry-check:
+    name: Run certificate expiry undeliverable report script
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v4
+      - name: Python Setup
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: '3.11'
+      - name: Install Python Packages from Requirements File
+        run: |
+          pip install pipenv
+          pipenv install
+      - name: execute certificate expiry undeliverable report run
+        run: pipenv run python3 -m bin.report_cerificate_expiry_undeliverable --test agnieszka.bachleda@digital.justice.gov.uk
+        env:
+          NOTIFY_API_KEY: ${{ secrets.NOTIFY_API_KEY }}
+          
