@@ -27,7 +27,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             "notifications": []
         }
 
-        result = self.notify_service._check_for_undelivered_emails_for_template(
+        result = self.notify_service.check_for_undelivered_emails_for_template(
             self.template_id)
         self.assertEqual(len(result), 0)
 
@@ -45,7 +45,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             ]
         }
 
-        result = self.notify_service._check_for_undelivered_emails_for_template(
+        result = self.notify_service.check_for_undelivered_emails_for_template(
             self.template_id)
 
         self.assertEqual(len(result), 1)
