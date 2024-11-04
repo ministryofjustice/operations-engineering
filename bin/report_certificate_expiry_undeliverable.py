@@ -32,7 +32,7 @@ def main(testrun: bool = False, test_email: str = ""):
     notify_api_key = get_environment_variables()
     
     logger.info("Instantiating services...")
-    notify_service = NotifyService(cert_config, notify_api_key, MINISTRY_OF_JUSTICE))
+    notify_service = NotifyService(cert_config, notify_api_key, MINISTRY_OF_JUSTICE)
 
     print("Building undelivered email report...")
     undelivered_email_report = notify_service.check_for_undelivered_emails_for_template(
