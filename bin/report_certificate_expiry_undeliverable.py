@@ -18,6 +18,7 @@ cert_config = {
     "CERT_UNDELIVERED_REPORT_TEMPALATE_ID": "6d0e7249-6b2d-4f0e-bf32-657e9300d09e"
 }
 
+
 def get_environment_variables():
 
     notify_api_key = os.environ.get("NOTIFY_PROD_API_KEY")
