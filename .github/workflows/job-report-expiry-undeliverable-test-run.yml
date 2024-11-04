@@ -26,7 +26,7 @@ jobs:
           pip install pipenv
           pipenv install
       - name: execute certificate expiry undeliverable report run
-        run: pipenv run python3 -m bin.report_cerificate_expiry_undeliverable --test agnieszka.bachleda@digital.justice.gov.uk
+        run: pipenv run python3 -m bin.report_certificate_expiry_undeliverable --test agnieszka.bachleda@digital.justice.gov.uk
         env:
           NOTIFY_API_KEY: ${{ secrets.NOTIFY_API_KEY }}
           
