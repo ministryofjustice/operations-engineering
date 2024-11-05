@@ -65,13 +65,13 @@ class NotifyService:
         )
 
     def check_for_undelivered_first_emails(self):
-        return self._check_for_undelivered_emails_for_template(
+        return self.check_for_undelivered_emails_for_template(
             self._get_first_email_template_id())
 
     def _get_notifications_by_type_and_status(self, template_type, status):
         return self.client.get_all_notifications(status=status, template_type=template_type)
 
-    def _check_for_undelivered_emails_for_template(self, template_id):
+    def check_for_undelivered_emails_for_template(self, template_id):
         notifications = self._get_notifications_by_type_and_status('email', 'failed')[
             'notifications']
         today = datetime.now(timezone.utc).date()
@@ -156,6 +156,14 @@ class NotifyService:
             f"Sent to:\n{''.join([f'{address}{new_line}' for address in email_parameter['email_addresses']])}"
             f"\nExpiry Date: {email_parameter['end_date']} \n\n"
             for email_parameter in email_parameter_list
+        )
+
+    def build_undeliverable_email_report_string_crs(self, undeliverable_email_list):
+        return "".join(
+            f"Email Address: {undeliverable_email['email_address']}\n"
+            f"Sent at: {undeliverable_email['created_at']}\n"
+            f"Status: {undeliverable_email['status']} \n\n"
+            for undeliverable_email in undeliverable_email_list
         )
 
     def send_report_email_crs(self, report, template_id, email):

@@ -27,7 +27,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             "notifications": []
         }
 
-        result = self.notify_service._check_for_undelivered_emails_for_template(
+        result = self.notify_service.check_for_undelivered_emails_for_template(
             self.template_id)
         self.assertEqual(len(result), 0)
 
@@ -45,7 +45,7 @@ class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
             ]
         }
 
-        result = self.notify_service._check_for_undelivered_emails_for_template(
+        result = self.notify_service.check_for_undelivered_emails_for_template(
             self.template_id)
 
         self.assertEqual(len(result), 1)
@@ -201,7 +201,7 @@ class TestNotifyServiceFunctionsForMojOrg(unittest.TestCase):
         self.assertEqual(self.notify_service._get_first_email_template_id(
         ), "30351e8f-320b-4ebe-b0bf-d6aa0a7c607d")
 
-    @patch.object(NotifyService, "_check_for_undelivered_emails_for_template")
+    @patch.object(NotifyService, "check_for_undelivered_emails_for_template")
     @patch.object(NotifyService, "_get_first_email_template_id")
     def test_check_for_undelivered_first_emails(self, mock_get_first_email_template_id, mock_check_for_undelivered_emails_for_template):
         mock_check_for_undelivered_emails_for_template.return_value = "some-value"
