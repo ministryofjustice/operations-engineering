@@ -1,10 +1,12 @@
 import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
-from test.files.test_config import test_config
+from test.test_utils.test_data_certificates import TestData
+from test.test_utils.test_config_certificates import test_config
 import requests
 from services.notify_service import NotifyService
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
+
 
 # pylint: disable=W0212, W0221
 
@@ -208,6 +210,53 @@ class TestNotifyServiceFunctionsForMojOrg(unittest.TestCase):
         self.assertEqual(
             self.notify_service.check_for_undelivered_first_emails(), "some-value")
         mock_get_first_email_template_id.assert_called_once()
+
+
+class TestBuildParameters(unittest.TestCase):
+    def setUp(self):
+        self.config = test_config
+        self.api_key = 'test_api_key'
+
+        self.notify_service = NotifyService(self.config, self.api_key, MINISTRY_OF_JUSTICE)
+
+    def test_build_parameters_returns_multiple_expected_domains(self):
+        test_case_count = 3
+        data = TestData.generate_multiple_valid_certificate_list(
+            count=test_case_count)
+        response = self.notify_service.build_email_parameter_list_crs(data)
+
+        self.assertIn(f"{TestData.test_domain_name_root}{0}",
+                      response[0]['domain_name'])
+        self.assertIn(f"{TestData.test_domain_name_root}{1}",
+                      response[1]['domain_name'])
+        self.assertIn(f"{TestData.test_domain_name_root}{2}",
+                      response[2]['domain_name'])
+
+    def test_build_parameters_returns_multiple_expected_domains_with_expected_email(self):
+        test_case_count = 3
+        data = TestData.generate_multiple_valid_certificate_list(
+            count=test_case_count)
+        response = self.notify_service.build_email_parameter_list(data)
+
+        self.assertIn(f"{TestData.test_recipient_email_root}{0}",
+                      response[0]['email_addresses'])
+        self.assertIn(f"{TestData.test_recipient_email_root}{1}",
+                      response[1]['email_addresses'])
+        self.assertIn(f"{TestData.test_recipient_email_root}{2}",
+                      response[2]['email_addresses'])
+
+    def test_build_parameters_returns_multiple_expected_emails(self):
+        test_case_count = 3
+        data = TestData.generate_single_valid_certificate_multiple_emails(
+            count=test_case_count)
+        response = self.notify_service.build_email_parameter_list(data)
+
+        self.assertIn(f"{TestData.test_recipient_email_root}",
+                      response[0]['email_addresses'][0])
+        self.assertIn(f"{TestData.test_recipient_email_root}",
+                      response[0]['email_addresses'][1])
+        self.assertIn(f"{TestData.test_recipient_email_root}",
+                      response[0]['email_addresses'][2])
 
 
 if __name__ == "__main__":

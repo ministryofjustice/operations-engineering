@@ -68,7 +68,7 @@ class TestGandiCertificateList(unittest.TestCase):
 
         self.assertEqual(actual_result, expected_result)
         mock_get.assert_called_once_with(
-            url=f"https://api.gandi.net/v5/certificates",
+            url=f"https://api.gandi.net/{self.url_extension}",
             params={"per_page": 1000},
             headers={"Authorization": "Bearer test_token"},
             timeout=60
@@ -87,7 +87,7 @@ class TestGandiCertificateList(unittest.TestCase):
         expected_message = "You may need to export your Gandi API key:\n Unauthorized"
         self.assertEqual(str(context.exception), expected_message)
         mock_get.assert_called_once_with(
-            url=f"https://api.gandi.net/v5/certificates",
+            url=f"https://api.gandi.net/{self.url_extension}",
             params={"per_page": 1000},
             headers={"Authorization": "Bearer test_token"},
             timeout=60
@@ -106,7 +106,7 @@ class TestGandiCertificateList(unittest.TestCase):
         expected_message = "Gandi API key does not exist or is in the wrong format:\n Invalid API key"
         self.assertEqual(str(context.exception), expected_message)
         mock_get.assert_called_once_with(
-            url=f"https://api.gandi.net/v5/certificates",
+            url=f"https://api.gandi.net/{self.url_extension}",
             params={'per_page': 1000},
             headers={"Authorization": "Bearer test_token"},
             timeout=60
@@ -125,7 +125,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
         response = self.gandi_service.get_expired_certificates_from_valid_certificate_list(
             TestData.generate_single_filtered_certificate_list_with_expiry_date(
                 30),
-            TestData.generate_single_email_list(), 
+            TestData.generate_single_email_list(),
             test_config["cert_expiry_thresholds"])
 
         self.assertIn(TestData.test_domain_name_root, response)
@@ -204,7 +204,7 @@ class TestCertificateRetrievalValidity(unittest.TestCase):
             TestData.generate_single_email_list()
         )
         self.assertNotIn(TestData.test_domain_name_root, response)
-   
+
     def test_multiple_valid_certificates_returned(self):
         test_case_count = 3
         response = self.gandi_service.get_certificates_in_valid_state(
