@@ -1,9 +1,10 @@
 import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
+import requests
 from test.test_utils.test_data_certificates import TestData
 from test.test_utils.test_config_certificates import test_config
-import requests
+
 from services.notify_service import NotifyService
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
@@ -12,7 +13,6 @@ from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 
 class TestCheckForUndeliveredEmailsFromNotify(unittest.TestCase):
-
     @patch("services.notify_service.NotificationsAPIClient")
     def setUp(self, mock_notify_client):
         self.config = test_config
@@ -213,16 +213,19 @@ class TestNotifyServiceFunctionsForMojOrg(unittest.TestCase):
 
 
 class TestBuildParameters(unittest.TestCase):
-    def setUp(self):
+    @patch("services.notify_service.NotificationsAPIClient")
+    def setUp(self, mock_notify_client):
         self.config = test_config
         self.api_key = 'test_api_key'
-
-        self.notify_service = NotifyService(self.config, self.api_key, MINISTRY_OF_JUSTICE)
+        self.notify_service = NotifyService(
+            self.config, self.api_key, "some-org")
+        self.notify_service.client = mock_notify_client
 
     def test_build_parameters_returns_multiple_expected_domains(self):
         test_case_count = 3
         data = TestData.generate_multiple_valid_certificate_list(
             count=test_case_count)
+
         response = self.notify_service.build_email_parameter_list_crs(data)
 
         self.assertIn(f"{TestData.test_domain_name_root}{0}",
@@ -236,7 +239,7 @@ class TestBuildParameters(unittest.TestCase):
         test_case_count = 3
         data = TestData.generate_multiple_valid_certificate_list(
             count=test_case_count)
-        response = self.notify_service.build_email_parameter_list(data)
+        response = self.notify_service.build_email_parameter_list_crs(data)
 
         self.assertIn(f"{TestData.test_recipient_email_root}{0}",
                       response[0]['email_addresses'])
@@ -249,7 +252,7 @@ class TestBuildParameters(unittest.TestCase):
         test_case_count = 3
         data = TestData.generate_single_valid_certificate_multiple_emails(
             count=test_case_count)
-        response = self.notify_service.build_email_parameter_list(data)
+        response = self.notify_service.build_email_parameter_list_crs(data)
 
         self.assertIn(f"{TestData.test_recipient_email_root}",
                       response[0]['email_addresses'][0])
@@ -257,6 +260,119 @@ class TestBuildParameters(unittest.TestCase):
                       response[0]['email_addresses'][1])
         self.assertIn(f"{TestData.test_recipient_email_root}",
                       response[0]['email_addresses'][2])
+
+
+@patch.object(NotifyService, '_send_email_crs')
+class TestSendEmail(unittest.TestCase):
+    @patch("services.notify_service.NotificationsAPIClient")
+    def setUp(self, mock_notify_client):
+        self.config = test_config
+        self.api_key = 'test_api_key'
+        self.notify_service = NotifyService(self.config, self.api_key, "some-org")
+        self.notify_service.client = mock_notify_client
+
+    def test_send_emails_from_parameters_sends_emails(self, mock_send_email):
+        email_parameter_list = TestData.generate_multiple_email_parameter_list(
+            count=3)
+
+        self.notify_service.send_emails_from_parameters_crs(email_parameter_list)
+        mock_send_email.assert_any_call(
+            email_parameter_list[0], email_parameter_list[0]['email_addresses'])
+        mock_send_email.assert_any_call(
+            email_parameter_list[1], email_parameter_list[1]['email_addresses'])
+        mock_send_email.assert_any_call(
+            email_parameter_list[2], email_parameter_list[2]['email_addresses'])
+
+    def test_email_does_not_send_with_empty_list(self, mock_send_email):
+        email_parameter_list = []
+        self.notify_service.send_emails_from_parameters_crs(email_parameter_list)
+        mock_send_email.assert_not_called()
+
+    def test_send_emails_from_parameters_handles_http_error(self, mock_send_email):
+        mock_send_email.side_effect = requests.exceptions.HTTPError(
+            'API Key error')
+        email_parameter_list = TestData.generate_multiple_email_parameter_list()
+        with self.assertRaises(requests.exceptions.HTTPError) as context:
+            self.notify_service.send_emails_from_parameters_crs(
+                email_parameter_list)
+
+        expected_message = "API Key error"
+        self.assertEqual(str(context.exception), expected_message)
+
+
+class TestSendReportEmail(unittest.TestCase):
+    @patch("services.notify_service.NotificationsAPIClient")
+    def setUp(self, mock_notify_client) :
+        self.config = test_config
+        self.api_key = 'test_api_key'
+        self.template_id = 'test_template_id'
+        self.ops_email = 'test_ops_email'
+        self.notify_service = NotifyService(self.config, self.api_key, "some-org")
+        self.notify_service.client = mock_notify_client
+
+    def test_send_main_report_is_sent_with_expected_data(self):
+        test_main_report_data = TestData.generate_main_report_single_domain_single_email()
+
+        self.notify_service.client.send_email_notification.return_value = None
+        self.notify_service.send_report_email_crs(
+            test_main_report_data, self.template_id, self.ops_email)
+
+        self.notify_service.client.send_email_notification.assert_called_once_with(
+            email_address=self.ops_email,
+            template_id=self.template_id,
+            personalisation={
+                "report": test_main_report_data
+            }
+        )
+
+    def test_send_main_report_with_multiple_domains_is_sent_with_expected_data(self):
+        test_case_count = 3
+        test_main_report_data = TestData.generate_main_report_multiple_domain_multiple_email(
+            test_case_count, test_case_count)
+
+        self.notify_service.client.send_email_notification.return_value = None
+        self.notify_service.send_report_email_crs(
+            test_main_report_data, self.template_id, self.ops_email)
+
+        self.notify_service.client.send_email_notification.assert_called_once_with(
+            email_address=self.ops_email,
+            template_id=self.template_id,
+            personalisation={
+                "report": test_main_report_data
+            }
+        )
+
+    def test_send_undeliverable_report_is_sent_with_expected_data(self):
+        test_undeliverable_report_data = TestData.generate_undeliverable_report_single_email()
+
+        self.notify_service.client.send_email_notification.return_value = None
+        self.notify_service.send_report_email_crs(
+            test_undeliverable_report_data, self.template_id, self.ops_email)
+
+        self.notify_service.client.send_email_notification.assert_called_once_with(
+            email_address=self.ops_email,
+            template_id=self.template_id,
+            personalisation={
+                "report": test_undeliverable_report_data
+            }
+        )
+
+    def test_send_undeliverable_report_with_multiple_domains_is_sent_with_expected_data(self):
+        test_case_count = 3
+        test_undeliverable_report_data = TestData.generate_undeliverable_report_multiple_email(
+            test_case_count)
+
+        self.notify_service.client.send_email_notification.return_value = None
+        self.notify_service.send_report_email_crs(
+            test_undeliverable_report_data, self.template_id, self.ops_email)
+
+        self.notify_service.client.send_email_notification.assert_called_once_with(
+            email_address=self.ops_email,
+            template_id=self.template_id,
+            personalisation={
+                "report": test_undeliverable_report_data
+            }
+        )
 
 
 if __name__ == "__main__":
