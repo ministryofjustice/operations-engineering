@@ -50,7 +50,7 @@ class TestGandiAccountBalance(unittest.TestCase):
 class TestGandiCertificateList(unittest.TestCase):
     def setUp(self):
         self.token = "test_token"
-        self.url_extension = "v5/certificates"
+        self.url_extension = test_config["CERT_URL_EXTENSION"]
         self.org_id = "example_org_id"
         self.gandi_service = GandiService(self.token, self.url_extension)
 
@@ -117,7 +117,7 @@ class TestGandiCertificateList(unittest.TestCase):
 class TestGetExpiredCertificates(unittest.TestCase):
     def setUp(self):
         self.token = "test_token"
-        self.url_extension = "v5/certificates"
+        self.url_extension = test_config["CERT_URL_EXTENSION"]
         self.org_id = "example_org_id"
         self.gandi_service = GandiService(self.token, self.url_extension)
 
@@ -188,7 +188,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
 class TestCertificateRetrievalValidity(unittest.TestCase):
     def setUp(self):
         self.token = "test_token"
-        self.url_extension = "v5/certificates"
+        self.url_extension = test_config["CERT_URL_EXTENSION"]
         self.org_id = "example_org_id"
         self.gandi_service = GandiService(self.token, self.url_extension)
 
