@@ -1,9 +1,10 @@
 # pylint: disable=W0221, C0411
 import os
+import json
 import tempfile
 import unittest
 from botocore.exceptions import ClientError
-from unittest.mock import call, patch
+from unittest.mock import call, patch, mock_open
 from io import BytesIO
 from services.s3_service import S3Service
 
@@ -73,6 +74,28 @@ class TestS3Service(unittest.TestCase):
         )
 
         self.assertFalse(self.s3_service.is_well_known_mta_sts_enforce("example.com"))
+
+    def test_get_json_file_success(self):
+        mock_content = '{"key": "value"}'
+        with patch(self.builtins, mock_open(read_data=mock_content)) as mock_file:
+            result = self.s3_service.get_json_file(self.the_json_file, self.s3_json_file)
+            self.assertEqual(result, json.loads(mock_content))
+            self.mock_boto3.assert_has_calls([
+                call.client("s3"),
+                call.client().download_fileobj(self.s3_service.bucket_name, self.the_json_file, mock_file())
+            ])
+
+    def test_get_json_file_not_found(self):
+        with patch(self.builtins, mock_open()) as mock_file:
+            mock_file.side_effect = FileNotFoundError
+            with self.assertRaises(FileNotFoundError):
+                self.s3_service.get_json_file(self.the_json_file, self.s3_json_file)
+
+    def test_get_json_file_invalid_json(self):
+        mock_content = 'Not a JSON'
+        with patch(self.builtins, mock_open(read_data=mock_content)) as mock_file:
+            with self.assertRaises(ValueError):
+                self.s3_service.get_json_file(self.the_json_file, self.s3_json_file)
 
 
 if __name__ == "__main__":
