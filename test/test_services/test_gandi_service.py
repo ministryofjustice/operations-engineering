@@ -126,7 +126,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
             TestData.generate_single_filtered_certificate_list_with_expiry_date(
                 30),
             TestData.generate_single_email_list(),
-            test_config["cert_expiry_thresholds"])
+            test_config["CERT_EXPIRY_THRESHOLDS"])
 
         self.assertIn(TestData.test_domain_name_root, response)
 
@@ -136,7 +136,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
             TestData.generate_multiple_filtered_certificate_list_with_expiry_date(
                 30, test_case_count),
             TestData.generate_multiple_email_list(test_case_count),
-            test_config["cert_expiry_thresholds"])
+            test_config["CERT_EXPIRY_THRESHOLDS"])
 
         self.assertIn(f"{TestData.test_domain_name_root}0", response)
         self.assertIn(f"{TestData.test_domain_name_root}1", response)
@@ -147,7 +147,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
             TestData.generate_single_filtered_certificate_list_with_expiry_date(
                 30),
             TestData.generate_single_email_list(),
-            test_config["cert_expiry_thresholds"])
+            test_config["CERT_EXPIRY_THRESHOLDS"])
 
         self.assertIn(TestData.test_recipient_email_root,
                       response[TestData.test_domain_name_root]['emails'])
@@ -157,7 +157,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
             TestData.generate_single_filtered_certificate_list_with_expiry_date(
                 30),
             TestData.generate_single_email_list(recipcc=3),
-            test_config["cert_expiry_thresholds"])
+            test_config["CERT_EXPIRY_THRESHOLDS"])
 
         self.assertIn(TestData.test_recipient_email_root,
                       response[TestData.test_domain_name_root]['emails'])
@@ -174,7 +174,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
             TestData.generate_single_filtered_certificate_list_with_expiry_date(
                 30),
             TestData.generate_single_email_list(cname=test_case_count),
-            test_config["cert_expiry_thresholds"])
+            test_config["CERT_EXPIRY_THRESHOLDS"])
 
         self.assertIn(f"{TestData.test_cname_email_root}{0}",
                       response[TestData.test_domain_name_root]['emails'])
