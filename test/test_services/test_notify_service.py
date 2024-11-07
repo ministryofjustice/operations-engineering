@@ -302,7 +302,7 @@ class TestSendEmail(unittest.TestCase):
 
 class TestSendReportEmail(unittest.TestCase):
     @patch("services.notify_service.NotificationsAPIClient")
-    def setUp(self, mock_notify_client) :
+    def setUp(self, mock_notify_client):
         self.config = test_config
         self.api_key = 'test_api_key'
         self.template_id = 'test_template_id'

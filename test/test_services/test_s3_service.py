@@ -93,7 +93,7 @@ class TestS3Service(unittest.TestCase):
 
     def test_get_json_file_invalid_json(self):
         mock_content = 'Not a JSON'
-        with patch(self.builtins, mock_open(read_data=mock_content)) as mock_file:
+        with patch(self.builtins, mock_open(read_data=mock_content)):
             with self.assertRaises(ValueError):
                 self.s3_service.get_json_file(self.the_json_file, self.s3_json_file)
 

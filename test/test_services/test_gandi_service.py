@@ -183,6 +183,7 @@ class TestGetExpiredCertificates(unittest.TestCase):
         self.assertIn(f"{TestData.test_cname_email_root}{2}",
                       response[TestData.test_domain_name_root]['emails'])
 
+
 @freeze_time("2023-01-01")
 class TestCertificateRetrievalValidity(unittest.TestCase):
     def setUp(self):
