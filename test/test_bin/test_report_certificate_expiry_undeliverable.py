@@ -39,7 +39,7 @@ class TestUndeliverableReport(unittest.TestCase):
             "test_undelivered_report_template_id",
             "test_reply_email")
 
-    @patch.object(NotifyService, "__init__", return_value=None)  
+    @patch.object(NotifyService, "__init__", return_value=None)
     @patch.object(NotifyService, "check_for_undelivered_emails_for_template")
     @patch.object(NotifyService, "build_undeliverable_email_report_string_crs")
     @patch.object(NotifyService, "send_report_email_crs")
@@ -53,8 +53,8 @@ class TestUndeliverableReport(unittest.TestCase):
         mock_check_emails.assert_called_once_with("test_expiry_template_id")
         mock_build_report.assert_called_once_with(["email1", "email2"])
         mock_send_report.assert_called_once_with(
-            "Test report content", 
-            "test_undelivered_report_template_id", 
+            "Test report content",
+            "test_undelivered_report_template_id",
             "testemail@gov.uk"
         )
 

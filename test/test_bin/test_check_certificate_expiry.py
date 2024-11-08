@@ -45,7 +45,7 @@ class TestCertificateExpiryCheck(unittest.TestCase):
     @patch.object(NotifyService, "send_report_email_crs")
     def test_main_testrun(self, mock_send_report, mock_build_report, mock_send_test_email,
                           mock_build_email_params, mock_get_json, mock_get_expired_certificates,
-                          mock_get_valid_certificates, mock_get_certificate_list, 
+                          mock_get_valid_certificates, mock_get_certificate_list,
                           mock_s3_init, mock_notify_init, mock_gandi_init):
 
         mock_get_certificate_list.return_value = ["test_cert1", "test_cert2"]
@@ -68,6 +68,7 @@ class TestCertificateExpiryCheck(unittest.TestCase):
         mock_build_email_params.assert_called_once_with(["expired_test_cert"])
         mock_send_test_email.assert_called_once_with([{"recipient": "test_recipient"}], "testemail@gov.uk")
         mock_send_report.assert_called_once_with("Test report content", 'test_report_template_id', "testemail@gov.uk")
+
 
 if __name__ == "__main__":
     unittest.main()

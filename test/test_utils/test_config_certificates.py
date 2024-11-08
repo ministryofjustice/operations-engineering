@@ -5,5 +5,4 @@ test_config = {
     "CERT_URL_EXTENSION": "v5/certificate/issued-certs",
     "CERT_REPORT_TEMPLATE_ID": "test_report_template_id",
     "CERT_UNDELIVERED_REPORT_TEMPALATE_ID": "test_undelivered_report_template_id"
-    
 }
