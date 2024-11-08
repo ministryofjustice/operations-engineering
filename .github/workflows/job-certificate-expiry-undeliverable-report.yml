@@ -23,7 +23,7 @@ jobs:
           pip install pipenv
           pipenv install
       - name: Execute certificate expiry undeliverable report run
-        run: pipenv run python3 -m bin.report_certificate_expiry_undeliverable --test ${{ github.event.inputs.email }}
+        run: pipenv run python3 -m bin.report_certificate_expiry_undeliverable
         env:
           NOTIFY_PROD_API_KEY: ${{ secrets.NOTIFY_PROD_API_KEY }}
       - name: Report failure to Slack
