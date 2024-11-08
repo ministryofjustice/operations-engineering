@@ -26,9 +26,9 @@ jobs:
       - name: Execute dormant user removal accuracy report run
         run: pipenv run python3 -m bin.dormant_user_removal_accuracy_report
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
+          GH_MOJ_ADMIN_TOKEN: ${{ secrets.READONLY_MOJ_GITHUB_DORMANT_USERS }}
+          GH_AP_ADMIN_TOKEN: ${{ secrets.READONLY_AP_GITHUB_DORMANT_USERS }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
