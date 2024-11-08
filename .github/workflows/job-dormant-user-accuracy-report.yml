@@ -29,6 +29,7 @@ jobs:
           GH_MOJ_ADMIN_TOKEN: ${{ secrets.READONLY_MOJ_GITHUB_DORMANT_USERS }}
           GH_AP_ADMIN_TOKEN: ${{ secrets.READONLY_AP_GITHUB_DORMANT_USERS }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0

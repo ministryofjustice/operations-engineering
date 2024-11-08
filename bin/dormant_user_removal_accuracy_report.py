@@ -11,12 +11,13 @@ def main():
         "GH_MOJ_ADMIN_TOKEN",
         "GH_AP_ADMIN_TOKEN",
         "ADMIN_SLACK_TOKEN",
+        "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"
     ]
 
     env = EnvironmentVariables(required_env_vars)
 
     moj_github_org_service = GithubService(env.get(
-        "GH_MOJ_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE)
+        "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MINISTRY_OF_JUSTICE)
     # ap_github_org_service = GithubService(env.get(
     #     "GH_AP_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
 
