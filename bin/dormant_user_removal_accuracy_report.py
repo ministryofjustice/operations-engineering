@@ -3,18 +3,8 @@ import logging
 from datetime import datetime, timedelta
 import requests
 from services.github_service import GithubService
-from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE
+from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 from utils.environment import EnvironmentVariables
-
-
-
-def get_environment_variables() -> str:
-    github_token = os.getenv("GH_TOKEN")
-    if not github_token:
-        raise ValueError(
-            "The env variable GH_TOKEN is empty or missing")
-
-    return github_token
 
 
 def main():
@@ -24,13 +14,18 @@ def main():
         "GH_AP_ADMIN_TOKEN",
         "ADMIN_SLACK_TOKEN",
     ]
+
     env = EnvironmentVariables(required_env_vars)
+
+    moj_github_org_token = GithubService(env.get(
+        "GH_MOJ_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE)
+    # ap_github_org_token = GithubService(env.get(
+    #     "GH_AP_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
 
     # Configure logging
     logging.basicConfig(level=logging.INFO)
 
-    github_token = get_environment_variables()
-    github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
+    github_service = GithubService(moj_github_org_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
 
     github_username = 'AntonyBishop'
 
