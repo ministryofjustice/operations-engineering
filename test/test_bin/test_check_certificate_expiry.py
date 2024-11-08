@@ -69,7 +69,7 @@ class TestCertificateExpiryCheck(unittest.TestCase):
         mock_build_email_params.assert_called_once_with(["expired_test_cert"])
         mock_send_test_email.assert_called_once_with([{"recipient": "test_recipient"}], "testemail@gov.uk")
         mock_send_report.assert_called_once_with("Test report content", 'test_report_template_id', "testemail@gov.uk")
-    
+
     @patch.object(GandiService, "__init__", return_value=None)
     @patch.object(NotifyService, "__init__", return_value=None)
     @patch.object(S3Service, "__init__", return_value=None)
