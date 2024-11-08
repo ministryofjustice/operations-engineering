@@ -1,0 +1,44 @@
+name: Certificate Expiry
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+
+jobs:
+  certificate-expiry-check-test-run:
+    name: Run certificate expiry script
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@486457dc46e82b9a740ca0ef1dac6a38a3fc272d # v4.0.2
+        with:
+          role-to-assume: ${{secrets.AWS_CERTIFICATE_EMAIL_ARN}}
+          aws-region: eu-west-2
+      - name: Python Setup
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: '3.11'
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+      - run: pipenv run python3 -m bin.check_certificate_expiry
+        env:
+          GANDI_CERTIFICATES_TOKEN: ${{ secrets.GANDI_CERTIFICATES_TOKEN }}
+          NOTIFY_PROD_API_KEY: ${{ secrets.NOTIFY_PROD_API_KEY }}
+          S3_CERT_BUCKET_NAME: ${{ secrets.S3_CERT_BUCKET_NAME }}
+          S3_CERT_OBJECT_NAME: ${{ secrets.S3_CERT_OBJECT_NAME}}
+      - name: Report failure to Slack
+        if: always()
+        uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure'
+          notification_title: 'Failed GitHub Action Run'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
