@@ -239,21 +239,12 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_github_rejoin_report(self,
-                                  total_removed_moj,
-                                  total_removed_ap,
-                                  total_rejoined_moj,
-                                  total_rejoined_ap,
-                                  error_rate_moj,
-                                  error_rate_ap):
+    def send_github_rejoin_report(self, total_removed_moj, total_rejoined_moj, error_rate_moj):
         message = (
             f"*Erroneous User Removal Report*\n\n"
             f"Over the past week:\n\n"
-            f"The ministryofjustice org has had {total_removed_moj} users removed, with {total_rejoined_moj} since rejoining.\n\n"
-            f"The moj-analytical-services org has had {total_removed_ap} users removed, with {total_rejoined_ap} since rejoining.\n\n"
-            f"Our erroneous user removal rate for ministryofjustice is {error_rate_moj}%.\n\n"
-            f"And our erroneous user removal rate for moj-analytical-services is {error_rate_ap}%."
-
+            f"We have removed {total_removed_moj} users, with {total_rejoined_moj} since rejoining.\n\n"
+            f"Our erroneous user removal rate for user removal is {error_rate_moj}%."
         )
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
