@@ -1263,3 +1263,54 @@ class GithubService:
                 old_poc_repositories[repo] = age
 
         return old_poc_repositories
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_user_removal_events(self, since_date: str, actor: str) -> list:
+        logging.info(f"Getting audit log entries for users removed by {actor} since {since_date}")
+        today = datetime.now()
+        query_string = f"action:org.remove_member actor:{actor} created:{since_date}..{today.strftime('%Y-%m-%d')}"
+
+        query = """
+            query($organisation_name: String!, $query_string: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $query_string
+                    ) {
+                        edges{
+                            node{
+                                ... on OrgRemoveMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    userLogin
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "query_string": query_string,
+            "cursor": None
+        }
+
+        removed_users = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            removed_users.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return removed_users

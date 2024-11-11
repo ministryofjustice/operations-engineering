@@ -1911,5 +1911,42 @@ class TestGetOldPOCRepositories(unittest.TestCase):
         self.assertEqual({}, response)
 
 
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("services.github_service.Github")
+class TestUserRemovalEvents(unittest.TestCase):
+    def test_get_user_removal_events(self, _mock_github_client_gql):
+        github_service = GithubService("", ORGANISATION_NAME)
+        return_value = {
+            "organization": {
+                "auditLog": {
+                    "edges": [
+                        {"node": {"action": "org.remove_member", "createdAt": "2023-12-06T10:32:07.832Z",
+                                            "actorLogin": "admin_user", "userLogin": "removed_user1"}},
+                        {"node": {"action": "org.remove_member", "createdAt": "2023-12-07T11:32:07.832Z",
+                                            "actorLogin": "admin_user", "userLogin": "removed_user2"}}
+                    ],
+                    "pageInfo": {
+                        "endCursor": None,
+                        "hasNextPage": False
+                    }
+                }
+            }
+        }
+
+        github_service.github_client_gql_api.execute.return_value = return_value
+
+        result = github_service.get_user_removal_events("2023-12-01", "admin_user")
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['action'], 'org.remove_member')
+        self.assertEqual(result[0]['actorLogin'], 'admin_user')
+        self.assertEqual(result[0]['userLogin'], 'removed_user1')
+
+        self.assertEqual(result[1]['action'], 'org.remove_member')
+        self.assertEqual(result[1]['actorLogin'], 'admin_user')
+        self.assertEqual(result[1]['userLogin'], 'removed_user2')
+
+
 if __name__ == "__main__":
     unittest.main()
