@@ -20,6 +20,7 @@ cert_config = {
     "CERT_EXPIRY_THRESHOLDS": [30],
     "CERT_URL_EXTENSION": "v5/certificate/issued-certs",
     "CERT_REPORT_TEMPLATE_ID": "04b6ca6c-2945-4a0d-a267-53fb61b370ef",
+    "CERT_EXPIRY_TEMPALATE_ID": "06abd028-0a8f-43d9-a122-90a92f9b62ee"
 }
 
 
