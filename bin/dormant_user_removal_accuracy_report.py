@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from services.github_service import GithubService
 from services.slack_service import SlackService
-from config.constants import MINISTRY_OF_JUSTICE, OPERATIONS_ENGINEERING_GITHUB_USERNAMES
+from config.constants import MINISTRY_OF_JUSTICE
 from utils.environment import EnvironmentVariables
 
 
@@ -15,6 +15,16 @@ def main():
 
     env = EnvironmentVariables(required_env_vars)
 
+    operations_engineering_users = [
+        "andyrogers1973",
+        "jasonBirchall",
+        "tamsinforbes",
+        "AntonyBishop",
+        "connormaglynn",
+        "PepperMoJ",
+        "levgorbunov1",
+    ]
+
     moj_github_org_service = GithubService(env.get(
         "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MINISTRY_OF_JUSTICE)
 
@@ -23,7 +33,7 @@ def main():
 
     all_removed_usernames = []
 
-    for github_username in OPERATIONS_ENGINEERING_GITHUB_USERNAMES:
+    for github_username in operations_engineering_users:
         removed_users_entries = moj_github_org_service.get_user_removal_events(one_week_ago, github_username)
         removed_usernames = [entry['userLogin'].lower() for entry in removed_users_entries]
         all_removed_usernames.extend(removed_usernames)
