@@ -239,6 +239,16 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
+    def send_github_rejoin_report(self, total_removed, total_rejoined, error_rate, organisation):
+        message = (
+            f"*Erroneous User Removal Report*\n\n"
+            f"Over the past week, {total_removed} users have been removed from the {organisation} org.\n\n"
+            f"Of those users, {total_rejoined} have since rejoined."
+            f"Our removal error rate for this week is {error_rate}."
+        )
+        blocks = self._create_block_with_message(message)
+        self._send_alert_to_operations_engineering(blocks)
+
     def _send_alert_to_operations_engineering(self, blocks: list[dict]):
         try:
             self.slack_client.chat_postMessage(

@@ -54,7 +54,7 @@ def main():
         f"Percentage of users removed in error: {error_rate}%"
     )
 
-    # SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(total_removed, total_rejoined, error_rate)
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(total_removed, total_rejoined, error_rate, MINISTRY_OF_JUSTICE)
 
     logging.info(result_message)
 
