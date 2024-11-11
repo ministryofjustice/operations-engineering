@@ -455,6 +455,27 @@ class TestSlackService(unittest.TestCase):
             ]
         )
 
+    def test_send_github_rejoin_report(self):
+        total_removed_moj = 10
+        total_rejoined_moj = 2
+        error_rate_moj = 20.0
+
+        expected_message = (
+            f"*Erroneous User Removal Report*\n\n"
+            f"Over the past week:\n\n"
+            f"We have removed {total_removed_moj} users, with {total_rejoined_moj} since rejoining.\n\n"
+            f"Our erroneous removal rate for users is {error_rate_moj}%."
+        )
+
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_github_rejoin_report(total_removed_moj, total_rejoined_moj, error_rate_moj)
+
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V",
+            mrkdown=True,
+            blocks=blocks
+        )
+
 
 @patch("slack_sdk.WebClient.__new__")
 class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
