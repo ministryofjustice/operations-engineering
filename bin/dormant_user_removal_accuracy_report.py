@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from services.github_service import GithubService
+from services.slack_service import SlackService
 from config.constants import ENTERPRISE, MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 from utils.environment import EnvironmentVariables
 
@@ -45,13 +46,15 @@ def main():
     if total_removed == 0:
         error_rate = 0
     else:
-        error_rate = (total_rejoined / total_removed) * 100
+        error_rate = round((total_rejoined / total_removed) * 100, 2)
 
     result_message = (
         f"Total users removed by {github_username} in the last week: {total_removed}\n"
         f"Total users who have rejoined: {total_rejoined}\n"
-        f"Percentage of users removed in error: {error_rate:.2f}%"
+        f"Percentage of users removed in error: {error_rate}%"
     )
+
+    # SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(total_removed, total_rejoined, error_rate)
 
     logging.info(result_message)
 
