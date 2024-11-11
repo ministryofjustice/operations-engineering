@@ -19,7 +19,7 @@ def main():
     moj_github_org_service = GithubService(env.get(
         "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MINISTRY_OF_JUSTICE)
     ap_github_org_service = GithubService(env.get(
-        "GH_AP_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
+        "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MOJ_ANALYTICAL_SERVICES)
 
     github_username = 'AntonyBishop'
 
@@ -59,6 +59,7 @@ def main():
       total_rejoined_ap,
       error_rate_moj,
       error_rate_ap)
+
 
 if __name__ == '__main__':
     main()
