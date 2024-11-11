@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime, timedelta
 from services.github_service import GithubService
 from services.slack_service import SlackService
@@ -19,45 +18,47 @@ def main():
 
     moj_github_org_service = GithubService(env.get(
         "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MINISTRY_OF_JUSTICE)
-    # ap_github_org_service = GithubService(env.get(
-    #     "GH_AP_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
-
-    # Configure logging
-    logging.basicConfig(level=logging.INFO)
+    ap_github_org_service = GithubService(env.get(
+        "GH_AP_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
 
     github_username = 'AntonyBishop'
 
     today = datetime.now()
     one_week_ago = (today - timedelta(days=7)).strftime('%Y-%m-%d')
 
-    removed_users_entries = moj_github_org_service.get_user_removal_events(one_week_ago, github_username)
+    removed_users_entries_moj = moj_github_org_service.get_user_removal_events(one_week_ago, github_username)
+    removed_users_entries_ap = ap_github_org_service.get_user_removal_events(one_week_ago, github_username)
 
-    removed_usernames = [entry['userLogin'].lower() for entry in removed_users_entries]
-    logging.info("Users removed by %s in the last week: %s", github_username, removed_usernames)
+    removed_usernames_moj = [entry['userLogin'].lower() for entry in removed_users_entries_moj]
+    removed_usernames_ap = [entry['userLogin'].lower() for entry in removed_users_entries_ap]
 
-    current_members = [username.lower() for username in moj_github_org_service.get_org_members_login_names()]
+    current_members_moj = [username.lower() for username in moj_github_org_service.get_org_members_login_names()]
+    current_members_ap = [username.lower() for username in ap_github_org_service.get_org_members_login_names()]
 
-    users_rejoined = [username for username in removed_usernames if username in current_members]
-    logging.info("Users who have rejoined: %s", users_rejoined)
+    users_rejoined_moj = [username for username in removed_usernames_moj if username in current_members_moj]
+    users_rejoined_ap = [username for username in removed_usernames_ap if username in current_members_ap]
 
-    total_removed = len(removed_usernames)
-    total_rejoined = len(users_rejoined)
+    total_removed_moj = len(removed_usernames_moj)
+    total_rejoined_moj = len(users_rejoined_moj)
 
-    if total_removed == 0:
-        error_rate = 0
+    total_removed_ap = len(removed_usernames_ap)
+    total_rejoined_ap = len(users_rejoined_ap)
+
+    if total_removed_moj and total_removed_ap == 0:
+        error_rate_moj = 0
+        error_rate_ap = 0
+
     else:
-        error_rate = round((total_rejoined / total_removed) * 100, 2)
+        error_rate_moj = round((total_rejoined_moj / total_removed_moj) * 100, 2)
+        error_rate_ap = round((total_rejoined_ap / total_removed_ap) * 100, 2)
 
-    result_message = (
-        f"Total users removed by {github_username} in the last week: {total_removed}\n"
-        f"Total users who have rejoined: {total_rejoined}\n"
-        f"Percentage of users removed in error: {error_rate}%"
-    )
-
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(total_removed, total_rejoined, error_rate, MINISTRY_OF_JUSTICE)
-
-    logging.info(result_message)
-
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(
+      total_removed_moj,
+      total_removed_ap,
+      total_rejoined_moj,
+      total_rejoined_ap,
+      error_rate_moj,
+      error_rate_ap)
 
 if __name__ == '__main__':
     main()
