@@ -15,37 +15,29 @@ def main():
 
     env = EnvironmentVariables(required_env_vars)
 
-    moj_github_org_service = GithubService(
-        env.get("GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MINISTRY_OF_JUSTICE
-    )
+    moj_github_org_service = GithubService(env.get(
+        "GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN"), MINISTRY_OF_JUSTICE)
 
     today = datetime.now()
     one_week_ago = (today - timedelta(days=7)).strftime('%Y-%m-%d')
 
-    removed_users_entries = moj_github_org_service.get_user_removal_events(
-        one_week_ago, OPERATIONS_ENGINEERING_GITHUB_USERNAMES
-    )
+    all_removed_usernames = []
 
-    removed_usernames = [entry['userLogin'].lower()
-                         for entry in removed_users_entries]
+    for github_username in OPERATIONS_ENGINEERING_GITHUB_USERNAMES:
+        removed_users_entries = moj_github_org_service.get_user_removal_events(one_week_ago, github_username)
+        removed_usernames = [entry['userLogin'].lower() for entry in removed_users_entries]
+        all_removed_usernames.extend(removed_usernames)
 
     current_members = [username.lower() for username in moj_github_org_service.get_org_members_login_names()]
 
-    users_rejoined = [
-        username for username in removed_usernames if username in current_members
-    ]
+    users_rejoined = [username for username in all_removed_usernames if username in current_members]
 
-    total_removed = len(removed_usernames)
+    total_removed = len(all_removed_usernames)
     total_rejoined = len(users_rejoined)
 
-    if total_removed == 0:
-        error_rate = 0
-    else:
-        error_rate = round((total_rejoined / total_removed) * 100, 2)
+    error_rate = round((total_rejoined / total_removed) * 100, 2) if total_removed else 0
 
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(
-        total_removed, total_rejoined, error_rate
-    )
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_github_rejoin_report(total_removed, total_rejoined, error_rate)
 
 
 if __name__ == '__main__':

@@ -4,7 +4,7 @@ import json
 from calendar import timegm
 from datetime import date, datetime, timedelta, timezone
 from time import gmtime, sleep
-from typing import Any, Callable, List
+from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, GithubException, NamedUser, RateLimitExceededException,
@@ -1265,11 +1265,10 @@ class GithubService:
         return old_poc_repositories
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_user_removal_events(self, since_date: str, actors: List[str]) -> list:
-
+    def get_user_removal_events(self, since_date: str, actor: str) -> list:
+        logging.info(f"Getting audit log entries for users removed by {actor} since {since_date}")
         today = datetime.now()
-        actor_query = ' OR '.join(f"actor:{user}" for user in actors)
-        query_string = f"action:org.remove_member ({actor_query}) created:{since_date}..{today.strftime('%Y-%m-%d')}"
+        query_string = f"action:org.remove_member actor:{actor} created:{since_date}..{today.strftime('%Y-%m-%d')}"
 
         query = """
             query($organisation_name: String!, $query_string: String!, $cursor: String) {
