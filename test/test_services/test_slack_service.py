@@ -477,28 +477,6 @@ class TestSlackService(unittest.TestCase):
         )
 
 
-@patch("slack_sdk.WebClient.__new__")
-class SendUnownedReposAlertToOperationsEngineering(unittest.TestCase):
-
-    def test_downstream_services_called(self, mock_slack_client: MagicMock):
-        repos = ["some-repo1", "some-repo2", "some-repo3"]
-        SlackService(
-            "").send_unowned_repos_slack_message(repos)
-        mock_slack_client.return_value.chat_postMessage.assert_called_with(
-            channel="C033QBE511V",
-            mrkdown=True,
-            blocks=[
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": '*Unowned Repositories Automation*\n\nRepositories on the GitHub Organisation that have no team or collaborator:\n[\'some-repo1\', \'some-repo2\', \'some-repo3\']'
-                    }
-                }
-            ]
-        )
-
-
 @patch('slack_sdk.WebClient.users_list')
 class GetAllSlackUsernamesTest(unittest.TestCase):
 

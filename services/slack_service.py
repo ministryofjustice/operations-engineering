@@ -206,15 +206,6 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_unowned_repos_slack_message(self, repositories: list):
-        message = (
-            f"*Unowned Repositories Automation*\n\n"
-            f"Repositories on the GitHub Organisation that have no team or collaborator:\n"
-            f"{repositories}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
     def send_alert_for_poc_repositories(self, repositories):
         message = (
             "The following POC GitHub Repositories persist:\n\n"
