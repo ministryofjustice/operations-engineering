@@ -1,6 +1,7 @@
 # class Constants:
 MINISTRY_OF_JUSTICE = "ministryofjustice"
 MOJ_ANALYTICAL_SERVICES = "moj-analytical-services"
+MINISTRY_OF_JUSTICE_TEST = "ministryofjustice-test"
 MISSING_EMAIL_ADDRESS = "-"
 NO_ACTIVITY = "no activity"
 ENTERPRISE = "ministry-of-justice-uk"

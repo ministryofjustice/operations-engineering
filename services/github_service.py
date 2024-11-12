@@ -7,7 +7,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, GithubException, NamedUser, RateLimitExceededException,
+from github import (Github, GithubException, NamedUser, Repository, RateLimitExceededException,
                     UnknownObjectException)
 from github.Organization import Organization
 from github.Repository import Repository
@@ -1263,3 +1263,96 @@ class GithubService:
                 old_poc_repositories[repo] = age
 
         return old_poc_repositories
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_active_repository_names(self) -> list[str]:
+        """
+        Returns the list of public, private and internal repos in an
+        org that are not archived, disabled nor locked
+
+        """
+        repos = self.fetch_all_repositories_in_org()
+        active_repos = [repo.get("name") for repo in repos]
+
+        return active_repos
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_current_user_logins(self) -> set[str]:
+        current_users = self.__get_all_users() # list of NamedUser class
+        logins = [user.login for user in current_users]
+        return set(logins)
+
+    def get_current_contributors_for_active_repos(self) -> dict[str, set[str]]:
+        """
+        Returns a list of dictionaries containing the active repo name and its set of
+        contributors who are also in the org current users set. Output is sorted by
+        number of current contributors in descending order.
+        [
+          {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}},
+          {'repository': 'repo2', 'contributors': {'c3', 'c4'}}
+        ]
+        Repos with 0 contributors or 0 current contributors are dropped.
+        """
+
+        current_users = self.__get_all_users() # list of NamedUser class
+        logins = [user.login for user in current_users]
+        active_repos = self.get_active_repository_names()
+        number_of_repos = len(active_repos)
+        active_repos_and_current_contributors = []
+        count = 1
+        for repo_name in active_repos:
+            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: number {count} of {number_of_repos}")
+
+            repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
+            contributors = [contributor.login for contributor in repo.get_contributors()]
+            if contributors:
+                current_contributors = set(logins).intersection(set(contributors))
+                if current_contributors:
+                    active_repos_and_current_contributors.append(
+                        {"repository": repo_name, "contributors": current_contributors}
+                    )
+            count += 1
+
+        sorted_active_repos_and_current_contributors = sorted(
+            active_repos_and_current_contributors,
+            key=lambda d: len(d['contributors']),
+            reverse=True
+        )
+        return sorted_active_repos_and_current_contributors
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repo_committers_since(
+        self,
+        repo_name: str,
+        contributors: set[str],
+        since_datetime: datetime,
+    ) -> dict[str, set[str]]:
+        """
+        Function to get the contributors who have committed to the given repo
+        since the given datetime
+
+        Input:
+            repo_name: repoistory name as string (without org name)
+            contributors: set of strings of GitHub logins who are contributors to
+            the given repo and also current org members
+            since_datetime: datetime object for the date to check commits since
+
+        Output:
+            active_repo_committers: Returns a set of contributors for the given repository
+            that have non-zero commits since the given datetime.
+        """
+        if contributors:
+            active_repo_committers = set()
+            repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
+            print(f"Repo name: {repo_name} - Contributors: {contributors}")
+            for contributor in contributors:
+                contributor_commits = repo.get_commits(
+                    since=since_datetime,
+                    author=contributor
+                )
+                print(f"Contributor {contributor} has {contributor_commits.totalCount} commits since {str(since_datetime)}")
+                if contributor_commits.totalCount > 0:
+                    active_repo_committers.add(contributor)
+            return active_repo_committers
+        else:
+            print(f"No contributors to check for repo {repo_name}")

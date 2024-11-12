@@ -21,3 +21,4 @@ moj-analytical-services_first_email_list.json
 export-*
 export-moj-analytical-services.json
 dormant.csv
+bin/experiments.py
