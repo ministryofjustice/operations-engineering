@@ -2,6 +2,7 @@
 name: 🧪 Identify Non-Committers
 on:
   pull_request: # remove after testing
+    types: [opened, edited, reopened, synchronize]
   workflow_dispatch:
 
 jobs:
