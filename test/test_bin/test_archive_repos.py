@@ -1,3 +1,5 @@
+# pylint: disable=C0411
+
 import os
 import unittest
 from datetime import datetime
