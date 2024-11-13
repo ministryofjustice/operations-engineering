@@ -1,11 +1,12 @@
+# pylint: disable=W0221, C0411
+
 import unittest
 from datetime import datetime
 from unittest.mock import MagicMock, patch
+from slack_sdk.errors import SlackApiError
 
 from services.sentry_service import UsageStats
 from services.slack_service import SlackService
-
-# pylint: disable=W0221
 
 START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
@@ -515,7 +516,10 @@ class GetAllSlackUsernamesTest(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_handle_exception_gracefully(self, mock_user_list):
-        mock_user_list.side_effect = Exception("An unexpected error occurred")
+        mock_response = MagicMock()
+        mock_response.status_code = 500
+
+        mock_user_list.side_effect = SlackApiError("An unexpected error occurred", response=mock_response)
 
         result = self.slack_service.get_all_slack_usernames()
 

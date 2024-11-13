@@ -1,3 +1,5 @@
+# pylint: disable=C0411, R0917
+
 import logging
 import time
 from textwrap import dedent
@@ -249,8 +251,6 @@ class SlackService:
             )
         except SlackApiError as e:
             logging.error("Slack API error: {%s}", e.response['error'])
-        except Exception as e:
-            logging.error("Failed to send Slack alert: {%s}", str(e))
 
     def _create_block_with_message(self, message, block_type="section"):
         return [
@@ -303,7 +303,7 @@ class SlackService:
                                   response['error'])
                     break
                 time.sleep(delay_seconds)
-        except Exception as e:
+        except SlackApiError as e:
             logging.error("An error has occurred connecting to Slack: %s", e)
             return []
 
