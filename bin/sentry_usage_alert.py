@@ -1,5 +1,7 @@
 import os
 
+from requests import RequestException
+
 from clients.sentry_client import SentryClient
 from config.logging_config import logging
 from services.kpi_service import KpiService
@@ -58,7 +60,7 @@ def main():
             transaction_usage_stats.total
         )
         kpi_service.track_sentry_replays_used_for_day(replay_usage_stats.total)
-    except Exception as e:
+    except RequestException as e:
         logging.info("Issue when trying to track sentry quota usage...")
         logging.error(e)
 
