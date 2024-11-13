@@ -93,6 +93,7 @@ Please run all apply operations through the CI/CD pipeline below.
 The CI/CD pipeline is configured in `.github/workflows/cicd-terraform-auth0.yml`. It runs automatically on pull requests and pushes to the `main` branch that affect this directory.
 
 The workflow performs the following steps:
+
 1. Checkout code
 2. Set up Terraform
 3. Configure AWS credentials
@@ -108,14 +109,14 @@ The workflow performs the following steps:
 
 ## Troubleshooting
 
-1. **Authentication Issues**: 
+1. **Authentication Issues**:
    - Verify that the Auth0 credentials in GitHub secrets are correct and up-to-date.
    - Ensure the Auth0 application has the necessary permissions.
 
-2. **Terraform State Conflicts**: 
+2. **Terraform State Conflicts**:
    - The state is stored in an S3 backend. Ensure you have the correct AWS permissions.
 
-3. **Resource Creation Failures**: 
+3. **Resource Creation Failures**:
    - Check the Auth0 logs for detailed error messages.
    - Verify that the Auth0 application has the required scopes.
 
