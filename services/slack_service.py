@@ -1,3 +1,5 @@
+# pylint: disable=C0411
+
 import logging
 import time
 from textwrap import dedent
