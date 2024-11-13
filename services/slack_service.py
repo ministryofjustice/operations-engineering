@@ -1,4 +1,4 @@
-# pylint: disable=C0411
+# pylint: disable=C0411, R0917
 
 import logging
 import time
