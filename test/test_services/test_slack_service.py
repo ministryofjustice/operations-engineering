@@ -6,7 +6,7 @@ from slack_sdk.errors import SlackApiError
 from services.sentry_service import UsageStats
 from services.slack_service import SlackService
 
-# pylint: disable=W0221
+# pylint: disable=W0221, C0411
 
 START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
