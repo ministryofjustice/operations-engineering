@@ -251,8 +251,6 @@ class SlackService:
             )
         except SlackApiError as e:
             logging.error("Slack API error: {%s}", e.response['error'])
-        except Exception as e:
-            logging.error("Failed to send Slack alert: {%s}", str(e))
 
     def _create_block_with_message(self, message, block_type="section"):
         return [
