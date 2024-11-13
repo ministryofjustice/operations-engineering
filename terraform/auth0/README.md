@@ -4,7 +4,7 @@ This README outlines the process of managing Auth0 resources using Terraform for
 
 ## Directory Structure
 
-```
+```text
 .
 ├── operations-engineering/
 │   ├── auth0_import.tf
@@ -58,25 +58,29 @@ resource "auth0_client" "prod_auth0managementapi" {
 ### Local Development
 
 1. Clone the repository:
-   ```
+
+   ```bash
    git clone https://github.com/ministryofjustice/operatiions-engineering.git
    cd operatiions-engineering/terraform/auth0
    ```
 
 2. Set up your Auth0 credentials as environment variables:
-   ```
+
+   ```bash
    export AUTH0_DOMAIN="your_domain"
    export AUTH0_CLIENT_ID="your_client_id"
    export AUTH0_CLIENT_SECRET="your_client_secret"
    ```
 
 3. Initialize Terraform:
-   ```
+
+   ```bash
    terraform init
    ```
 
 4. Plan your changes:
-   ```
+
+   ```bash
    terraform plan
    ```
 
