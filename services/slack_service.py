@@ -303,7 +303,7 @@ class SlackService:
                                   response['error'])
                     break
                 time.sleep(delay_seconds)
-        except Exception as e:
+        except SlackApiError as e:
             logging.error("An error has occurred connecting to Slack: %s", e)
             return []
 
