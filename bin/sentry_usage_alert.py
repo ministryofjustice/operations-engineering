@@ -1,3 +1,5 @@
+# pylint: disable=C0411
+
 import os
 
 from requests import RequestException
