@@ -9,7 +9,7 @@ assignees: ''
 
 ## Maintenance Pages Request
 
-### **Pretasks**
+### **Pre-tasks**
 
 Collect the following information in order to action this request, please attach this information to this ticket
 
