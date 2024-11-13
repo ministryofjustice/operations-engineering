@@ -1,9 +1,6 @@
 # This workflow is triggered manually to identify dormant GitHub users. It's currently in an experimental phase and will eventually be integrated into the main dormant user process.
 name: 🧪 💍 Identify Non-Committers
 on:
-  # pull_request: # remove after testing
-  #   types: [opened, edited, reopened, synchronize, converted_to_draft]
-  #   branches: [spike-gh-dormant-users-replica]
   workflow_dispatch:
 
 jobs:
