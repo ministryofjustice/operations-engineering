@@ -1264,24 +1264,6 @@ class GithubService:
 
         return old_poc_repositories
 
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_active_repository_names(self) -> list[str]:
-        """
-        Returns the list of public, private and internal repos in an
-        org that are not archived, disabled nor locked
-
-        """
-        repos = self.fetch_all_repositories_in_org()
-        active_repos = [repo.get("name") for repo in repos]
-
-        return active_repos
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_current_user_logins(self) -> set[str]:
-        current_users = self.__get_all_users() # list of NamedUser class
-        logins = [user.login for user in current_users]
-        return set(logins)
-
     def get_current_contributors_for_active_repos(self) -> dict[str, set[str]]:
         """
         Returns a list of dictionaries containing the active repo name and its set of
@@ -1294,9 +1276,8 @@ class GithubService:
         Repos with 0 contributors or 0 current contributors are dropped.
         """
 
-        current_users = self.__get_all_users() # list of NamedUser class
-        logins = [user.login for user in current_users]
-        active_repos = self.get_active_repository_names()
+        logins = self.get_org_members_login_names()
+        active_repos = [repo.get("name") for repo in self.fetch_all_repositories_in_org()]
         number_of_repos = len(active_repos)
         active_repos_and_current_contributors = []
         count = 1

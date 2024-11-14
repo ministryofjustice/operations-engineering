@@ -9,9 +9,9 @@ from services.github_service import GithubService
 
 def main():
 
-    gh_admin_token = os.getenv("GH_ADMIN_TOKEN")
-    if not gh_admin_token:
-        raise Exception("GH_ADMIN_TOKEN must be set")
+    gh_token = os.getenv("MOJ_TEST_GH_TOKEN")
+    if not gh_token:
+        raise Exception("MOJ_TEST_GH_TOKEN must be set")
 
     # gh_orgs = [
     #     GithubService(str(gh_admin_token), MINISTRY_OF_JUSTICE),
@@ -19,12 +19,12 @@ def main():
     # ]
 
     gh_orgs = [
-        GithubService(str(gh_admin_token), MINISTRY_OF_JUSTICE_TEST),
+        GithubService(str(gh_token), MINISTRY_OF_JUSTICE_TEST),
     ]
 
     for gh in gh_orgs:
         # Create set of current user logins
-        current_users_set = gh.get_current_user_logins()
+        current_users_set = set(gh.get_org_members_login_names())
         # Ignore set
         ignore_set = {"moj-operations-engineering-bot"}
 
