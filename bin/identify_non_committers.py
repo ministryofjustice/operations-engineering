@@ -7,25 +7,19 @@ from operator import itemgetter
 from services.github_service import GithubService
 
 
-def _calculate_date(in_last_days: int) -> str:
-    current_date = datetime.now()
-    date = current_date - timedelta(days=in_last_days)
-    timestamp_format = "%Y-%m-%d"
-    return date.strftime(timestamp_format)
-
-
-
 def main():
 
     gh_admin_token = os.getenv("GH_ADMIN_TOKEN")
     if not gh_admin_token:
         raise Exception("ADMIN_GITHUB_TOKEN must be set")
 
-    # gh = GithubService(str(gh_admin_token), MINISTRY_OF_JUSTICE_TEST)
-    gh = GithubService(str(gh_admin_token), MINISTRY_OF_JUSTICE)
+    gh = GithubService(str(gh_admin_token), MINISTRY_OF_JUSTICE_TEST)
+    # gh = GithubService(str(gh_admin_token), MINISTRY_OF_JUSTICE)
 
     # Create set of current user logins
     current_users_set = gh.get_current_user_logins()
+    # Ignore set
+    ignore_set = {"moj-operations-engineering-bot"}
 
 
     # Get list of dictionaries of active repos and their current contributors
@@ -33,39 +27,27 @@ def main():
     print("\nRepos and current contributors:")
     print(repos_and_current_contributors)
 
-    # Initiate the active_user set with bot accounts
-    active_users = {"moj-operations-engineering-bot"}
-    print(f"\nActive users starting ignore set: {active_users}")
-    since_datetime = datetime(2024, 8, 7)
-    number_of_repos = len(repos_and_current_contributors)
+    users_to_check = list(current_users_set - ignore_set)
+
+    dormant_users = []
+    since_datetime=datetime(2023, 8, 7)
     count = 1
+    number_of_users = len(users_to_check)
 
-    for repo_object in repos_and_current_contributors:
-        repo_name = repo_object.get('repository')
-        print(f"\nGetting commits since {since_datetime} for repository {repo_name}: number {count} out of {number_of_repos}")
-
-        # Remove known active contributors
-        contributors_less_active_users = repo_object.get("contributors") - active_users
-        print(f"Removed known committers from contributor check set for repo: {repo_name}")
-
-        # Get commits for remaining contributors to determine if they are active
-        active_repo_committers = gh.get_repo_committers_since(
-            repo_name=repo_object.get("repository"),
-            contributors=contributors_less_active_users,
-            since_datetime=since_datetime,
+    for login in users_to_check:
+        print(f"\nChecking user {count} of {number_of_users}")
+        commits = gh.user_has_commmits_since(
+            login=login,
+            repos_and_contributors=repos_and_current_contributors,
+            since_datetime=since_datetime
         )
-        if active_repo_committers:
-            active_users = active_users.union(active_repo_committers)
+        if not commits:
+            dormant_users.append(login)
+        print(f"{login} has made commits since {since_datetime}: {commits}")
         count += 1
 
-    print(f"\nFinal active user set:\n{active_users}")
-
-    # Get contributors who have not committed since the given date
-    non_committers = current_users_set - active_users
-    print(f"\nFinal non-committers set to be removed:\n{non_committers}")
-
-    return non_committers
-
+    print(f"\nDormant users: {dormant_users}")
+    print(f"Active users: {set(users_to_check) - set(dormant_users)}")
 
 
 if __name__ == "__main__":

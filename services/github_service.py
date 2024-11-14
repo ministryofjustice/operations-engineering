@@ -1301,7 +1301,7 @@ class GithubService:
         active_repos_and_current_contributors = []
         count = 1
         for repo_name in active_repos:
-            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: number {count} of {number_of_repos}")
+            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
 
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             contributors = [contributor.login for contributor in repo.get_contributors()]
@@ -1321,38 +1321,44 @@ class GithubService:
         return sorted_active_repos_and_current_contributors
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_repo_committers_since(
+    def get_repos_user_has_contributed_to(
         self,
-        repo_name: str,
-        contributors: set[str],
-        since_datetime: datetime,
-    ) -> dict[str, set[str]]:
+        login: str,
+        repos_and_contributors: dict[str, set[str]]
+    ) -> list[str]:
         """
-        Function to get the contributors who have committed to the given repo
-        since the given datetime
-
-        Input:
-            repo_name: repoistory name as string (without org name)
-            contributors: set of strings of GitHub logins who are contributors to
-            the given repo and also current org members
-            since_datetime: datetime object for the date to check commits since
-
-        Output:
-            active_repo_committers: Returns a set of contributors for the given repository
-            that have non-zero commits since the given datetime.
+        For a known GH user get the repos they have contributed to within org.
         """
-        if contributors:
-            active_repo_committers = set()
+        repos = [
+            repo_object.get("repository") for repo_object in repos_and_contributors if login in repo_object.get("contributors")
+        ]
+        return repos
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def user_has_commmits_since(
+        self,
+        login: str,
+        repos_and_contributors: dict[str, set[str]],
+        since_datetime: datetime
+    ) -> bool:
+        """
+        Determine if a given user has made any commits to at least one of the repos they
+        have contributed to in the org since the given datetime.
+        """
+        repos = self.get_repos_user_has_contributed_to(
+            login=login,
+            repos_and_contributors=repos_and_contributors
+        )
+        print(f"{login} has contributed to {len(repos)} repos")
+
+        for repo_name in repos:
+            print(f"Checking {login} for commits in {repo_name}")
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
-            print(f"Repo name: {repo_name} - Contributors: {contributors}")
-            for contributor in contributors:
-                contributor_commits = repo.get_commits(
-                    since=since_datetime,
-                    author=contributor
-                )
-                print(f"Contributor {contributor} has {contributor_commits.totalCount} commits since {str(since_datetime)}")
-                if contributor_commits.totalCount > 0:
-                    active_repo_committers.add(contributor)
-            return active_repo_committers
-        else:
-            print(f"No contributors to check for repo {repo_name}")
+            commits = repo.get_commits(
+                since=since_datetime,
+                author=login
+            )
+            if commits.totalCount > 0:
+                return True
+
+        return False
