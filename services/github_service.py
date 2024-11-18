@@ -1278,9 +1278,7 @@ class GithubService:
         """
 
         logins = [user.login for user in self.__get_all_users()]
-        # active_repos = [repo.get("name") for repo in self.fetch_all_repositories_in_org()]
         active_repos = self.get_active_repositories()
-        print(active_repos)
         number_of_repos = len(active_repos)
         active_repos_and_current_contributors = []
         count = 1
@@ -1380,11 +1378,10 @@ class GithubService:
 
     def get_active_repositories(self) -> list[str]:
         """A wrapper function to run a GraphQL query to get a list of active (not locked,
-        not archived nor disabled) repositories in the
-        organisation.
+        not archived nor disabled) repositories in the organisation.
 
         Returns:
-            list: A list of the organisation active repositories.
+            list: A list of the organisation's active repositories.
         """
 
         repo_has_next_page = True
