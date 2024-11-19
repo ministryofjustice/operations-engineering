@@ -7,7 +7,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, GithubException, NamedUser, RateLimitExceededException,
+from github import (Github, NamedUser, RateLimitExceededException,
                     UnknownObjectException)
 from github.Organization import Organization
 from github.Repository import Repository
@@ -85,40 +85,6 @@ class GithubService:
                 "Authorization": f"Bearer {org_token}",
             }
         )
-
-    def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
-        for repo in self.__get_repos_to_consider_for_archiving("all"):
-            if self.__is_repo_ready_for_archiving(repo, last_active_cutoff_date, allow_list):
-                logging.info(f"Archiving repository: {repo.name}")
-                repo.edit(archived=True)
-
-    def __get_repos_to_consider_for_archiving(self, repository_type: str) -> list[Repository]:
-        repositories = list(
-            self.github_client_core_api.get_organization(self.organisation_name).get_repos(type=repository_type))
-        return [repository for repository in repositories if not (repository.archived or repository.fork)]
-
-    def __is_repo_ready_for_archiving(self, repository: Repository, last_active_cutoff_date: datetime, allow_list: list[str]) -> bool:
-        if (repository.created_at).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-            logging.debug(
-                f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
-            return False
-
-        if repository.name in allow_list:
-            logging.debug(
-                f"Skipping repository: {repository.name}. Reason: Present in allow list")
-            return False
-
-        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
-            latest_commit_position = 0
-            commit = repository.get_commits()[latest_commit_position]
-            if commit and (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-                logging.debug(
-                    f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-                return False
-        except GithubException:
-            logging.debug(f"Repository has no commits: {repository.name}")
-
-        return True
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
