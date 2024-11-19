@@ -7,12 +7,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-<<<<<<< HEAD
-from github import (Github, GithubException, NamedUser, Repository, RateLimitExceededException,
-=======
-from github import (Github, NamedUser, RateLimitExceededException,
->>>>>>> main
-                    UnknownObjectException)
+from github import (Github, GithubException, NamedUser, Repository, RateLimitExceededException, UnknownObjectException)
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
@@ -1235,7 +1230,57 @@ class GithubService:
         return old_poc_repositories
 
     @retries_github_rate_limit_exception_at_next_reset_once
-<<<<<<< HEAD
+
+    def get_user_removal_events(self, since_date: str, actor: str) -> list:
+        logging.info(f"Getting audit log entries for users removed by {actor} since {since_date}")
+        today = datetime.now()
+        query_string = f"action:org.remove_member actor:{actor} created:{since_date}..{today.strftime('%Y-%m-%d')}"
+
+        query = """
+            query($organisation_name: String!, $query_string: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $query_string
+                    ) {
+                        edges{
+                            node{
+                                ... on OrgRemoveMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    userLogin
+                                }
+                            }
+                        }
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                    }
+                }
+            }
+        """
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "query_string": query_string,
+            "cursor": None
+        }
+
+        removed_users = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            removed_users.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return removed_users
+
     def get_current_contributors_for_active_repos(self) -> list[dict[str, set[str]]]:
         """
         Returns a list of dictionaries containing the active repo name and its set of
@@ -1334,36 +1379,6 @@ class GithubService:
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
                     repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
-=======
-    def get_user_removal_events(self, since_date: str, actor: str) -> list:
-        logging.info(f"Getting audit log entries for users removed by {actor} since {since_date}")
-        today = datetime.now()
-        query_string = f"action:org.remove_member actor:{actor} created:{since_date}..{today.strftime('%Y-%m-%d')}"
-
-        query = """
-            query($organisation_name: String!, $query_string: String!, $cursor: String) {
-                organization(login: $organisation_name) {
-                    auditLog(
-                        first: 100
-                        after: $cursor
-                        query: $query_string
-                    ) {
-                        edges{
-                            node{
-                                ... on OrgRemoveMemberAuditEntry {
-                                    action
-                                    createdAt
-                                    actorLogin
-                                    userLogin
-                                }
-                            }
-                        }
->>>>>>> main
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-<<<<<<< HEAD
                         nodes {
                             name
                             isDisabled
@@ -1401,27 +1416,3 @@ class GithubService:
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
         return active_repositories
-=======
-                    }
-                }
-            }
-        """
-        variable_values = {
-            "organisation_name": self.organisation_name,
-            "query_string": query_string,
-            "cursor": None
-        }
-
-        removed_users = []
-        while True:
-            data = self.github_client_gql_api.execute(
-                gql(query), variable_values=variable_values)
-            removed_users.extend(
-                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
-            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
-                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
-            else:
-                break
-
-        return removed_users
->>>>>>> main
