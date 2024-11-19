@@ -1414,8 +1414,7 @@ class GithubService:
                 for repo in data["organization"]["repositories"]["nodes"]:
                     if repo["isDisabled"]:
                         continue
-                    else:
-                        active_repositories.append(repo["name"])
+                    active_repositories.append(repo["name"])
             repo_has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
