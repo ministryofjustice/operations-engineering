@@ -7,7 +7,7 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, RateLimitExceededException, UnknownObjectException)
+from github import (Github, RateLimitExceededException, NamedUser, UnknownObjectException)
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
