@@ -42,24 +42,17 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
 
     return [user.lower() for user in all_users if user not in list(set(active_users).union(bot_list))]
 
-def get_inactive_committers(gh_orgs):
+def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
     for gh in gh_orgs:
-        # Create set of current user logins
-        current_users_set = set(gh.get_org_members_login_names())
-        # Ignore set
-        ignore_set = {"moj-operations-engineering-bot"}
-
         # Get list of dictionaries of active repos and their current contributors
         repos_and_current_contributors = gh.get_current_contributors_for_active_repos()
-
-        users_to_check = list(current_users_set - ignore_set)
 
         non_committers = []
         since_datetime=(datetime.now() - timedelta(days=90))
         count = 1
 
-        for login in users_to_check:
+        for login in inactive_users_from_audit_log:
             commits = gh.user_has_commmits_since(
                 login=login,
                 repos_and_contributors=repos_and_current_contributors,
@@ -81,11 +74,13 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
 
-    inactive_committers = get_inactive_committers(gh_orgs)
+    print(f"Number of dormant users from audit log: {len(dormant_users_according_to_github)}")
 
-    dormant_users_accoding_to_github_and_commit_activity = list(set(dormant_users_according_to_github).intersection(set(inactive_committers)))
+    dormant_users_accoding_to_github_and_commit_activity = get_inactive_committers(gh_orgs, dormant_users_according_to_github)
 
     print(dormant_users_accoding_to_github_and_commit_activity)
+
+    print(len(dormant_users_accoding_to_github_and_commit_activity))
 
 
 if __name__ == "__main__":
