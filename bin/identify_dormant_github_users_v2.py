@@ -72,8 +72,6 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
 
-    print(f"Number of dormant users from audit log: {len(dormant_users_according_to_github)}")
-
     dormant_users_accoding_to_github_and_commit_activity = get_inactive_committers(gh_orgs, dormant_users_according_to_github)
 
     print(dormant_users_accoding_to_github_and_commit_activity)
