@@ -9,7 +9,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Configure AWS Credentials - Role to Assume Cloud Platforms Route53 Read Role
         uses: aws-actions/configure-aws-credentials@486457dc46e82b9a740ca0ef1dac6a38a3fc272d # v4.0.2

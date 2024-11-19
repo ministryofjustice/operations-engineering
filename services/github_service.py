@@ -7,13 +7,17 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
+<<<<<<< HEAD
 from github import (Github, GithubException, NamedUser, Repository, RateLimitExceededException,
+=======
+from github import (Github, NamedUser, RateLimitExceededException,
+>>>>>>> main
                     UnknownObjectException)
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
 from gql.transport.aiohttp import AIOHTTPTransport
-from gql.transport.exceptions import TransportQueryError
+from gql.transport.exceptions import TransportServerError
 from requests import Session
 
 from config.logging_config import logging
@@ -37,7 +41,7 @@ def retries_github_rate_limit_exception_at_next_reset_once(func: Callable) -> Ca
         """
         try:
             return func(*args, **kwargs)
-        except (RateLimitExceededException, TransportQueryError) as exception:
+        except (RateLimitExceededException, TransportServerError) as exception:
             logging.warning(
                 f"Caught {type(exception).__name__}, retrying calls when rate limit resets.")
             rate_limits = args[0].github_client_core_api.get_rate_limit()
@@ -85,40 +89,6 @@ class GithubService:
                 "Authorization": f"Bearer {org_token}",
             }
         )
-
-    def archive_all_inactive_repositories(self, last_active_cutoff_date: datetime, allow_list: list[str]) -> None:
-        for repo in self.__get_repos_to_consider_for_archiving("all"):
-            if self.__is_repo_ready_for_archiving(repo, last_active_cutoff_date, allow_list):
-                logging.info(f"Archiving repository: {repo.name}")
-                repo.edit(archived=True)
-
-    def __get_repos_to_consider_for_archiving(self, repository_type: str) -> list[Repository]:
-        repositories = list(
-            self.github_client_core_api.get_organization(self.organisation_name).get_repos(type=repository_type))
-        return [repository for repository in repositories if not (repository.archived or repository.fork)]
-
-    def __is_repo_ready_for_archiving(self, repository: Repository, last_active_cutoff_date: datetime, allow_list: list[str]) -> bool:
-        if (repository.created_at).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-            logging.debug(
-                f"Skipping repository: {repository.name}. Reason: Repository created later than last active cutoff date")
-            return False
-
-        if repository.name in allow_list:
-            logging.debug(
-                f"Skipping repository: {repository.name}. Reason: Present in allow list")
-            return False
-
-        try:  # Try block needed as get_commits() can cause exception when a repository has no commits as GH returns negative result.
-            latest_commit_position = 0
-            commit = repository.get_commits()[latest_commit_position]
-            if commit and (commit.commit.author.date).replace(tzinfo=None) >= (last_active_cutoff_date).replace(tzinfo=None):
-                logging.debug(
-                    f"Skipping repository: {repository.name}. Reason: Last commit date later than last active cutoff date")
-                return False
-        except GithubException:
-            logging.debug(f"Repository has no commits: {repository.name}")
-
-        return True
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_outside_collaborators_login_names(self) -> list[str]:
@@ -1265,6 +1235,7 @@ class GithubService:
         return old_poc_repositories
 
     @retries_github_rate_limit_exception_at_next_reset_once
+<<<<<<< HEAD
     def get_current_contributors_for_active_repos(self) -> list[dict[str, set[str]]]:
         """
         Returns a list of dictionaries containing the active repo name and its set of
@@ -1363,10 +1334,36 @@ class GithubService:
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
                     repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
+=======
+    def get_user_removal_events(self, since_date: str, actor: str) -> list:
+        logging.info(f"Getting audit log entries for users removed by {actor} since {since_date}")
+        today = datetime.now()
+        query_string = f"action:org.remove_member actor:{actor} created:{since_date}..{today.strftime('%Y-%m-%d')}"
+
+        query = """
+            query($organisation_name: String!, $query_string: String!, $cursor: String) {
+                organization(login: $organisation_name) {
+                    auditLog(
+                        first: 100
+                        after: $cursor
+                        query: $query_string
+                    ) {
+                        edges{
+                            node{
+                                ... on OrgRemoveMemberAuditEntry {
+                                    action
+                                    createdAt
+                                    actorLogin
+                                    userLogin
+                                }
+                            }
+                        }
+>>>>>>> main
                         pageInfo {
                             endCursor
                             hasNextPage
                         }
+<<<<<<< HEAD
                         nodes {
                             name
                             isDisabled
@@ -1404,3 +1401,27 @@ class GithubService:
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
         return active_repositories
+=======
+                    }
+                }
+            }
+        """
+        variable_values = {
+            "organisation_name": self.organisation_name,
+            "query_string": query_string,
+            "cursor": None
+        }
+
+        removed_users = []
+        while True:
+            data = self.github_client_gql_api.execute(
+                gql(query), variable_values=variable_values)
+            removed_users.extend(
+                [entry["node"] for entry in data["organization"]["auditLog"]["edges"] if entry["node"]])
+            if data["organization"]["auditLog"]["pageInfo"]["hasNextPage"]:
+                variable_values["cursor"] = data["organization"]["auditLog"]["pageInfo"]["endCursor"]
+            else:
+                break
+
+        return removed_users
+>>>>>>> main

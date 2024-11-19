@@ -16,4 +16,4 @@ class PingdomService:
         if response.status_code == 200:
             return response.json()
 
-        response.raise_for_status()
+        return response.raise_for_status()

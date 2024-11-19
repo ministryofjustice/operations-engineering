@@ -1,15 +1,15 @@
 ---
-name: Operations Engineering Decomission Pages Request
-about: Create a ticket for the Decomission Pages
+name: Operations Engineering Decommission Pages Request
+about: Create a ticket for the Decommission Pages
 title: ''
 labels: Maintenance Pages
 assignees: ''
 
 ---
 
-## Decomission Pages Request
+## Decommission Pages Request
 
-### **Pretasks**
+### **Pre-tasks**
 
 Collect the following information in order to action this request, please attach this information to this ticket
 
@@ -40,9 +40,9 @@ These are the steps that need to be followed at switch time
 1. [ ] Add NS record to current DNS location pointing at the Name Servers retrieved from the Cloud Platform Team
 2. [ ] Merge Certificate PR and check cert has been issues with below command
 
-```
-kubectl describe cert domains-cert -n maintenance-pages
-```
+    ```bash
+    kubectl describe cert domains-cert -n maintenance-pages
+    ```
 
 3. [ ] Merge Remove A record PR
 4. [ ] Merge Ingress PR

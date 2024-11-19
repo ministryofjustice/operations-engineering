@@ -6,13 +6,11 @@ from freezegun import freeze_time
 from github import (Github, GithubException, RateLimitExceededException,
                     UnknownObjectException)
 from github.Branch import Branch
-from github.Commit import Commit
-from github.GitCommit import GitCommit
 from github.NamedUser import NamedUser
 from github.Organization import Organization
 from github.Repository import Repository
 from github.Variable import Variable
-from gql.transport.exceptions import TransportQueryError
+from gql.transport.exceptions import TransportServerError
 
 from services.github_service import (
     GithubService, retries_github_rate_limit_exception_at_next_reset_once)
@@ -65,9 +63,9 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
                           "test_arg")
 
     @freeze_time("2023-02-01")
-    def test_function_is_called_twice_when_transport_query_error_raised_once(self):
+    def test_function_is_called_twice_when_transport_server_error_raised_once(self):
         mock_function = Mock(
-            side_effect=[TransportQueryError(Mock(), Mock(), Mock()), Mock()])
+            side_effect=[TransportServerError(Mock(), Mock()), Mock()])
         mock_github_client = Mock(Github)
         mock_github_client.get_rate_limit().graphql.reset = datetime.now()
         mock_github_service = Mock(
@@ -79,14 +77,14 @@ class TestRetriesGithubRateLimitExceptionAtNextResetOnce(unittest.TestCase):
     @freeze_time("2023-02-01")
     def test_rate_limit_exception_raised_when_transport_query_error_raised_twice(self):
         mock_function = Mock(side_effect=[
-            TransportQueryError(Mock(), Mock(), Mock()),
-            TransportQueryError(Mock(), Mock(), Mock())]
+            TransportServerError(Mock(), Mock()),
+            TransportServerError(Mock(), Mock())]
         )
         mock_github_client = Mock(Github)
         mock_github_client.get_rate_limit().graphql.reset = datetime.now()
         mock_github_service = Mock(
             GithubService, github_client_core_api=mock_github_client)
-        self.assertRaises(TransportQueryError,
+        self.assertRaises(TransportServerError,
                           retries_github_rate_limit_exception_at_next_reset_once(
                               mock_function), mock_github_service,
                           "test_arg")
@@ -112,124 +110,6 @@ class TestGithubServiceInit(unittest.TestCase):
                          github_service.organisation_name)
         self.assertEqual(ENTERPRISE_NAME,
                          github_service.enterprise_name)
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
-class TestGithubServiceArchiveInactiveRepositories(unittest.TestCase):
-
-    # Default for archiving a repository
-    # pylint: disable=R0917
-    def __get_repository(self, last_active_date: datetime, created_at_date: datetime, archived: bool = False, fork: bool = False, repo_name: str = None, has_commits: bool = True) -> Mock:
-        repository_to_consider_for_archiving = Mock(
-            Repository, archived=archived, fork=fork)
-        repository_to_consider_for_archiving.name = repo_name
-        repository_to_consider_for_archiving.created_at = created_at_date
-        repository_to_consider_for_archiving.get_commits.return_value = (
-            [Mock(Commit, commit=Mock(GitCommit, author=Mock(
-                NamedUser, date=last_active_date)))] if has_commits else None
-        )
-        return repository_to_consider_for_archiving
-
-    def setUp(self):
-        self.last_active_cutoff_date = datetime.now()
-        self.before_cutoff = self.last_active_cutoff_date - timedelta(days=1)
-        self.after_cutoff = self.last_active_cutoff_date + timedelta(days=1)
-
-    def test_no_archive_when_repo_is_archived(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, archived=True)
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
-        self.assertEqual(repo.edit.called, False)
-
-    def test_no_archive_when_repo_is_forked(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, fork=True)
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
-        self.assertEqual(repo.edit.called, False)
-
-    def test_no_archive_when_recently_active(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff)
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
-        self.assertEqual(repo.edit.called, False)
-
-    def test_no_archive_when_recently_created(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff)
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
-        self.assertEqual(repo.edit.called, False)
-
-    def test_no_archive_when_on_allow_list(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.after_cutoff, created_at_date=self.after_cutoff, repo_name="allow_me")
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(self.last_active_cutoff_date,
-                                                                               ["allow_me"])
-        self.assertEqual(repo.edit.called, False)
-
-    def test_no_archive_when_repo_has_no_commits_and_created_after_cutoff(self, mock_github_client_core_api):
-        repo = self.__get_repository(
-            last_active_date=self.before_cutoff, created_at_date=self.after_cutoff, has_commits=False)
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            repo,
-            repo,
-            repo
-        ]
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, [])
-        self.assertEqual(repo.edit.called, False)
-
-    def test_archives_inactive_repositories(self, mock_github_client_core_api):
-        repo = self.__get_repository(self.before_cutoff, self.before_cutoff)
-        repo_on_allow_list = self.__get_repository(
-            self.before_cutoff, self.before_cutoff, repo_name="allow_this")
-        mock_github_client_core_api.return_value.get_organization().get_repos.return_value = [
-            Mock(Repository, archived=False, fork=True),
-            repo,
-            Mock(Repository, archived=True, fork=True),
-            Mock(Repository, archived=False, fork=True),
-            repo,
-            Mock(Repository, archived=True, fork=True),
-            Mock(Repository, archived=True, fork=False),
-            repo_on_allow_list,
-            repo_on_allow_list,
-        ]
-
-        GithubService("", ORGANISATION_NAME).archive_all_inactive_repositories(
-            self.last_active_cutoff_date, ["allow_this"])
-
-        repo.edit.assert_has_calls(
-            [call(archived=True), call(archived=True)])
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
@@ -1909,6 +1789,43 @@ class TestGetOldPOCRepositories(unittest.TestCase):
         response = GithubService("", ORGANISATION_NAME).get_old_poc_repositories()
 
         self.assertEqual({}, response)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("services.github_service.Github")
+class TestUserRemovalEvents(unittest.TestCase):
+    def test_get_user_removal_events(self, _mock_github_client_gql):
+        github_service = GithubService("", ORGANISATION_NAME)
+        return_value = {
+            "organization": {
+                "auditLog": {
+                    "edges": [
+                        {"node": {"action": "org.remove_member", "createdAt": "2023-12-06T10:32:07.832Z",
+                                            "actorLogin": "admin_user", "userLogin": "removed_user1"}},
+                        {"node": {"action": "org.remove_member", "createdAt": "2023-12-07T11:32:07.832Z",
+                                            "actorLogin": "admin_user", "userLogin": "removed_user2"}}
+                    ],
+                    "pageInfo": {
+                        "endCursor": None,
+                        "hasNextPage": False
+                    }
+                }
+            }
+        }
+
+        github_service.github_client_gql_api.execute.return_value = return_value
+
+        result = github_service.get_user_removal_events("2023-12-01", "admin_user")
+
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['action'], 'org.remove_member')
+        self.assertEqual(result[0]['actorLogin'], 'admin_user')
+        self.assertEqual(result[0]['userLogin'], 'removed_user1')
+
+        self.assertEqual(result[1]['action'], 'org.remove_member')
+        self.assertEqual(result[1]['actorLogin'], 'admin_user')
+        self.assertEqual(result[1]['userLogin'], 'removed_user2')
 
 
 

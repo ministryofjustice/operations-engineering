@@ -1,3 +1,4 @@
+# pylint: disable=C0411
 from datetime import datetime, timezone
 import requests
 from notifications_python_client.notifications import NotificationsAPIClient
@@ -64,13 +65,13 @@ class NotifyService:
         )
 
     def check_for_undelivered_first_emails(self):
-        return self._check_for_undelivered_emails_for_template(
+        return self.check_for_undelivered_emails_for_template(
             self._get_first_email_template_id())
 
     def _get_notifications_by_type_and_status(self, template_type, status):
         return self.client.get_all_notifications(status=status, template_type=template_type)
 
-    def _check_for_undelivered_emails_for_template(self, template_id):
+    def check_for_undelivered_emails_for_template(self, template_id):
         notifications = self._get_notifications_by_type_and_status('email', 'failed')[
             'notifications']
         today = datetime.now(timezone.utc).date()
@@ -98,6 +99,81 @@ class NotifyService:
                 template_id=template_id,
                 personalisation=personalisation,
                 email_reply_to_id=operations_engineering_email_id
+            )
+        except requests.exceptions.HTTPError as api_key_error:
+            raise requests.exceptions.HTTPError(
+                f"You may need to export your Notify API Key:\n {api_key_error}"
+            ) from api_key_error
+
+    def build_email_parameter_list_crs(self, valid_certificate_list):
+        emails_parameter_list = []
+        for valid_certificate in valid_certificate_list:
+            params = {
+                'email_addresses': valid_certificate_list.get(valid_certificate).get('emails'),
+                'domain_name': valid_certificate,
+                'csr_email': self.config['CERT_REPLY_EMAIL'],
+                'end_date': valid_certificate_list.get(valid_certificate).get('expiry_date')
+            }
+            emails_parameter_list.append(params)
+        return emails_parameter_list
+
+    def _send_email_crs(self, email_params, recipients):
+        for email in recipients:
+            domain_name = self._remove_suffix_if_present(
+                email_params['domain_name'])
+            try:
+                self.client.send_email_notification(
+                    email_address=email,
+                    template_id=self.config["CERT_EXPIRY_TEMPALATE_ID"],
+                    personalisation={
+                        "domain_name": domain_name,
+                        "csr_email": email_params['csr_email'],
+                        "end_date": email_params['end_date'].strftime('%d/%m/%Y')
+                    }
+                )
+            except requests.exceptions.HTTPError as api_key_error:
+                raise requests.exceptions.HTTPError(
+                    f"You may need to export your Notify API Key:\n {api_key_error}"
+                ) from api_key_error
+
+    def send_emails_from_parameters_crs(self, email_parameter_list):
+        for email_parameters in email_parameter_list:
+            self._send_email_crs(email_parameters,
+                                 email_parameters['email_addresses'])
+
+    def send_test_email_from_parameters_crs(self, email_parameter_list, test_email):
+        for email_parameters in email_parameter_list:
+            self._send_email_crs(email_parameters, [test_email])
+
+    def _remove_suffix_if_present(self, domain_name):
+        base, sep, suffix = domain_name.rpartition('.')
+        return base if sep == '.' and suffix.isdigit() else domain_name
+
+    def build_main_report_string_crs(self, email_parameter_list):
+        new_line = '\n'
+        return "".join(
+            f"Domain Name: {self._remove_suffix_if_present(email_parameter['domain_name'])}\n"
+            f"Sent to:\n{''.join([f'{address}{new_line}' for address in email_parameter['email_addresses']])}"
+            f"\nExpiry Date: {email_parameter['end_date']} \n\n"
+            for email_parameter in email_parameter_list
+        )
+
+    def build_undeliverable_email_report_string_crs(self, undeliverable_email_list):
+        return "".join(
+            f"Email Address: {undeliverable_email['email_address']}\n"
+            f"Sent at: {undeliverable_email['created_at']}\n"
+            f"Status: {undeliverable_email['status']} \n\n"
+            for undeliverable_email in undeliverable_email_list
+        )
+
+    def send_report_email_crs(self, report, template_id, email):
+        try:
+            self.client.send_email_notification(
+                email_address=email,
+                template_id=template_id,
+                personalisation={
+                    "report": report
+                }
             )
         except requests.exceptions.HTTPError as api_key_error:
             raise requests.exceptions.HTTPError(

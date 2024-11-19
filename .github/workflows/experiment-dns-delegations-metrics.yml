@@ -9,9 +9,9 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - uses: ministryofjustice/github-actions/setup-aws-profile@v18.2.1
+      - uses: ministryofjustice/github-actions/setup-aws-profile@721b0f273fc8356611cb18b3dfc02074d59217da # v18.2.1
         with:
           role-arn: ${{ secrets.DSD_ROUTE53_READ_ROLE_ARN }}
           profile-name: dsd_route53_read
@@ -42,7 +42,7 @@ jobs:
           aws route53 list-hosted-zones --max-items="1" --profile="dsd_route53_read" --output="json" | jq ".HostedZones[].Name"
           aws route53 list-hosted-zones --max-items="1" --profile="cloud_platform_route53_read" --output="json" | jq ".HostedZones[].Name"
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: "3.11"
           cache: "pipenv"
