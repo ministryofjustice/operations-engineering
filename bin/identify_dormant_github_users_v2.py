@@ -44,11 +44,11 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
 
 def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
+    active_committers = []
+
     for gh in gh_orgs:
-        # Get list of dictionaries of active repos and their current contributors
         repos_and_current_contributors = gh.get_current_contributors_for_active_repos()
 
-        non_committers = []
         since_datetime=(datetime.now() - timedelta(days=90))
         count = 1
 
@@ -58,11 +58,11 @@ def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
                 repos_and_contributors=repos_and_current_contributors,
                 since_datetime=since_datetime
             )
-            if not commits:
-                non_committers.append(login)
+            if commits and login not in active_committers:
+                active_committers.append(login)
             count += 1
 
-        return non_committers
+        return list(set(inactive_users_from_audit_log).difference(set(active_committers)))
 
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
