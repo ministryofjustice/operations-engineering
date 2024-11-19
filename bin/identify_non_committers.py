@@ -1,8 +1,7 @@
 import os
-from datetime import datetime, timedelta
-from config.constants import MINISTRY_OF_JUSTICE, MINISTRY_OF_JUSTICE_TEST, MOJ_ANALYTICAL_SERVICES
 import time
-from operator import itemgetter
+from datetime import datetime
+from config.constants import MINISTRY_OF_JUSTICE_TEST # , MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 from services.github_service import GithubService
 
