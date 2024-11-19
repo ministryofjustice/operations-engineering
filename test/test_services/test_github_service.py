@@ -1911,5 +1911,239 @@ class TestGetOldPOCRepositories(unittest.TestCase):
         self.assertEqual({}, response)
 
 
+
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceGetCurrentContributorsForActiveRepos(unittest.TestCase):
+    def setUp(self):
+        self.active_repos = ["repo1", "repo2", "repo3"]
+
+    def test_drops_non_member_contributors(
+            self,
+            mock_github_client_core_api
+        ):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
+
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = [
+            Mock(NamedUser, login="c1"),
+            Mock(NamedUser, login="c2")
+        ]
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2"), MagicMock(login="c3")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2"), MagicMock(login="c4")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3"), MagicMock(login="c1")]))
+        ]
+        response = github_service.get_current_contributors_for_active_repos()
+        expected = [{'repository': 'repo1', 'contributors': {'c1', 'c2'}}, {'repository': 'repo2', 'contributors': {'c2'}}, {'repository': 'repo3', 'contributors': {'c1'}}]
+        self.assertEqual(response, expected)
+
+    def test_returns_sorted_by_number_of_contributors_descending(
+            self,
+            mock_github_client_core_api
+        ):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_active_repositories = MagicMock(
+            return_value=self.active_repos
+        )
+
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = [
+            Mock(NamedUser, login="c1"),
+            Mock(NamedUser, login="c2")
+        ]
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c3")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2"), MagicMock(login="c1")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3")]))
+        ]
+        response = github_service.get_current_contributors_for_active_repos()
+        expected = [{'repository': 'repo2', 'contributors': {'c1', 'c2'}}, {'repository': 'repo1', 'contributors': {'c1'}}]
+        self.assertEqual(response, expected)
+
+    def test_drops_repos_with_zero_contributors(
+            self,
+            mock_github_client_core_api
+        ):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_active_repositories = MagicMock(
+            return_value=self.active_repos
+        )
+
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = [
+            Mock(NamedUser, login="c1"),
+            Mock(NamedUser, login="c2")
+        ]
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c3")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3"), MagicMock(login="c4")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login=None)]))
+        ]
+        response = github_service.get_current_contributors_for_active_repos()
+        expected = [{'repository': 'repo1', 'contributors': {'c1'}}]
+        self.assertEqual(response, expected)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetReposUserHasContributedTo(unittest.TestCase):
+    def test_returns_expected_repos(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        repos = github_service.get_repos_user_has_contributed_to(
+            login="c1",
+            repos_and_contributors=[
+                {'repository': 'repo1', 'contributors': {'c1', 'c2'}},
+                {'repository': 'repo2', 'contributors': {'c2', 'c3'}},
+                {'repository': 'repo3', 'contributors': {'c1', 'c3'}}
+            ]
+        )
+        self.assertEqual(repos, ['repo1', 'repo3'])
+
+    def test_no_repos_contributed_to_returns_empty_list(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        repos = github_service.get_repos_user_has_contributed_to(
+            login="c5",
+            repos_and_contributors=[
+                {'repository': 'repo1', 'contributors': {'c1', 'c2'}},
+                {'repository': 'repo2', 'contributors': {'c2', 'c3'}},
+                {'repository': 'repo3', 'contributors': {'c1', 'c3'}}
+            ]
+        )
+        self.assertEqual(repos, [])
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
+    def setUp(self):
+        self.repos_and_contributors=[
+            {'repository': 'repo1', 'contributors': {'c1', 'c2'}},
+            {'repository': 'repo2', 'contributors': {'c2', 'c3'}},
+            {'repository': 'repo3', 'contributors': {'c1', 'c3'}}
+        ]
+        self.since_datetime=datetime(2024, 5, 3)
+
+    def test_user_has_commits_since_true(
+            self,
+            mock_github_client_core_api
+        ):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_repos_user_has_contributed_to = MagicMock(
+            return_value=['repo1', 'repo3']
+        )
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=0))),
+            MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=20))),
+        ]
+        response = github_service.user_has_commmits_since(
+            login = "c1",
+            repos_and_contributors=self.repos_and_contributors,
+            since_datetime=self.since_datetime
+        )
+        self.assertEqual(response, True)
+
+    def test_user_has_commits_since_false_no_commits(
+            self,
+            mock_github_client_core_api
+        ):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_repos_user_has_contributed_to = MagicMock(
+            return_value=['repo1', 'repo2']
+        )
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=0))),
+            MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=0))),
+        ]
+        response = github_service.user_has_commmits_since(
+            login = "c2",
+            repos_and_contributors=self.repos_and_contributors,
+            since_datetime=self.since_datetime
+        )
+        self.assertEqual(response, False)
+
+    def test_user_has_commits_since_false_no_repos(
+            self,
+            mock_github_client_core_api
+        ):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_repos_user_has_contributed_to = MagicMock(
+            return_value=[]
+        )
+        mock_github_client_core_api.return_value.get_repo.side_effect = []
+        response = github_service.user_has_commmits_since(
+            login = "c5",
+            repos_and_contributors=self.repos_and_contributors,
+            since_datetime=self.since_datetime
+        )
+        self.assertEqual(response, False)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetPaginatedListOfUnlockedUnarchivedRepos(unittest.TestCase):
+    def test_calls_downstream_services(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_unlocked_unarchived_repos(
+            "test_after_cursor"
+        )
+        github_service.github_client_gql_api.execute.assert_called_once()
+
+    def test_throws_value_error_when_page_size_greater_than_limit(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        self.assertRaises(
+            ValueError,
+            github_service.get_paginated_list_of_unlocked_unarchived_repos,
+            "test_after_cursor",
+            101
+        )
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__", new=MagicMock)
+class TestGithubServiceGetActiveRepositories(unittest.TestCase):
+    def setUp(self):
+        self.return_data = {
+            "organization": {
+                "repositories": {
+                    "pageInfo": {
+                        "endCursor": "repo_1_end_cursor",
+                        "hasNextPage": False
+                    },
+                    "nodes": [
+                        {
+                            "name": "repository_1",
+                            "isDisabled": False,
+                        },
+                        {
+                            "name": "repository_2",
+                            "isDisabled": True,
+                        },
+                        {
+                            "name": "repository_3",
+                            "isDisabled": False,
+                        },
+                    ]
+                }
+            }
+        }
+
+    def test_returns_correct_data(self):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_paginated_list_of_unlocked_unarchived_repos = MagicMock(
+            return_value=self.return_data
+        )
+        active_repositories = github_service.get_active_repositories()
+        self.assertEqual(len(active_repositories), 2)
+        self.assertEqual(set(active_repositories), {"repository_1", "repository_3"})
+
+
 if __name__ == "__main__":
     unittest.main()
