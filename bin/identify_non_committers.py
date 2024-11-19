@@ -14,8 +14,8 @@ def main():
         raise Exception("TOKEN must be set")
 
     # gh = GithubService(str(gh_token), MINISTRY_OF_JUSTICE)
-    gh = GithubService(str(gh_token), MOJ_ANALYTICAL_SERVICES)
-    # gh = GithubService(str(gh_token), MINISTRY_OF_JUSTICE_TEST)
+    # gh = GithubService(str(gh_token), MOJ_ANALYTICAL_SERVICES)
+    gh = GithubService(str(gh_token), MINISTRY_OF_JUSTICE_TEST)
 
     # Create set of current user logins
     # current_users_set = set(gh.get_org_members_login_names())
@@ -27,13 +27,12 @@ def main():
     print("\nRepos and current contributors:")
     print(repos_and_current_contributors)
 
-    # users_to_check = list(current_users_set - ignore_set)
-
-    users_to_check = []
+    # Feed users to check here
+    users_to_check = [user.login for user in gh._GithubService__get_all_users()]
 
     print(users_to_check)
     non_committers = []
-    since_datetime=datetime(2024, 8, 1)
+    since_datetime=datetime(2023, 8, 1)
     count = 1
     number_of_users = len(users_to_check)
 
