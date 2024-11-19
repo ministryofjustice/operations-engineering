@@ -6,16 +6,20 @@ from operator import itemgetter
 
 from services.github_service import GithubService
 
+def get_environment_variables() -> tuple:
+    gh_token = os.getenv("GH_ADMIN_TOKEN")
+    if not gh_token:
+        raise ValueError(
+            "The env variable GH_ADMIN_TOKEN is empty or missing")
+    return gh_token
 
 def main():
 
-    gh_token = os.getenv("GH_ADMIN_TOKEN")
-    if not gh_token:
-        raise Exception("TOKEN must be set")
-
+    gh_token = get_environment_variables()
     # gh = GithubService(str(gh_token), MINISTRY_OF_JUSTICE)
     # gh = GithubService(str(gh_token), MOJ_ANALYTICAL_SERVICES)
-    gh = GithubService(str(gh_token), MINISTRY_OF_JUSTICE_TEST)
+
+    gh = GithubService(gh_token, MINISTRY_OF_JUSTICE_TEST)
 
     # Create set of current user logins
     # current_users_set = set(gh.get_org_members_login_names())
