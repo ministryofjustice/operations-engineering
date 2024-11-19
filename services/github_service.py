@@ -1230,7 +1230,6 @@ class GithubService:
         return old_poc_repositories
 
     @retries_github_rate_limit_exception_at_next_reset_once
-
     def get_user_removal_events(self, since_date: str, actor: str) -> list:
         logging.info(f"Getting audit log entries for users removed by {actor} since {since_date}")
         today = datetime.now()

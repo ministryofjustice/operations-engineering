@@ -1828,9 +1828,6 @@ class TestUserRemovalEvents(unittest.TestCase):
         self.assertEqual(result[1]['userLogin'], 'removed_user2')
 
 
-
-
-
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
@@ -1838,10 +1835,7 @@ class TestGithubServiceGetCurrentContributorsForActiveRepos(unittest.TestCase):
     def setUp(self):
         self.active_repos = ["repo1", "repo2", "repo3"]
 
-    def test_drops_non_member_contributors(
-            self,
-            mock_github_client_core_api
-        ):
+    def test_drops_non_member_contributors(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
 
@@ -1859,10 +1853,7 @@ class TestGithubServiceGetCurrentContributorsForActiveRepos(unittest.TestCase):
         expected = [{'repository': 'repo1', 'contributors': {'c1', 'c2'}}, {'repository': 'repo2', 'contributors': {'c2'}}, {'repository': 'repo3', 'contributors': {'c1'}}]
         self.assertEqual(response, expected)
 
-    def test_returns_sorted_by_number_of_contributors_descending(
-            self,
-            mock_github_client_core_api
-        ):
+    def test_returns_sorted_by_number_of_contributors_descending(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_active_repositories = MagicMock(
             return_value=self.active_repos
@@ -1882,10 +1873,7 @@ class TestGithubServiceGetCurrentContributorsForActiveRepos(unittest.TestCase):
         expected = [{'repository': 'repo2', 'contributors': {'c1', 'c2'}}, {'repository': 'repo1', 'contributors': {'c1'}}]
         self.assertEqual(response, expected)
 
-    def test_drops_repos_with_zero_contributors(
-            self,
-            mock_github_client_core_api
-        ):
+    def test_drops_repos_with_zero_contributors(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_active_repositories = MagicMock(
             return_value=self.active_repos
@@ -1934,22 +1922,20 @@ class TestGithubServiceGetReposUserHasContributedTo(unittest.TestCase):
         )
         self.assertEqual(repos, [])
 
+
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
 class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
     def setUp(self):
-        self.repos_and_contributors=[
+        self.repos_and_contributors = [
             {'repository': 'repo1', 'contributors': {'c1', 'c2'}},
             {'repository': 'repo2', 'contributors': {'c2', 'c3'}},
             {'repository': 'repo3', 'contributors': {'c1', 'c3'}}
         ]
-        self.since_datetime=datetime(2024, 5, 3)
+        self.since_datetime = datetime(2024, 5, 3)
 
-    def test_user_has_commits_since_true(
-            self,
-            mock_github_client_core_api
-        ):
+    def test_user_has_commits_since_true(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repos_user_has_contributed_to = MagicMock(
             return_value=['repo1', 'repo3']
@@ -1959,16 +1945,13 @@ class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
             MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=20))),
         ]
         response = github_service.user_has_commmits_since(
-            login = "c1",
+            login="c1",
             repos_and_contributors=self.repos_and_contributors,
             since_datetime=self.since_datetime
         )
         self.assertEqual(response, True)
 
-    def test_user_has_commits_since_false_no_commits(
-            self,
-            mock_github_client_core_api
-        ):
+    def test_user_has_commits_since_false_no_commits(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repos_user_has_contributed_to = MagicMock(
             return_value=['repo1', 'repo2']
@@ -1978,23 +1961,20 @@ class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
             MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=0))),
         ]
         response = github_service.user_has_commmits_since(
-            login = "c2",
+            login="c2",
             repos_and_contributors=self.repos_and_contributors,
             since_datetime=self.since_datetime
         )
         self.assertEqual(response, False)
 
-    def test_user_has_commits_since_false_no_repos(
-            self,
-            mock_github_client_core_api
-        ):
+    def test_user_has_commits_since_false_no_repos(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_repos_user_has_contributed_to = MagicMock(
             return_value=[]
         )
         mock_github_client_core_api.return_value.get_repo.side_effect = []
         response = github_service.user_has_commmits_since(
-            login = "c5",
+            login="c5",
             repos_and_contributors=self.repos_and_contributors,
             since_datetime=self.since_datetime
         )

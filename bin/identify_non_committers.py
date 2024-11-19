@@ -1,9 +1,10 @@
 import os
 import time
 from datetime import datetime
-from config.constants import MINISTRY_OF_JUSTICE_TEST # , MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
+from config.constants import MINISTRY_OF_JUSTICE_TEST  # , MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 from services.github_service import GithubService
+
 
 def get_environment_variables() -> tuple:
     gh_token = os.getenv("GH_ADMIN_TOKEN")
@@ -11,6 +12,7 @@ def get_environment_variables() -> tuple:
         raise ValueError(
             "The env variable GH_ADMIN_TOKEN is empty or missing")
     return gh_token
+
 
 def main():
 
@@ -35,7 +37,7 @@ def main():
 
     print(users_to_check)
     non_committers = []
-    since_datetime=datetime(2023, 8, 1)
+    since_datetime = datetime(2023, 8, 1)
     count = 1
     number_of_users = len(users_to_check)
 
