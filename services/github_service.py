@@ -1379,6 +1379,10 @@ class GithubService:
             query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
                 organization(login: $organisation_name) {
                     repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
                         nodes {
                             name
                             isDisabled
