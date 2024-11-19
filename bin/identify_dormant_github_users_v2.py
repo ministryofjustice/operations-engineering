@@ -51,7 +51,7 @@ def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
         since_datetime=(datetime.now() - timedelta(days=90))
 
         for login in inactive_users_from_audit_log:
-            if login not in active_committers
+            if login not in active_committers:
                 commits = gh.user_has_commmits_since(
                     login=login,
                     repos_and_contributors=repos_and_current_contributors,
