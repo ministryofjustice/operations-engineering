@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from config.constants import MINISTRY_OF_JUSTICE, MINISTRY_OF_JUSTICE_TEST, MOJ_ANALYTICAL_SERVICES
+from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 import time
 from dataclasses import dataclass
 
