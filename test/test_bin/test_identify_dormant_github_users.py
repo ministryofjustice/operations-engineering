@@ -46,7 +46,7 @@ class TestDormantGitHubUsers(unittest.TestCase):
     def test_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(self, mock_get_active_users_for_dormant_users_process):
         mock_get_active_users_for_dormant_users_process.return_value = ["member1"]
         mock_github_service = MagicMock()
-        mock_github_service.get_all_enterprise_members = MagicMock(return_value=["member1", "member2", "bot1", "bot2"])
+        mock_github_service.get_all_enterprise_members = MagicMock(return_value=["member1", "member2", "analytical-platform-bot", "cloud-platform-dummy-user"])
 
         assert get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(mock_github_service, self.allowed_bot_users) == ["member2"]
 
