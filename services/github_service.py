@@ -1292,6 +1292,8 @@ class GithubService:
         Repos with 0 contributors or 0 current contributors are dropped.
         """
 
+        logins = self.get_org_members_login_names()
+        active_repos = [repo.get("name") for repo in self.fetch_all_repositories_in_org()]
         logins = [user.login for user in self.__get_all_users()]
         active_repos = self.get_active_repositories()
         number_of_repos = len(active_repos)
@@ -1300,8 +1302,6 @@ class GithubService:
         active_repos_and_current_contributors = []
         count = 1
         for repo_name in active_repos:
-            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
-
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             contributors = [contributor.login for contributor in repo.get_contributors()]
             if contributors:
@@ -1348,10 +1348,8 @@ class GithubService:
             login=login,
             repos_and_contributors=repos_and_contributors
         )
-        print(f"{login} has contributed to {len(repos)} repos")
 
         for repo_name in repos:
-            print(f"Checking {login} for commits in {repo_name}")
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             commits = repo.get_commits(
                 since=since_datetime,
