@@ -4,6 +4,7 @@ import time
 
 from services.github_service import GithubService
 from services.cloudtrail_service import CloudtrailService
+from services.cloudwatch_service import CloudWatchService
 from utils.environment import EnvironmentVariables
 
 # These are the users that are deemed acceptable to be dormant.
@@ -62,6 +63,27 @@ def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
         return list(set(inactive_users_from_audit_log).difference(set(active_committers)))
 
+def get_active_users_from_auth0_log_group() -> list:
+    """Operations Engineering, Cloud, Mod and Analytical Platforms all have thir own
+    Auth0 tenants. All logs are collected in a single Cloudwatch log group.
+    This function will parse the logs and return a list of active users using
+    an insights query.
+    """
+    cloudwatch_log_group = "/aws/events/LogsFromOperationsEngineeringAuth0"
+
+    cloudwatch_service = CloudWatchService(cloudwatch_log_group)
+    return cloudwatch_service.get_all_auth0_users_that_appear_in_tenants()
+
+def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> list:
+    active_email_addresses = get_active_users_from_auth0_log_group()
+
+    dormant_users_not_in_auth0 = [
+        user
+        for user in dormant_users_according_to_github
+        if user.email and user.email.lower() not in active_email_addresses
+    ]
+    return dormant_users_not_in_auth0
+
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
 
@@ -72,11 +94,13 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
 
-    dormant_users_accoding_to_github_and_commit_activity = get_inactive_committers(gh_orgs, dormant_users_according_to_github)
+    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_according_to_github)
 
-    print(dormant_users_accoding_to_github_and_commit_activity)
+    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    print(len(dormant_users_accoding_to_github_and_commit_activity))
+    print(dormant_users_accoding_to_github_auth0_and_commits)
+
+    print(len(dormant_users_accoding_to_github_auth0_and_commits))
 
 
 if __name__ == "__main__":
