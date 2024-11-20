@@ -1398,46 +1398,6 @@ class TestReportOnInactiveUsers(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
-class TestSetStandards(unittest.TestCase):
-    def test_set_standards(self, mock_github_client_core_api: MagicMock):
-        mock_protection = Mock(required_status_checks=Mock(
-            contexts=["test"], strict=True))
-        mock_branch = Mock(Branch)
-        mock_branch.get_protection.return_value = mock_protection
-        mock_repo = MagicMock(Repository)
-        mock_repo.get_branch.return_value = mock_branch
-        mock_github_client_core_api.return_value.get_repo.return_value = mock_repo
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service.set_standards("test_repository")
-
-        mock_branch.edit_protection.assert_called_with(contexts=["test"],
-                                                       strict=True,
-                                                       enforce_admins=True,
-                                                       required_approving_review_count=1,
-                                                       dismiss_stale_reviews=True, )
-
-    def test_set_standards_handles_null_required_checks(self, mock_github_client_core_api: MagicMock):
-        mock_protection = Mock(required_status_checks=None)
-        mock_branch = Mock(Branch)
-        mock_branch.get_protection.return_value = mock_protection
-        mock_repo = MagicMock(Repository)
-        mock_repo.get_branch.return_value = mock_branch
-        mock_github_client_core_api.return_value.get_repo.return_value = mock_repo
-
-        github_service = GithubService("", ORGANISATION_NAME)
-        github_service.set_standards("test_repository")
-
-        mock_branch.edit_protection.assert_called_with(contexts=[],
-                                                       strict=False,
-                                                       enforce_admins=True,
-                                                       required_approving_review_count=1,
-                                                       dismiss_stale_reviews=True, )
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
 class TestGithubServiceUpdateTeamRepositoryPermission(unittest.TestCase):
 
     def test_updates_team_repository_permission(self, mock_github_client_core_api):
