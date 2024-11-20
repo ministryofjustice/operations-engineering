@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 from bin.identify_dormant_github_users import (
     ALLOWED_BOT_USERS, DormantUser, filter_out_active_auth0_users,
-    get_active_users_from_auth0_log_group, message_to_slack_channel)
+    get_active_users_from_auth0_log_group)
 
 from bin.identify_dormant_github_users_v2 import get_inactive_users_from_data_lake_ignoring_bots_and_collaborators
 
@@ -41,23 +41,6 @@ class TestDormantGitHubUsers(unittest.TestCase):
             name='user2', email='user2@example.com')]
 
         self.assertIn(expected_result[0], result)
-
-    def test_message_to_slack_channel(self):
-        dormant_users = [
-            DormantUser(name='user1', email='user1@example.com'),
-            DormantUser(name='user2', email='user2@example.com')
-        ]
-
-        result = message_to_slack_channel(dormant_users)
-
-        expected_message = (
-            "Hello 🤖, \n\n"
-            "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n\n"
-            "user1 | user1@example.com\n"
-            "user2 | user2@example.com\n"
-        )
-
-        self.assertEqual(result, expected_message)
 
     @patch.object(CloudtrailService, "get_active_users_for_dormant_users_process")
     def test_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(self, mock_get_active_users_for_dormant_users_process):
