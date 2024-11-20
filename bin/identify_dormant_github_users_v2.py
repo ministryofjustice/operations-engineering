@@ -94,13 +94,17 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
 
+    # Use mod platform profile to make cloudwatch query
+
     dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_according_to_github)
 
-    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
+    print(len(dormant_users_according_to_github_and_auth0))
 
-    print(dormant_users_accoding_to_github_auth0_and_commits)
+    # dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    print(len(dormant_users_accoding_to_github_auth0_and_commits))
+    # print(dormant_users_accoding_to_github_auth0_and_commits)
+
+    # print(len(dormant_users_accoding_to_github_auth0_and_commits))
 
 
 if __name__ == "__main__":

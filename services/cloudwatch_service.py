@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class CloudWatchService:
     def __init__(self, log_group_name) -> None:
-        session = boto3.Session()
+        session = boto3.Session(profile_name="auth0_logs_profile")
         self.client = session.client("logs", region_name="eu-west-2")
         self.log_group_name = log_group_name
 
