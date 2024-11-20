@@ -32,9 +32,6 @@ class KpiService:
     def __add_indicator(self, indicator: str, count: int) -> None:
         self.__post("/api/indicator/add", {"indicator": indicator, "count": count})
 
-    def track_number_of_repositories_with_standards_label(self, count: int) -> None:
-        self.__add_indicator("REPOSITORIES_WITH_STANDARDS_LABEL", count)
-
     def track_sentry_transactions_used_for_day(self, count: int):
         self.__add_indicator("SENTRY_TRANSACTIONS_USED_OVER_PAST_DAY", count)
 
