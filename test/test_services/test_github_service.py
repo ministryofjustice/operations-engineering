@@ -5,10 +5,8 @@ from unittest.mock import MagicMock, Mock, call, patch
 from freezegun import freeze_time
 from github import (Github, GithubException, RateLimitExceededException,
                     UnknownObjectException)
-from github.Branch import Branch
 from github.NamedUser import NamedUser
 from github.Organization import Organization
-from github.Repository import Repository
 from github.Variable import Variable
 from gql.transport.exceptions import TransportServerError
 
