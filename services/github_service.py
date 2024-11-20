@@ -1278,9 +1278,11 @@ class GithubService:
 
         logins = self.get_org_members_login_names()
         active_repos = [repo.get("name") for repo in self.fetch_all_repositories_in_org()]
+        number_of_repos = len(active_repos)
         active_repos_and_current_contributors = []
         count = 1
         for repo_name in active_repos:
+            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             contributors = [contributor.login for contributor in repo.get_contributors()]
             if contributors:
