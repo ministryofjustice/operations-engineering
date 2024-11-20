@@ -89,6 +89,7 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
         for user in dormant_users_according_to_github
         if user.email and user.email.lower() not in active_email_addresses
     ]
+
     return dormant_users_not_in_auth0
 
 def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org: GithubService) -> list[DormantUser]:
@@ -117,13 +118,11 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
 
-    print(len(dormant_users_according_to_github_and_auth0))
+    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    # dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
+    print(dormant_users_accoding_to_github_auth0_and_commits)
 
-    # print(dormant_users_accoding_to_github_auth0_and_commits)
-
-    # print(len(dormant_users_accoding_to_github_auth0_and_commits))
+    print(len(dormant_users_accoding_to_github_auth0_and_commits))
 
 
 if __name__ == "__main__":
