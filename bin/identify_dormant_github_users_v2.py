@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from config.constants import MINISTRY_OF_JUSTICE, MINISTRY_OF_JUSTICE_TEST, MOJ_ANALYTICAL_SERVICES
 import time
+from dataclasses import dataclass
 
 from services.github_service import GithubService
 from services.cloudtrail_service import CloudtrailService
@@ -34,6 +35,12 @@ ALLOWED_BOT_USERS = [
     "opg-weblate",
     "slack-moj",
 ]
+
+@dataclass
+class DormantUser:
+    name: str
+    email: str | None
+
 
 def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list) -> list:
     all_users = github_service.get_all_enterprise_members()
@@ -78,11 +85,23 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
     active_email_addresses = get_active_users_from_auth0_log_group()
 
     dormant_users_not_in_auth0 = [
-        user
+        user.name
         for user in dormant_users_according_to_github
         if user.email and user.email.lower() not in active_email_addresses
     ]
     return dormant_users_not_in_auth0
+
+def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org: GithubService) -> list[DormantUser]:
+    dormant_users = [
+        DormantUser(
+            user,
+            moj_github_org.get_user_org_email_address(user)
+            or ap_github_org.get_user_org_email_address(user),
+        )
+        for user in users
+    ]
+
+    return dormant_users
 
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
@@ -94,9 +113,9 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
 
-    # Use mod platform profile to make cloudwatch query
+    dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])
 
-    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_according_to_github)
+    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
 
     print(len(dormant_users_according_to_github_and_auth0))
 
