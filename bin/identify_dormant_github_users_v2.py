@@ -110,7 +110,7 @@ def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
 
     gh_orgs = [
-        GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
+        # GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
         GithubService(env.get("GH_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
