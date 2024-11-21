@@ -68,7 +68,9 @@ def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
             if commits and login not in active_committers:
                 active_committers.append(login)
 
-        return list(set(inactive_users_from_audit_log).difference(set(active_committers)))
+    print(f"Active Committers: {active_committers}")
+
+    return list(set(inactive_users_from_audit_log).difference(set(active_committers)))
 
 def get_active_users_from_auth0_log_group() -> list:
     """Operations Engineering, Cloud, Mod and Analytical Platforms all have thir own
