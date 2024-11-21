@@ -48,7 +48,7 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
     cloudtrail_service = CloudtrailService()
     active_users = cloudtrail_service.get_active_users_for_dormant_users_process()
 
-    return [user.lower() for user in all_users if user not in list(set(active_users).union(bot_list))]
+    return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
 def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
@@ -120,8 +120,7 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
 
-    # dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
-    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers([gh_orgs[1]], dormant_users_according_to_github_and_auth0)
+    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
     print(dormant_users_accoding_to_github_auth0_and_commits)
 
