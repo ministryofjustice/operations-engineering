@@ -1178,9 +1178,8 @@ class GithubService:
         if response.status_code == 200:
             logging.info("Successfully retrieved PAT list.")
             return response.json()
-        logging.error(
-            f"Failed to fetch PAT list: {response.status_code}, error: {response}")
-        return []
+
+        raise ValueError(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_enterprise_members(self) -> list:
