@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Generate a token to access Operations Engineering PAT App
         id: generate-token
-        uses: actions/create-github-app-token@ad38cffc07bac6e3857755914c4c88bfd2db4da4 # v1.10.2
+        uses: actions/create-github-app-token@25cc3bdc279c3498f554da7599deab2213b272e6 # v1.11.0
         with:
           app-id: ${{ secrets.OPERATIONS_ENGINEERING_PAT_APP_ID }}
           private-key: ${{ secrets.OE_PAT_APP_PRIVATE_KEY }}
