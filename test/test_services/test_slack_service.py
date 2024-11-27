@@ -3,7 +3,6 @@
 import unittest
 from datetime import datetime
 from unittest.mock import MagicMock, patch
-from slack_sdk.errors import SlackApiError
 
 from services.sentry_service import UsageStats
 from services.slack_service import SlackService

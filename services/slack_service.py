@@ -1,7 +1,6 @@
 # pylint: disable=C0411, R0917
 
 import logging
-import time
 from textwrap import dedent
 from urllib.parse import quote
 from slack_sdk import WebClient
