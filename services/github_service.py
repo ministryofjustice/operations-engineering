@@ -101,7 +101,7 @@ class GithubService:
         existing_users_in_team = self.__get_users_from_team(team_id)
 
         for user in all_users:
-            if user not in existing_users_in_team:
+            if user not in existing_users_in_team and user != None:
                 self.__add_user_to_team(user, team_id)
 
     @retries_github_rate_limit_exception_at_next_reset_once
