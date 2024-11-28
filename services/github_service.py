@@ -115,7 +115,7 @@ class GithubService:
         try:
             self.github_client_core_api.get_organization(self.organisation_name).get_team(team_id).add_membership(user)
         except GithubException as err:
-            print(f"Could not add {user.login} to team {team_id}: {err.message}")
+            print(f"Could not add {user.login} to team {team_id}: {err}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_repositories_from_team(self, team_id: int) -> list[Repository]:
