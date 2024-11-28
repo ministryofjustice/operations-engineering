@@ -8,7 +8,7 @@ from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, NamedUser, RateLimitExceededException,
-                    UnknownObjectException)
+                    UnknownObjectException, GithubException)
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
@@ -112,8 +112,10 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
         logging.info(f"Adding user {user.login} to team {team_id}")
-        self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id).add_membership(user)
+        try:
+            self.github_client_core_api.get_organization(self.organisation_name).get_team(team_id).add_membership(user)
+        except GithubException as err:
+            print(f"Could not add {user.login} to team {team_id}: {err.message}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_repositories_from_team(self, team_id: int) -> list[Repository]:
