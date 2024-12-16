@@ -10,9 +10,9 @@ on:
 
 
   jobs:
-  check--runners-cpu:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check CPU details
-      run: |
-        lscpu
+    check--runners-cpu:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Check CPU details
+          run: |
+            lscpu
