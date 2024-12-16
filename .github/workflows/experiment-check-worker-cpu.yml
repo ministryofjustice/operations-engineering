@@ -9,10 +9,10 @@ on:
   workflow_dispatch:
 
 
-  jobs:
-    check--runners-cpu:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Check CPU details
-          run: |
-            lscpu
+jobs:
+  check--runners-cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CPU details
+        run: |
+          lscpu
