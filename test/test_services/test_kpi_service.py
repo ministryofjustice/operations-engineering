@@ -8,28 +8,6 @@ TEST_BASE_URL = "test_base_url"
 
 
 @patch("services.kpi_service.requests")
-class TestKPIServiceTrackNumberOfRepositoriesWithStandardsLabel(unittest.TestCase):
-    def test_api_called(self, mock_requests: MagicMock):
-        KpiService(
-            TEST_BASE_URL, TEST_API_KEY
-        ).track_number_of_repositories_with_standards_label(1)
-
-        mock_requests.post.assert_has_calls(
-            [
-                call(
-                    url=f"{TEST_BASE_URL}/api/indicator/add",
-                    headers={
-                        "X-API-KEY": TEST_API_KEY,
-                        "Content-Type": "application/json",
-                    },
-                    timeout=10,
-                    json={"indicator": "REPOSITORIES_WITH_STANDARDS_LABEL", "count": 1},
-                )
-            ]
-        )
-
-
-@patch("services.kpi_service.requests")
 class TestKPIServiceTrackSentryTransactionsUsedForDay(unittest.TestCase):
     def test_api_called(self, mock_requests: MagicMock):
         KpiService(TEST_BASE_URL, TEST_API_KEY).track_sentry_transactions_used_for_day(

@@ -7,7 +7,8 @@ from time import gmtime, sleep
 from typing import Any, Callable
 
 from dateutil.relativedelta import relativedelta
-from github import (Github, RateLimitExceededException, NamedUser, UnknownObjectException)
+from github import (Github, NamedUser, RateLimitExceededException,
+                    UnknownObjectException, GithubException)
 from github.Organization import Organization
 from github.Repository import Repository
 from gql import Client, gql
@@ -110,9 +111,11 @@ class GithubService:
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __add_user_to_team(self, user: NamedUser, team_id: int) -> None:
-        logging.info(f"Adding user {user.name} to team {team_id}")
-        self.github_client_core_api.get_organization(
-            self.organisation_name).get_team(team_id).add_membership(user)
+        logging.info(f"Adding user {user.login} to team {team_id}")
+        try:
+            self.github_client_core_api.get_organization(self.organisation_name).get_team(team_id).add_membership(user)
+        except GithubException as err:
+            print(f"Could not add {user.login} to team {team_id}: {err}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_repositories_from_team(self, team_id: int) -> list[Repository]:
@@ -611,23 +614,6 @@ class GithubService:
         users = self.github_client_core_api.get_repo(
             f"{self.organisation_name}/{repository_name}").get_collaborators("outside") or []
         return [member.login.lower() for member in users]
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def set_standards(self, repository_name: str):
-        repo = self.github_client_core_api.get_repo(
-            f"{self.organisation_name}/{repository_name}")
-
-        repo.edit(has_issues=True)
-
-        branch = repo.get_branch("main")
-        current_protection = branch.get_protection()
-        branch.edit_protection(
-            contexts=current_protection.required_status_checks.contexts if current_protection.required_status_checks else [],
-            strict=current_protection.required_status_checks.strict if current_protection.required_status_checks else False,
-            enforce_admins=True,
-            required_approving_review_count=1,
-            dismiss_stale_reviews=True,
-        )
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_paginated_list_of_repositories_per_topic(self, topic: str, after_cursor: str | None,
@@ -1194,9 +1180,8 @@ class GithubService:
         if response.status_code == 200:
             logging.info("Successfully retrieved PAT list.")
             return response.json()
-        logging.error(
-            f"Failed to fetch PAT list: {response.status_code}, error: {response}")
-        return []
+
+        raise ValueError(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_all_enterprise_members(self) -> list:
