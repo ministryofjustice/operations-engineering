@@ -36,6 +36,7 @@ ALLOWED_BOT_USERS = [
     "slack-moj",
 ]
 
+
 @dataclass
 class DormantUser:
     name: str
@@ -49,6 +50,7 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
     active_users = cloudtrail_service.get_active_users_for_dormant_users_process()
 
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
+
 
 def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
@@ -70,6 +72,7 @@ def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
     return list(set(inactive_users_from_audit_log).difference(set(active_committers)))
 
+
 def get_active_users_from_auth0_log_group() -> list:
     """Operations Engineering, Cloud, Mod and Analytical Platforms all have thir own
     Auth0 tenants. All logs are collected in a single Cloudwatch log group.
@@ -80,6 +83,7 @@ def get_active_users_from_auth0_log_group() -> list:
 
     cloudwatch_service = CloudWatchService(cloudwatch_log_group)
     return cloudwatch_service.get_all_auth0_users_that_appear_in_tenants()
+
 
 def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> list:
     active_email_addresses = get_active_users_from_auth0_log_group()
@@ -92,6 +96,7 @@ def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> li
 
     return dormant_users_not_in_auth0
 
+
 def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org: GithubService) -> list[DormantUser]:
     dormant_users = [
         DormantUser(
@@ -103,6 +108,7 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
     ]
 
     return dormant_users
+
 
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
