@@ -1264,3 +1264,137 @@ class GithubService:
                 break
 
         return removed_users
+
+    def get_current_contributors_for_active_repos(self) -> list[dict[str, set[str]]]:
+        """
+        Returns a list of dictionaries containing the active repo name and its set of
+        contributors who are also in the org current users set. Output is sorted by
+        number of current contributors in descending order.
+        [
+          {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}},
+          {'repository': 'repo2', 'contributors': {'c3', 'c4'}}
+        ]
+        Repos with 0 contributors or 0 current contributors are dropped.
+        """
+
+        logins = self.get_org_members_login_names()
+        active_repos = [repo.get("name") for repo in self.fetch_all_repositories_in_org()]
+        number_of_repos = len(active_repos)
+        active_repos_and_current_contributors = []
+        count = 1
+        for repo_name in active_repos:
+            logging.info(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
+            repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
+            contributors = [contributor.login for contributor in repo.get_contributors()]
+            if contributors:
+                current_contributors = set(logins).intersection(set(contributors))
+                if current_contributors:
+                    active_repos_and_current_contributors.append(
+                        {"repository": repo_name, "contributors": current_contributors}
+                    )
+            count += 1
+
+        sorted_active_repos_and_current_contributors = sorted(
+            active_repos_and_current_contributors,
+            key=lambda d: len(d['contributors']),
+            reverse=True
+        )
+        return sorted_active_repos_and_current_contributors
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_repos_user_has_contributed_to(
+        self,
+        login: str,
+        repos_and_contributors: list[dict[str, set[str]]]
+    ) -> list[str]:
+        """
+        For a known GH user get the repos they have contributed to within org.
+        """
+        repos = [
+            repo_object.get("repository") for repo_object in repos_and_contributors if login in repo_object.get("contributors")
+        ]
+        return repos
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def user_has_commmits_since(
+        self,
+        login: str,
+        repos_and_contributors: list[dict[str, set[str]]],
+        since_datetime: datetime
+    ) -> bool:
+        """
+        Determine if a given user has made any commits to at least one of the repos they
+        have contributed to in the org since the given datetime.
+        """
+        repos = self.get_repos_user_has_contributed_to(
+            login=login,
+            repos_and_contributors=repos_and_contributors
+        )
+
+        for repo_name in repos:
+            repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
+            commits = repo.get_commits(
+                since=since_datetime,
+                author=login
+            )
+            if commits.totalCount > 0:
+                return True
+
+        return False
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_unlocked_unarchived_repos(
+        self,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated list of org unlocked unarchived repositories. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        return self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $organisation_name) {
+                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                        nodes {
+                            name
+                            isDisabled
+                        }
+
+                    }
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
+                               "after_cursor": after_cursor})
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_active_repositories(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a list of active (not locked,
+        not archived nor disabled) repositories in the organisation.
+
+        Returns:
+            list: A list of the organisation's active repositories.
+        """
+
+        repo_has_next_page = True
+        after_cursor = None
+        active_repositories = []
+        while repo_has_next_page:
+            data = self.get_paginated_list_of_unlocked_unarchived_repos(
+                after_cursor, self.GITHUB_GQL_MAX_PAGE_SIZE
+            )
+            if data["organization"]["repositories"]["nodes"] is not None:
+                for repo in data["organization"]["repositories"]["nodes"]:
+                    if repo["isDisabled"]:
+                        continue
+                    active_repositories.append(repo["name"])
+            repo_has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
+            after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
+
+        return active_repositories
