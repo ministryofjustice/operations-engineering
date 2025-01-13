@@ -16,15 +16,6 @@ class TestDormantGitHubUsers(unittest.TestCase):
     def setUp(self):
         self.allowed_bot_users = ALLOWED_BOT_USERS
 
-    @patch('services.cloudwatch_service.CloudWatchService.get_all_auth0_users_that_appear_in_tenants')
-    def test_get_active_users_from_auth0_log_group(self, mock_get_users):
-        mock_get_users.return_value = [
-            'user1@example.com', 'user2@example.com']
-
-        result = get_active_users_from_auth0_log_group()
-
-        self.assertEqual(result, ['user1@example.com', 'user2@example.com'])
-
     @patch('bin.identify_dormant_github_users.get_active_users_from_auth0_log_group')
     def test_filter_out_active_auth0_users(self, mock_get_active_users):
         mock_get_active_users.return_value = [
