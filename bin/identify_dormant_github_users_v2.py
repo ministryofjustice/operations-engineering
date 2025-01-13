@@ -58,7 +58,7 @@ def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
     for gh in gh_orgs:
         repos_and_current_contributors = gh.get_current_contributors_for_active_repos()
-        since_datetime=(datetime.now() - timedelta(days=90))
+        since_datetime = (datetime.now() - timedelta(days=90))
 
         for username in inactive_users_from_audit_log:
             if username not in active_committers:

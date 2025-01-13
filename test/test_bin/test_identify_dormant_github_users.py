@@ -1,15 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
-from bin.identify_dormant_github_users import (
-    ALLOWED_BOT_USERS, DormantUser, filter_out_active_auth0_users,
-    get_active_users_from_auth0_log_group)
+from bin.identify_dormant_github_users import (ALLOWED_BOT_USERS, DormantUser, filter_out_active_auth0_users)
 
 from bin.identify_dormant_github_users_v2 import get_inactive_users_from_data_lake_ignoring_bots_and_collaborators, identify_dormant_github_users
 
 from services.cloudtrail_service import CloudtrailService
-from services.github_service import GithubService
 
 class TestDormantGitHubUsers(unittest.TestCase):
 
@@ -51,14 +47,7 @@ class TestDormantGitHubUsers(unittest.TestCase):
     @patch('bin.identify_dormant_github_users_v2.map_usernames_to_emails')
     @patch('bin.identify_dormant_github_users_v2.get_inactive_users_from_data_lake_ignoring_bots_and_collaborators')
     @patch('os.environ')
-    def test_identify_dormant_github_users(self,
-        mock_env,
-        mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators,
-        mock_map_usernames_to_emails,
-        mock_filter_out_active_auth0_users,
-        mock_get_inactive_committers,
-        _mock_github_client_core_api
-    ):
+    def test_identify_dormant_github_users(self, mock_env, mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators, mock_map_usernames_to_emails, mock_filter_out_active_auth0_users, mock_get_inactive_committers, _mock_github_client_core_api):
         mock_env.get.side_effect = lambda k: 'mock_token' if k in ['GH_ADMIN_TOKEN'] else None
         mock_map_usernames_to_emails.return_value = [{"name": "user1", "email": "user1@gmail.com"}, {"name": "user2", "email": "user1@gmail.com"}, {"name": "user3", "email": "user1@gmail.com"}]
         mock_filter_out_active_auth0_users.return_value = ["user1", "user2"]
