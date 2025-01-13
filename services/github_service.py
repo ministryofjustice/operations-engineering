@@ -1283,7 +1283,7 @@ class GithubService:
         active_repos_and_current_contributors = []
         count = 1
         for repo_name in active_repos:
-            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
+            logging.info(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             contributors = [contributor.login for contributor in repo.get_contributors()]
             if contributors:
