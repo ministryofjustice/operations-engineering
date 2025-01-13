@@ -1271,19 +1271,22 @@ class GithubService:
         contributors who are also in the org current users set. Output is sorted by
         number of current contributors in descending order.
         [
-          {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}},
-          {'repository': 'repo2', 'contributors': {'c3', 'c4'}}
+            {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}},
+            {'repository': 'repo2', 'contributors': {'c3', 'c4'}}
         ]
         Repos with 0 contributors or 0 current contributors are dropped.
         """
 
-        logins = self.get_org_members_login_names()
-        active_repos = [repo.get("name") for repo in self.fetch_all_repositories_in_org()]
+        logins = [user.login for user in self.__get_all_users()]
+        active_repos = self.get_active_repositories()
         number_of_repos = len(active_repos)
+        print(f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories")
+
         active_repos_and_current_contributors = []
         count = 1
         for repo_name in active_repos:
-            logging.info(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
+            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
+
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             contributors = [contributor.login for contributor in repo.get_contributors()]
             if contributors:
