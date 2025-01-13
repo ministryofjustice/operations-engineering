@@ -41,7 +41,6 @@ class TestDormantGitHubUsers(unittest.TestCase):
 
     @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
     @patch("gql.Client.__new__", new=MagicMock)
-    @patch("services.github_service.Github")
     @patch('bin.identify_dormant_github_users_v2.get_inactive_committers')
     @patch('bin.identify_dormant_github_users_v2.filter_out_active_auth0_users')
     @patch('bin.identify_dormant_github_users_v2.map_usernames_to_emails')
