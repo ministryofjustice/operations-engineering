@@ -113,7 +113,7 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 
 def identify_dormant_github_users():
-    env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
+    env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
 
     gh_orgs = [
         GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
