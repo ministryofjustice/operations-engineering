@@ -120,15 +120,13 @@ def identify_dormant_github_users():
         GithubService(env.get("GH_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
-    # dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
+    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
 
-    # dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])
+    dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])
 
-    # dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
+    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
 
-    # dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
-
-    dormant_users_accoding_to_github_auth0_and_commits = ["test1", "test2", "test3"]
+    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
     SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_accoding_to_github_auth0_and_commits)
 
