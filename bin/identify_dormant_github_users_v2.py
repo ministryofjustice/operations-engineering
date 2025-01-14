@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from services.github_service import GithubService
 from services.cloudtrail_service import CloudtrailService
 from services.cloudwatch_service import CloudWatchService
+from services.slack_service import SlackService
 from utils.environment import EnvironmentVariables
 
 # These are the users that are deemed acceptable to be dormant.
@@ -112,7 +113,7 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 
 def identify_dormant_github_users():
-    env = EnvironmentVariables(["GH_ADMIN_TOKEN"])
+    env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
 
     gh_orgs = [
         GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
@@ -127,9 +128,7 @@ def identify_dormant_github_users():
 
     dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    print(dormant_users_accoding_to_github_auth0_and_commits)
-
-    print(len(dormant_users_accoding_to_github_auth0_and_commits))
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_accoding_to_github_auth0_and_commits)
 
 
 if __name__ == "__main__":
