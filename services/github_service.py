@@ -3,8 +3,10 @@
 import json
 from calendar import timegm
 from datetime import date, datetime, timedelta, timezone
-from time import gmtime, sleep
+from time import gmtime, sleep, time
 from typing import Any, Callable
+import concurrent.futures
+
 
 from dateutil.relativedelta import relativedelta
 from github import (Github, NamedUser, RateLimitExceededException,
@@ -1265,11 +1267,35 @@ class GithubService:
 
         return removed_users
 
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_current_contributors_for_repo(
+            self,
+            repo_name: str,
+            current_logins: list) -> dict[str, set[str]]:
+        """
+        Input:
+            repo_name: string
+            current_logins: list of logins for the GitHub org
+
+        Output:
+        Returns a dictionary containing the active repo name and its set of
+        contributors who are also in the org current users set.
+            {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}}
+        Returns None if repo has 0 contributors or 0 current contributors.
+        """
+        repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
+        contributors = [contributor.login for contributor in repo.get_contributors()]
+        if contributors:
+            current_contributors = set(current_logins).intersection(set(contributors))
+            if current_contributors:
+                return {"repository": repo_name, "contributors": current_contributors}
+
+    @retries_github_rate_limit_exception_at_next_reset_once
     def get_current_contributors_for_active_repos(self) -> list[dict[str, set[str]]]:
         """
-        Returns a list of dictionaries containing the active repo name and its set of
-        contributors who are also in the org current users set. Output is sorted by
-        number of current contributors in descending order.
+        Returns a sorted list of dictionaries containing the active repo name and
+        its set of contributors who are also in the org current users set. Output
+        is sorted by number of current contributors in descending order.
         [
             {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}},
             {'repository': 'repo2', 'contributors': {'c3', 'c4'}}
@@ -1277,25 +1303,29 @@ class GithubService:
         Repos with 0 contributors or 0 current contributors are dropped.
         """
 
-        logins = [user.login for user in self.__get_all_users()]
-        active_repos = self.get_active_repositories()
+        logins = [user.login for user in self.__get_all_users()] # ~20 seconds
+        active_repos = self.get_active_repositories() # ~30 secs
         number_of_repos = len(active_repos)
         print(f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories")
 
-        active_repos_and_current_contributors = []
-        count = 1
-        for repo_name in active_repos:
-            print(f"Getting current contributors to {self.organisation_name}/{repo_name}: repo {count} of {number_of_repos}")
+        active_repos_and_current_contributors = [] # ~100 seconds
 
-            repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
-            contributors = [contributor.login for contributor in repo.get_contributors()]
-            if contributors:
-                current_contributors = set(logins).intersection(set(contributors))
-                if current_contributors:
-                    active_repos_and_current_contributors.append(
-                        {"repository": repo_name, "contributors": current_contributors}
+        print(f"Getting current contributors for active repos in {self.organisation_name}")
+        threading_start = time()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for repo_name in active_repos:
+                futures.append(
+                    executor.submit(
+                        self.get_current_contributors_for_repo,
+                        repo_name=repo_name,
+                        current_logins=logins
                     )
-            count += 1
+                )
+            for future in concurrent.futures.as_completed(futures):
+                if future.result():
+                    active_repos_and_current_contributors.append(future.result())
+        print(f"Threaded time to get current contributors for active repos: {time() - threading_start}")
 
         sorted_active_repos_and_current_contributors = sorted(
             active_repos_and_current_contributors,
