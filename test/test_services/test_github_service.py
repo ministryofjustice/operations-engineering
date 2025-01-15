@@ -1803,6 +1803,7 @@ class TestGithubServiceGetCurrentContributorsForRepo(unittest.TestCase):
             repo_name="repo1",
             current_logins=self.current_member_logins
         )
+
         expected = {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}}
         self.assertEqual(response, expected)
 

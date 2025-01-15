@@ -1303,12 +1303,12 @@ class GithubService:
         Repos with 0 contributors or 0 current contributors are dropped.
         """
 
-        logins = [user.login for user in self.__get_all_users()] # ~20 seconds
-        active_repos = self.get_active_repositories() # ~30 secs
+        logins = [user.login for user in self.__get_all_users()]
+        active_repos = self.get_active_repositories()
         number_of_repos = len(active_repos)
         print(f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories")
 
-        active_repos_and_current_contributors = [] # ~100 seconds
+        active_repos_and_current_contributors = []
 
         print(f"Getting current contributors for active repos in {self.organisation_name}")
         threading_start = time()
