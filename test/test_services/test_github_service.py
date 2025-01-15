@@ -1797,7 +1797,7 @@ class TestGithubServiceGetCurrentContributorsForRepo(unittest.TestCase):
         github_service = GithubService("", ORGANISATION_NAME)
 
         mock_github_client_core_api.return_value.get_repo.side_effect = [
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"),MagicMock(login="c2"), MagicMock(login="c3")]))
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2"), MagicMock(login="c3")]))
         ]
         response = github_service.get_current_contributors_for_repo(
             repo_name="repo1",
@@ -1868,7 +1868,6 @@ class TestGithubServiceGetCurrentContributorsForActiveRepos(unittest.TestCase):
         expected = [{'repository': 'repo1', 'contributors': {'c1', 'c2'}}, {'repository': 'repo2', 'contributors': {'c2'}}]
         self.assertEqual(response, expected)
         self.assertCountEqual(response, expected)
-
 
     def test_drops_non_current_member_contributors(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
