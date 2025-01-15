@@ -1,9 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from bin.identify_dormant_github_users import (ALLOWED_BOT_USERS, DormantUser, filter_out_active_auth0_users)
-
-from bin.identify_dormant_github_users_v2 import get_inactive_users_from_data_lake_ignoring_bots_and_collaborators, identify_dormant_github_users
+from bin.identify_dormant_github_users_v2 import ALLOWED_BOT_USERS, get_inactive_users_from_data_lake_ignoring_bots_and_collaborators, identify_dormant_github_users
 
 from services.cloudtrail_service import CloudtrailService
 
@@ -11,25 +9,6 @@ class TestDormantGitHubUsers(unittest.TestCase):
 
     def setUp(self):
         self.allowed_bot_users = ALLOWED_BOT_USERS
-
-    @patch('bin.identify_dormant_github_users.get_active_users_from_auth0_log_group')
-    def test_filter_out_active_auth0_users(self, mock_get_active_users):
-        mock_get_active_users.return_value = [
-            'user1@example.com', 'user3@example.com']
-
-        dormant_users_according_to_github = [
-            DormantUser(name='user1', email='user1@example.com'),
-            DormantUser(name='user2', email='user2@example.com'),
-            DormantUser(name='user3', email='user3@example.com')
-        ]
-
-        result = filter_out_active_auth0_users(
-            dormant_users_according_to_github)
-
-        expected_result = [DormantUser(
-            name='user2', email='user2@example.com')]
-
-        self.assertIn(expected_result[0], result)
 
     @patch.object(CloudtrailService, "get_active_users_for_dormant_users_process")
     def test_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(self, mock_get_active_users_for_dormant_users_process):
