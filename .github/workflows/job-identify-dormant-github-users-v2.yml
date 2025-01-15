@@ -3,6 +3,8 @@ name: 🧪 Identify Dormant GitHub Users
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 1 * *"
 
 jobs:
   identify_dormant_github_users:
@@ -37,3 +39,4 @@ jobs:
       - run: pipenv run python3 -m bin.identify_dormant_github_users_v2
         env:
           GH_ADMIN_TOKEN: ${{ secrets.DORMANT_USERS_TEST_MULTIORG_ADMIN_GH_TOKEN }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
