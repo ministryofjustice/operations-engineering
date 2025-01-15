@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
-import time
 from dataclasses import dataclass
+import time
+from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 from services.github_service import GithubService
 from services.cloudtrail_service import CloudtrailService
@@ -52,7 +52,7 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
 
-def get_inactive_committers(gh_orgs, inactive_users_from_audit_log):
+def filter_out_inactive_committers(gh_orgs, inactive_users_from_audit_log):
 
     active_committers = []
 
@@ -125,11 +125,11 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
 
-    dormant_users_accoding_to_github_auth0_and_commits = get_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
+    dormant_users_according_to_github_auth0_and_commits = filter_out_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    print(dormant_users_accoding_to_github_auth0_and_commits)
+    print(dormant_users_according_to_github_auth0_and_commits)
 
-    print(len(dormant_users_accoding_to_github_auth0_and_commits))
+    print(len(dormant_users_according_to_github_auth0_and_commits))
 
 
 if __name__ == "__main__":
