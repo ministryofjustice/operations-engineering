@@ -113,11 +113,11 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 
 def identify_dormant_github_users():
-    env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN"])
+    env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
 
     gh_orgs = [
-        GithubService(env.get("GH_MOJ_TOKEN"), MINISTRY_OF_JUSTICE),
-        GithubService(env.get("GH_MOJAS_TOKEN"), MOJ_ANALYTICAL_SERVICES)
+        GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
+        GithubService(env.get("GH_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
