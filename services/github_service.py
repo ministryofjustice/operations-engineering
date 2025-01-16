@@ -1290,6 +1290,8 @@ class GithubService:
             if current_contributors:
                 return {"repository": repo_name, "contributors": current_contributors}
 
+        return None
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_current_contributors_for_active_repos(self) -> list[dict[str, set[str]]]:
         """
@@ -1311,7 +1313,6 @@ class GithubService:
         active_repos_and_current_contributors = []
 
         print(f"Getting current contributors for active repos in {self.organisation_name}")
-        threading_start = time()
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for repo_name in active_repos:
@@ -1325,7 +1326,6 @@ class GithubService:
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     active_repos_and_current_contributors.append(future.result())
-        print(f"Threaded time to get current contributors for active repos: {time() - threading_start}")
 
         sorted_active_repos_and_current_contributors = sorted(
             active_repos_and_current_contributors,
