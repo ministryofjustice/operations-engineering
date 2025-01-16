@@ -1789,67 +1789,155 @@ class TestUserRemovalEvents(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
+class TestGithubServiceGetCurrentContributorsForRepo(unittest.TestCase):
+    def setUp(self):
+        self.current_member_logins = ["c1", "c2", "c3", "c4"]
+
+    def test_returns_expected_current_contributors(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2"), MagicMock(login="c3")]))
+        ]
+        response = github_service.get_current_contributors_for_repo(
+            repo_name="repo1",
+            current_logins=self.current_member_logins
+        )
+
+        expected = {'repository': 'repo1', 'contributors': {'c1', 'c2', 'c3'}}
+        self.assertEqual(response, expected)
+
+    def test_drops_non_current_member_contributors(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2"), MagicMock(login="c5")]))
+        ]
+        response = github_service.get_current_contributors_for_repo(
+            repo_name="repo1",
+            current_logins=self.current_member_logins
+        )
+        expected = {'repository': 'repo1', 'contributors': {'c1', 'c2'}}
+        self.assertEqual(response, expected)
+
+    def test_handles_no_contributors(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[]))
+        ]
+        response = github_service.get_current_contributors_for_repo(
+            repo_name="repo1",
+            current_logins=self.current_member_logins
+        )
+        expected = None
+        self.assertEqual(response, expected)
+
+    def test_handles_no_current_contributors(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c7"), MagicMock(login="c8")]))
+        ]
+        response = github_service.get_current_contributors_for_repo(
+            repo_name="repo1",
+            current_logins=self.current_member_logins
+        )
+        expected = None
+        self.assertEqual(response, expected)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
 class TestGithubServiceGetCurrentContributorsForActiveRepos(unittest.TestCase):
     def setUp(self):
-        self.active_repos = ["repo1", "repo2", "repo3"]
+        self.active_repos = ["repo1", "repo2"]
+        self.current_members = [Mock(NamedUser, login="c1"), Mock(NamedUser, login="c2")]
 
-    def test_drops_non_member_contributors(self, mock_github_client_core_api):
+    def test_returns_current_contributors(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
         github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
 
-        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = [
-            Mock(NamedUser, login="c1"),
-            Mock(NamedUser, login="c2")
-        ]
-
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = self.current_members
         mock_github_client_core_api.return_value.get_repo.side_effect = [
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2"), MagicMock(login="c3")])),
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2"), MagicMock(login="c4")])),
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3"), MagicMock(login="c1")]))
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2")]))
         ]
         response = github_service.get_current_contributors_for_active_repos()
-        expected = [{'repository': 'repo1', 'contributors': {'c1', 'c2'}}, {'repository': 'repo2', 'contributors': {'c2'}}, {'repository': 'repo3', 'contributors': {'c1'}}]
+        expected = [{'repository': 'repo1', 'contributors': {'c1', 'c2'}}, {'repository': 'repo2', 'contributors': {'c2'}}]
         self.assertEqual(response, expected)
+        self.assertCountEqual(response, expected)
+
+    def test_drops_non_current_member_contributors(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
+
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = self.current_members
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c2"), MagicMock(login="c3")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2"), MagicMock(login="c4")]))
+        ]
+        response = github_service.get_current_contributors_for_active_repos()
+        expected = [{'repository': 'repo1', 'contributors': {'c1', 'c2'}}, {'repository': 'repo2', 'contributors': {'c2'}}]
+        self.assertEqual(response, expected)
+        self.assertCountEqual(response, expected)
 
     def test_returns_sorted_by_number_of_contributors_descending(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_active_repositories = MagicMock(
-            return_value=self.active_repos
-        )
+        github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
 
-        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = [
-            Mock(NamedUser, login="c1"),
-            Mock(NamedUser, login="c2")
-        ]
-
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = self.current_members
         mock_github_client_core_api.return_value.get_repo.side_effect = [
             MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c3")])),
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2"), MagicMock(login="c1")])),
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3")]))
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c2"), MagicMock(login="c1")]))
         ]
         response = github_service.get_current_contributors_for_active_repos()
         expected = [{'repository': 'repo2', 'contributors': {'c1', 'c2'}}, {'repository': 'repo1', 'contributors': {'c1'}}]
         self.assertEqual(response, expected)
+        self.assertCountEqual(response, expected)
 
     def test_drops_repos_with_zero_contributors(self, mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
-        github_service.get_active_repositories = MagicMock(
-            return_value=self.active_repos
-        )
+        github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
 
-        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = [
-            Mock(NamedUser, login="c1"),
-            Mock(NamedUser, login="c2")
-        ]
-
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = self.current_members
         mock_github_client_core_api.return_value.get_repo.side_effect = [
             MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c3")])),
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3"), MagicMock(login="c4")])),
-            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login=None)]))
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login=None)])),
         ]
         response = github_service.get_current_contributors_for_active_repos()
         expected = [{'repository': 'repo1', 'contributors': {'c1'}}]
         self.assertEqual(response, expected)
+        self.assertCountEqual(response, expected)
+
+    def test_drops_repos_with_zero_current_contributors(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
+
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = self.current_members
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c1"), MagicMock(login="c3")])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c3"), MagicMock(login="c4")])),
+        ]
+        response = github_service.get_current_contributors_for_active_repos()
+        expected = [{'repository': 'repo1', 'contributors': {'c1'}}]
+        self.assertEqual(response, expected)
+        self.assertCountEqual(response, expected)
+
+    def test_handles_none_response(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+        github_service.get_active_repositories = MagicMock(return_value=self.active_repos)
+
+        mock_github_client_core_api.return_value.get_organization.return_value.get_members.return_value = self.current_members
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login=None), MagicMock(login=None)])),
+            MagicMock(get_contributors=MagicMock(return_value=[MagicMock(login="c4"), MagicMock(login="c5")])),
+        ]
+        response = github_service.get_current_contributors_for_active_repos()
+        expected = []
+        self.assertEqual(response, expected)
+        self.assertCountEqual(response, expected)
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
