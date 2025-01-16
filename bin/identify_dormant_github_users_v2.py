@@ -44,10 +44,10 @@ class DormantUser:
     email: str | None
 
 
-def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list) -> list:
+def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_moderation_platform_infrastructure: bool) -> list:
     all_users = github_service.get_all_enterprise_members()
 
-    cloudtrail_service = CloudtrailService()
+    cloudtrail_service = CloudtrailService(use_moderation_platform_infrastructure)
     active_users = cloudtrail_service.get_active_users_for_dormant_users_process()
 
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
@@ -113,14 +113,15 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 
 def identify_dormant_github_users():
-    env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN"])
+    env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE"])
+    use_moderation_platform_infrastructure = True if env.get("USE_MP_INFRASTRUCTURE") == "true" else False
 
     gh_orgs = [
         GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
         GithubService(env.get("GH_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
-    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS)
+    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS, use_moderation_platform_infrastructure)
 
     dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])
 
@@ -128,7 +129,11 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github_auth0_and_commits = filter_out_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits)
+    if use_moderation_platform_infrastructure:
+        print("Dormant users according to Github, Auth0 and commits:")
+        print(dormant_users_according_to_github_auth0_and_commits)
+    else:
+        SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits)
 
 
 if __name__ == "__main__":

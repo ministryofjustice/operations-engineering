@@ -6,8 +6,14 @@ from botocore.exceptions import ClientError
 
 
 class CloudtrailService:
-    def __init__(self) -> None:
-        self.client = boto3.client("cloudtrail", region_name="eu-west-2")
+    def __init__(self, use_mp_infrastructure: bool) -> None:
+        if use_mp_infrastructure:
+            session = boto3.Session(
+                profile_name="operations_engineering_dev_query_cloudtrail"
+            )
+            self.client = session.client("cloudtrail", region_name="eu-west-2")
+        else:
+            self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
     def get_active_users_for_dormant_users_process(self):
         username_key = "eventData.useridentity.principalid"
@@ -22,16 +28,14 @@ class CloudtrailService:
         WHERE eventTime > '{period_cutoff}';
         """
 
-        query_id = self.client.start_query(
-            QueryStatement=query_string)["QueryId"]
+        query_id = self.client.start_query(QueryStatement=query_string)["QueryId"]
 
         return self.get_query_results(query_id)
 
     # pylint: disable=W0719
     def get_query_results(self, query_id):
         while True:
-            status = self.client.get_query_results(
-                QueryId=query_id)["QueryStatus"]
+            status = self.client.get_query_results(QueryId=query_id)["QueryStatus"]
             print(f"Query status: {status}")
             if status in ["FAILED", "CANCELLED", "TIMED_OUT"]:
                 raise ClientError(
@@ -48,10 +52,8 @@ class CloudtrailService:
             time.sleep(20)
 
     def extract_query_results(self, query_id):
-        response = self.client.get_query_results(
-            QueryId=query_id, MaxQueryResults=1000)
-        active_users = [list(row[0].values())[0]
-                        for row in response["QueryResultRows"]]
+        response = self.client.get_query_results(QueryId=query_id, MaxQueryResults=1000)
+        active_users = [list(row[0].values())[0] for row in response["QueryResultRows"]]
 
         if "NextToken" in response:
             next_token = response["NextToken"]
