@@ -3,7 +3,7 @@
 import json
 from calendar import timegm
 from datetime import date, datetime, timedelta, timezone
-from time import gmtime, sleep, time
+from time import gmtime, sleep
 from typing import Any, Callable
 import concurrent.futures
 
