@@ -4,11 +4,13 @@ name: 🧪 Identify Dormant GitHub Users
 on:
   workflow_dispatch:
     inputs:
-      use-modernisation-platform-infrastructure:
-        description: "Enter `true` Use Modernisation Platform Infrastructure (defaults to DSD Account)"
-        required: false
-        # default: "false" # Default to DSD Account
-        default: "true" # TODO: Remove this after testing on PR
+      use_modernisation_platform_infrastructure:
+        type: choice
+        description: "Select `true` to Use Modernisation Platform Infrastructure (defaults to DSD Infrastructure)"
+        options:
+          - "false"
+          - "true"
+        default: "false"
   schedule:
     - cron: "0 0 1 * *"
   pull_request:
@@ -29,8 +31,8 @@ jobs:
           role-arn: ${{secrets.AWS_GITHUB_DORMANT_USERS_ARN}}
           profile-name: auth0_logs_profile
 
-      - name: Setup Profile to Query CloudTrail Modernisation Platform Account `operations-engineering-dev`
-        if: inputs.use-modernisation-platform-infrastructure == 'true'
+      - name: Setup Profile to Query CloudTrail in Modernisation Platform Account `operations-engineering-dev`
+        if: inputs.use_modernisation_platform_infrastructure == 'true'
         uses: ministryofjustice/github-actions/setup-aws-profile@721b0f273fc8356611cb18b3dfc02074d59217da # v18.2.1
         with:
           role-arn: ${{secrets.AWS_MP_OPERATIONS_ENGINEERING_DEV_QUERY_CLOUDTRAIL_ROLE_ARN}}
@@ -56,4 +58,4 @@ jobs:
         env:
           GH_ADMIN_TOKEN: ${{ secrets.DORMANT_USERS_TEST_MULTIORG_ADMIN_GH_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-          USE_MP_INFRASTRUCTURE: ${{ inputs.use-modernisation-platform-infrastructure }}
+          USE_MP_INFRASTRUCTURE: ${{ inputs.use_modernisation_platform_infrastructure || 'true' }} # TODO: Remove else condition for PR run
