@@ -32,7 +32,6 @@ jobs:
           profile-name: auth0_logs_profile
 
       - name: Setup Profile to Query CloudTrail in Modernisation Platform Account `operations-engineering-dev`
-        if: inputs.use_modernisation_platform_infrastructure == 'true'
         uses: ministryofjustice/github-actions/setup-aws-profile@721b0f273fc8356611cb18b3dfc02074d59217da # v18.2.1
         with:
           role-arn: ${{secrets.AWS_MP_OPERATIONS_ENGINEERING_DEV_QUERY_CLOUDTRAIL_ROLE_ARN}}
