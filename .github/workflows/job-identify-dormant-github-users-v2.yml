@@ -3,6 +3,14 @@ name: 🧪 Identify Dormant GitHub Users
 
 on:
   workflow_dispatch:
+    inputs:
+      use_modernisation_platform_infrastructure:
+        type: choice
+        description: "Select `true` to Use Modernisation Platform Infrastructure (defaults to DSD Infrastructure)"
+        options:
+          - "false"
+          - "true"
+        default: "false"
   schedule:
     - cron: "0 0 1 * *"
 
@@ -19,6 +27,12 @@ jobs:
         with:
           role-arn: ${{secrets.AWS_GITHUB_DORMANT_USERS_ARN}}
           profile-name: auth0_logs_profile
+
+      - name: Setup Profile to Query CloudTrail in Modernisation Platform Account `operations-engineering-dev`
+        uses: ministryofjustice/github-actions/setup-aws-profile@721b0f273fc8356611cb18b3dfc02074d59217da # v18.2.1
+        with:
+          role-arn: ${{secrets.AWS_MP_OPERATIONS_ENGINEERING_DEV_QUERY_CLOUDTRAIL_ROLE_ARN}}
+          profile-name: operations_engineering_dev_query_cloudtrail
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@486457dc46e82b9a740ca0ef1dac6a38a3fc272d # v4.0.2
@@ -40,3 +54,4 @@ jobs:
         env:
           GH_ADMIN_TOKEN: ${{ secrets.DORMANT_USERS_TEST_MULTIORG_ADMIN_GH_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          USE_MP_INFRASTRUCTURE: ${{ inputs.use_modernisation_platform_infrastructure }}

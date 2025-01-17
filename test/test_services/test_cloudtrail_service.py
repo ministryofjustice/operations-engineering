@@ -10,7 +10,7 @@ class TestCloudtrailService(unittest.TestCase):
 
     @mock_aws
     def setUp(self):
-        self.cloudtrail_service = CloudtrailService()
+        self.cloudtrail_service = CloudtrailService(False)
         self.cloudtrail_service.client = boto3.client("cloudtrail", region_name="us-west-2")
 
     @freeze_time("2024-07-11 00:00:00")
@@ -26,7 +26,7 @@ class TestCloudtrailService(unittest.TestCase):
         WHERE eventTime > '2024-04-12 00:00:00';
         """
 
-        assert self.cloudtrail_service.get_active_users_for_dormant_users_process() == mock_active_users
+        assert self.cloudtrail_service.get_active_users_for_dormant_users_process(False) == mock_active_users
         self.cloudtrail_service.client.start_query.assert_called_once_with(QueryStatement=mock_query_string)
 
     @patch.object(CloudtrailService, "extract_query_results")
