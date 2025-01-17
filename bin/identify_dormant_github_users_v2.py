@@ -114,7 +114,7 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE"])
-    use_moderation_platform_infrastructure = True if env.get("USE_MP_INFRASTRUCTURE") == "true" else False
+    use_moderation_platform_infrastructure = env.get("USE_MP_INFRASTRUCTURE") == "true"
 
     print("Using moderation platform infrastructure:", use_moderation_platform_infrastructure)
     print("Env var valaue USE_MP_INFRASTRUCTURE:", env.get("USE_MP_INFRASTRUCTURE"))
