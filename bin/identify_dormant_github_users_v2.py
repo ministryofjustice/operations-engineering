@@ -48,7 +48,7 @@ def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_ser
     all_users = github_service.get_all_enterprise_members()
 
     cloudtrail_service = CloudtrailService(use_moderation_platform_infrastructure)
-    active_users = cloudtrail_service.get_active_users_for_dormant_users_process()
+    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(use_moderation_platform_infrastructure)
 
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
