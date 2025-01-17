@@ -13,9 +13,6 @@ on:
         default: "false"
   schedule:
     - cron: "0 0 1 * *"
-  pull_request:
-    branches:
-      - main
 
 jobs:
   identify_dormant_github_users:
@@ -57,4 +54,4 @@ jobs:
         env:
           GH_ADMIN_TOKEN: ${{ secrets.DORMANT_USERS_TEST_MULTIORG_ADMIN_GH_TOKEN }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-          USE_MP_INFRASTRUCTURE: ${{ inputs.use_modernisation_platform_infrastructure || 'true' }} # TODO: Remove else condition for PR run
+          USE_MP_INFRASTRUCTURE: ${{ inputs.use_modernisation_platform_infrastructure }}
