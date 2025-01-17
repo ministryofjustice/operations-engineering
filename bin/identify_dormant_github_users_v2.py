@@ -116,6 +116,11 @@ def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_ADMIN_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE"])
     use_moderation_platform_infrastructure = True if env.get("USE_MP_INFRASTRUCTURE") == "true" else False
 
+    print("Using moderation platform infrastructure:", use_moderation_platform_infrastructure)
+    print("Env var valaue USE_MP_INFRASTRUCTURE:", env.get("USE_MP_INFRASTRUCTURE"))
+
+    return
+
     gh_orgs = [
         GithubService(env.get("GH_ADMIN_TOKEN"), MINISTRY_OF_JUSTICE),
         GithubService(env.get("GH_ADMIN_TOKEN"), MOJ_ANALYTICAL_SERVICES)
