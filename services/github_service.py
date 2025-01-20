@@ -109,6 +109,7 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_all_users(self) -> list:
         logging.info("Getting all organization members")
+        logging.info(self.github_client_core_api.get_rate_limit())
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -1304,7 +1305,6 @@ class GithubService:
         ]
         Repos with 0 contributors or 0 current contributors are dropped.
         """
-
         logins = [user.login for user in self.__get_all_users()]
         active_repos = self.get_active_repositories()
         number_of_repos = len(active_repos)
@@ -1315,6 +1315,7 @@ class GithubService:
         active_repos_and_current_contributors = []
 
         logging.info(f"Getting current contributors for active repos in {self.organisation_name}")
+        logging.info(f"Pre getting current contributors: {self.github_client_core_api.get_rate_limit()}")
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for repo_name in active_repos:
@@ -1325,8 +1326,6 @@ class GithubService:
                         current_logins=logins
                     )
                 )
-                rate_limits = self.github_client_core_api.get_rate_limit()
-                logging.info(f"Current core rate limit: {rate_limits}")
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     active_repos_and_current_contributors.append(future.result())
@@ -1336,6 +1335,7 @@ class GithubService:
             key=lambda d: len(d['contributors']),
             reverse=True
         )
+        logging.info(f"Post getting current contributors: {self.github_client_core_api.get_rate_limit()}")
         return sorted_active_repos_and_current_contributors
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -1388,8 +1388,6 @@ class GithubService:
         logging.info(
             f"Getting paginated list of org unlocked unarchived repositories. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
-        rate_limits = self.github_client_core_api.get_rate_limit()
-        logging.info(f"Current core rate limit: {rate_limits}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
