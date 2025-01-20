@@ -1325,6 +1325,8 @@ class GithubService:
                         current_logins=logins
                     )
                 )
+                rate_limits = self.github_client_core_api.get_rate_limit()
+                logging.info(f"Current core rate limit: {rate_limits}")
             for future in concurrent.futures.as_completed(futures):
                 if future.result():
                     active_repos_and_current_contributors.append(future.result())
@@ -1386,6 +1388,8 @@ class GithubService:
         logging.info(
             f"Getting paginated list of org unlocked unarchived repositories. Page size {page_size}, after cursor {bool(after_cursor)}"
         )
+        rate_limits = self.github_client_core_api.get_rate_limit()
+        logging.info(f"Current core rate limit: {rate_limits}")
         if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
             raise ValueError(
                 f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
