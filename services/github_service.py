@@ -1308,11 +1308,13 @@ class GithubService:
         logins = [user.login for user in self.__get_all_users()]
         active_repos = self.get_active_repositories()
         number_of_repos = len(active_repos)
-        print(f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories")
+        logging.info(
+            f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories"
+        )
 
         active_repos_and_current_contributors = []
 
-        print(f"Getting current contributors for active repos in {self.organisation_name}")
+        logging.info(f"Getting current contributors for active repos in {self.organisation_name}")
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for repo_name in active_repos:
