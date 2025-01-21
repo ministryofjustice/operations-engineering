@@ -6,11 +6,11 @@ on:
     inputs:
       use_modernisation_platform_infrastructure:
         type: choice
-        description: "Select `true` to Use Modernisation Platform Infrastructure (defaults to DSD Infrastructure)"
+        description: "Select `false` to Use DSD Infrastructure (defaults to Modernisation Platform Infrastructure)"
         options:
           - "false"
           - "true"
-        default: "false"
+        default: "true"
   schedule:
     - cron: "0 0 1 * *"
 
