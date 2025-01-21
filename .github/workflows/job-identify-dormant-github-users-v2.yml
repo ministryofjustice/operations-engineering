@@ -52,6 +52,7 @@ jobs:
 
       - run: pipenv run python3 -m bin.identify_dormant_github_users_v2
         env:
-          GH_ADMIN_TOKEN: ${{ secrets.DORMANT_USERS_TEST_MULTIORG_ADMIN_GH_TOKEN }}
+          GH_MOJ_TOKEN: ${{ secrets.GH_MOJ_DORMANT_USERS_READ }}
+          GH_MOJAS_TOKEN: ${{ secrets.GH_MOJAS_DORMANT_USERS_READ }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
           USE_MP_INFRASTRUCTURE: ${{ inputs.use_modernisation_platform_infrastructure }}

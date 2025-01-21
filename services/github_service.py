@@ -109,6 +109,7 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def __get_all_users(self) -> list:
         logging.info("Getting all organization members")
+        logging.info(self.github_client_core_api.get_rate_limit())
         return self.github_client_core_api.get_organization(self.organisation_name).get_members() or []
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -1304,15 +1305,17 @@ class GithubService:
         ]
         Repos with 0 contributors or 0 current contributors are dropped.
         """
-
         logins = [user.login for user in self.__get_all_users()]
         active_repos = self.get_active_repositories()
         number_of_repos = len(active_repos)
-        print(f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories")
+        logging.info(
+            f"Org: {self.organisation_name} has {len(logins)} members and {number_of_repos} active repositories"
+        )
 
         active_repos_and_current_contributors = []
 
-        print(f"Getting current contributors for active repos in {self.organisation_name}")
+        logging.info(f"Getting current contributors for active repos in {self.organisation_name}")
+        logging.info(f"Pre getting current contributors: {self.github_client_core_api.get_rate_limit()}")
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for repo_name in active_repos:
@@ -1332,6 +1335,7 @@ class GithubService:
             key=lambda d: len(d['contributors']),
             reverse=True
         )
+        logging.info(f"Post getting current contributors: {self.github_client_core_api.get_rate_limit()}")
         return sorted_active_repos_and_current_contributors
 
     @retries_github_rate_limit_exception_at_next_reset_once
