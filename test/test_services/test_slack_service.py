@@ -345,21 +345,6 @@ class TestSlackService(unittest.TestCase):
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
 
-    def test_send_low_gandi_funds_alert(self):
-        remaining_funds = 100
-        threshold = 500
-        expected_message = (
-            f"*Low Gandi Funds Remaining*\n\n"
-            f":warning: We currently have £{remaining_funds} left out of £{threshold}\n\n"
-            f"Please read the following Runbook for next steps:"
-            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/certificates/manual-ssl-certificate-processes.html#regenerating-certificates"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_low_gandi_funds_alert(remaining_funds, threshold)
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
     def test_send_unknown_user_alert_to_operations_engineering(self):
         users = ["user1", "user2"]
         expected_message = (

@@ -156,16 +156,6 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_low_gandi_funds_alert(self, remaining_funds, threshold):
-        message = (
-            f"*Low Gandi Funds Remaining*\n\n"
-            f":warning: We currently have £{remaining_funds} left out of £{threshold}\n\n"
-            f"Please read the following Runbook for next steps:"
-            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/certificates/manual-ssl-certificate-processes.html#regenerating-certificates"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
     def send_unknown_user_alert_to_operations_engineering(self, users: list):
         message = (
             f"*Dormant Users Automation*\n\n"

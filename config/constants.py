@@ -1,5 +1,4 @@
 # class Constants:
-GANDI_FUND_THRESHOLD = 500
 GITHUB_LICENSE_THRESHOLD = 20
 MINISTRY_OF_JUSTICE = "ministryofjustice"
 MOJ_ANALYTICAL_SERVICES = "moj-analytical-services"

@@ -8,19 +8,6 @@ class GandiService:
         self.url = "https://api.gandi.net/" + url_extension
         self.params = {'per_page': 1000}
 
-    def get_current_account_balance_from_org(self, org_id):
-        try:
-            response = requests.get(
-                url=self.url + org_id, headers=self.headers, timeout=60)
-            response.raise_for_status()
-            return float(response.json()['prepaid']['amount'])
-        except requests.exceptions.HTTPError as authentication_error:
-            raise requests.exceptions.HTTPError(
-                f"You may need to export your Gandi API key:\n {authentication_error}") from authentication_error
-        except TypeError as api_key_error:
-            raise TypeError(
-                f"Gandi API key does not exist or is in the wrong format:\n {api_key_error}") from api_key_error
-
     def _get_email_address_of_domain_owners(self, domain_name, email_list):
         domain_name_to_check = self._remove_suffix_if_present(domain_name)
         if email_list[domain_name_to_check]['external_cname']:
