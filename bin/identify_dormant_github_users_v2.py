@@ -116,7 +116,7 @@ def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE"])
     use_modernisation_platform_infrastructure = env.get("USE_MP_INFRASTRUCTURE") != "false"
 
-    print("Using moderation platform infrastructure:", use_modernisation_platform_infrastructure)
+    print("Using modernisation platform infrastructure:", use_modernisation_platform_infrastructure)
     print("Env var valaue USE_MP_INFRASTRUCTURE:", env.get("USE_MP_INFRASTRUCTURE"))
 
     gh_orgs = [
