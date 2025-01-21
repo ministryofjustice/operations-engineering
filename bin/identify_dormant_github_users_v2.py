@@ -44,11 +44,11 @@ class DormantUser:
     email: str | None
 
 
-def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_moderation_platform_infrastructure: bool) -> list:
+def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_modernisation_platform_infrastructure: bool) -> list:
     all_users = github_service.get_all_enterprise_members()
 
-    cloudtrail_service = CloudtrailService(use_moderation_platform_infrastructure)
-    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(use_moderation_platform_infrastructure)
+    cloudtrail_service = CloudtrailService(use_modernisation_platform_infrastructure)
+    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(use_modernisation_platform_infrastructure)
 
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
@@ -114,9 +114,9 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 def identify_dormant_github_users():
     env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE"])
-    use_moderation_platform_infrastructure = env.get("USE_MP_INFRASTRUCTURE") == "true"
+    use_modernisation_platform_infrastructure = env.get("USE_MP_INFRASTRUCTURE") != "false"
 
-    print("Using moderation platform infrastructure:", use_moderation_platform_infrastructure)
+    print("Using moderation platform infrastructure:", use_modernisation_platform_infrastructure)
     print("Env var valaue USE_MP_INFRASTRUCTURE:", env.get("USE_MP_INFRASTRUCTURE"))
 
     gh_orgs = [
@@ -124,7 +124,7 @@ def identify_dormant_github_users():
         GithubService(env.get("GH_MOJAS_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
-    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS, use_moderation_platform_infrastructure)
+    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS, use_modernisation_platform_infrastructure)
 
     dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])
 
