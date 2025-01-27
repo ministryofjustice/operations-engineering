@@ -23,11 +23,6 @@ jobs:
         env:
           ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
           GITHUB_ORGANIZATION_NAME: ministryofjustice
-      - name: Remove moj-analytical-services stale outside collaborators
-        run: pipenv run python -m bin.remove_stale_outside_collaborators
-        env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.OPS_ENG_GENERAL_ADMIN_BOT_PAT }}
-          GITHUB_ORGANIZATION_NAME: moj-analytical-services
       - name: Report failure to Slack
         if: always()
         uses: ravsamhq/notify-slack-action@be814b201e233b2dc673608aa46e5447c8ab13f2 # v2.5.0
