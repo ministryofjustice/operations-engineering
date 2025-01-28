@@ -132,7 +132,10 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github_auth0_and_commits = filter_out_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
 
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits)
+    print(dormant_users_according_to_github_auth0_and_commits)
+    print(len(dormant_users_according_to_github_auth0_and_commits))
+
+    # SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits)
 
 
 if __name__ == "__main__":
