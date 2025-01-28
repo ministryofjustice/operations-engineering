@@ -65,7 +65,7 @@ def filter_out_inactive_committers(gh_orgs, inactive_users_from_audit_log):
             commits = False
             if username not in active_committers:
                 commits = gh.user_has_commmits_since(
-                    login=username.lower(),
+                    username=username,
                     repos_and_contributors=repos_and_current_contributors,
                     since_datetime=since_datetime
                 )

@@ -1341,21 +1341,21 @@ class GithubService:
     @retries_github_rate_limit_exception_at_next_reset_once
     def get_repos_user_has_contributed_to(
         self,
-        login: str,
+        username: str,
         repos_and_contributors: list[dict[str, set[str]]]
     ) -> list[str]:
         """
         For a known GH user get the repos they have contributed to within org.
         """
         repos = [
-            repo_object.get("repository") for repo_object in repos_and_contributors if login in repo_object.get("contributors")
+            repo_object.get("repository") for repo_object in repos_and_contributors if username in repo_object.get("contributors")
         ]
         return repos
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def user_has_commmits_since(
         self,
-        login: str,
+        username: str,
         repos_and_contributors: list[dict[str, set[str]]],
         since_datetime: datetime
     ) -> bool:
@@ -1364,7 +1364,7 @@ class GithubService:
         have contributed to in the org since the given datetime.
         """
         repos = self.get_repos_user_has_contributed_to(
-            login=login,
+            username=username,
             repos_and_contributors=repos_and_contributors
         )
 
@@ -1372,7 +1372,7 @@ class GithubService:
             repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
             commits = repo.get_commits(
                 since=since_datetime,
-                author=login
+                author=username.lower()
             )
             if commits.totalCount > 0:
                 return True
