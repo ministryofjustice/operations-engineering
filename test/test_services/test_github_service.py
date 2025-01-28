@@ -1947,7 +1947,7 @@ class TestGithubServiceGetReposUserHasContributedTo(unittest.TestCase):
     def test_returns_expected_repos(self):
         github_service = GithubService("", ORGANISATION_NAME)
         repos = github_service.get_repos_user_has_contributed_to(
-            login="c1",
+            username="c1",
             repos_and_contributors=[
                 {'repository': 'repo1', 'contributors': {'c1', 'c2'}},
                 {'repository': 'repo2', 'contributors': {'c2', 'c3'}},
@@ -1959,7 +1959,7 @@ class TestGithubServiceGetReposUserHasContributedTo(unittest.TestCase):
     def test_no_repos_contributed_to_returns_empty_list(self):
         github_service = GithubService("", ORGANISATION_NAME)
         repos = github_service.get_repos_user_has_contributed_to(
-            login="c5",
+            username="c5",
             repos_and_contributors=[
                 {'repository': 'repo1', 'contributors': {'c1', 'c2'}},
                 {'repository': 'repo2', 'contributors': {'c2', 'c3'}},
@@ -1991,7 +1991,7 @@ class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
             MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=20))),
         ]
         response = github_service.user_has_commmits_since(
-            login="c1",
+            username="c1",
             repos_and_contributors=self.repos_and_contributors,
             since_datetime=self.since_datetime
         )
@@ -2007,7 +2007,7 @@ class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
             MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=0))),
         ]
         response = github_service.user_has_commmits_since(
-            login="c2",
+            username="c2",
             repos_and_contributors=self.repos_and_contributors,
             since_datetime=self.since_datetime
         )
@@ -2020,7 +2020,7 @@ class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
         )
         mock_github_client_core_api.return_value.get_repo.side_effect = []
         response = github_service.user_has_commmits_since(
-            login="c5",
+            username="c5",
             repos_and_contributors=self.repos_and_contributors,
             since_datetime=self.since_datetime
         )
