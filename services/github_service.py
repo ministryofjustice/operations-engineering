@@ -1116,7 +1116,7 @@ class GithubService:
         org = self.github_client_core_api.get_organization(org_name)
         all_repos = org.get_repos(type="all")
         private_internal_repos = [repo.name for repo in all_repos if not repo.archived and (
-            repo.visibility=="internal" or repo.visibility=="private")]
+            repo.visibility == "internal" or repo.visibility == "private")]
 
         return private_internal_repos
 
@@ -1167,14 +1167,14 @@ class GithubService:
     def calculate_total_minutes_enterprise(self):
 
         organisations = self.get_all_organisations_in_enterprise()
-        enterprise_billable_repos=[]
+        enterprise_billable_repos = []
         for org in organisations: 
             org_repos = self.get_all_private_internal_repos_names(org)
             enterprise_billable_repos.extend(org_repos)
 
         gha_minutes_total = 0.0
         if enterprise_billable_repos:
-            current_billing_month =  datetime.now().month
+            current_billing_month = datetime.now().month
             billing_data = self.get_current_month_gha_minutes_for_enterprise(current_billing_month)
             gha_minutes_total = sum(
                 item['quantity']

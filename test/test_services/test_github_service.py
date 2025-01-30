@@ -1614,7 +1614,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
     def test_get_all_private_internal_repos_names(self,  _mock_github_client_rest_api, mock_github_client_core_api): 
 
-        def create_mock_repo(name: str, archived:bool, visibility: str, ):
+        def create_mock_repo(name: str, archived: bool, visibility: str, ):
             mock_repo = MagicMock()
             mock_repo.name = name
             mock_repo.visibility = visibility
@@ -1635,9 +1635,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_org.get_repos.return_value = mock_repos
         repos = github_service.get_all_private_internal_repos_names("test_org")
 
-   
         self.assertEqual(repos, ["repo1", "repo2"])
-
 
     @patch.object(GithubService, "get_all_organisations_in_enterprise")
     @patch.object(GithubService, "get_all_private_internal_repos_names")
@@ -1659,17 +1657,17 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_datetime.now.return_value = datetime(2025, 1, 29)
         mock_get_current_month_gha_minutes_for_enterprise.return_value = {
             "usageItems": [
-                { "date": "2025-01-06T15:15:47Z", "product": "actions",
+                {"date": "2025-01-06T15:15:47Z", "product": "actions",
                  "sku": "Actions Linux", "quantity": 100,
                  "unitType": "Minutes", "pricePerUnit": 0.008,
                  "grossAmount": 0.8, "discountAmount": 0, "netAmount": 0.8,
                  "organizationName": "test_org1", "repositoryName": "repo1"},
-                { "date": "'2025-01-06T15:18:44Z'", "product": "actions",
+                {"date": "'2025-01-06T15:18:44Z'", "product": "actions",
                  "sku": "Actions Linux", "quantity": 35,
                  "unitType": "Minutes", "pricePerUnit": 0.008,
                  "grossAmount": 0.8, "discountAmount": 0, "netAmount": 0.8,
                  "organizationName": "test_org1", "repositoryName": "repo2"},
-                { "date": "'2025-01-06T15:20:44Z'", "product": "actions",
+                {"date": "'2025-01-06T15:20:44Z'", "product": "actions",
                  "sku": "Actions Linux", "quantity": 50,
                  "unitType": "Minutes", "pricePerUnit": 0.008,
                  "grossAmount": 0.8, "discountAmount": 0, "netAmount": 0.8,
