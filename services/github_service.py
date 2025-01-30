@@ -1168,7 +1168,7 @@ class GithubService:
 
         organisations = self.get_all_organisations_in_enterprise()
         enterprise_billable_repos = []
-        for org in organisations: 
+        for org in organisations:
             org_repos = self.get_all_private_internal_repos_names(org)
             enterprise_billable_repos.extend(org_repos)
 

@@ -1612,7 +1612,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         assert not mock_modify_gha_minutes_quota_threshold.called
 
-    def test_get_all_private_internal_repos_names(self,  _mock_github_client_rest_api, mock_github_client_core_api): 
+    def test_get_all_private_internal_repos_names(self,  _mock_github_client_rest_api, mock_github_client_core_api):
 
         def create_mock_repo(name: str, archived: bool, visibility: str, ):
             mock_repo = MagicMock()
@@ -1651,8 +1651,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         mock_get_all_organisations_in_enterprise.return_value = ['test_org1', 'test_org2']
         mock_repos = {
-        "test_org1": ["repo1", "repo2"],
-        "test_org2": ["repo3"]}
+            "test_org1": ["repo1", "repo2"],
+            "test_org2": ["repo3"]}
         mock_get_all_private_internal_repos_names.side_effect = lambda org: mock_repos[org]
         mock_datetime.now.return_value = datetime(2025, 1, 29)
         mock_get_current_month_gha_minutes_for_enterprise.return_value = {
