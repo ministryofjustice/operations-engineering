@@ -32,28 +32,24 @@ class TestFetchGithubActionsQuota(unittest.TestCase):
     @patch("gql.Client.__new__", new=MagicMock)
     @patch("github.Github.__new__", new=MagicMock)
     @patch("bin.fetch_github_actions_quota.get_environment_variables")
-    @patch.object(GithubService, "get_all_organisations_in_enterprise")
-    @patch.object(GithubService, "calculate_total_minutes_used")
+    @patch.object(GithubService, "calculate_total_minutes_enterprise")
     @patch.object(KpiService, "track_enterprise_github_actions_quota_usage")
     def test_fetch_gha_quota(
         self,
         mock_track_enterprise_github_actions_quota_usage,
-        mock_calculate_total_minutes_used,
-        mock_get_all_organisations_in_enterprise,
+        mock_calculate_total_minutes_enterprise,
         mock_get_environment_variables
     ):
         # Mock services
         mock_get_environment_variables.return_value = "token_mock"
-        mock_get_all_organisations_in_enterprise.return_value = ['org1', 'org2']
-        mock_calculate_total_minutes_used.return_value = 3456778
+        mock_calculate_total_minutes_enterprise.return_value = 3456778
 
         # Run script
         fetch_gha_quota()
 
         # Assert
         mock_get_environment_variables.assert_called_once()
-        mock_get_all_organisations_in_enterprise.assert_called_once()
-        mock_calculate_total_minutes_used.assert_called_once_with(['org1', 'org2'])
+        mock_calculate_total_minutes_enterprise.assert_called_once()
         mock_track_enterprise_github_actions_quota_usage.assert_called_once_with(3456778)
 
 

@@ -1108,6 +1108,35 @@ class GithubService:
 
         return response.json()
 
+    def get_all_private_internal_repos_names(self, org_name: str):
+
+        logging.info(
+            f"Getting all private and internal repos used for organization {org_name}")
+        private_internal_repos = []
+        org = self.github_client_core_api.get_organization(org_name)
+        all_repos = org.get_repos(type="all")
+        private_internal_repos = [
+            repo.name for repo in all_repos if not repo.archived and repo.visibility in (
+                'internal', 'private')]
+
+        return private_internal_repos
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_current_month_gha_minutes_for_enterprise(self, month) -> int:
+
+        logging.info(
+            f"Getting usage report for current billing month for the enterprise {self.enterprise_name}")
+
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
+
+        response = self.github_client_rest_api.get(
+            f"https://api.github.com/enterprises/{self.enterprise_name}/settings/billing/usage?month={month}", headers=headers)
+
+        return response.json()
+
     @retries_github_rate_limit_exception_at_next_reset_once
     def modify_gha_minutes_quota_threshold(self, new_threshold):
         logging.info(f"Changing the alerting threshold to {new_threshold}%")
@@ -1136,21 +1165,32 @@ class GithubService:
             self.modify_gha_minutes_quota_threshold(base_alerting_threshold)
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def calculate_total_minutes_used(self, organisations):
-        total = 0
+    def calculate_total_minutes_enterprise(self):
 
+        organisations = self.get_all_organisations_in_enterprise()
+        enterprise_billable_repos = []
         for org in organisations:
-            billing_data = self.get_gha_minutes_used_for_organisation(org)
-            minutes_used = billing_data["total_minutes_used"]
-            total += minutes_used
+            org_repos = self.get_all_private_internal_repos_names(org)
+            enterprise_billable_repos.extend(org_repos)
 
-        return total
+        gha_minutes_total = 0.0
+        if enterprise_billable_repos:
+            current_billing_month = datetime.now().month
+            billing_data = self.get_current_month_gha_minutes_for_enterprise(current_billing_month)
+            gha_minutes_total = sum(
+                item['quantity']
+                for item in billing_data.get('usageItems')
+                if item.get('product') == 'actions'
+                and item.get('unitType') == 'Minutes'
+                and item.get('repositoryName') in enterprise_billable_repos
+            )
+
+        return gha_minutes_total
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def check_if_gha_minutes_quota_is_low(self):
-        organisations = self.get_all_organisations_in_enterprise()
 
-        total_minutes_used = self.calculate_total_minutes_used(organisations)
+        total_minutes_used = self.calculate_total_minutes_enterprise()
 
         print(f"Total minutes used: {total_minutes_used}")
 

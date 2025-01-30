@@ -18,10 +18,7 @@ def fetch_gha_quota():
     github_token = get_environment_variables()
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
 
-    # Get all organisations
-    organisations = github_service.get_all_organisations_in_enterprise()
-    # Get total quota usage
-    total_minutes_used = github_service.calculate_total_minutes_used(organisations)
+    total_minutes_used = github_service.calculate_total_minutes_enterprise()
 
     # Save metric in KPI dashboard db
     KpiService(os.getenv("KPI_DASHBOARD_URL"), os.getenv("KPI_DASHBOARD_API_KEY")).track_enterprise_github_actions_quota_usage(total_minutes_used)
