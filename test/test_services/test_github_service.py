@@ -1613,18 +1613,18 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         assert not mock_modify_gha_minutes_quota_threshold.called
 
     def test_get_all_private_internal_repos_names(self,  _mock_github_client_rest_api, mock_github_client_core_api): 
-        
-        def create_mock_repo(name:str, archived:bool, visibility:str, ):
+
+        def create_mock_repo(name: str, archived:bool, visibility: str, ):
             mock_repo = MagicMock()
-            mock_repo.name=name
-            mock_repo.visibility=visibility
+            mock_repo.name = name
+            mock_repo.visibility = visibility
             mock_repo.archived = archived
-            
+
             return mock_repo
-            
+
         github_service = GithubService("", ORGANISATION_NAME)
         mock_org = MagicMock()
-        
+
         mock_repos = [
             create_mock_repo(name="repo1", archived=False, visibility="internal"),
             create_mock_repo(name="repo2", archived=False, visibility="private"),
@@ -1634,8 +1634,8 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         mock_github_client_core_api.return_value.get_organization.return_value = mock_org
         mock_org.get_repos.return_value = mock_repos
         repos = github_service.get_all_private_internal_repos_names("test_org")
-        
-        
+
+   
         self.assertEqual(repos, ["repo1", "repo2"])
 
 
@@ -1657,7 +1657,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         "test_org2": ["repo3"]}
         mock_get_all_private_internal_repos_names.side_effect = lambda org: mock_repos[org]
         mock_datetime.now.return_value = datetime(2025, 1, 29)
-        mock_get_current_month_gha_minutes_for_enterprise.return_value ={
+        mock_get_current_month_gha_minutes_for_enterprise.return_value = {
             "usageItems": [
                 { "date": "2025-01-06T15:15:47Z", "product": "actions",
                  "sku": "Actions Linux", "quantity": 100,
@@ -1713,7 +1713,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
         _mock_github_client_core_api
     ):
         github_service = GithubService("", ORGANISATION_NAME)
-        
+
         mock_calculate_total_minutes_enterprise.return_value = 5000
         mock_get_repository_variable.side_effect = self._mock_repository_variable
 

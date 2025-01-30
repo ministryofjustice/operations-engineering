@@ -17,7 +17,7 @@ def get_environment_variables() -> str:
 def fetch_gha_quota():
     github_token = get_environment_variables()
     github_service = GithubService(github_token, MINISTRY_OF_JUSTICE, ENTERPRISE)
-    
+
     total_minutes_used = github_service.calculate_total_minutes_enterprise()
 
     # Save metric in KPI dashboard db
