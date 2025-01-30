@@ -1115,8 +1115,9 @@ class GithubService:
         private_internal_repos = []
         org = self.github_client_core_api.get_organization(org_name)
         all_repos = org.get_repos(type="all")
-        private_internal_repos = [repo.name for repo in all_repos if not repo.archived and (
-            repo.visibility == "internal" or repo.visibility == "private")]
+        private_internal_repos = [
+            repo.name for repo in all_repos if not repo.archived and repo.visibility in (
+                'internal', 'private')]
 
         return private_internal_repos
 
