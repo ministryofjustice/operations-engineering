@@ -1612,24 +1612,79 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         assert not mock_modify_gha_minutes_quota_threshold.called
 
-    @patch.object(GithubService, "get_gha_minutes_used_for_organisation")
-    def test_calculate_total_minutes_used(self, mock_get_gha_minutes_used_for_organisation, _mock_github_client_rest_api, _mock_github_client_core_api):
+    def test_get_all_private_internal_repos_names(self,  _mock_github_client_rest_api, mock_github_client_core_api): 
+        
+        def create_mock_repo(name:str, archived:bool, visibility:str, ):
+            mock_repo = MagicMock()
+            mock_repo.name=name
+            mock_repo.visibility=visibility
+            mock_repo.archived = archived
+            
+            return mock_repo
+            
+        github_service = GithubService("", ORGANISATION_NAME)
+        mock_org = MagicMock()
+        
+        mock_repos = [
+            create_mock_repo(name="repo1", archived=False, visibility="internal"),
+            create_mock_repo(name="repo2", archived=False, visibility="private"),
+            create_mock_repo(name="repo3", archived=False, visibility="public"),
+            create_mock_repo(name="repo4", archived=True, visibility="private")
+        ]
+        mock_github_client_core_api.return_value.get_organization.return_value = mock_org
+        mock_org.get_repos.return_value = mock_repos
+        repos = github_service.get_all_private_internal_repos_names("test_org")
+        
+        
+        self.assertEqual(repos, ["repo1", "repo2"])
+
+
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    @patch.object(GithubService, "get_all_private_internal_repos_names")
+    @patch("datetime.datetime")
+    @patch.object(GithubService, "get_current_month_gha_minutes_for_enterprise")
+    def test_calculate_total_minutes_enterprise(self, mock_get_current_month_gha_minutes_for_enterprise,
+                                                mock_datetime,
+                                                mock_get_all_private_internal_repos_names,
+                                                mock_get_all_organisations_in_enterprise,
+                                                _mock_github_client_rest_api,
+                                                _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_gha_minutes_used_for_organisation.return_value = {
-            "total_minutes_used": 10}
+        mock_get_all_organisations_in_enterprise.return_value = ['test_org1', 'test_org2']
+        mock_repos = {
+        "test_org1": ["repo1", "repo2"],
+        "test_org2": ["repo3"]}
+        mock_get_all_private_internal_repos_names.side_effect = lambda org: mock_repos[org]
+        mock_datetime.now.return_value = datetime(2025, 1, 29)
+        mock_get_current_month_gha_minutes_for_enterprise.return_value ={
+            "usageItems": [
+                { "date": "2025-01-06T15:15:47Z", "product": "actions",
+                 "sku": "Actions Linux", "quantity": 100,
+                 "unitType": "Minutes", "pricePerUnit": 0.008,
+                 "grossAmount": 0.8, "discountAmount": 0, "netAmount": 0.8,
+                 "organizationName": "test_org1", "repositoryName": "repo1"},
+                { "date": "'2025-01-06T15:18:44Z'", "product": "actions",
+                 "sku": "Actions Linux", "quantity": 35,
+                 "unitType": "Minutes", "pricePerUnit": 0.008,
+                 "grossAmount": 0.8, "discountAmount": 0, "netAmount": 0.8,
+                 "organizationName": "test_org1", "repositoryName": "repo2"},
+                { "date": "'2025-01-06T15:20:44Z'", "product": "actions",
+                 "sku": "Actions Linux", "quantity": 50,
+                 "unitType": "Minutes", "pricePerUnit": 0.008,
+                 "grossAmount": 0.8, "discountAmount": 0, "netAmount": 0.8,
+                 "organizationName": "test_org2", "repositoryName": "repo3"}
+                ]}
 
         self.assertEqual(
-            github_service.calculate_total_minutes_used(["org1", "org2"]), 20)
+            github_service.calculate_total_minutes_enterprise(), 185)
 
     @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
-    @patch.object(GithubService, "calculate_total_minutes_used")
-    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    @patch.object(GithubService, "calculate_total_minutes_enterprise")
     def test_alert_on_low_quota_if_low(
         self,
-        mock_get_all_organisations_in_enterprise,
-        mock_calculate_total_minutes_used,
+        mock_calculate_total_minutes_enterprise,
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_repository_variable,
         _mock_github_client_rest_api,
@@ -1637,9 +1692,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     ):
         github_service = GithubService("", ORGANISATION_NAME)
 
-        mock_get_all_organisations_in_enterprise.return_value = [
-            "org1", "org2"]
-        mock_calculate_total_minutes_used.return_value = 37500
+        mock_calculate_total_minutes_enterprise.return_value = 37500
         mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         result = github_service.check_if_gha_minutes_quota_is_low()
@@ -1650,22 +1703,18 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
     @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
-    @patch.object(GithubService, "calculate_total_minutes_used")
-    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    @patch.object(GithubService, "calculate_total_minutes_enterprise")
     def test_alert_on_low_quota_if_not_low(
         self,
-        mock_get_all_organisations_in_enterprise,
-        mock_calculate_total_minutes_used,
+        mock_calculate_total_minutes_enterprise,
         mock_reset_alerting_threshold_if_first_day_of_month,
         mock_get_repository_variable,
         _mock_github_client_rest_api,
         _mock_github_client_core_api
     ):
         github_service = GithubService("", ORGANISATION_NAME)
-
-        mock_get_all_organisations_in_enterprise.return_value = [
-            "org1", "org2"]
-        mock_calculate_total_minutes_used.return_value = 5000
+        
+        mock_calculate_total_minutes_enterprise.return_value = 5000
         mock_get_repository_variable.side_effect = self._mock_repository_variable
 
         result = github_service.check_if_gha_minutes_quota_is_low()
