@@ -11,11 +11,10 @@ SR_SLACK_CHANNEL = "operations-engineering-team"
 OPERATIONS_ENGINEERING_GITHUB_USERNAMES = [
     "SeanPrivett",
     "andyrogers1973",
-    "jasonBirchall",
     "tamsinforbes",
     "AntonyBishop",
     "connormaglynn",
-    "PepperMoJ",
     "levgorbunov1",
     "moj-operations-engineering-bot",
+    "jnioche-jd",
 ]
