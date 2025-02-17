@@ -70,7 +70,7 @@ class TestCloudWatchService(unittest.TestCase):
         ]
 
         service = CloudWatchService(log_group_name='test-log-group')
-        result = service.get_all_auth0_users_that_appear_in_tenants()
+        result = service.get_all_auth0_users_that_appear_in_tenants(days_since=90)
 
         expected_query = """
         fields @timestamp, @message
