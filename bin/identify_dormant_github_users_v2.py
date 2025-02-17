@@ -44,12 +44,7 @@ class DormantUser:
     email: str | None
 
 
-def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(
-        github_service,
-        bot_list: list,
-        use_modernisation_platform_infrastructure: bool,
-        days_since: int
-    ) -> list:
+def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_modernisation_platform_infrastructure: bool, days_since: int) -> list:
     all_users = github_service.get_all_enterprise_members()
 
     cloudtrail_service = CloudtrailService(use_modernisation_platform_infrastructure)
@@ -140,7 +135,7 @@ def identify_dormant_github_users():
 
     dormant_users_according_to_github_auth0_and_commits = filter_out_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0, days_since)
 
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits)
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits, str(days_since))
 
 
 if __name__ == "__main__":

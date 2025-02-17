@@ -92,10 +92,10 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_dormant_user_list(self, user_list):
+    def send_dormant_user_list(self, user_list, days_since: str):
         message = (
             f"*Dormant User Report*\n\n"
-            f"Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n"
+            f"Here is a list of dormant GitHub users that have not been seen in Auth0 logs for {days_since} days:\n"
             f"{user_list}"
         )
         blocks = self._create_block_with_message(message)
