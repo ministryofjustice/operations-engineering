@@ -18,3 +18,9 @@ variable "auth0_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "streaming_aws_account_id" {
+  description = "account id of aws account to target for log streaming"
+  type        = string
+  sensitive   = true
+}
