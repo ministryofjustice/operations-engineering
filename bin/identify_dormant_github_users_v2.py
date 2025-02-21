@@ -44,11 +44,11 @@ class DormantUser:
     email: str | None
 
 
-def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_modernisation_platform_infrastructure: bool, days_since: int) -> list:
+def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, days_since: int) -> list:
     all_users = github_service.get_all_enterprise_members()
 
-    cloudtrail_service = CloudtrailService(use_modernisation_platform_infrastructure)
-    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(use_modernisation_platform_infrastructure, days_since)
+    cloudtrail_service = CloudtrailService()
+    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(days_since)
 
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
@@ -113,12 +113,8 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 
 def identify_dormant_github_users():
-    env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE", "DAYS_SINCE"])
-    use_modernisation_platform_infrastructure = env.get("USE_MP_INFRASTRUCTURE") != "false"
+    env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "DAYS_SINCE"])
     days_since = int(env.get("DAYS_SINCE"))
-
-    print("Using modernisation platform infrastructure:", use_modernisation_platform_infrastructure)
-    print("Env var valaue USE_MP_INFRASTRUCTURE:", env.get("USE_MP_INFRASTRUCTURE"))
 
     gh_orgs = [
         GithubService(env.get("GH_MOJ_TOKEN"), MINISTRY_OF_JUSTICE),
@@ -126,7 +122,7 @@ def identify_dormant_github_users():
     ]
 
     dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(
-        gh_orgs[0], ALLOWED_BOT_USERS, use_modernisation_platform_infrastructure, days_since
+        gh_orgs[0], ALLOWED_BOT_USERS, days_since
     )
 
     dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])

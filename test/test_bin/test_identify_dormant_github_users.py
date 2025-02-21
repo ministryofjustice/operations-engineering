@@ -27,7 +27,7 @@ class TestDormantGitHubUsers(unittest.TestCase):
     @patch('bin.identify_dormant_github_users_v2.get_inactive_users_from_data_lake_ignoring_bots_and_collaborators')
     @patch('os.environ')
     def test_identify_dormant_github_users(self, mock_env, _mock_get_inactive_users_from_data_lake_ignoring_bots_and_collaborators, mock_map_usernames_to_emails, mock_filter_out_active_auth0_users, mock_filter_out_inactive_committers, _mock_github_client_core_api):
-        mock_env.get.side_effect = lambda k: 'mock_token' if k in ['GH_MOJ_TOKEN', 'GH_MOJAS_TOKEN', 'ADMIN_SLACK_TOKEN', 'USE_MP_INFRASTRUCTURE'] else 90 if k in ['DAYS_SINCE'] else None
+        mock_env.get.side_effect = lambda k: 'mock_token' if k in ['GH_MOJ_TOKEN', 'GH_MOJAS_TOKEN', 'ADMIN_SLACK_TOKEN'] else 90 if k in ['DAYS_SINCE'] else None
         mock_map_usernames_to_emails.return_value = [{"name": "user1", "email": "user1@gmail.com"}, {"name": "user2", "email": "user1@gmail.com"}, {"name": "user3", "email": "user1@gmail.com"}]
         mock_filter_out_active_auth0_users.return_value = ["user1", "user2"]
 
