@@ -16,7 +16,7 @@ class TestDormantGitHubUsers(unittest.TestCase):
         mock_github_service = MagicMock()
         mock_github_service.get_all_enterprise_members = MagicMock(return_value=["member1", "member2", "analytical-platform-bot", "cloud-platform-dummy-user"])
 
-        assert get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(mock_github_service, self.allowed_bot_users, False, 90) == ["member2"]
+        assert get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(mock_github_service, self.allowed_bot_users, 90) == ["member2"]
 
     @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
     @patch("gql.Client.__new__", new=MagicMock)
