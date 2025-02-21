@@ -11,6 +11,7 @@ class CloudtrailService:
             session = boto3.Session(profile_name="operations_engineering_dev_query_cloudtrail")
             self.client = session.client("cloudtrail", region_name="eu-west-2")
         except:
+            print("Can't find profile operations_engineering_dev_query_cloudtrail, using default")
             self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
 
