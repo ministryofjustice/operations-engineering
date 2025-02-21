@@ -2,26 +2,21 @@ import time
 from datetime import datetime, timedelta
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ProfileNotFound
 
 
 class CloudtrailService:
-    def __init__(self, use_mp_infrastructure: bool) -> None:
-        if use_mp_infrastructure:
-            session = boto3.Session(
-                profile_name="operations_engineering_dev_query_cloudtrail"
-            )
+    def __init__(self) -> None:
+        try:
+            session = boto3.Session(profile_name="operations_engineering_dev_query_cloudtrail")
             self.client = session.client("cloudtrail", region_name="eu-west-2")
-        else:
+        except ProfileNotFound:
+            print("Can't find profile operations_engineering_dev_query_cloudtrail, using default")
             self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
-    def get_active_users_for_dormant_users_process(self, use_mp_infrastructure: bool, days_since: int):
+    def get_active_users_for_dormant_users_process(self, days_since: int):
         username_key = "eventData.useridentity.principalid"
-        data_store_id = (
-            "983f662c-c395-43b4-8537-de788b3b1091"
-            if use_mp_infrastructure
-            else "ec682140-3e75-40c0-8e04-f06207791c2e"
-        )
+        data_store_id = "983f662c-c395-43b4-8537-de788b3b1091"
         period_cutoff = (datetime.now() - timedelta(days=days_since)).strftime(
             "%Y-%m-%d %H:%M:%S"
         )

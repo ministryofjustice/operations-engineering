@@ -10,7 +10,7 @@ class TestCloudtrailService(unittest.TestCase):
 
     @mock_aws
     def setUp(self):
-        self.cloudtrail_service = CloudtrailService(False)
+        self.cloudtrail_service = CloudtrailService()
         self.cloudtrail_service.client = boto3.client("cloudtrail", region_name="us-west-2")
 
     @freeze_time("2024-07-11 00:00:00")
