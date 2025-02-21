@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ProfileNotFound
 
 
 class CloudtrailService:
@@ -10,10 +10,9 @@ class CloudtrailService:
         try:
             session = boto3.Session(profile_name="operations_engineering_dev_query_cloudtrail")
             self.client = session.client("cloudtrail", region_name="eu-west-2")
-        except:
+        except ProfileNotFound:
             print("Can't find profile operations_engineering_dev_query_cloudtrail, using default")
             self.client = boto3.client("cloudtrail", region_name="eu-west-2")
-
 
     def get_active_users_for_dormant_users_process(self, days_since: int):
         username_key = "eventData.useridentity.principalid"
