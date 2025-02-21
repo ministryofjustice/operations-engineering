@@ -7,9 +7,11 @@ from botocore.exceptions import ClientError
 
 class CloudtrailService:
     def __init__(self) -> None:
-        session = boto3.Session(profile_name="operations_engineering_dev_query_cloudtrail")
-
-        self.client = session.client("cloudtrail", region_name="eu-west-2")
+        try:
+            session = boto3.Session(profile_name="operations_engineering_dev_query_cloudtrail")
+            self.client = session.client("cloudtrail", region_name="eu-west-2")
+        except:
+            self.client = boto3.client("cloudtrail", region_name="eu-west-2")
 
 
     def get_active_users_for_dormant_users_process(self, days_since: int):
