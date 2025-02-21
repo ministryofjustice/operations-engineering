@@ -44,22 +44,22 @@ class DormantUser:
     email: str | None
 
 
-def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_modernisation_platform_infrastructure: bool) -> list:
+def get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(github_service, bot_list: list, use_modernisation_platform_infrastructure: bool, days_since: int) -> list:
     all_users = github_service.get_all_enterprise_members()
 
     cloudtrail_service = CloudtrailService(use_modernisation_platform_infrastructure)
-    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(use_modernisation_platform_infrastructure)
+    active_users = cloudtrail_service.get_active_users_for_dormant_users_process(use_modernisation_platform_infrastructure, days_since)
 
     return [user for user in all_users if user not in list(set(active_users).union(bot_list))]
 
 
-def filter_out_inactive_committers(gh_orgs, inactive_users_from_audit_log):
+def filter_out_inactive_committers(gh_orgs, inactive_users_from_audit_log, days_since):
 
     active_committers = []
 
     for gh in gh_orgs:
         repos_and_current_contributors = gh.get_current_contributors_for_active_repos()
-        since_datetime = (datetime.now() - timedelta(days=90))
+        since_datetime = (datetime.now() - timedelta(days=days_since))
 
         for username in inactive_users_from_audit_log:
             commits = False
@@ -75,7 +75,7 @@ def filter_out_inactive_committers(gh_orgs, inactive_users_from_audit_log):
     return list(set(inactive_users_from_audit_log).difference(set(active_committers)))
 
 
-def get_active_users_from_auth0_log_group() -> list:
+def get_active_users_from_auth0_log_group(days_since: int) -> list:
     """Operations Engineering, Cloud, Mod and Analytical Platforms all have thir own
     Auth0 tenants. All logs are collected in a single Cloudwatch log group.
     This function will parse the logs and return a list of active users using
@@ -84,11 +84,11 @@ def get_active_users_from_auth0_log_group() -> list:
     cloudwatch_log_group = "/aws/events/LogsFromOperationsEngineeringAuth0"
 
     cloudwatch_service = CloudWatchService(cloudwatch_log_group)
-    return cloudwatch_service.get_all_auth0_users_that_appear_in_tenants()
+    return cloudwatch_service.get_all_auth0_users_that_appear_in_tenants(days_since)
 
 
-def filter_out_active_auth0_users(dormant_users_according_to_github: list) -> list:
-    active_email_addresses = get_active_users_from_auth0_log_group()
+def filter_out_active_auth0_users(dormant_users_according_to_github: list, days_since: int) -> list:
+    active_email_addresses = get_active_users_from_auth0_log_group(days_since)
 
     dormant_users_not_in_auth0 = [
         user.name
@@ -113,8 +113,9 @@ def map_usernames_to_emails(users, moj_github_org: GithubService, ap_github_org:
 
 
 def identify_dormant_github_users():
-    env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE"])
+    env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "USE_MP_INFRASTRUCTURE", "DAYS_SINCE"])
     use_modernisation_platform_infrastructure = env.get("USE_MP_INFRASTRUCTURE") != "false"
+    days_since = int(env.get("DAYS_SINCE"))
 
     print("Using modernisation platform infrastructure:", use_modernisation_platform_infrastructure)
     print("Env var valaue USE_MP_INFRASTRUCTURE:", env.get("USE_MP_INFRASTRUCTURE"))
@@ -124,15 +125,17 @@ def identify_dormant_github_users():
         GithubService(env.get("GH_MOJAS_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
-    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(gh_orgs[0], ALLOWED_BOT_USERS, use_modernisation_platform_infrastructure)
+    dormant_users_according_to_github = get_inactive_users_from_data_lake_ignoring_bots_and_collaborators(
+        gh_orgs[0], ALLOWED_BOT_USERS, use_modernisation_platform_infrastructure, days_since
+    )
 
     dormant_users_with_emails = map_usernames_to_emails(dormant_users_according_to_github, gh_orgs[0], gh_orgs[1])
 
-    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails)
+    dormant_users_according_to_github_and_auth0 = filter_out_active_auth0_users(dormant_users_with_emails, days_since)
 
-    dormant_users_according_to_github_auth0_and_commits = filter_out_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0)
+    dormant_users_according_to_github_auth0_and_commits = filter_out_inactive_committers(gh_orgs, dormant_users_according_to_github_and_auth0, days_since)
 
-    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits)
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_users_according_to_github_auth0_and_commits, str(days_since))
 
 
 if __name__ == "__main__":

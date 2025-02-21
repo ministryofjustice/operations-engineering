@@ -38,14 +38,14 @@ class CloudWatchService:
                 return None
             time.sleep(1)  # Sleep to rate limit the polling
 
-    def get_all_auth0_users_that_appear_in_tenants(self, days_to_check=90):
+    def get_all_auth0_users_that_appear_in_tenants(self, days_since):
         query = """
         fields @timestamp, @message
         | parse @message '"user_name":"*"' as user_name
         | stats count() by user_name
         """
         start_time = int(
-            (datetime.now() - timedelta(days=days_to_check)).timestamp())
+            (datetime.now() - timedelta(days=days_since)).timestamp())
         end_time = int(datetime.now().timestamp())
 
         query_id = self.run_insights_query(query, start_time, end_time)

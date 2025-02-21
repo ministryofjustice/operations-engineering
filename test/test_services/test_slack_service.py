@@ -250,11 +250,11 @@ class TestSlackService(unittest.TestCase):
         user_list = "Test user list"
         expected_message = (
             "*Dormant User Report*\n\n"
-            "Here is a list of dormant GitHub users that have not been seen in Auth0 logs:\n"
+            "Here is a list of dormant GitHub users that have not been seen in Auth0 logs for 13 days:\n"
             f"{user_list}"
         )
         blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_dormant_user_list(user_list)
+        self.slack_service.send_dormant_user_list(user_list, str(13))
         self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )

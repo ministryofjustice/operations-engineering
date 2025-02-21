@@ -11,6 +11,14 @@ on:
           - "false"
           - "true"
         default: "true"
+      days_since:
+        type: choice
+        description: "Select the number of days since to check for user dormancy."
+        options:
+          - "90"
+          - "60"
+          - "30"
+        default: "90"
   schedule:
     - cron: "0 0 1 * *"
 
@@ -56,3 +64,4 @@ jobs:
           GH_MOJAS_TOKEN: ${{ secrets.GH_MOJAS_DORMANT_USERS_READ }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
           USE_MP_INFRASTRUCTURE: ${{ inputs.use_modernisation_platform_infrastructure }}
+          DAYS_SINCE: ${{ inputs.days_since }}
