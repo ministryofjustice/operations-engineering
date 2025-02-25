@@ -7,7 +7,7 @@ on:
 
 env:
   ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
-  GH_TOKEN: ${{ secrets.OPS_ENG_ENTERPRISE_BILLING_PAT_TOKEN }}
+  GH_TOKEN: ${{ secrets.ENTERPRISE_BILLING_TOKEN_FROM_TONY }}
 
 jobs:
   low-quota-threshold:
