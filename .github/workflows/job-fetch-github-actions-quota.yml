@@ -19,7 +19,7 @@ jobs:
           pip install pipenv
           pipenv install
       - run: pipenv run python3 -m bin.fetch_github_actions_quota
-        env: 
+        env:
           GH_TOKEN: ${{ secrets.ENTERPRISE_BILLING_TOKEN_FROM_TONY }}
           KPI_DASHBOARD_URL: ${{ secrets.KPI_DASHBOARD_PROD_URL }}
           KPI_DASHBOARD_API_KEY: ${{ secrets.KPI_DASHBOARD_PROD_API_KEY }}
