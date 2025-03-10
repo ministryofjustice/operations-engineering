@@ -707,7 +707,7 @@ class TestGithubServiceGetOrgRepoNames(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
-class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
+class TestGithubServiceGetDormantOutsideCollaborators(unittest.TestCase):
     def setUp(self):
         self.return_data = {
             "organization": {
@@ -770,9 +770,9 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
         github_service.get_outside_collaborators_login_names = MagicMock(
             return_value=self.all_outside_collaborators
         )
-        stale_outside_collaborators = github_service.get_stale_outside_collaborators()
-        self.assertEqual(len(stale_outside_collaborators), 1)
-        self.assertEqual(stale_outside_collaborators, ["outside_collab_4"])
+        dormant_outside_collaborators = github_service.get_dormant_outside_collaborators()
+        self.assertEqual(len(dormant_outside_collaborators), 1)
+        self.assertEqual(dormant_outside_collaborators, ["outside_collab_4"])
 
     def test_counts_disabled_repo_outside_collaborators(self):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -783,9 +783,9 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
         github_service.get_outside_collaborators_login_names = MagicMock(
             return_value=self.all_outside_collaborators
         )
-        stale_outside_collaborators = github_service.get_stale_outside_collaborators()
-        self.assertEqual(len(stale_outside_collaborators), 2)
-        self.assertEqual(set(stale_outside_collaborators), set(["outside_collab_3", "outside_collab_4"]))
+        dormant_outside_collaborators = github_service.get_dormant_outside_collaborators()
+        self.assertEqual(len(dormant_outside_collaborators), 2)
+        self.assertEqual(set(dormant_outside_collaborators), set(["outside_collab_3", "outside_collab_4"]))
 
     def test_outside_collaborators_has_next_page_raises_error(self):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -797,7 +797,7 @@ class TestGithubServiceGetStaleOutsideCollaborators(unittest.TestCase):
             return_value=self.all_outside_collaborators
         )
         with self.assertRaises(ValueError):
-            github_service.get_stale_outside_collaborators()
+            github_service.get_dormant_outside_collaborators()
 
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)

@@ -500,15 +500,15 @@ class GithubService:
             "after_cursor": after_cursor
         })
 
-    def get_stale_outside_collaborators(self) -> list[str]:
-        """A wrapper function to run a GraphQL query to get a list of the Stale Outside Collaborators
+    def get_dormant_outside_collaborators(self) -> list[str]:
+        """A wrapper function to run a GraphQL query to get a list of the Dormant Outside Collaborators
         in the organisation. These are Outside Collaborators not affiliated with any open (not locked,
         not archived nor disabled) repositories. The function collects the Active Outside Collaborators
         (those affiliated with at least one open repository) and then subtracts these from the total
         list of Outside Collaborators.
 
         Returns:
-            list: A list of the organisation stale outside collaborators login names in lower case
+            list: A list of the organisation dormant outside collaborators login names in lower case
         """
 
         all_outside_collaborators = self.get_outside_collaborators_login_names()
@@ -528,7 +528,7 @@ class GithubService:
                     # unreliable if it does so.
                     if repo["collaborators"]["pageInfo"]["hasNextPage"]:
                         raise ValueError(
-                            "Some Outside Collaborators omitted from calculation; cannot get reliable Stale Outside Collaborators list."
+                            "Some Outside Collaborators omitted from calculation; cannot get reliable Dormant Outside Collaborators list."
                         )
                     for collaborators in repo["collaborators"]["edges"]:
                         if collaborators:
@@ -536,9 +536,9 @@ class GithubService:
             repo_has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
-        stale_outside_collaborators = set(all_outside_collaborators) - set(active_outside_collaborators)
+        dormant_outside_collaborators = set(all_outside_collaborators) - set(active_outside_collaborators)
 
-        return list(stale_outside_collaborators)
+        return list(dormant_outside_collaborators)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
