@@ -1,5 +1,4 @@
-# This workflow is triggered manually to identify dormant GitHub users. It's currently in an experimental phase and will eventually be integrated into the main dormant user process.
-name: 🧪 Identify Dormant GitHub Users
+name: ⚙️ Identify Dormant GitHub Users
 
 on:
   workflow_dispatch:
