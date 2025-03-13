@@ -93,7 +93,7 @@ class GithubService:
         logging.info("Getting Outside Collaborators Login Names")
         outside_collaborators = self.github_client_core_api.get_organization(
             self.organisation_name).get_outside_collaborators() or []
-        return [outside_collaborator.login.lower() for outside_collaborator in outside_collaborators]
+        return outside_collaborators
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def add_all_users_to_team(self, team_name: str) -> None:
@@ -169,47 +169,6 @@ class GithubService:
                                 name
                             }
                         }
-                    }
-                }
-            }
-        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
-                               "after_cursor": after_cursor})
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
-        self,
-        after_cursor: str | None,
-        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
-    ) -> dict[str, Any]:
-        logging.info(
-            f"Getting paginated list of org unlocked unarchived repositories and their first 100 outside collaborators. Page size {page_size}, after cursor {bool(after_cursor)}"
-        )
-        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
-            raise ValueError(
-                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
-        return self.github_client_gql_api.execute(gql("""
-            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
-                organization(login: $organisation_name) {
-                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
-                        pageInfo {
-                            endCursor
-                            hasNextPage
-                        }
-                        nodes {
-                            name
-                            isDisabled
-                            collaborators(first: 100, affiliation: OUTSIDE){
-                                pageInfo {
-                                    hasNextPage
-                                }
-                                edges {
-                                    node {
-                                        login
-                                    }
-                                }
-                            }
-                        }
-
                     }
                 }
             }
@@ -500,21 +459,67 @@ class GithubService:
             "after_cursor": after_cursor
         })
 
-    def get_dormant_outside_collaborators(self) -> list[str]:
-        """A wrapper function to run a GraphQL query to get a list of the Dormant Outside Collaborators
-        in the organisation. These are Outside Collaborators not affiliated with any open (not locked,
-        not archived nor disabled) repositories. The function collects the Active Outside Collaborators
-        (those affiliated with at least one open repository) and then subtracts these from the total
-        list of Outside Collaborators.
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
+        self,
+        after_cursor: str | None,
+        page_size: int = GITHUB_GQL_DEFAULT_PAGE_SIZE,
+    ) -> dict[str, Any]:
+        logging.info(
+            f"Getting paginated list of org unlocked unarchived repositories and their first 100 outside collaborators. Page size {page_size}, after cursor {bool(after_cursor)}"
+        )
+        if page_size > self.GITHUB_GQL_MAX_PAGE_SIZE:
+            raise ValueError(
+                f"Page size of {page_size} is too large. Max page size {self.GITHUB_GQL_MAX_PAGE_SIZE}")
+        return self.github_client_gql_api.execute(gql("""
+            query($organisation_name: String!, $page_size: Int!, $after_cursor: String) {
+                organization(login: $organisation_name) {
+                    repositories(first: $page_size, after: $after_cursor, isLocked: false, isArchived: false) {
+                        pageInfo {
+                            endCursor
+                            hasNextPage
+                        }
+                        nodes {
+                            name
+                            isDisabled
+                            visibility
+                            collaborators(first: 100, affiliation: OUTSIDE){
+                                pageInfo {
+                                    hasNextPage
+                                }
+                                edges {
+                                    node {
+                                        login
+                                    }
+                                }
+                            }
+                        }
 
-        Returns:
-            list: A list of the organisation dormant outside collaborators login names in lower case
+                    }
+                }
+            }
+        """), variable_values={"organisation_name": self.organisation_name, "page_size": page_size,
+                               "after_cursor": after_cursor})
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def get_active_repos_and_outside_collaborators(self) -> list[dict[str, bool, list[str]]]:
+        """A wrapper function to run a GraphQL query to get a list of dictionaries containing active
+        repositories and for each its set of current affiliated Outside Collaborators login names for
+        the organisaiton. These Outside Collaborators are affiliated with at least one active (not locked,
+        archived nor disabled) repository.
+
+        Output:
+            list: A list of dictionaries containing active repositories and for each its list of current
+            affiliated outside collaborators login names. Also includes whether the repo has public
+            visibility or not (False = private or internal)
+            [
+                {'repository': 'repo1', 'public': True, 'outside_collaborators': ['c1', 'c2', 'c3']},
+                {'repository': 'repo2', 'public': False, 'outside_collaborators': ['c3', 'c4']}
+            ]
         """
-
-        all_outside_collaborators = self.get_outside_collaborators_login_names()
         repo_has_next_page = True
         after_cursor = None
-        active_outside_collaborators = []
+        active_repos_and_outside_collaborators = []
         while repo_has_next_page:
             data = self.get_paginated_list_of_unlocked_unarchived_repos_and_their_first_100_outside_collaborators(
                 after_cursor, self.GITHUB_GQL_MAX_PAGE_SIZE
@@ -524,21 +529,26 @@ class GithubService:
                     if repo["isDisabled"]:
                         continue
                     # The query only returns the first 100 Outside Collaborators on a repo, if there is a next page
-                    # it will not collect them. This is very unlikely to occur, however the function output is
-                    # unreliable if it does so.
+                    # of collaborators it will not collect them. This is very unlikely to occur, however the function
+                    # output is unreliable if it does so.
                     if repo["collaborators"]["pageInfo"]["hasNextPage"]:
                         raise ValueError(
-                            "Some Outside Collaborators omitted from calculation; cannot get reliable Dormant Outside Collaborators list."
+                            f"Repo has more than {self.GITHUB_GQL_MAX_PAGE_SIZE} Outside Collaborators; only collected the first {self.GITHUB_GQL_MAX_PAGE_SIZE} hence omitted and calculation unreliable."
                         )
-                    for collaborators in repo["collaborators"]["edges"]:
-                        if collaborators:
-                            active_outside_collaborators.append(collaborators["node"]["login"].lower())
+                    if repo["visibility"] == "PUBLIC":
+                        public = True
+                    else:
+                        public = False
+                    if repo["collaborators"]["edges"]:
+                        collaborators = [edge["node"]["login"] for edge in repo["collaborators"]["edges"]]
+                        active_repos_and_outside_collaborators.append(
+                            {"repository": repo["name"], "public": public, "outside_collaborators": collaborators}
+                        )
             repo_has_next_page = data["organization"]["repositories"]["pageInfo"]["hasNextPage"]
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
-        dormant_outside_collaborators = set(all_outside_collaborators) - set(active_outside_collaborators)
+        return active_repos_and_outside_collaborators
 
-        return list(dormant_outside_collaborators)
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
@@ -774,15 +784,6 @@ class GithubService:
         github_user = self.github_client_core_api.get_user(user)
         self.github_client_core_api.get_organization(
             self.organisation_name).remove_from_membership(github_user)
-
-    @retries_github_rate_limit_exception_at_next_reset_once
-    def remove_outside_collaborator_from_org(self, outside_collaborator: str):
-        github_user = self.github_client_core_api.get_user(outside_collaborator)
-        self.github_client_core_api.get_organization(
-            self.organisation_name
-        ).remove_outside_collaborator(
-            github_user
-        )
 
     def get_inactive_users(self, team_name: str, users_to_ignore, repositories_to_ignore: list[str],
                            inactivity_months: int) -> list[NamedUser.NamedUser]:
