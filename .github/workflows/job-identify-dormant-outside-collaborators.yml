@@ -1,0 +1,46 @@
+name: ⚙️ Identify Dormant Outside Collaborators
+
+on:
+  workflow_dispatch:
+    inputs:
+      days_since:
+        type: choice
+        description: "Select the number of days since to check for outside collaborator dormancy."
+        options:
+          - "90"
+          - "60"
+          - "30"
+        default: "90"
+
+jobs:
+  identify_dormant_outside_collaborators:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: "3.11"
+          cache: "pipenv"
+
+      - name: Install Pipenv
+        run: |
+          pip install pipenv
+          pipenv install
+
+      - name: Identify Dormant Outside Collaborators
+        run: pipenv run python3 -m bin.identify_dormant_outside_collaborators
+        env:
+          GH_MOJ_TOKEN: ${{ secrets.GH_MOJ_DORMANT_USERS_READ }}
+          GH_MOJAS_TOKEN: ${{ secrets.GH_MOJAS_DORMANT_USERS_READ }}
+          ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
+          DAYS_SINCE: ${{ inputs.days_since }}
+
+      # - name: Report failure to Slack
+      #   if: always()
+      #   uses: ravsamhq/notify-slack-action@v2
