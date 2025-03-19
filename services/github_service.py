@@ -7,7 +7,6 @@ from time import gmtime, sleep
 from typing import Any, Callable
 import concurrent.futures
 
-
 from dateutil.relativedelta import relativedelta
 from github import (Github, NamedUser, RateLimitExceededException,
                     UnknownObjectException, GithubException)
@@ -548,6 +547,7 @@ class GithubService:
             after_cursor = data["organization"]["repositories"]["pageInfo"]["endCursor"]
 
         return active_repos_and_outside_collaborators
+
 
 
     @retries_github_rate_limit_exception_at_next_reset_once
@@ -1392,6 +1392,25 @@ class GithubService:
             repo_object.get("repository") for repo_object in repos_and_contributors if username in repo_object.get("contributors")
         ]
         return repos
+
+
+    @retries_github_rate_limit_exception_at_next_reset_once
+    def user_has_committed_to_repo_since(
+        self,
+        username: str,
+        repo_name: str,
+        since_datetime: datetime
+    ) -> bool:
+
+        repo = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo_name}")
+        commits = repo.get_commits(
+                since=since_datetime,
+                author=username.lower()
+        )
+        if commits.totalCount > 0:
+            return True
+        return False
+
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def user_has_commmits_since(
