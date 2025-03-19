@@ -54,6 +54,7 @@ def identify_dormant_outside_collaborators():
         days_since=str(days_since)
     )
 
+
 if __name__ == "__main__":
     start = time.time()
     identify_dormant_outside_collaborators()
