@@ -1,7 +1,7 @@
+from datetime import datetime, timedelta
 import logging
-import os
 import time
-from github import GithubException
+import pandas as pd
 from config.constants import MINISTRY_OF_JUSTICE, MOJ_ANALYTICAL_SERVICES
 
 from services.github_service import GithubService
@@ -16,64 +16,48 @@ logger = logging.getLogger(__name__)
 def identify_dormant_outside_collaborators():
     env = EnvironmentVariables(["GH_MOJ_TOKEN", "GH_MOJAS_TOKEN", "ADMIN_SLACK_TOKEN", "DAYS_SINCE"])
     days_since = int(env.get("DAYS_SINCE"))
+    since_datetime = (datetime.now() - timedelta(days=days_since))
 
     gh_orgs = [
         GithubService(env.get("GH_MOJ_TOKEN"), MINISTRY_OF_JUSTICE),
         GithubService(env.get("GH_MOJAS_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
 
+    ocs_repos_and_activity = []
     for gh_org in gh_orgs:
-        dormant_outside_collaborators = gh_org.get_dormant_outside_collaborators()
+        active_repos_and_outside_collaborators = gh_org.get_active_repos_and_outside_collaborators()
+        for repo_object in active_repos_and_outside_collaborators:
+            for oc in repo_object.get("outside_collaborators"):
+                is_oc_active_in_repo = gh_org.user_has_committed_to_repo_since(
+                    username = oc,
+                    repo_name = repo_object.get("repository"),
+                    since_datetime = since_datetime
+                )
+                ocs_repos_and_activity.append(
+                    {
+                        "outside_collaborator": oc,
+                        "organisation": gh_org.organisation_name,
+                        "repository": repo_object.get("repository"),
+                        "public": repo_object.get("public"),
+                        "active": is_oc_active_in_repo
+                    }
+                )
 
-        SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_user_list(dormant_outside_collaborators, str(days_since))
+    df_oc_report = pd.DataFrame(ocs_repos_and_activity)
+    # Get commit activity for each OC: summing T/F means no commits in any repo shows as 0
+    activity_pivot = df_oc_report.pivot_table(['active'], 'outside_collaborator', aggfunc=sum)
+    # Filter for zero commits
+    zero_commits = activity_pivot.loc[activity_pivot["active"] == 0]
 
+    SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_outside_collaborator_list(
+        user_list=zero_commits.index.values,
+        days_since=str(days_since)
+    )
+
+    return None
 
 if __name__ == "__main__":
     start = time.time()
     identify_dormant_outside_collaborators()
     end = time.time()
     print(f"\nTime taken: {(end-start) / 60} minutes")
-
-# #  This currently removes dormant OCs -  just want it to identify and post to slack, also post failure to slack
-# def get_environment_variables() -> str:
-#     github_token = os.getenv("ADMIN_GITHUB_TOKEN")
-#     if not github_token:
-#         raise ValueError(
-#             "The env variable ADMIN_GITHUB_TOKEN is empty or missing")
-
-#     github_organization_name = os.getenv("GITHUB_ORGANIZATION_NAME")
-#     if not github_organization_name:
-#         raise ValueError(
-#             "The env variable GITHUB_ORGANIZATION_NAME is empty or missing")
-
-#     return github_token, github_organization_name
-
-
-# def main():
-#     github_token, github_organization_name = get_environment_variables()
-#     github = GithubService(github_token, github_organization_name)
-#     dormant_outside_collaborators = github.get_dormant_outside_collaborators()
-
-#     if not dormant_outside_collaborators:
-#         logger.info(
-#             "No Dormant Outside Collaborators detected."
-#         )
-
-#     for dormant_outside_collaborator in dormant_outside_collaborators:
-#         try:
-#             github.remove_outside_collaborator_from_org(dormant_outside_collaborator)
-#             logger.info(
-#                 "Removed Outside Collaborator %s from %s",
-#                 dormant_outside_collaborator,
-#                 github_organization_name
-#             )
-#         except GithubException:
-#             logger.error(
-#                 "Failed to remove Outside Collaborator %s from %s",
-#                 dormant_outside_collaborator,
-#                 github_organization_name
-#             )
-
-
-# if __name__ == "__main__":
-#     main()
