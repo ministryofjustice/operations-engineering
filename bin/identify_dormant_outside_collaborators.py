@@ -29,9 +29,9 @@ def identify_dormant_outside_collaborators():
         for repo_object in active_repos_and_outside_collaborators:
             for oc in repo_object.get("outside_collaborators"):
                 is_oc_active_in_repo = gh_org.user_has_committed_to_repo_since(
-                    username = oc,
-                    repo_name = repo_object.get("repository"),
-                    since_datetime = since_datetime
+                    username=oc,
+                    repo_name=repo_object.get("repository"),
+                    since_datetime=since_datetime
                 )
                 ocs_repos_and_activity.append(
                     {
@@ -53,8 +53,6 @@ def identify_dormant_outside_collaborators():
         user_list=zero_commits.index.values,
         days_since=str(days_since)
     )
-
-    return None
 
 if __name__ == "__main__":
     start = time.time()

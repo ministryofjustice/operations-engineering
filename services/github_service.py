@@ -548,12 +548,9 @@ class GithubService:
 
         return active_repos_and_outside_collaborators
 
-
-
     @retries_github_rate_limit_exception_at_next_reset_once
     def fetch_all_repositories_in_org(self) -> list[dict[str, Any]]:
         """A wrapper function to run a GraphQL query to get the list of repositories in the organisation
-
         Returns:
             list: A list of the organisation repos names
         """
@@ -1393,7 +1390,6 @@ class GithubService:
         ]
         return repos
 
-
     @retries_github_rate_limit_exception_at_next_reset_once
     def user_has_committed_to_repo_since(
         self,
@@ -1410,7 +1406,6 @@ class GithubService:
         if commits.totalCount > 0:
             return True
         return False
-
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def user_has_commmits_since(
