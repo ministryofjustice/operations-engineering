@@ -2083,6 +2083,40 @@ class TestGithubServiceUserHasCommitsSince(unittest.TestCase):
 
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
+@patch("github.Github.__new__")
+class TestGithubServiceUserHasCommitedToRepoSince(unittest.TestCase):
+    def setUp(self):
+        self.since_datetime = datetime(2024, 5, 3)
+
+    def test_user_has_committed_to_repo_since_true(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=10)))
+        ]
+        response = github_service.user_has_committed_to_repo_since(
+            username="c1",
+            repo_name="repo1",
+            since_datetime=self.since_datetime
+        )
+        self.assertEqual(response, True)
+
+    def test_user_has_committed_to_repo_since_false(self, mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_github_client_core_api.return_value.get_repo.side_effect = [
+            MagicMock(get_commits=MagicMock(return_value=MagicMock(totalCount=0)))
+        ]
+        response = github_service.user_has_committed_to_repo_since(
+            username="c1",
+            repo_name="repo1",
+            since_datetime=self.since_datetime
+        )
+        self.assertEqual(response, False)
+
+
+@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
+@patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__", new=MagicMock)
 class TestGithubServiceGetPaginatedListOfUnlockedUnarchivedRepos(unittest.TestCase):
     def test_calls_downstream_services(self):
