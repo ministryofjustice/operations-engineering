@@ -534,10 +534,11 @@ class GithubService:
                         raise ValueError(
                             f"Repo has more than {self.GITHUB_GQL_MAX_PAGE_SIZE} Outside Collaborators; only collected the first {self.GITHUB_GQL_MAX_PAGE_SIZE} hence omitted and calculation unreliable."
                         )
+                    public = False
                     if repo["visibility"] == "PUBLIC":
                         public = True
-                    else:
-                        public = False
+                    # else:
+                    #     public = False
                     if repo["collaborators"]["edges"]:
                         collaborators = [edge["node"]["login"] for edge in repo["collaborators"]["edges"]]
                         active_repos_and_outside_collaborators.append(

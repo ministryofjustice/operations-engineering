@@ -790,7 +790,8 @@ class TestGithubServiceGetActiveReposAndOutsideCollaborators(unittest.TestCase):
         )
         active_repos_and_ocs = github_service.get_active_repos_and_outside_collaborators()
         response = [
-            {'repository': 'repo1', 'public': False, 'outside_collaborators': ['outside_collab_1', 'outside_collab_2']}        ]
+            {'repository': 'repo1', 'public': False, 'outside_collaborators': ['outside_collab_1', 'outside_collab_2']}
+        ]
         self.assertEqual(len(active_repos_and_ocs), 1)
         self.assertEqual(active_repos_and_ocs, response)
 
