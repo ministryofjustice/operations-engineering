@@ -40,7 +40,3 @@ jobs:
           GH_MOJAS_TOKEN: ${{ secrets.GH_MOJAS_DORMANT_USERS_READ }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
           DAYS_SINCE: ${{ inputs.days_since }}
-
-      # - name: Report failure to Slack
-      #   if: always()
-      #   uses: ravsamhq/notify-slack-action@v2
