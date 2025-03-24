@@ -47,10 +47,10 @@ def identify_dormant_outside_collaborators():
     # Get commit activity for each OC: summing T/F means no commits in any repo shows as 0
     activity_pivot = df_oc_report.pivot_table(['active'], 'outside_collaborator', aggfunc=sum)
     # Filter for zero commits
-    zero_commits = activity_pivot.loc[activity_pivot["active"] == 0]
+    ocs_with_zero_commits = activity_pivot.loc[activity_pivot["active"] == 0]
 
     SlackService(env.get("ADMIN_SLACK_TOKEN")).send_dormant_outside_collaborator_list(
-        user_list=zero_commits.index.values,
+        user_list=ocs_with_zero_commits.index.values,
         days_since=str(days_since)
     )
 
