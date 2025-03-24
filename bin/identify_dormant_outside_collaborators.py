@@ -24,7 +24,7 @@ def identify_dormant_outside_collaborators():
     ]
     ocs_repos_and_activity = []
     for gh_org in gh_orgs:
-        logging.info("Getting repos and Outside Collaborators for %s", gh_org.organisation_name)
+        logging.info("Getting repositories and Outside Collaborators for %s", gh_org.organisation_name)
         active_repos_and_outside_collaborators = gh_org.get_active_repos_and_outside_collaborators()
         for repo_object in active_repos_and_outside_collaborators:
             logging.info("Checking Outside Collaborator activity for %s", repo_object.get('repository'))
