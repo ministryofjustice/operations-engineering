@@ -1,6 +1,7 @@
 name: ⚙️ Identify Dormant Outside Collaborators
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       days_since:
