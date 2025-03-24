@@ -22,11 +22,13 @@ def identify_dormant_outside_collaborators():
         GithubService(env.get("GH_MOJ_TOKEN"), MINISTRY_OF_JUSTICE),
         GithubService(env.get("GH_MOJAS_TOKEN"), MOJ_ANALYTICAL_SERVICES)
     ]
-
+    print("Starting OC run")
     ocs_repos_and_activity = []
     for gh_org in gh_orgs:
+        print(f"Getting repos and OCs for {gh_org.organisation_name}")
         active_repos_and_outside_collaborators = gh_org.get_active_repos_and_outside_collaborators()
         for repo_object in active_repos_and_outside_collaborators:
+            logging.info("Checking Outside Collaborator activity for %s", repo_object.get('repository'))
             for oc in repo_object.get("outside_collaborators"):
                 is_oc_active_in_repo = gh_org.user_has_committed_to_repo_since(
                     username=oc,
