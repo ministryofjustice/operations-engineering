@@ -12,9 +12,3 @@ variable "ops_eng_support_members" {
     "andyrogers1973",
   ]
 }
-
-
-variable "cloud_optimisation_and_accountability_team_id" {
-  description = "cloud-optimisation-and-accountability team id"
-  type        = string
-}

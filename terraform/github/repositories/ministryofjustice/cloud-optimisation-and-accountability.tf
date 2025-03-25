@@ -9,6 +9,6 @@ module "cloud-optimisation-and-accountability" {
   topics      = ["cloud-optimisation-and-accountability"]
 
   team_access = {
-    admin = [var.cloud_optimisation_and_accountability_team.id]
+    admin = [var.cloud_optimisation_and_accountability_team_id]
   }
 }
