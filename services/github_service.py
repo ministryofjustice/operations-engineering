@@ -537,8 +537,6 @@ class GithubService:
                     public = False
                     if repo["visibility"] == "PUBLIC":
                         public = True
-                    # else:
-                    #     public = False
                     if repo["collaborators"]["edges"]:
                         collaborators = [edge["node"]["login"] for edge in repo["collaborators"]["edges"]]
                         active_repos_and_outside_collaborators.append(
