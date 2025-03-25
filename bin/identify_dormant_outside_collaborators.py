@@ -26,8 +26,11 @@ def identify_dormant_outside_collaborators():
     for gh_org in gh_orgs:
         logging.info("Getting repositories and Outside Collaborators for %s", gh_org.organisation_name)
         active_repos_and_outside_collaborators = gh_org.get_active_repos_and_outside_collaborators()
+        repo_count = 1
+        number_of_repos = len(active_repos_and_outside_collaborators)
         for repo_object in active_repos_and_outside_collaborators:
-            logging.info("Checking Outside Collaborator activity for %s", repo_object.get('repository'))
+            logging.info("Checking Outside Collaborator activity for repository %s of %s", repo_count, number_of_repos)
+            repo_count += 1
             for oc in repo_object.get("outside_collaborators"):
                 is_oc_active_in_repo = gh_org.user_has_committed_to_repo_since(
                     username=oc,
@@ -46,7 +49,7 @@ def identify_dormant_outside_collaborators():
 
     df_oc_report = pd.DataFrame(ocs_repos_and_activity)
     # Get commit activity for each OC: summing T/F means no commits in any repo shows as 0
-    activity_pivot = df_oc_report.pivot_table(['active'], 'outside_collaborator', aggfunc=sum)
+    activity_pivot = df_oc_report.pivot_table(['active'], 'outside_collaborator', aggfunc='sum')
     # Filter for zero commits
     ocs_with_zero_commits = activity_pivot.loc[activity_pivot["active"] == 0]
 
