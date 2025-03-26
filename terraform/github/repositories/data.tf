@@ -11,3 +11,7 @@ data "github_team" "test_team_access" {
   provider = github.ministryofjustice-test
   slug     = "test-team-access"
 }
+
+data "github_team" "cloud_optimisation_and_accountability" {
+  slug = "cloud-optimisation-and-accountability"
+}
