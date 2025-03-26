@@ -259,6 +259,20 @@ class TestSlackService(unittest.TestCase):
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
 
+    def test_send_dormant_outside_collaborator_list(self):
+        user_list = "Test user list"
+        days_since = "13"
+        expected_message = (
+            f"🦥 *Dormant Outside Collaborator Report* 🦥\n\n"
+            f"These GitHub Outside Collaborators have made no commits for {days_since} days on any repository they are affiliated with:\n"
+            f"{user_list}"
+        )
+        blocks = self.slack_service._create_block_with_message(expected_message)
+        self.slack_service.send_dormant_outside_collaborator_list(user_list, str(13))
+        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
+            channel="C033QBE511V", mrkdown=True, blocks=blocks
+        )
+
     def test_send_pat_report_alert(self):
         expected_message = (
             "*Expired PAT Report*\n\n"

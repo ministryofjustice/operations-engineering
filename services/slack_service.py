@@ -101,6 +101,15 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
+    def send_dormant_outside_collaborator_list(self, user_list, days_since: str):
+        message = (
+            f"🦥 *Dormant Outside Collaborator Report* 🦥\n\n"
+            f"These GitHub Outside Collaborators have made no commits for {days_since} days on any repository they are affiliated with:\n"
+            f"{user_list}"
+        )
+        blocks = self._create_block_with_message(message)
+        self._send_alert_to_operations_engineering(blocks)
+
     def send_pat_report_alert(self):
         message = (
             "*Expired PAT Report*\n\n"
