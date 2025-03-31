@@ -14,6 +14,6 @@ import {
 }
 
 import {
-  to = module.ministryofjustice-test.module.test_tamf_repo_test_org.maintain["9472191"]
+  to = module.ministryofjustice-test.module.test_tamf_repo_test_org.push["9472191"]
   id = "9472191:test-tamf-repo-test-org"
 }
