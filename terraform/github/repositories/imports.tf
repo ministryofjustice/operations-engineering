@@ -25,6 +25,5 @@ import {
 
 import {
   to = module.ministryofjustice-test.module.test-repo-levg.github_branch_protection.default
-  id = github_repository.test-repo-levg.R_kgDOLPRAVQ
-  # id = "test-repo-levg"
+  id = "test-repo-levg"
 }
