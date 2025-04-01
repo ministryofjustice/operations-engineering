@@ -5,7 +5,7 @@ import {
 
 import {
   to = module.ministryofjustice-test.module.test_tamf_repo_test_org.github_branch_protection.default
-  id = "test-tamf-repo-test-org:main"
+  id = "test-tamf-repo-test-org"
 }
 
 import {
@@ -25,5 +25,5 @@ import {
 
 import {
   to = module.ministryofjustice-test.module.test-repo-levg.github_branch_protection.default
-  id = "test-repo-levg:main"
+  id = "test-repo-levg"
 }
