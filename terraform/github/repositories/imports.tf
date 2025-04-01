@@ -1,20 +1,3 @@
-# ministryofjustice template-repository
-import {
-  to = module.ministryofjustice.module.template-repository.github_repository.default
-  id = "template-repository"
-}
-
-import {
-  to = module.ministryofjustice.module.template-repository.github_branch_protection.default
-  id = "template-repository"
-}
-
-import {
-  to = module.ministryofjustice.module.template-repository.github_team_repository.admin["4192115"]
-  id = "4192115:template-repository"
-}
-
-
 # ministryofjustice-test
 import {
   to = module.ministryofjustice-test.module.test_tamf_repo_test_org.github_repository.default
