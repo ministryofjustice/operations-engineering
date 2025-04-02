@@ -20,10 +20,8 @@ jobs:
       path: "terraform/github/repositories"
       terraform_version: "1.6.6"
       name: "github repositories"
-      aws_profile_name: "dsd_secret_manager_access_profile"
     secrets:
-      iam_role: ${{ secrets.TERRAFORM_GITHUB_REPOS_S3_ROLE_ARN_PROD }}
-      aws_profile_arn: ${{ secrets.AWS_SECRETS_MANAGER_ROLE_ARN }}
+      iam_role: ${{ secrets.TERRAFORM_GITHUB_REPOS_ROLE_ARN }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
       env: |
