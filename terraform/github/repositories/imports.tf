@@ -36,7 +36,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.github-actions.github_branch_protection.default
-  id = "github-actions"
+  id = "github-actions:main"
 }
 
 import {
@@ -51,7 +51,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-certificate-renewal.github_branch_protection.default
-  id = "operations-engineering-certificate-renewal"
+  id = "operations-engineering-certificate-renewal:main"
 }
 
 import {
@@ -66,7 +66,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-cloud-platform-namespace.github_branch_protection.default
-  id = "operations-engineering-cloud-platform-namespace"
+  id = "operations-engineering-cloud-platform-namespace:main"
 }
 
 import {
@@ -81,7 +81,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-documentation-browser-extension.github_branch_protection.default
-  id = "operations-engineering-documentation-browser-extension"
+  id = "operations-engineering-documentation-browser-extension:main"
 }
 
 import {
@@ -96,7 +96,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-find-a-github-repository-owner.github_branch_protection.default
-  id = "operations-engineering-find-a-github-repository-owner"
+  id = "operations-engineering-find-a-github-repository-owner:main"
 }
 
 import {
@@ -111,7 +111,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-github-actions-dashboard.github_branch_protection.default
-  id = "operations-engineering-github-actions-dashboard"
+  id = "operations-engineering-github-actions-dashboard:main"
 }
 
 import {
@@ -126,7 +126,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-kpi-dashboard.github_branch_protection.default
-  id = "operations-engineering-kpi-dashboard"
+  id = "operations-engineering-kpi-dashboard:main"
 }
 
 import {
@@ -141,7 +141,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-runbooks.github_branch_protection.default
-  id = "operations-engineering-runbooks"
+  id = "operations-engineering-runbooks:main"
 }
 
 import {
@@ -156,7 +156,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-support-metadata.github_branch_protection.default
-  id = "operations-engineering-support-metadata"
+  id = "operations-engineering-support-metadata:main"
 }
 
 import {
@@ -171,7 +171,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering-user-guide.github_branch_protection.default
-  id = "operations-engineering-user-guide"
+  id = "operations-engineering-user-guide:main"
 }
 
 import {
@@ -186,7 +186,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.operations-engineering.github_branch_protection.default
-  id = "operations-engineering"
+  id = "operations-engineering:main"
 }
 
 import {
@@ -201,7 +201,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.terraform-aws-mtasts.github_branch_protection.default
-  id = "terraform-aws-mtasts"
+  id = "terraform-aws-mtasts:main"
 }
 
 import {
@@ -216,7 +216,7 @@ import {
 
 import {
   to = module.ministryofjustice.module.terraform-github-repository.github_branch_protection.default
-  id = "terraform-github-repository"
+  id = "terraform-github-repository:main"
 }
 
 import {
