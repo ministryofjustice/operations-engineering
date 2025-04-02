@@ -1,14 +1,14 @@
-module "operations-engineering-cloud-platform-namespace" {
-  source  = "ministryofjustice/repository/github"
-  version = "1.2.1"
+# module "operations-engineering-cloud-platform-namespace" {
+#   source  = "ministryofjustice/repository/github"
+#   version = "1.2.1"
 
-  poc = false
+#   poc = false
 
-  name        = "operations-engineering-cloud-platform-namespace"
-  description = "This repository contains the terraform code for an operations engineering namespace in the cloud platform"
-  topics      = ["operations-engineering"]
+#   name        = "operations-engineering-cloud-platform-namespace"
+#   description = "This repository contains the terraform code for an operations engineering namespace in the cloud platform"
+#   topics      = ["operations-engineering"]
 
-  team_access = {
-    admin = [var.operations_engineering_team_id]
-  }
-}
+#   team_access = {
+#     admin = [var.operations_engineering_team_id]
+#   }
+# }

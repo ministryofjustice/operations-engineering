@@ -1,15 +1,15 @@
-module "terraform-aws-mtasts" {
-  source  = "ministryofjustice/repository/github"
-  version = "1.2.1"
+# module "terraform-aws-mtasts" {
+#   source  = "ministryofjustice/repository/github"
+#   version = "1.2.1"
 
-  poc = false
+#   poc = false
 
-  name        = "terraform-aws-mtasts"
-  type        = "module"
-  description = "MTA-STS/TLS-RPT AWS Terraform Module"
-  topics      = ["operations-engineering"]
+#   name        = "terraform-aws-mtasts"
+#   type        = "module"
+#   description = "MTA-STS/TLS-RPT AWS Terraform Module"
+#   topics      = ["operations-engineering"]
 
-  team_access = {
-    admin = [var.operations_engineering_team_id]
-  }
-}
+#   team_access = {
+#     admin = [var.operations_engineering_team_id]
+#   }
+# }
