@@ -1,6 +1,5 @@
 # ministryofjustice-test
 
-# R_kgDOLRPf2Q test-tamf-repo-test-org
 import {
   to = module.ministryofjustice-test.module.test_tamf_repo_test_org.github_repository.default
   id = "test-tamf-repo-test-org"
@@ -17,7 +16,7 @@ import {
   to = module.ministryofjustice-test.module.test_tamf_repo_test_org.github_team_repository.push["9472191"]
   id = "9472191:test-tamf-repo-test-org"
 }
-# R_kgDOLPRAVQ test-repo-levg
+
 import {
   to = module.ministryofjustice-test.module.test-repo-levg.github_repository.default
   id = "test-repo-levg"
@@ -29,20 +28,20 @@ import {
 }
 
 # # ministryofjustice
-# import {
-#   to = module.ministryofjustice.module.github-actions.github_repository.default
-#   id = "github-actions"
-# }
+import {
+  to = module.ministryofjustice.module.github-actions.github_repository.default
+  id = "github-actions"
+}
 
-# import {
-#   to = module.ministryofjustice.module.github-actions.github_branch_protection.default
-#   id = "github-actions:main"
-# }
+import {
+  to = module.ministryofjustice.module.github-actions.github_branch_protection.default
+  id = "github-actions:main"
+}
 
-# import {
-#   to = module.ministryofjustice.module.github-actions.github_team_repository.admin["4192115"]
-#   id = "4192115:github-actions"
-# }
+import {
+  to = module.ministryofjustice.module.github-actions.github_team_repository.admin["4192115"]
+  id = "4192115:github-actions"
+}
 
 # import {
 #   to = module.ministryofjustice.module.operations-engineering-certificate-renewal.github_repository.default
