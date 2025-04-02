@@ -26,7 +26,7 @@ import {
 
 import {
   to = module.ministryofjustice-test.module.test-repo-levg.github_branch_protection.default
-  id = "test-repo-levg"
+  id = "test-repo-levg:main"
 }
 
 # ministryofjustice
