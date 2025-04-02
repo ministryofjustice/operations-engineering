@@ -35,7 +35,8 @@ import {
 
 import {
   to = module.ministryofjustice.module.github-actions.github_branch_protection.default
-  id = "github-actions:main"
+  id = "215042618:main"
+  # id = "github-actions:main"
 }
 
 import {
