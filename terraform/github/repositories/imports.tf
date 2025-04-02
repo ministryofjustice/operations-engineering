@@ -33,10 +33,10 @@ import {
   id = "github-actions"
 }
 
-# import {
-#   to = module.ministryofjustice.module.github-actions.github_branch_protection.default
-#   id = "github-actions:main"
-# }
+import {
+  to = module.ministryofjustice.module.github-actions.github_branch_protection.default
+  id = "github-actions:main"
+}
 
 import {
   to = module.ministryofjustice.module.github-actions.github_team_repository.admin["4192115"]
