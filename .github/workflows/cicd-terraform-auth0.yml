@@ -27,7 +27,7 @@ jobs:
       path: "terraform/auth0/${{ matrix.path }}"
       name: "auth0 (${{ matrix.path }})"
     secrets:
-      iam_role: ${{ secrets.TERRAFORM_AUTH0_S3_ROLE_ARN_DEV }}
+      iam_role: ${{ secrets.TERRAFORM_AUTH0_S3_ROLE_ARN }}
       repo_github_token: ${{ secrets.GITHUB_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
       env: |
