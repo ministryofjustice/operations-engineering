@@ -30,3 +30,25 @@ import {
   to = auth0_connection.google_oauth2
   id = "con_yyrB18AQbSUcMLTm"
 }
+
+# As this is not a resource identifiable by an ID within the Auth0 Management API,
+# tenant can be imported using a random string.
+#
+# We recommend [Version 4 UUID](https://www.uuidgenerator.net/version4)
+import {
+  to = auth0_tenant.tenant
+  id = "db796dd0-9670-4641-85bb-b6462e3ab6a9"
+}
+
+import {
+  to = auth0_resource_server.auth0_management_api
+  id = ""
+}
+
+# Use random string!
+# We recommend [Version 4 UUID](https://www.uuidgenerator.net/version4)
+
+import {
+  to = auth0_attack_protection.attack_protection
+  id = "f9e2376d-c64d-44ec-9a34-04b65dabb0ca"
+}
