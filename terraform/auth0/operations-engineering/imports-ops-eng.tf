@@ -48,7 +48,7 @@ import {
 
 import {
   to = auth0_resource_server.auth0_management_api
-  id = "https://operations-engineering.uk.auth0.com/api/v2/"
+  id = "https://operations-engineering.eu.auth0.com/api/v2/"
 }
 
 # Use random string!
