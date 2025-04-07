@@ -42,7 +42,7 @@ import {
 
 import {
   to = auth0_resource_server.auth0_management_api
-  id = ""
+  id = "https://operations-engineering-test.uk.auth0.com/api/v2/"
 }
 
 # Use random string!
