@@ -20,10 +20,10 @@ import {
   id = "k6ysmMa4y8ubV1cHw7DhoZnmt5odBoeJ"
 }
 
-# import {
-#   to = auth0_client.pagerduty
-#   id = ""
-# }
+import {
+  to = auth0_client.pagerduty
+  id = "hrmwI3eZiyRLR2DQQmgCIZEPQ2wsuhxN"
+}
 
 import {
   to = auth0_client.standards_report
