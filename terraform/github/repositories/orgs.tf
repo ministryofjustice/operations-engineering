@@ -3,8 +3,8 @@ module "ministryofjustice" {
 
   ECR_REGION                     = var.ECR_REGION
   ECR_REGISTRY                   = var.ECR_REGISTRY
-  operations_engineering_team_id = data.github_team.operations_engineering.id
   cloud_optimisation_and_accountability_team_id = data.github_team.cloud_optimisation_and_accountability.id
+  operations_engineering_team_id                = data.github_team.operations_engineering.id
 }
 
 module "ministryofjustice-test" {
