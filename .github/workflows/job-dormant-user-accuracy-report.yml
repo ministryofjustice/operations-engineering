@@ -26,8 +26,8 @@ jobs:
       - name: Execute dormant user removal accuracy report run
         run: pipenv run python3 -m bin.dormant_user_removal_accuracy_report
         env:
-          GH_MOJ_ADMIN_TOKEN: ${{ secrets.READONLY_MOJ_GITHUB_DORMANT_USERS }}
-          GH_AP_ADMIN_TOKEN: ${{ secrets.READONLY_AP_GITHUB_DORMANT_USERS }}
+          GH_MOJ_ADMIN_TOKEN: ${{ secrets.GH_MOJ_DORMANT_USERS_READ }}
+          GH_AP_ADMIN_TOKEN: ${{ secrets.GH_MOJAS_DORMANT_USERS_READ }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
           GH_GITHUB_TOKEN_AUDIT_LOG_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN }}
       - name: Report failure to Slack
