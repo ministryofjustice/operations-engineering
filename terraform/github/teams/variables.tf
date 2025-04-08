@@ -12,4 +12,3 @@ variable "ops_eng_support_members" {
     "andyrogers1973",
   ]
 }
-
