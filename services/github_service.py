@@ -1,6 +1,7 @@
 # pylint: disable=E1136, E1135, W0718, C0411
 
 import json
+import time
 from calendar import timegm
 from datetime import date, datetime, timedelta, timezone
 from time import gmtime, sleep
@@ -1129,10 +1130,21 @@ class GithubService:
             "X-GitHub-Api-Version": "2022-11-28"
         }
 
-        response = self.github_client_rest_api.get(
-            f"https://api.github.com/enterprises/{self.enterprise_name}/settings/billing/usage?month={month}", headers=headers)
+        max_attempts = 3
+        for attempt in range(1, max_attempts + 1):
+            response = self.github_client_rest_api.get(
+                f"https://api.github.com/enterprises/{self.enterprise_name}/settings/billing/usage?month={month}",
+                headers=headers
+            )
 
-        return response.json()
+            data = response.json()
+            if data and data.get("usageItems") is not None:
+                return data
+
+            logging.warning(f"Attempt {attempt} failed to get valid usage data. Retrying...")
+            time.sleep(2 ** attempt)  # Exponential backoff: 2s, 4s, 8s
+
+        raise ValueError("Failed to retrieve valid usage data after multiple attempts.")
 
     @retries_github_rate_limit_exception_at_next_reset_once
     def modify_gha_minutes_quota_threshold(self, new_threshold):
@@ -1173,16 +1185,23 @@ class GithubService:
         gha_minutes_total = 0.0
         if enterprise_billable_repos:
             current_billing_month = datetime.now().month
-            billing_data = self.get_current_month_gha_minutes_for_enterprise(current_billing_month)
-            print(billing_data['usageItems'])
-            gha_minutes_total = sum(
-                item['quantity']
-                for item in billing_data.get('usageItems')
-                if item.get('product') == 'actions'
-                and item.get('unitType') == 'Minutes'
-                and item.get('repositoryName') in enterprise_billable_repos
-            )
+            try:
+                billing_data = self.get_current_month_gha_minutes_for_enterprise(current_billing_month)
+                usage_items = billing_data.get('usageItems', [])
 
+                if not usage_items:
+                    logging.warning("No usage items returned in billing data.")
+                else:
+                    gha_minutes_total = sum(
+                        item['quantity']
+                        for item in usage_items
+                        if item.get('product') == 'actions'
+                        and item.get('unitType') == 'Minutes'
+                        and item.get('repositoryName') in enterprise_billable_repos
+                    )
+            except Exception as e:
+                logging.error(f"Failed to retrieve or process billing data: {e}")
+        
         return gha_minutes_total
 
     @retries_github_rate_limit_exception_at_next_reset_once
