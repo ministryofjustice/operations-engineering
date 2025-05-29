@@ -20,7 +20,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.alert_on_low_github_licences
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN_ENTERPRISE_DATA }}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.ENTERPRISE_BILLING_TOKEN_FROM_TONY }}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
 
       - name: Report failure to Slack
