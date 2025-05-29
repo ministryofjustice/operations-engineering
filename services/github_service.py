@@ -1174,6 +1174,7 @@ class GithubService:
         if enterprise_billable_repos:
             current_billing_month = datetime.now().month
             billing_data = self.get_current_month_gha_minutes_for_enterprise(current_billing_month)
+            print(billing_data['usageItems'])
             gha_minutes_total = sum(
                 item['quantity']
                 for item in billing_data.get('usageItems')
