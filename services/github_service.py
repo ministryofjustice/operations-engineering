@@ -1201,7 +1201,7 @@ class GithubService:
                     )
             except Exception as e:
                 logging.error(f"Failed to retrieve or process billing data: {e}")
-        
+
         return gha_minutes_total
 
     @retries_github_rate_limit_exception_at_next_reset_once
