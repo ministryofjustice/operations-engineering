@@ -1138,7 +1138,7 @@ class GithubService:
             )
 
             data = response.json()
-            if data and data.get("usageItems") is not None:
+            if data and data.get("usageItems"):
                 return data
 
             logging.warning(f"Attempt {attempt} failed to get valid usage data. Retrying...")
