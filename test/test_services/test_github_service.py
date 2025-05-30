@@ -1562,7 +1562,6 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
                          'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             ]
         )
-    
 
     def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1693,7 +1692,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
     @patch("logging.error")
     def test_calculate_total_minutes_enterprise_error_case(self, mock_logging_error,
                                                            mock_get_current_month_gha_minutes_for_enterprise,
-                                                           mock_datetime,mock_get_all_private_internal_repos_names,
+                                                           mock_datetime, mock_get_all_private_internal_repos_names,
                                                            mock_get_all_organisations_in_enterprise,
                                                            _mock_github_client_rest_api,
                                                            _mock_github_client_core_api):
