@@ -1562,6 +1562,7 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
                          'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
             ]
         )
+    
 
     def test_modify_gha_minutes_quota_threshold(self, mock_github_client_rest_api, _mock_github_client_core_api):
         github_service = GithubService("", ORGANISATION_NAME)
@@ -1684,6 +1685,31 @@ class TestGHAMinutesQuotaOperations(unittest.TestCase):
 
         self.assertEqual(
             github_service.calculate_total_minutes_enterprise(), 185)
+
+    @patch.object(GithubService, "get_all_organisations_in_enterprise")
+    @patch.object(GithubService, "get_all_private_internal_repos_names")
+    @patch("datetime.datetime")
+    @patch.object(GithubService, "get_current_month_gha_minutes_for_enterprise")
+    @patch("logging.error")
+    def test_calculate_total_minutes_enterprise_error_case(self, mock_logging_error,
+                                                           mock_get_current_month_gha_minutes_for_enterprise,
+                                                           mock_datetime,mock_get_all_private_internal_repos_names,
+                                                           mock_get_all_organisations_in_enterprise,
+                                                           _mock_github_client_rest_api,
+                                                           _mock_github_client_core_api):
+        github_service = GithubService("", ORGANISATION_NAME)
+
+        mock_get_all_organisations_in_enterprise.return_value = ['test_org1']
+        mock_get_all_private_internal_repos_names.return_value = ['repo1']
+        mock_datetime.now.return_value = datetime(2025, 1, 29)
+        mock_get_current_month_gha_minutes_for_enterprise.side_effect = Exception("Billing usage report error")
+
+        result = github_service.calculate_total_minutes_enterprise()
+
+        self.assertEqual(result, 0.0)
+
+        mock_logging_error.assert_called_once()
+        self.assertIn("Failed to retrieve or process billing data", mock_logging_error.call_args[0][0])
 
     @patch.object(GithubService, "_get_repository_variable")
     @patch.object(GithubService, "reset_alerting_threshold_if_first_day_of_month")
