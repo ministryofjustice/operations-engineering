@@ -427,6 +427,7 @@ disable=raw-checker-failed,
         R0902,  # Too many instance attributes
         R0903,  # Too few public methods
         R0904,  # Too many public methods
+        R0917,  # Too many positional arguments
         W0212  # Access to a protected member (we do this for testing)
 
 
