@@ -6,7 +6,7 @@ module "operations-engineering" {
 
   name            = "operations-engineering"
   description     = "This repository is home to the Operations Engineering's tools and utilities for managing, monitoring, and optimising software development processes at the Ministry of Justice."
-  homepage_url    = "https://user-guide.operations-engineering.service.justice.gov.uk/"
+  homepage_url    = "https://cloud-optimisation-and-accountability.justice.gov.uk/documentation/operations-engineering-legacy/operations-engineering-user-guide/user-guide-index.html"
   has_discussions = true
   topics          = ["operations-engineering", "python", "issue-tracker"]
 
