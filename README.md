@@ -12,7 +12,7 @@ The Operations Engineering team buy, build, and run tools to help build and oper
 
 This mono repository includes code that performs various operations engineering tasks to streamline our workflow and maintain high operational standards. Here are some highlights:
 
-- **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://user-guide.operations-engineering.service.justice.gov.uk/documentation/information/mojrepostandards.html). These reports help us maintain the quality of our code and streamline collaboration.
+- **Repository Reports:** We generate reports that verify the adherence of the Ministry of Justice organisation's repositories to the high standards outlined in our [Repository Standards](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/). These reports help us maintain the quality of our code and streamline collaboration.
 
 - **Sentry Monitoring:** We monitor Sentry for over and under-utilisation, ensuring we leverage this error-tracking tool to its full potential. This helps in identifying and rectifying application errors more efficiently.
 
