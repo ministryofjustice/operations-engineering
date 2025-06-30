@@ -7,6 +7,10 @@ module "coat-cur-data-pipeline" {
   name        = "coat-cur-data-pipeline"
   description = "A GitHub repository for the Cloud Optimisation and Accountability Team Cost and Usage Report Data Pipeline "
   topics      = ["cloud-optimisation-and-accountability"]
+  template = {
+    "owner" : "ministryofjustice",
+    "repository" : "analytical-platform-airflow-python-template"
+  }
 
   homepage_url = "https://cloud-optimisation-and-accountability.justice.gov.uk/"
 
