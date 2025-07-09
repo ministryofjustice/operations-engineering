@@ -6,8 +6,8 @@ resource "auth0_connection" "google_workspace" {
   options {
     client_id        = var.google_workspace_connection_client_id
     client_secret    = var.google_workspace_connection_secret
-    domain           = "digital.justice.gov.uk"
-    tenant_domain    = "digital.justice.gov.uk"
+    domain           = "justice.gov.uk"
+    tenant_domain    = "justice.gov.uk"
     api_enable_users = true
     scopes           = ["ext_profile", "basic_profile"]
     upstream_params = jsonencode({
