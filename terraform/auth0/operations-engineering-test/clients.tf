@@ -55,14 +55,14 @@ resource "auth0_client" "github" {
   cross_origin_loc                      = null
   custom_login_page                     = null
   custom_login_page_on                  = true
-  description                           = "Web application to SSO into the ministryofjustice-test GitHub Organisation" # s"
+  description                           = "Web application to SSO into the ministryofjustice-test GitHub Organisations"
   form_template                         = null
   grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
   initiate_login_uri                    = null
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "GitHub" # " - Test Organisation"
+  name                                  = "GitHub - Test Organisation"
   oidc_conformant                       = true
   organization_require_behavior         = "no_prompt"
   organization_usage                    = null
