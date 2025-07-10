@@ -62,7 +62,7 @@ resource "auth0_client" "github" {
   is_first_party                        = true
   is_token_endpoint_ip_header_trusted   = false
   logo_uri                              = null
-  name                                  = "GitHub - Test Organisation"
+  name                                  = "GitHub" # " - Test Organisation"
   oidc_conformant                       = true
   organization_require_behavior         = "no_prompt"
   organization_usage                    = null
