@@ -9,7 +9,7 @@ resource "auth0_connection" "google_workspace" {
     client_secret    = var.google_workspace_connection_secret
     domain           = "justice.gov.uk"
     tenant_domain    = "justice.gov.uk"
-    api_enable_users = true
+    api_enable_users = false
     scopes           = ["ext_profile", "basic_profile"]
     upstream_params = jsonencode({
       "screen_name" : {
