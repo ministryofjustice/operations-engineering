@@ -175,59 +175,6 @@ resource "auth0_client" "terraform_provider_auth0" {
   }
 }
 
-resource "auth0_client" "standards_report" {
-  allowed_clients                       = []
-  allowed_logout_urls                   = ["http://127.0.0.1:4567", "http://127.0.0.1/", "http://localhost:4567", "http://localhost", "http://operations-engineering-reports.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-dev.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk"]
-  allowed_origins                       = []
-  app_type                              = "regular_web"
-  callbacks                             = ["http://127.0.0.1:4567/callback", "http://127.0.0.1:4567/auth/callback", "http://localhost:4567/auth/callback", "https://localhost:4567/auth/callback", "http://127.0.0.1/callback", "http://localhost:4567/callback", "http://localhost/callback", "http://operations-engineering-reports.cloud-platform.service.justice.gov.uk/callback", "http://operations-engineering-reports-dev.cloud-platform.service.justice.gov.uk/callback", "http://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk/callback"]
-  client_aliases                        = []
-  client_metadata                       = {}
-  cross_origin_auth                     = false
-  cross_origin_loc                      = null
-  custom_login_page                     = null
-  custom_login_page_on                  = true
-  description                           = "This enables login via GitHub SSO to the Standards Report: https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/"
-  form_template                         = null
-  grant_types                           = ["authorization_code", "implicit", "refresh_token"]
-  initiate_login_uri                    = null
-  is_first_party                        = true
-  is_token_endpoint_ip_header_trusted   = false
-  logo_uri                              = null
-  name                                  = "Standards Report"
-  oidc_backchannel_logout_urls          = []
-  oidc_conformant                       = true
-  organization_require_behavior         = null
-  organization_usage                    = null
-  require_pushed_authorization_requests = false
-  sso                                   = false
-  sso_disabled                          = false
-  web_origins                           = ["http://127.0.0.1:4567", "http://localhost:4567", "http://localhost", "http://127.0.0.1/", "http://operations-engineering-reports.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-dev.cloud-platform.service.justice.gov.uk", "http://operations-engineering-reports-prod.cloud-platform.service.justice.gov.uk"]
-  jwt_configuration {
-    alg                 = "RS256"
-    lifetime_in_seconds = 36000
-    scopes              = {}
-    secret_encoded      = false
-  }
-  native_social_login {
-    apple {
-      enabled = false
-    }
-    facebook {
-      enabled = false
-    }
-  }
-  refresh_token {
-    expiration_type              = "non-expiring"
-    idle_token_lifetime          = 1296000
-    infinite_idle_token_lifetime = true
-    infinite_token_lifetime      = true
-    leeway                       = 0
-    rotation_type                = "non-rotating"
-    token_lifetime               = 2592000
-  }
-}
-
 resource "auth0_client" "kpi_dashboard" {
   allowed_clients                       = []
   allowed_logout_urls                   = []
@@ -344,47 +291,5 @@ resource "auth0_client" "github" {
       digest_algorithm                   = "sha256"
       name_identifier_probes             = ["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
     }
-  }
-}
-
-resource "auth0_client" "find_a_github_repository_owner" {
-  allowed_logout_urls                   = ["https://find-a-github-repository-owner-dev.cloud-platform.service.justice.gov.uk/"]
-  app_type                              = "regular_web"
-  callbacks                             = ["https://find-a-github-repository-owner-dev.cloud-platform.service.justice.gov.uk/auth/callback"]
-  cross_origin_auth                     = false
-  custom_login_page_on                  = true
-  description                           = "This secures the web application to MoJ employees"
-  grant_types                           = ["authorization_code", "implicit", "refresh_token", "client_credentials"]
-  is_first_party                        = true
-  is_token_endpoint_ip_header_trusted   = false
-  name                                  = "Find a GitHub Repository Owner Dev"
-  oidc_conformant                       = true
-  organization_require_behavior         = "no_prompt"
-  require_pushed_authorization_requests = false
-  sso                                   = false
-  sso_disabled                          = false
-  web_origins                           = ["https://find-a-github-repository-owner-dev.cloud-platform.service.justice.gov.uk/"]
-  jwt_configuration {
-    alg                 = "RS256"
-    lifetime_in_seconds = 35994
-    scopes              = {}
-    secret_encoded      = false
-  }
-  native_social_login {
-    apple {
-      enabled = false
-    }
-    facebook {
-      enabled = false
-    }
-  }
-  refresh_token {
-    expiration_type              = "non-expiring"
-    idle_token_lifetime          = 2592000
-    infinite_idle_token_lifetime = true
-    infinite_token_lifetime      = true
-    leeway                       = 0
-    rotation_type                = "non-rotating"
-    token_lifetime               = 31557600
   }
 }
