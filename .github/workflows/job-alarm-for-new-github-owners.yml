@@ -21,7 +21,7 @@ jobs:
           pipenv install
       - run: pipenv run python3 -m bin.check_for_new_github_owners
         env:
-          ADMIN_GITHUB_TOKEN: ${{ secrets.GH_BOT_AUDIT_LOG_PAT_TOKEN}}
+          ADMIN_GITHUB_TOKEN: ${{ secrets.OPERATIONS_ENGINEERING_GITHUB_AUDIT_LOG_READ_ONLY}}
           ADMIN_SLACK_TOKEN: ${{ secrets.ADMIN_SEND_TO_SLACK }}
 
       - name: Report failure to Slack
