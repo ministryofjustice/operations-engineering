@@ -75,7 +75,7 @@ class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCa
 
 
 @patch("slack_sdk.WebClient.__new__")
-class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.TestCase):
+class TestSlackServiceSendSpanUsageAlertToOperationsEngineering(unittest.TestCase):
 
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
         SlackService("").send_usage_alert_to_operations_engineering(
@@ -88,15 +88,15 @@ class TestSlackServiceSendTransactionUsageAlertToOperationsEngineering(unittest.
                 end_time=datetime.strptime(END_TIME, DATE_FORMAT)
             ),
             4,
-            "transaction"
+            "span"
         )
         mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
             {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':warning: *Sentry Transaction Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
+                                         'text': ':warning: *Sentry Span Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
             {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
-                                                              'text': 'Check Sentry for projects with excessive transactions :eyes:'},
+                                                              'text': 'Check Sentry for projects with excessive spans :eyes:'},
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
-                                                                           'text': ':sentry: Transaction usage for period',
+                                                                           'text': ':sentry: Span usage for period',
                                                                            'emoji': True},
                                                 'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
             {'type': 'section',
