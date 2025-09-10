@@ -59,8 +59,8 @@ class TestSentryUsageAlertMain(unittest.TestCase):
                     1,
                     UsageStats(
                         total=10000000,
-                        max_usage=967741,
-                        percentage_of_quota_used=10.333343322231878,
+                        max_usage=22580645,
+                        percentage_of_quota_used=0.4428571460204082,
                         start_time="2023-06-08T00:00:00Z",
                         end_time="2023-06-09T00:00:00Z",
                     ),
