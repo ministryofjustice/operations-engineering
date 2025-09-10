@@ -32,14 +32,5 @@ class KpiService:
     def __add_indicator(self, indicator: str, count: int) -> None:
         self.__post("/api/indicator/add", {"indicator": indicator, "count": count})
 
-    def track_sentry_transactions_used_for_day(self, count: int):
-        self.__add_indicator("SENTRY_TRANSACTIONS_USED_OVER_PAST_DAY", count)
-
-    def track_sentry_errors_used_for_day(self, count: int):
-        self.__add_indicator("SENTRY_ERRORS_USED_OVER_PAST_DAY", count)
-
-    def track_sentry_replays_used_for_day(self, count: int):
-        self.__add_indicator("SENTRY_REPLAYS_USED_OVER_PAST_DAY", count)
-
     def track_enterprise_github_actions_quota_usage(self, count: int):
         self.__add_indicator("ENTERPRISE_GITHUB_ACTIONS_QUOTA_USAGE", count)
