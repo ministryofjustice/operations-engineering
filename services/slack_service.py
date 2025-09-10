@@ -12,7 +12,7 @@ class SlackService:
     OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID = "C033QBE511V"
     OPERATIONS_ENGINEERING_TEAM_CHANNEL_ID = "CPVD6398C"
     DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-    SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/sentryio/respond-to-sentry-usage-alert"
+    SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://cloud-optimisation-and-accountability.justice.gov.uk/documentation/operations-engineering-legacy/operations-engineering-runbooks/tools/respond-to-sentry-usage-alert.html#respond-to-sentry-usage-alert"
     OPERATION_ENGINEERING_REPOSITORY_URL = "https://github.com/ministryofjustice/operations-engineering"
 
     # Added to stop TypeError on instantiation. See https://github.com/python/cpython/blob/d2340ef25721b6a72d45d4508c672c4be38c67d3/Objects/typeobject.c#L4444

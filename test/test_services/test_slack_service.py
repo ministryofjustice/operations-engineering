@@ -10,7 +10,7 @@ from services.slack_service import SlackService
 START_TIME = "2023-06-08T00:00:00Z"
 END_TIME = "2023-06-09T00:00:00Z"
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://runbooks.operations-engineering.service.justice.gov.uk/documentation/services/sentryio/respond-to-sentry-usage-alert"
+SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://cloud-optimisation-and-accountability.justice.gov.uk/documentation/operations-engineering-legacy/operations-engineering-runbooks/tools/respond-to-sentry-usage-alert.html#respond-to-sentry-usage-alert"
 
 
 @patch("slack_sdk.WebClient.__new__")
