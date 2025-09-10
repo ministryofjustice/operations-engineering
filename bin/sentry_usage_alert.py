@@ -2,8 +2,6 @@
 
 import os
 
-from requests import RequestException
-
 from clients.sentry_client import SentryClient
 from config.logging_config import logging
 from services.sentry_service import SentryService
