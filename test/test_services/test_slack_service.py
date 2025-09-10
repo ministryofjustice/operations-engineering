@@ -92,13 +92,13 @@ class TestSlackServiceSendSpanUsageAlertToOperationsEngineering(unittest.TestCas
         )
         mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
             {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':warning: *Sentry Span Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Transactions\n- Transactions consumed over period: 1\n- Percentage consumed: 300%'}},
+                                         'text': ':warning: *Sentry Span Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Spans\n- Spans consumed over period: 1\n- Percentage consumed: 300%'}},
             {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
                                                               'text': 'Check Sentry for projects with excessive spans :eyes:'},
                                   'accessory': {'type': 'button', 'text': {'type': 'plain_text',
                                                                            'text': ':sentry: Span usage for period',
                                                                            'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=transactions&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
+                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=spans&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
             {'type': 'section',
              'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
              'accessory': {'type': 'button',
