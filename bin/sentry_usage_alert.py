@@ -57,9 +57,9 @@ def main():
         slack_service.send_usage_alert_to_operations_engineering(
             period_in_days, error_usage_stats, usage_threshold, "error"
         )
-    if transaction_usage_stats.percentage_of_quota_used > usage_threshold:
+    if span_usage_stats.percentage_of_quota_used > usage_threshold:
         slack_service.send_usage_alert_to_operations_engineering(
-            period_in_days, transaction_usage_stats, usage_threshold, "transaction"
+            period_in_days, span_usage_stats, usage_threshold, "span"
         )
     if replay_usage_stats.percentage_of_quota_used > usage_threshold:
         slack_service.send_usage_alert_to_operations_engineering(
