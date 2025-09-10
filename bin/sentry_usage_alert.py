@@ -52,7 +52,6 @@ def main():
         f"Replay quota consumed over past {period_in_days} {'days' if period_in_days > 1 else 'day'} [ {replay_usage_stats.total} / {replay_usage_stats.max_usage} ]. Percentage consumed over period: [ {replay_usage_stats.percentage_of_quota_used:.0%} ]"
     )
 
-    
     if error_usage_stats.percentage_of_quota_used > usage_threshold:
         slack_service.send_usage_alert_to_operations_engineering(
             period_in_days, error_usage_stats, usage_threshold, "error"
