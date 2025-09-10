@@ -6,6 +6,7 @@ from services.kpi_service import KpiService
 TEST_API_KEY = "test_api_key"
 TEST_BASE_URL = "test_base_url"
 
+
 @patch("services.kpi_service.requests")
 class TestKPIServiceTrackEnterpriceGithubActionQuotaUsage(unittest.TestCase):
     def test_api_called(self, mock_requests: MagicMock):
