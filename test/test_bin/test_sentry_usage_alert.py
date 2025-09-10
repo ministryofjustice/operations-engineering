@@ -99,6 +99,7 @@ class TestSentryUsageAlertMain(unittest.TestCase):
         mock_slack_service.return_value.send_error_usage_alert_to_operations_engineering.assert_not_called()
         mock_slack_service.return_value.send_span_usage_alert_to_operations_engineering.assert_not_called()
 
+
 @patch("requests.get", new=MagicMock)
 class TestGetEnvironmentVariables(unittest.TestCase):
     def test_raises_error_when_no_sentry_environment_variable_provided(self):
