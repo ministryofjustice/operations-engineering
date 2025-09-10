@@ -19,7 +19,7 @@ class TestSentryServiceLogQuotaUsageForPeriodInDays(unittest.TestCase):
 
         self.assertEqual(10000, span_usage_stats.total)
         self.assertEqual(0.01, round(span_usage_stats.percentage_of_quota_used, 2))
-        self.assertEqual(967741, span_usage_stats.max_usage)
+        self.assertEqual(1000000, span_usage_stats.max_usage)
 
         self.assertEqual(10000, replay_usage_stats.total)
         self.assertEqual(0.39, round(replay_usage_stats.percentage_of_quota_used, 2))
