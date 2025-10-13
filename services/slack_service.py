@@ -101,35 +101,12 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_dormant_outside_collaborator_list(self, user_list, days_since: str):
-        message = (
-            f"🦥 *Dormant Outside Collaborator Report* 🦥\n\n"
-            f"These GitHub Outside Collaborators have made no commits for {days_since} days on any repository they are affiliated with:\n"
-            f"{user_list}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
     def send_pat_report_alert(self):
         message = (
             "*Expired PAT Report*\n\n"
             "Some expired PAT(s) have been detected.\n\n"
             "Please review the current list here:\n"
             "https://github.com/organizations/ministryofjustice/settings/personal-access-tokens/active"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_new_github_joiner_metrics_alert(self, new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, org, audit_log_url, time_delta_in_days):
-        message = (
-            f"*GitHub Joiner Metrics*\n\n"
-            f"Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
-            f"*Added by Operations Engineering:*\n"
-            f"{new_members_added_by_oe}\n\n"
-            f"*Added externally:*\n"
-            f"{new_members_added_externally}\n\n"
-            f"{percentage}% of the new joiners were added by operations engineering.\n\n"
-            f"Please review the audit log for more details: {audit_log_url}"
         )
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)

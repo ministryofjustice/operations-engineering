@@ -259,20 +259,6 @@ class TestSlackService(unittest.TestCase):
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
 
-    def test_send_dormant_outside_collaborator_list(self):
-        user_list = "Test user list"
-        days_since = "13"
-        expected_message = (
-            f"🦥 *Dormant Outside Collaborator Report* 🦥\n\n"
-            f"These GitHub Outside Collaborators have made no commits for {days_since} days on any repository they are affiliated with:\n"
-            f"{user_list}"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_dormant_outside_collaborator_list(user_list, str(13))
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
     def test_send_pat_report_alert(self):
         expected_message = (
             "*Expired PAT Report*\n\n"
@@ -282,32 +268,6 @@ class TestSlackService(unittest.TestCase):
         )
         blocks = self.slack_service._create_block_with_message(expected_message)
         self.slack_service.send_pat_report_alert()
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
-    def test_send_new_github_joiner_metrics_alert(self):
-        new_members_added_by_oe = "OE members"
-        new_members_added_externally = "External members"
-        percentage = 50
-        total_new_members = 10
-        org = "Test Org"
-        audit_log_url = "http://auditlog.url"
-        time_delta_in_days = 7
-        expected_message = (
-            f"*GitHub Joiner Metrics*\n\n"
-            f"Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
-            f"*Added by Operations Engineering:*\n"
-            f"{new_members_added_by_oe}\n\n"
-            f"*Added externally:*\n"
-            f"{new_members_added_externally}\n\n"
-            f"{percentage}% of the new joiners were added by operations engineering.\n\n"
-            f"Please review the audit log for more details: {audit_log_url}"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_new_github_joiner_metrics_alert(
-            new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, org, audit_log_url, time_delta_in_days
-        )
         self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
