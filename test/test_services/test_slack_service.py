@@ -4,7 +4,6 @@ import unittest
 from datetime import datetime
 from unittest.mock import MagicMock, patch
 
-from services.sentry_service import UsageStats
 from services.slack_service import SlackService
 
 START_TIME = "2023-06-08T00:00:00Z"
@@ -40,70 +39,6 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
         self.slack_client.conversations_list.return_value = {
             'channels': [self.channel], 'response_metadata': self.response_metadata}
         self.slack_service.slack_client = self.slack_client
-
-
-@patch("slack_sdk.WebClient.__new__")
-class TestSlackServiceSendErrorUsageAlertToOperationsEngineering(unittest.TestCase):
-
-    def test_downstream_services_called(self, mock_slack_client: MagicMock):
-        SlackService("").send_usage_alert_to_operations_engineering(
-            0,
-            UsageStats(
-                1,
-                2,
-                3,
-                start_time=datetime.strptime(START_TIME, DATE_FORMAT),
-                end_time=datetime.strptime(END_TIME, DATE_FORMAT)
-            ),
-            4,
-            "error"
-        )
-        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
-            {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':warning: *Sentry Error Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Errors\n- Errors consumed over period: 1\n- Percentage consumed: 300%'}},
-            {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
-                                                              'text': 'Check Sentry for projects with excessive errors :eyes:'},
-                                  'accessory': {'type': 'button', 'text': {'type': 'plain_text',
-                                                                           'text': ':sentry: Error usage for period',
-                                                                           'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=errors&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
-            {'type': 'section',
-             'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
-             'accessory': {'type': 'button',
-                           'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
-                           'url': SENTRY_QUOTA_MANAGEMENT_GUIDANCE}}])
-
-
-@patch("slack_sdk.WebClient.__new__")
-class TestSlackServiceSendSpanUsageAlertToOperationsEngineering(unittest.TestCase):
-
-    def test_downstream_services_called(self, mock_slack_client: MagicMock):
-        SlackService("").send_usage_alert_to_operations_engineering(
-            0,
-            UsageStats(
-                1,
-                2,
-                3,
-                start_time=datetime.strptime(START_TIME, DATE_FORMAT),
-                end_time=datetime.strptime(END_TIME, DATE_FORMAT)
-            ),
-            4,
-            "span"
-        )
-        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
-            {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':warning: *Sentry Span Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Spans\n- Spans consumed over period: 1\n- Percentage consumed: 300%'}},
-            {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
-                                                              'text': 'Check Sentry for projects with excessive spans :eyes:'},
-                                  'accessory': {'type': 'button', 'text': {'type': 'plain_text',
-                                                                           'text': ':sentry: Span usage for period',
-                                                                           'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=spans&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
-            {'type': 'section',
-             'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
-             'accessory': {'type': 'button',
-                           'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
-                           'url': SENTRY_QUOTA_MANAGEMENT_GUIDANCE}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
