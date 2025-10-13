@@ -1,7 +1,6 @@
 # pylint: disable=W0221, C0411
 
 import unittest
-from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 from services.slack_service import SlackService
