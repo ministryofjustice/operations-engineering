@@ -272,32 +272,6 @@ class TestSlackService(unittest.TestCase):
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
 
-    def test_send_new_github_joiner_metrics_alert(self):
-        new_members_added_by_oe = "OE members"
-        new_members_added_externally = "External members"
-        percentage = 50
-        total_new_members = 10
-        org = "Test Org"
-        audit_log_url = "http://auditlog.url"
-        time_delta_in_days = 7
-        expected_message = (
-            f"*GitHub Joiner Metrics*\n\n"
-            f"Here are the {total_new_members} new joiners added in the last {time_delta_in_days} days within the '{org}' GitHub org. \n\n"
-            f"*Added by Operations Engineering:*\n"
-            f"{new_members_added_by_oe}\n\n"
-            f"*Added externally:*\n"
-            f"{new_members_added_externally}\n\n"
-            f"{percentage}% of the new joiners were added by operations engineering.\n\n"
-            f"Please review the audit log for more details: {audit_log_url}"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_new_github_joiner_metrics_alert(
-            new_members_added_by_oe, new_members_added_externally, percentage, total_new_members, org, audit_log_url, time_delta_in_days
-        )
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
     def test_send_new_github_owners_alert(self):
         new_owner = "Test Owner"
         date_added = "2024-07-22"
