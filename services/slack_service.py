@@ -27,37 +27,6 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_new_github_owners_alert(self, new_owner, date_added, added_by, org, audit_log_url):
-        message = (
-            f"*New GitHub Owners Detected*\n\n"
-            f"A new owner has been detected in the `{org}` GitHub org.\n\n"
-            f"*New owner:* {new_owner}\n"
-            f"*Date added:* {date_added}\n"
-            f"*By who:* {added_by}\n\n"
-            f"Please review the audit log for more details: {audit_log_url}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_low_github_licenses_alert(self, remaining_licenses):
-        message = (
-            f"*Low GitHub Licenses Remaining*\n\n"
-            f"There are only {remaining_licenses} GitHub licenses remaining in the enterprise account.\n\n"
-            f"Please add more licenses using the instructions outlined here:"
-            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_low_github_actions_quota_alert(self, percentage_used):
-        message = (
-            f"*Low GitHub Actions Quota*\n\n"
-            f"{round(100 - percentage_used, 1)}% of the Github Actions minutes quota remains.\n"
-            f"What to do next: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-actions-minutes-procedure.html#low-github-actions-minutes-procedure"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
     def send_unknown_user_alert_to_operations_engineering(self, users: list):
         message = (
             f"*Dormant Users Automation*\n\n"
