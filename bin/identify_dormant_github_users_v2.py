@@ -35,6 +35,7 @@ ALLOWED_BOT_USERS = [
     "opg-use-an-lpa",
     "opg-weblate",
     "slack-moj",
+    "manage-people-on-probation-bot",
 ]
 
 
