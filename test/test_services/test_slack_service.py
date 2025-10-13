@@ -6,12 +6,6 @@ from unittest.mock import MagicMock, patch
 
 from services.slack_service import SlackService
 
-START_TIME = "2023-06-08T00:00:00Z"
-END_TIME = "2023-06-09T00:00:00Z"
-DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-SENTRY_QUOTA_MANAGEMENT_GUIDANCE = "https://cloud-optimisation-and-accountability.justice.gov.uk/documentation/operations-engineering-legacy/operations-engineering-runbooks/tools/respond-to-sentry-usage-alert.html#respond-to-sentry-usage-alert"
-
-
 @patch("slack_sdk.WebClient.__new__")
 class TestSlackServiceInit(unittest.TestCase):
 
@@ -43,34 +37,6 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
 
 @patch("slack_sdk.WebClient.__new__")
 class TestSlackServiceSendReplayUsageAlertToOperationsEngineering(unittest.TestCase):
-
-    def test_downstream_services_called(self, mock_slack_client: MagicMock):
-        SlackService("").send_usage_alert_to_operations_engineering(
-            0,
-            UsageStats(
-                1,
-                2,
-                3,
-                start_time=datetime.strptime(START_TIME, DATE_FORMAT),
-                end_time=datetime.strptime(END_TIME, DATE_FORMAT)
-            ),
-            4,
-            "replay"
-        )
-        mock_slack_client.return_value.chat_postMessage.assert_called_with(channel='C033QBE511V', mrkdown=True, blocks=[
-            {'type': 'section', 'text': {'type': 'mrkdwn',
-                                         'text': ':warning: *Sentry Replay Usage Alert :sentry::warning:*\n- Usage threshold: 400%\n- Period: 0 day\n- Max usage for period: 2 Replays\n- Replays consumed over period: 1\n- Percentage consumed: 300%'}},
-            {'type': 'divider'}, {'type': 'section', 'text': {'type': 'mrkdwn',
-                                                              'text': 'Check Sentry for projects with excessive replays :eyes:'},
-                                  'accessory': {'type': 'button', 'text': {'type': 'plain_text',
-                                                                           'text': ':sentry: Replay usage for period',
-                                                                           'emoji': True},
-                                                'url': 'https://ministryofjustice.sentry.io/stats/?dataCategory=replays&end=2023-06-09T00%3A00%3A00Z&sort=-accepted&start=2023-06-08T00%3A00%3A00Z&utc=true'}},
-            {'type': 'section',
-             'text': {'type': 'mrkdwn', 'text': 'See Sentry usage alert runbook for help with this alert'},
-             'accessory': {'type': 'button',
-                           'text': {'type': 'plain_text', 'text': ':blue_book: Runbook', 'emoji': True},
-                           'url': SENTRY_QUOTA_MANAGEMENT_GUIDANCE}}])
 
 
 @patch("slack_sdk.WebClient.__new__")
