@@ -142,53 +142,6 @@ class TestSlackService(unittest.TestCase):
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
 
-    def test_send_new_github_owners_alert(self):
-        new_owner = "Test Owner"
-        date_added = "2024-07-22"
-        added_by = "Test Admin"
-        org = "Test Org"
-        audit_log_url = "http://auditlog.url"
-        expected_message = (
-            f"*New GitHub Owners Detected*\n\n"
-            f"A new owner has been detected in the `{org}` GitHub org.\n\n"
-            f"*New owner:* {new_owner}\n"
-            f"*Date added:* {date_added}\n"
-            f"*By who:* {added_by}\n\n"
-            f"Please review the audit log for more details: {audit_log_url}"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_new_github_owners_alert(new_owner, date_added, added_by, org, audit_log_url)
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
-    def test_send_low_github_licenses_alert(self):
-        remaining_licenses = 5
-        expected_message = (
-            f"*Low GitHub Licenses Remaining*\n\n"
-            f"There are only {remaining_licenses} GitHub licenses remaining in the enterprise account.\n\n"
-            f"Please add more licenses using the instructions outlined here:"
-            f"https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-seats-procedure.html"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_low_github_licenses_alert(remaining_licenses)
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
-    def test_send_low_github_actions_quota_alert(self):
-        percentage_used = 90
-        expected_message = (
-            f"*Low GitHub Actions Quota*\n\n"
-            f"{round(100 - percentage_used, 1)}% of the Github Actions minutes quota remains.\n"
-            f"What to do next: https://runbooks.operations-engineering.service.justice.gov.uk/documentation/internal/low-github-actions-minutes-procedure.html#low-github-actions-minutes-procedure"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_low_github_actions_quota_alert(percentage_used)
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
     def test_send_unknown_user_alert_to_operations_engineering(self):
         users = ["user1", "user2"]
         expected_message = (
