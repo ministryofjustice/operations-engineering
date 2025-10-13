@@ -36,10 +36,6 @@ class TestSendMessageToPlainTextChannelName(unittest.TestCase):
 
 
 @patch("slack_sdk.WebClient.__new__")
-class TestSlackServiceSendReplayUsageAlertToOperationsEngineering(unittest.TestCase):
-
-
-@patch("slack_sdk.WebClient.__new__")
 class SendUnknownUserAlertToOperationsEngineering(unittest.TestCase):
 
     def test_downstream_services_called(self, mock_slack_client: MagicMock):
