@@ -5,7 +5,6 @@ from textwrap import dedent
 from urllib.parse import quote
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from services.sentry_service import UsageStats
 
 
 class SlackService:
@@ -21,67 +20,6 @@ class SlackService:
 
     def __init__(self, slack_token: str) -> None:
         self.slack_client = WebClient(slack_token)
-
-    def send_usage_alert_to_operations_engineering(
-        self, period_in_days: int, usage_stats: UsageStats, usage_threshold: float, category: str
-    ):
-        category_lower = category.lower()
-        category_capitalised = category.capitalize()
-        self.slack_client.chat_postMessage(
-            channel=self.OPERATIONS_ENGINEERING_ALERTS_CHANNEL_ID,
-            mrkdown=True,
-            blocks=[
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": dedent(f"""
-                            :warning: *Sentry {category_capitalised} Usage Alert :sentry::warning:*
-                            - Usage threshold: {usage_threshold:.0%}
-                            - Period: {period_in_days} {'days' if period_in_days > 1 else 'day'}
-                            - Max usage for period: {usage_stats.max_usage} {category_capitalised}s
-                            - {category_capitalised}s consumed over period: {usage_stats.total}
-                            - Percentage consumed: {usage_stats.percentage_of_quota_used:.0%}
-                        """).strip("\n")
-                    }
-                },
-                {
-                    "type": "divider"
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"Check Sentry for projects with excessive {category_lower}s :eyes:"
-                    },
-                    "accessory": {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": f":sentry: {category_capitalised} usage for period",
-                            "emoji": True
-                        },
-                        "url": f"https://ministryofjustice.sentry.io/stats/?dataCategory={category_lower}s&end={quote(usage_stats.end_time.strftime(self.DATE_FORMAT))}&sort=-accepted&start={quote(usage_stats.start_time.strftime(self.DATE_FORMAT))}&utc=true"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "See Sentry usage alert runbook for help with this alert"
-                    },
-                    "accessory": {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": ":blue_book: Runbook",
-                            "emoji": True
-                        },
-                        "url": self.SENTRY_QUOTA_MANAGEMENT_GUIDANCE
-                    }
-                }
-            ]
-        )
 
     def send_slack_support_stats_report(self, support_statistics):
         message = (
