@@ -18,30 +18,11 @@ class SlackService:
     def __init__(self, slack_token: str) -> None:
         self.slack_client = WebClient(slack_token)
 
-    def send_slack_support_stats_report(self, support_statistics):
-        message = (
-            f"*Slack Support Stats Report*\n\n"
-            f"Here an overview of our recent support statistics:\n"
-            f"{support_statistics}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
     def send_dormant_user_list(self, user_list, days_since: str):
         message = (
             f"*Dormant User Report*\n\n"
             f"Here is a list of dormant GitHub users that have not been seen in Auth0 logs for {days_since} days:\n"
             f"{user_list}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_pat_report_alert(self):
-        message = (
-            "*Expired PAT Report*\n\n"
-            "Some expired PAT(s) have been detected.\n\n"
-            "Please review the current list here:\n"
-            "https://github.com/organizations/ministryofjustice/settings/personal-access-tokens/active"
         )
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
