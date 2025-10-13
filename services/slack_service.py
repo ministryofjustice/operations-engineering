@@ -1,8 +1,6 @@
 # pylint: disable=C0411, R0917
 
 import logging
-from textwrap import dedent
-from urllib.parse import quote
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
