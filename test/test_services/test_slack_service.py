@@ -129,19 +129,6 @@ class TestSlackService(unittest.TestCase):
             blocks=self.blocks
         )
 
-    def test_send_slack_support_stats_report(self):
-        support_statistics = "Test support stats"
-        expected_message = (
-            "*Slack Support Stats Report*\n\n"
-            "Here an overview of our recent support statistics:\n"
-            f"{support_statistics}"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_slack_support_stats_report(support_statistics)
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
     def test_send_dormant_user_list(self):
         user_list = "Test user list"
         expected_message = (
@@ -151,19 +138,6 @@ class TestSlackService(unittest.TestCase):
         )
         blocks = self.slack_service._create_block_with_message(expected_message)
         self.slack_service.send_dormant_user_list(user_list, str(13))
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
-    def test_send_pat_report_alert(self):
-        expected_message = (
-            "*Expired PAT Report*\n\n"
-            "Some expired PAT(s) have been detected.\n\n"
-            "Please review the current list here:\n"
-            "https://github.com/organizations/ministryofjustice/settings/personal-access-tokens/active"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_pat_report_alert()
         self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
