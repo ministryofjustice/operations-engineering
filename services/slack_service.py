@@ -36,69 +36,8 @@ class SlackService:
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
-    def send_remove_users_from_github_alert_to_operations_engineering(
-        self, number_of_users: int, organisation_name: str
-    ):
-        message = (
-            f"*Dormant Users Automation*\n\n"
-            f"Removed {number_of_users} users from the {organisation_name} GitHub Organisation.\n\n"
-            f"See the GH Action for more info: {self.OPERATION_ENGINEERING_REPOSITORY_URL}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_unused_circleci_context_alert_to_operations_engineering(self, number_of_contexts: int):
-        message = (
-            f"*Unused CircleCI Contexts*\n\n"
-            f"A total of {number_of_contexts} unused CircleCI contexts have been detected.\n\n"
-            f"Please see the GH Action for more information: {self.OPERATION_ENGINEERING_REPOSITORY_URL}"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_undelivered_email_alert_to_operations_engineering(
-        self, email_addresses: list, organisation_name: str
-    ):
-        message = (
-            f"*Dormant Users Automation*\n\n"
-            f"Undelivered emails for {organisation_name} GitHub Organisation:\n"
-            f"{email_addresses}\n\n"
-            f"Remove these users manually."
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_alert_for_poc_repositories(self, repositories):
-        message = (
-            "The following POC GitHub Repositories persist:\n\n"
-            + "\n".join([f"https://github.com/ministryofjustice/{repo} - {age} days old" for repo, age in repositories.items()])
-            + "\n\nConsider if they are still required. If not, please archive them by removing them from the Terraform configuration: https://github.com/ministryofjustice/operations-engineering/tree/main/terraform/github/repositories/ministryofjustice"
-        )
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
     def send_remove_users_slack_message(self, number_of_users: int, organisation_name: str):
         message = f"*Dormant Users Automation*\nRemoved {number_of_users} users from the {organisation_name} GitHub Organisation.\nSee the GH Action for more info: {self.OPERATION_ENGINEERING_REPOSITORY_URL}"
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_unknown_users_slack_message(self, unknown_users: list):
-        message = f"*Dormant Users Automation*\nRemove these users from the Dormant Users allow list:\n{unknown_users}"
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_undelivered_emails_slack_message(self, email_addresses: list, organisation_name: str):
-        message = f"*Dormant Users Automation*\nUndelivered emails for {organisation_name} GitHub Organisation:\n{email_addresses}\nRemove these users manually"
-        blocks = self._create_block_with_message(message)
-        self._send_alert_to_operations_engineering(blocks)
-
-    def send_github_rejoin_report(self, total_removed_moj, total_rejoined_moj, error_rate_moj):
-        message = (
-            f"*Erroneous User Removal Report*\n\n"
-            f"Over the past week:\n\n"
-            f"We have removed {total_removed_moj} users, with {total_rejoined_moj} since rejoining.\n\n"
-            f"Our erroneous removal rate for users is {error_rate_moj}%."
-        )
         blocks = self._create_block_with_message(message)
         self._send_alert_to_operations_engineering(blocks)
 
