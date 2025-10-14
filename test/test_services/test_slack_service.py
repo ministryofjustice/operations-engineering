@@ -169,19 +169,6 @@ class TestSlackService(unittest.TestCase):
             channel="C033QBE511V", mrkdown=True, blocks=blocks
         )
 
-    def test_send_unused_circleci_context_alert(self):
-        number_of_contexts = 4
-        expected_message = (
-            "*Unused CircleCI Contexts*\n\n"
-            f"A total of {number_of_contexts} unused CircleCI contexts have been detected.\n\n"
-            f"Please see the GH Action for more information: https://github.com/ministryofjustice/operations-engineering"
-        )
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_unused_circleci_context_alert_to_operations_engineering(number_of_contexts)
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V", mrkdown=True, blocks=blocks
-        )
-
     def test_send_unknown_users_slack_message(self):
         self.slack_service.send_unknown_users_slack_message(
             ["some-user1", "some-user2", "some-user3"])
@@ -235,27 +222,6 @@ class TestSlackService(unittest.TestCase):
                     }
                 }
             ]
-        )
-
-    def test_send_github_rejoin_report(self):
-        total_removed_moj = 10
-        total_rejoined_moj = 2
-        error_rate_moj = 20.0
-
-        expected_message = (
-            f"*Erroneous User Removal Report*\n\n"
-            f"Over the past week:\n\n"
-            f"We have removed {total_removed_moj} users, with {total_rejoined_moj} since rejoining.\n\n"
-            f"Our erroneous removal rate for users is {error_rate_moj}%."
-        )
-
-        blocks = self.slack_service._create_block_with_message(expected_message)
-        self.slack_service.send_github_rejoin_report(total_removed_moj, total_rejoined_moj, error_rate_moj)
-
-        self.mock_slack_client.return_value.chat_postMessage.assert_called_once_with(
-            channel="C033QBE511V",
-            mrkdown=True,
-            blocks=blocks
         )
 
 
