@@ -1244,15 +1244,6 @@ class GithubService:
         raise ValueError(f"Failed to fetch PAT list: {response.status_code}, error: {response}")
 
     @retries_github_rate_limit_exception_at_next_reset_once
-    def get_all_enterprise_members(self) -> list:
-        all_users = []
-
-        for org in self.organisations_in_enterprise:
-            all_users = all_users + [user.login for user in self.github_client_core_api.get_organization(org).get_members() if user.login not in all_users]
-
-        return all_users
-
-    @retries_github_rate_limit_exception_at_next_reset_once
     def calculate_repo_age(self, repo: str) -> list:
         creation_date = self.github_client_core_api.get_repo(f"{self.organisation_name}/{repo}").created_at
 
