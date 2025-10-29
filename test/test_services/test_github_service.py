@@ -1786,20 +1786,6 @@ class TestGithubServicePATRetrieval(unittest.TestCase):
 @patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
 @patch("gql.Client.__new__", new=MagicMock)
 @patch("github.Github.__new__")
-class TestGithubServiceGetAllEnterpriseMembers(unittest.TestCase):
-
-    def test_get_all_enterprise_members(self, mock_github_client_core_api):
-        mock_github_client_core_api.return_value.get_organization().get_members.return_value = [
-            Mock(NamedUser),
-            Mock(NamedUser),
-        ]
-        response = GithubService("", ORGANISATION_NAME).get_all_enterprise_members()
-        self.assertEqual(2, len(response))
-
-
-@patch("gql.transport.aiohttp.AIOHTTPTransport.__new__", new=MagicMock)
-@patch("gql.Client.__new__", new=MagicMock)
-@patch("github.Github.__new__")
 class TestGetOldPOCRepositories(unittest.TestCase):
 
     @freeze_time("2024-10-24")
